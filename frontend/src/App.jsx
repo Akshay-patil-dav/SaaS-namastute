@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard.jsx';
 import Dashboard2 from './pages/Dashboard2.jsx';
 import SalesDashboard from './pages/SalesDashboard.jsx';
+import SuperDashboard from './pages/SuperDashboard.jsx';
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
 import AppLayout from './components/layout/AppLayout';
 import PosLayout from './components/layout/PosLayout';
@@ -42,6 +43,14 @@ function AppRoutes() {
                     <ProtectedRoute>
                         {/* Swapped AppLayout to PosLayout for the new UI */}
                         <PosLayout><Dashboard /></PosLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/dashboard/super-dashboard"
+                element={
+                    <ProtectedRoute>
+                        <PosLayout><SuperDashboard /></PosLayout>
                     </ProtectedRoute>
                 }
             />

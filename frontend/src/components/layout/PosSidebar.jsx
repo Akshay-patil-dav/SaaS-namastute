@@ -101,6 +101,38 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 </div>
                                 <ChevronRight className="pos-menu-chevron" />
                             </a>
+                            <ul className={`pos-submenu ${openMenus.superAdmin ? 'show' : ''}`}>
+                                <li>
+                                    <NavLink to="/dashboard/super-dashboard" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                        Dashboard
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink to="/dashboard/super-companies" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                        Companies
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink to="/dashboard/super-subscriptions" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                        Subscriptions
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink to="/dashboard/super-packages" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                        Packages
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink to="/dashboard/super-domain" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                        Domain
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink to="/dashboard/super-purchase-transaction" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                        Purchase Transaction
+                                    </NavLink>
+                                </li>
+                            </ul>
                         </li>
                         <li className="pos-menu-item">
                             <a className={`pos-menu-link ${openMenus.application ? 'open' : ''}`} onClick={() => toggleMenu('application')}>
