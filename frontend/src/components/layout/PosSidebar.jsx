@@ -39,15 +39,28 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     });
 
     React.useEffect(() => {
-        setOpenMenus(prev => ({
-            ...prev,
-            dashboard: isDashboardActive ? true : prev.dashboard,
-            superAdmin: isSuperAdminActive ? true : prev.superAdmin
-        }));
+        // When the route changes, ensure only the active section is open
+        if (isDashboardActive) {
+            setOpenMenus({ dashboard: true, superAdmin: false });
+        } else if (isSuperAdminActive) {
+            setOpenMenus({ dashboard: false, superAdmin: true });
+        }
     }, [isDashboardActive, isSuperAdminActive]);
 
     const toggleMenu = (menu) => {
-        setOpenMenus(prev => ({ ...prev, [menu]: !prev[menu] }));
+        setOpenMenus(prev => {
+            const isCurrentlyOpen = prev[menu];
+            // Close everything first
+            const newState = {
+                dashboard: false,
+                superAdmin: false
+            };
+            // If it wasn't open, open it (accordion effect)
+            if (!isCurrentlyOpen) {
+                newState[menu] = true;
+            }
+            return newState;
+        });
     };
 
     return (
