@@ -30,18 +30,27 @@ import {
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
 
+    const isDashboardActive = location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/dashboard/admin2' || location.pathname === '/dashboard/sales';
+    const isSuperAdminActive = location.pathname.startsWith('/dashboard/super-');
+
     const [openMenus, setOpenMenus] = useState({
-        dashboard: location.pathname.startsWith('/dashboard') || location.pathname === '/',
-        superAdmin: false,
+        dashboard: isDashboardActive,
+        superAdmin: isSuperAdminActive,
         application: false,
         layouts: false
     });
 
+    React.useEffect(() => {
+        setOpenMenus(prev => ({
+            ...prev,
+            dashboard: isDashboardActive ? true : prev.dashboard,
+            superAdmin: isSuperAdminActive ? true : prev.superAdmin
+        }));
+    }, [isDashboardActive, isSuperAdminActive]);
+
     const toggleMenu = (menu) => {
         setOpenMenus(prev => ({ ...prev, [menu]: !prev[menu] }));
     };
-
-    const isDashboardActive = location.pathname.startsWith('/dashboard') || location.pathname === '/';
 
     return (
         <>
@@ -56,7 +65,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                 <div className="pos-sidebar-header">
                     <a href="/dashboard" className="pos-sidebar-logo">
                         <ShoppingBag className="pos-logo-icon" />
-                        <span style={{color: '#1a1a1a'}}>DREAM</span><span className="pos-logo-text-orange">POS</span>
+                        <span style={{color: '#1a1a1a', fontWeight: '800'}}>Namustute</span>
                     </a>
                 </div>
 
@@ -94,7 +103,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
                         </li>
                         <li className="pos-menu-item">
-                            <a className={`pos-menu-link ${openMenus.superAdmin ? 'open' : ''}`} onClick={() => toggleMenu('superAdmin')}>
+                            <a className={`pos-menu-link ${isSuperAdminActive ? 'active' : ''} ${openMenus.superAdmin ? 'open' : ''}`} onClick={() => toggleMenu('superAdmin')}>
                                 <div className="pos-menu-link-content">
                                     <UserCog className="pos-menu-icon" />
                                     <span>Super Admin</span>
