@@ -28,6 +28,7 @@ export default function SuperCompanies() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const tableData = [
     {
@@ -122,6 +123,12 @@ export default function SuperCompanies() {
     }
   ];
 
+  const filteredData = tableData.filter(item => 
+    item.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.url.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="super-companies-page">
       {/* Header */}
@@ -133,7 +140,7 @@ export default function SuperCompanies() {
         <div className="sc-header-actions">
           <button className="sc-btn-icon-square" title="Export PDF"><FileText size={16} color="#ef4444" /></button>
           <button className="sc-btn-icon-square" title="Export Excel"><FileSpreadsheet size={16} color="#22c55e" /></button>
-          <button className="sc-btn-icon-square" title="Refresh"><RefreshCw size={16} /></button>
+          <button className="sc-btn-icon-square" title="Refresh" onClick={() => window.location.reload()}><RefreshCw size={16} /></button>
           <button className="sc-btn-icon-square" title="Collapse"><ChevronUp size={16} /></button>
           <button className="sc-btn-add" onClick={() => setIsAddModalOpen(true)}>
             <PlusCircle size={16} /> Add Company
@@ -210,7 +217,13 @@ export default function SuperCompanies() {
         <div className="sc-table-controls">
           <div className="sc-search-wrap">
             <Search size={16} />
-            <input type="text" className="sc-search-input" placeholder="Search" />
+            <input 
+              type="text" 
+              className="sc-search-input" 
+              placeholder="Search" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <div className="sc-filters-wrap">
             <select className="sc-filter-select sc-select">
@@ -240,38 +253,46 @@ export default function SuperCompanies() {
               </tr>
             </thead>
             <tbody>
-              {tableData.map((row, index) => (
-                <tr key={index}>
-                  <td><input type="checkbox" className="sc-checkbox" /></td>
-                  <td>
-                    <div className="sc-company-info">
-                      <div className="sc-company-logo">
-                        {row.logo}
+              {filteredData.length > 0 ? (
+                filteredData.map((row, index) => (
+                  <tr key={index}>
+                    <td><input type="checkbox" className="sc-checkbox" /></td>
+                    <td>
+                      <div className="sc-company-info">
+                        <div className="sc-company-logo">
+                          {row.logo}
+                        </div>
+                        {row.company}
                       </div>
-                      {row.company}
-                    </div>
-                  </td>
-                  <td>{row.email}</td>
-                  <td>{row.url}</td>
-                  <td>
-                    {row.plan}
-                    <span className="sc-badge-upgrade">Upgrade</span>
-                  </td>
-                  <td>{row.date}</td>
-                  <td>
-                    <span className={`sc-status-badge ${row.status === 'Active' ? 'sc-status-active' : 'sc-status-inactive'}`}>
-                      {row.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="sc-actions-group">
-                      <button className="sc-action-btn" title="View"><Eye size={14} /></button>
-                      <button className="sc-action-btn" title="Edit"><Edit size={14} /></button>
-                      <button className="sc-action-btn" title="Delete"><Trash2 size={14} /></button>
-                    </div>
+                    </td>
+                    <td>{row.email}</td>
+                    <td>{row.url}</td>
+                    <td>
+                      {row.plan}
+                      <span className="sc-badge-upgrade">Upgrade</span>
+                    </td>
+                    <td>{row.date}</td>
+                    <td>
+                      <span className={`sc-status-badge ${row.status === 'Active' ? 'sc-status-active' : 'sc-status-inactive'}`}>
+                        {row.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="sc-actions-group">
+                        <button className="sc-action-btn" title="View"><Eye size={14} /></button>
+                        <button className="sc-action-btn" title="Edit"><Edit size={14} /></button>
+                        <button className="sc-action-btn" title="Delete"><Trash2 size={14} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#888' }}>
+                    No matching companies found
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

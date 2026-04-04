@@ -35,9 +35,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
     const [openMenus, setOpenMenus] = useState({
         dashboard: isDashboardActive,
-        superAdmin: isSuperAdminActive,
-        application: false,
-        layouts: false
+        superAdmin: isSuperAdminActive
     });
 
     React.useEffect(() => {
@@ -131,35 +129,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         Packages
                                     </NavLink>
                                 </li>
-                                <li>
-                                    <NavLink to="/dashboard/super-domain" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                        Domain
-                                    </NavLink>
-                                </li>
-                                <li>
-                                    <NavLink to="/dashboard/super-purchase-transaction" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                        Purchase Transaction
-                                    </NavLink>
-                                </li>
                             </ul>
-                        </li>
-                        <li className="pos-menu-item">
-                            <a className={`pos-menu-link ${openMenus.application ? 'open' : ''}`} onClick={() => toggleMenu('application')}>
-                                <div className="pos-menu-link-content">
-                                    <Layers className="pos-menu-icon" />
-                                    <span>Application</span>
-                                </div>
-                                <ChevronRight className="pos-menu-chevron" />
-                            </a>
-                        </li>
-                        <li className="pos-menu-item">
-                            <a className={`pos-menu-link ${openMenus.layouts ? 'open' : ''}`} onClick={() => toggleMenu('layouts')}>
-                                <div className="pos-menu-link-content">
-                                    <Layout className="pos-menu-icon" />
-                                    <span>Layouts</span>
-                                </div>
-                                <ChevronRight className="pos-menu-chevron" />
-                            </a>
                         </li>
                     </ul>
 

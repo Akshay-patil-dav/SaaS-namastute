@@ -7,6 +7,8 @@ import Dashboard2 from './pages/Dashboard2.jsx';
 import SalesDashboard from './pages/SalesDashboard.jsx';
 import SuperDashboard from './pages/SuperDashboard.jsx';
 import SuperCompanies from './pages/SuperCompanies.jsx';
+import SuperSubscriptions from './pages/SuperSubscriptions.jsx';
+import SuperPackages from './pages/SuperPackages.jsx';
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
 import AppLayout from './components/layout/AppLayout';
 import PosLayout from './components/layout/PosLayout';
@@ -60,6 +62,22 @@ function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <PosLayout><SuperCompanies /></PosLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/dashboard/super-subscriptions"
+                element={
+                    <ProtectedRoute>
+                        <PosLayout><SuperSubscriptions /></PosLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/dashboard/super-packages"
+                element={
+                    <ProtectedRoute>
+                        <PosLayout><SuperPackages /></PosLayout>
                     </ProtectedRoute>
                 }
             />
