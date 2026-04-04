@@ -2,114 +2,136 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard.jsx';
+import Dashboard2 from './pages/Dashboard2.jsx';
+import SalesDashboard from './pages/SalesDashboard.jsx';
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
-import AdminLayout from './components/layout/AdminLayout';
-
-import PageBuilder from './pages/PageBuilder';
-import AcceptInvite from './pages/AcceptInvite';
-import { WorkspaceProvider } from './context/WorkspaceContext';
-import { RealtimeProvider } from './context/RealtimeContext';
+import AppLayout from './components/layout/AppLayout';
+import PosLayout from './components/layout/PosLayout';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import UserManagement from './pages/admin/UserManagement';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminContent from './pages/admin/AdminContent';
+import AdminRoles from './pages/admin/AdminRoles';
+import AdminNotifications from './pages/admin/AdminNotifications';
 
 const ProtectedRoute = ({ children }) => {
     const { user, loading } = useAuth();
-    
-    if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
-    
-    if (!user) {
-        return <Navigate to="/" replace />;
-    }
-    
+    if (loading) return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>;
+    if (!user) return <Navigate to="/" replace />;
     return children;
 };
 
 const PublicRoute = ({ children }) => {
     const { user, loading } = useAuth();
-    
-    if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
-    
-    if (user) {
-        return <Navigate to="/dashboard" replace />;
-    }
-    
+    if (loading) return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>;
+    if (user) return <Navigate to="/dashboard" replace />;
     return children;
 };
 
 function AppRoutes() {
     return (
         <Routes>
-            <Route 
-                path="/" 
-                element={
-                    <PublicRoute>
-                        <Login />
-                    </PublicRoute>
-                } 
-            />
-            <Route 
-                path="/register" 
-                element={
-                    <PublicRoute>
-                        <Register />
-                    </PublicRoute>
-                } 
-            />
-            <Route 
-                path="/dashboard" 
+            <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+            <Route
+                path="/dashboard"
                 element={
                     <ProtectedRoute>
-                        <AdminLayout>
-                            <Dashboard />
-                        </AdminLayout>
+                        {/* Swapped AppLayout to PosLayout for the new UI */}
+                        <PosLayout><Dashboard /></PosLayout>
                     </ProtectedRoute>
-                } 
+                }
             />
-            <Route 
-                path="/page-builder" 
+            <Route
+                path="/dashboard/admin2"
                 element={
                     <ProtectedRoute>
-                        <AdminLayout>
-                            <PageBuilder />
-                        </AdminLayout>
+                        <PosLayout><Dashboard2 /></PosLayout>
                     </ProtectedRoute>
-                } 
+                }
             />
-            <Route 
-                path="/page-builder/:pageId" 
+            <Route
+                path="/dashboard/sales"
                 element={
                     <ProtectedRoute>
-                        <AdminLayout>
-                            <PageBuilder />
-                        </AdminLayout>
+                        <PosLayout><SalesDashboard /></PosLayout>
                     </ProtectedRoute>
-                } 
-            />
-            <Route 
-                path="/invite/accept/:token" 
-                element={
-                    <ProtectedRoute>
-                        <AcceptInvite />
-                    </ProtectedRoute>
-                } 
+                }
             />
             <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+
+            {/* Admin Routes */}
+            <Route
+                path="/admin"
+                element={
+                    <ProtectedRoute>
+                        <AdminLayout><AdminDashboard /></AdminLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/users"
+                element={
+                    <ProtectedRoute>
+                        <AdminLayout><UserManagement /></AdminLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/analytics"
+                element={
+                    <ProtectedRoute>
+                        <AdminLayout><AdminAnalytics /></AdminLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/content"
+                element={
+                    <ProtectedRoute>
+                        <AdminLayout><AdminContent /></AdminLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/roles"
+                element={
+                    <ProtectedRoute>
+                        <AdminLayout><AdminRoles /></AdminLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/notifications"
+                element={
+                    <ProtectedRoute>
+                        <AdminLayout><AdminNotifications /></AdminLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/settings"
+                element={
+                    <ProtectedRoute>
+                        <AdminLayout><AdminSettings /></AdminLayout>
+                    </ProtectedRoute>
+                }
+            />
+
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );
 }
 
-function App() {
+export default function App() {
     return (
         <AuthProvider>
-            <WorkspaceProvider>
-                <RealtimeProvider>
-                    <BrowserRouter>
-                        <AppRoutes />
-                    </BrowserRouter>
-                </RealtimeProvider>
-            </WorkspaceProvider>
+            <BrowserRouter>
+                <AppRoutes />
+            </BrowserRouter>
         </AuthProvider>
     );
 }
-
-export default App;

@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "@tailwindcss/vite": "^4.2.2",
     "axios": "^1.13.6",
+    "bootstrap": "^5.3.8",
     "lucide-react": "^0.577.0",
     "pg": "^8.20.0",
     "react": "^19.2.4",
@@ -19,6 +21,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",
+    "recharts": "^3.8.1",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {

@@ -1,0 +1,132 @@
+/* Dashboard 2 Specific Styling */
+
+.dash2-wrapper {
+    background-color: #f7f9fb;
+    min-height: 100vh;
+    padding: 1.5rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #334155;
+    overflow-x: hidden;
+}
+
+.dash2-card {
+    background: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    height: 100%;
+}
+
+/* Top white basic cards */
+.dash2-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.icon-box-orange { background-color: #fff1e6; color: #f97316; }
+.icon-box-green { background-color: #e6fcf5; color: #10b981; }
+.icon-box-blue { background-color: #e0f2fe; color: #0ea5e9; }
+.icon-box-red { background-color: #ffe4e6; color: #f43f5e; }
+
+.dash2-val {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+}
+.dash2-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Colored middle cards */
+.dash2-color-card {
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+.bg-orange { background-color: #f97316; }
+.bg-blue { background-color: #0ea5e9; }
+.bg-navy { background-color: #1e293b; }
+.bg-green { background-color: #22c55e; }
+
+.dash2-color-val { font-size: 1.5rem; font-weight: 700; margin-bottom: 0; }
+.dash2-color-label { font-size: 0.75rem; font-weight: 500; opacity: 0.9; margin-bottom: 0;}
+
+/* Titles */
+.dash2-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+.dash2-link {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #334155;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Tables */
+.dash2-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+.dash2-table th {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+.dash2-table td {
+    padding: 1rem;
+    font-size: 0.8rem;
+    color: #475569;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+.dash2-table-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    object-fit: contain;
+    background-color: #f8fafc;
+    padding: 2px;
+}
+.dash2-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Form Check overrides */
+.dash2-checkbox {
+    width: 1rem;
+    height: 1rem;
+    border-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+/* Small action buttons */
+.dash2-action-btn {
+    padding: 0.35rem;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    border-radius: 4px;
+    color: #64748b;
+    margin-left: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.dash2-action-btn:hover {
+    background: #f1f5f9;
+}

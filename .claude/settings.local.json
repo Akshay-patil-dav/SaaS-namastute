@@ -3,7 +3,13 @@
     "allow": [
       "Bash(find frontend:*)",
       "Bash(npm install:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(findstr \"^D\")",
+      "Bash(git checkout:*)",
+      "Bash(find src/main/java -name \"*.java\" -exec javac -d /tmp/compiled -sourcepath src/main/java {} +)",
+      "Bash(mvn compile:*)",
+      "Bash(./mvnw compile:*)",
+      "Bash(/c/Users/aksha/OneDrive/Desktop/Namustutam/SaaS-namastute/backend/mvnw compile:*)"
     ]
   }
 }

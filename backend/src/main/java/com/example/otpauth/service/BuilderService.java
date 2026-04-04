@@ -90,23 +90,6 @@ public class BuilderService {
         return dto;
     }
 
-    @Transactional
-    public void movePage(String email, String pageId, MovePageRequest request) {
-        Long pId = Long.parseLong(pageId.replace("p", ""));
-        Long fId = Long.parseLong(request.folderId.replace("f", ""));
-        
-        CustomPage page = pageRepo.findById(pId).orElseThrow();
-        PageFolder targetFolder = folderRepo.findById(fId).orElseThrow();
-        
-        // Security check: ensure they belong to the user or are shared
-        if (!hasAccess(page.getUser(), email, targetFolder)) {
-            throw new RuntimeException("Unauthorized action");
-        }
-
-        page.setFolder(targetFolder);
-        pageRepo.save(page);
-    }
-
     @Transactional(readOnly = true)
     public List<PageBlockDto> getPageBlocks(String email, String pageId) {
         Long pId = Long.parseLong(pageId.replace("p", ""));

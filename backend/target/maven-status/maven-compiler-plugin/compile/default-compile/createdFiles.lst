@@ -7,6 +7,7 @@ com\example\otpauth\repository\PageBlockRepository.class
 com\example\otpauth\dto\BuilderDto.class
 com\example\otpauth\repository\FolderInvitationRepository.class
 com\example\otpauth\service\SmsService.class
+com\example\otpauth\dto\BuilderDto$UpdateIconRequest.class
 com\example\otpauth\dto\BuilderDto$CreateFolderRequest.class
 com\example\otpauth\dto\BuilderDto$PageBlockDto.class
 com\example\otpauth\model\PageBlock.class

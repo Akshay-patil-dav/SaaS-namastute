@@ -7,6 +7,12 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token') || null);
     const [loading, setLoading] = useState(true);
 
+    // Check if user has admin role
+    const isAdmin = () => {
+        if (!user || !user.roles) return false;
+        return user.roles.includes('ADMIN') || user.roles.includes('SUPER_ADMIN') || user.roles.includes('ROLE_ADMIN');
+    };
+
     useEffect(() => {
         if (token) {
             localStorage.setItem('token', token);
@@ -41,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, logout, isAdmin }}>
             {children}
         </AuthContext.Provider>
     );
