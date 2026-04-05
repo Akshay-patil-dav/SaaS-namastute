@@ -98,12 +98,12 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             <ul className={`pos-submenu ${openMenus.dashboard ? 'show' : ''}`}>
                                 <li>
                                     <NavLink to="/dashboard" end className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                        <Square size={6} className="me-2" fill="currentColor" /> Admin Dashboard
+                                        Admin Dashboard
                                     </NavLink>
                                 </li>
                                 <li>
                                     <NavLink to="/dashboard/admin2" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                        <Circle size={6} className="me-2" fill="currentColor" /> Admin Dashboard 2
+                                Admin Dashboard 2
                                     </NavLink>
                                 </li>
                                 <li>
