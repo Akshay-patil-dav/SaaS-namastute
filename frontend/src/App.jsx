@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import { AuthProvider } from './context/AuthContext';
 import Dashboard from './pages/Dashboard.jsx';
 import Dashboard2 from './pages/Dashboard2.jsx';
 import SalesDashboard from './pages/SalesDashboard.jsx';
@@ -9,8 +7,6 @@ import SuperDashboard from './pages/SuperDashboard.jsx';
 import SuperCompanies from './pages/SuperCompanies.jsx';
 import SuperSubscriptions from './pages/SuperSubscriptions.jsx';
 import SuperPackages from './pages/SuperPackages.jsx';
-import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
-import AppLayout from './components/layout/AppLayout';
 import PosLayout from './components/layout/PosLayout';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
@@ -20,144 +16,188 @@ import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminContent from './pages/admin/AdminContent';
 import AdminRoles from './pages/admin/AdminRoles';
 import AdminNotifications from './pages/admin/AdminNotifications';
-
-const ProtectedRoute = ({ children }) => {
-    const { user, loading } = useAuth();
-    if (loading) return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>;
-    if (!user) return <Navigate to="/" replace />;
-    return children;
-};
-
-const PublicRoute = ({ children }) => {
-    const { user, loading } = useAuth();
-    if (loading) return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>;
-    if (user) return <Navigate to="/dashboard" replace />;
-    return children;
-};
+import ProductLayout from './components/layout/ProductLayout.jsx';
+import Products from './pages/Products.jsx';
+import CreateProduct from './pages/CreateProduct.jsx';
+import ExpiredProducts from './pages/ExpiredProducts.jsx';
+import LowStocks from './pages/LowStocks.jsx';
+import Category from './pages/Category.jsx';
+import SubCategory from './pages/SubCategory.jsx';
+import Brands from './pages/Brands.jsx';
+import Units from './pages/Units.jsx';
+import VariantAttributes from './pages/VariantAttributes.jsx';
+import Warranties from './pages/Warranties.jsx';
+import PrintBarcode from './pages/PrintBarcode.jsx';
+import PrintQRCode from './pages/PrintQRCode.jsx';
 
 function AppRoutes() {
     return (
         <Routes>
-            <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+            {/* Make Dashboard the root page */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            
             <Route
                 path="/dashboard"
                 element={
-                    <ProtectedRoute>
-                        {/* Swapped AppLayout to PosLayout for the new UI */}
-                        <PosLayout><Dashboard /></PosLayout>
-                    </ProtectedRoute>
+                    <PosLayout><Dashboard /></PosLayout>
                 }
             />
             <Route
                 path="/dashboard/super-dashboard"
                 element={
-                    <ProtectedRoute>
-                        <PosLayout><SuperDashboard /></PosLayout>
-                    </ProtectedRoute>
+                    <PosLayout><SuperDashboard /></PosLayout>
                 }
             />
             <Route
                 path="/dashboard/super-companies"
                 element={
-                    <ProtectedRoute>
-                        <PosLayout><SuperCompanies /></PosLayout>
-                    </ProtectedRoute>
+                    <PosLayout><SuperCompanies /></PosLayout>
                 }
             />
             <Route
                 path="/dashboard/super-subscriptions"
                 element={
-                    <ProtectedRoute>
-                        <PosLayout><SuperSubscriptions /></PosLayout>
-                    </ProtectedRoute>
+                    <PosLayout><SuperSubscriptions /></PosLayout>
                 }
             />
             <Route
                 path="/dashboard/super-packages"
                 element={
-                    <ProtectedRoute>
-                        <PosLayout><SuperPackages /></PosLayout>
-                    </ProtectedRoute>
+                    <PosLayout><SuperPackages /></PosLayout>
                 }
             />
             <Route
                 path="/dashboard/admin2"
                 element={
-                    <ProtectedRoute>
-                        <PosLayout><Dashboard2 /></PosLayout>
-                    </ProtectedRoute>
+                    <PosLayout><Dashboard2 /></PosLayout>
                 }
             />
             <Route
                 path="/dashboard/sales"
                 element={
-                    <ProtectedRoute>
-                        <PosLayout><SalesDashboard /></PosLayout>
-                    </ProtectedRoute>
+                    <PosLayout><SalesDashboard /></PosLayout>
                 }
             />
-            <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+            
+            {/* New Products Layout */}
+            <Route
+                path="/products"
+                element={
+                    <PosLayout><Products /></PosLayout>
+                }
+            />
+            <Route
+                path="/create-product"
+                element={
+                    <PosLayout><CreateProduct /></PosLayout>
+                }
+            />
+            <Route
+                path="/expired-products"
+                element={
+                    <PosLayout><ExpiredProducts /></PosLayout>
+                }
+            />
+            <Route
+                path="/low-stocks"
+                element={
+                    <PosLayout><LowStocks /></PosLayout>
+                }
+            />
+            <Route
+                path="/category"
+                element={
+                    <PosLayout><Category /></PosLayout>
+                }
+            />
+            <Route
+                path="/sub-category"
+                element={
+                    <PosLayout><SubCategory /></PosLayout>
+                }
+            />
+            <Route
+                path="/brands"
+                element={
+                    <PosLayout><Brands /></PosLayout>
+                }
+            />
+            <Route
+                path="/units"
+                element={
+                    <PosLayout><Units /></PosLayout>
+                }
+            />
+            <Route
+                path="/variant-attributes"
+                element={
+                    <PosLayout><VariantAttributes /></PosLayout>
+                }
+            />
+            <Route
+                path="/warranties"
+                element={
+                    <PosLayout><Warranties /></PosLayout>
+                }
+            />
+            <Route
+                path="/print-barcode"
+                element={
+                    <PosLayout><PrintBarcode /></PosLayout>
+                }
+            />
+            <Route
+                path="/print-qrcode"
+                element={
+                    <PosLayout><PrintQRCode /></PosLayout>
+                }
+            />
 
             {/* Admin Routes */}
             <Route
                 path="/admin"
                 element={
-                    <ProtectedRoute>
-                        <AdminLayout><AdminDashboard /></AdminLayout>
-                    </ProtectedRoute>
+                    <AdminLayout><AdminDashboard /></AdminLayout>
                 }
             />
             <Route
                 path="/admin/users"
                 element={
-                    <ProtectedRoute>
-                        <AdminLayout><UserManagement /></AdminLayout>
-                    </ProtectedRoute>
+                    <AdminLayout><UserManagement /></AdminLayout>
                 }
             />
             <Route
                 path="/admin/analytics"
                 element={
-                    <ProtectedRoute>
-                        <AdminLayout><AdminAnalytics /></AdminLayout>
-                    </ProtectedRoute>
+                    <AdminLayout><AdminAnalytics /></AdminLayout>
                 }
             />
             <Route
                 path="/admin/content"
                 element={
-                    <ProtectedRoute>
-                        <AdminLayout><AdminContent /></AdminLayout>
-                    </ProtectedRoute>
+                    <AdminLayout><AdminContent /></AdminLayout>
                 }
             />
             <Route
                 path="/admin/roles"
                 element={
-                    <ProtectedRoute>
-                        <AdminLayout><AdminRoles /></AdminLayout>
-                    </ProtectedRoute>
+                    <AdminLayout><AdminRoles /></AdminLayout>
                 }
             />
             <Route
                 path="/admin/notifications"
                 element={
-                    <ProtectedRoute>
-                        <AdminLayout><AdminNotifications /></AdminLayout>
-                    </ProtectedRoute>
+                    <AdminLayout><AdminNotifications /></AdminLayout>
                 }
             />
             <Route
                 path="/admin/settings"
                 element={
-                    <ProtectedRoute>
-                        <AdminLayout><AdminSettings /></AdminLayout>
-                    </ProtectedRoute>
+                    <AdminLayout><AdminSettings /></AdminLayout>
                 }
             />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
     );
 }

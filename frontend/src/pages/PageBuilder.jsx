@@ -143,13 +143,12 @@ const CanvasDropZone = ({ children, onDrop }) => {
 
 // Main PageBuilder Component
 function PageBuilderContent() {
-    const { user, token } = useAuth();
+    const { user } = useAuth();
     const { subscribe } = useRealtime();
     const { pageId } = useParams();
     const navigate = useNavigate();
 
-    // RBAC Check
-    const isClientOrAdmin = user?.roles?.some(role => ['CLIENT', 'OTHER', 'ROLE_CLIENT'].includes(role.toUpperCase()));
+    const isClientOrAdmin = true;
 
     // State
     const [activePageName, setActivePageName] = useState('Select a page');
@@ -159,13 +158,12 @@ function PageBuilderContent() {
     const [autoSaveStatus, setAutoSaveStatus] = useState('');
     const [isRealtimeUpdate, setIsRealtimeUpdate] = useState(false);
 
-    const axiosConfig = {
-        headers: { Authorization: `Bearer ${token}` }
-    };
+    const axiosConfig = {};
+    const token = null; // Token no longer used
 
     // --- DATA FETCH via URL Param ---
     useEffect(() => {
-        if (!isClientOrAdmin || !token) return;
+        if (!isClientOrAdmin) return;
 
         if (!pageId) {
             setCanvasBlocks([]);
@@ -462,20 +460,7 @@ function PageBuilderContent() {
         }
     };
 
-    // --- RENDER ---
-    if (!isClientOrAdmin) {
-        return (
-            <div className="flex h-[calc(100vh-100px)] items-center justify-center p-4">
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-red-100 text-center max-w-md w-full">
-                    <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Trash2 size={24} />
-                    </div>
-                    <h2 className="text-xl font-bold text-gray-800 mb-2">Access Denied</h2>
-                    <p className="text-gray-500 text-sm">This drag-and-drop page builder is restricted to CLIENT accounts only.</p>
-                </div>
-            </div>
-        );
-    }
+    // Access Denied block removed for open access
 
     return (
         <div className="h-[calc(100vh-70px)] md:h-[calc(100vh-100px)] -mt-2 -mx-2 md:-mx-6 flex flex-col md:flex-row overflow-hidden border-t border-gray-200 bg-white md:shadow-xl">

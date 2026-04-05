@@ -14,7 +14,7 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const { user, token } = useAuth();
 
-    const isClientOrAdmin = user?.roles?.some(role => ['CLIENT', 'OTHER', 'ROLE_CLIENT'].includes(role.toUpperCase()));
+    const isClientOrAdmin = true;
     const { refreshKey, triggerRefresh } = useWorkspace() || {};
 
     // Notion-style workspace state
@@ -37,9 +37,8 @@ export default function Sidebar() {
 
     // Fetch user workspace files for the sidebar tree
     const fetchWorkspace = () => {
-        if (!isClientOrAdmin || !token) return;
         setLoadingWorkspace(true);
-        axios.get('http://localhost:3000/api/builder/data', { headers: { Authorization: `Bearer ${token}` } })
+        axios.get('http://localhost:3000/api/builder/data')
             .then(res => {
                 const incoming = res.data.folders || [];
                 setFolders(prev => incoming.map(f => {
@@ -52,18 +51,17 @@ export default function Sidebar() {
             .finally(() => setLoadingWorkspace(false));
     };
 
-    useEffect(() => { fetchWorkspace(); }, [token, isClientOrAdmin, refreshKey]);
+    useEffect(() => { fetchWorkspace(); }, [refreshKey]);
 
     // Listen for real-time workspace changes from OTHER users via SSE
     useEffect(() => {
-        if (!token || !isClientOrAdmin) return;
-        const url = `http://localhost:3000/api/builder/notifications/stream?token=${token}`;
+        const url = `http://localhost:3000/api/builder/notifications/stream`;
         const es = new EventSource(url);
         es.addEventListener('workspace_change', () => {
             fetchWorkspace();
         });
         return () => es.close();
-    }, [token, isClientOrAdmin]);
+    }, []);
 
     const toggleFolder = (folderId) => {
         setFolders(folders.map(f => f.id === folderId ? { ...f, open: !f.open } : f));
@@ -94,9 +92,7 @@ export default function Sidebar() {
     const handleDeleteFolder = (folder) => {
         if (!window.confirm(`Delete folder "${folder.name}" and ALL its pages? This cannot be undone.`)) return;
         const numericId = folder.id.replace('f', '');
-        axios.delete(`http://localhost:3000/api/builder/folders/${numericId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(() => {
+        axios.delete(`http://localhost:3000/api/builder/folders/${numericId}`).then(() => {
             setFolders(prev => prev.filter(f => f.id !== folder.id));
             setPages(prev => prev.filter(p => p.folderId !== folder.id));
         }).catch(err => alert('Failed to delete folder: ' + (err.response?.data?.error || 'Unknown error')));
@@ -105,9 +101,7 @@ export default function Sidebar() {
     const handleDeletePage = (page) => {
         if (!window.confirm(`Delete page "${page.name}"? This cannot be undone.`)) return;
         const numericId = page.id.replace('p', '');
-        axios.delete(`http://localhost:3000/api/builder/pages/${numericId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(() => {
+        axios.delete(`http://localhost:3000/api/builder/pages/${numericId}`).then(() => {
             setPages(prev => prev.filter(p => p.id !== page.id));
         }).catch(err => alert('Failed to delete page: ' + (err.response?.data?.error || 'Unknown error')));
     };
@@ -116,8 +110,7 @@ export default function Sidebar() {
     const handleUpdateFolderIcon = (folder, iconName) => {
         const numericId = folder.id.replace('f', '');
         axios.put(`http://localhost:3000/api/builder/folders/${numericId}/icon`,
-            { icon: iconName },
-            { headers: { Authorization: `Bearer ${token}` } }
+            { icon: iconName }
         ).then(() => {
             setFolders(prev => prev.map(f => f.id === folder.id ? { ...f, icon: iconName } : f));
         }).catch(err => alert('Failed to update folder icon: ' + (err.response?.data?.error || 'Unknown error')));
@@ -126,8 +119,7 @@ export default function Sidebar() {
     const handleUpdatePageIcon = (page, iconName) => {
         const numericId = page.id.replace('p', '');
         axios.put(`http://localhost:3000/api/builder/pages/${numericId}/icon`,
-            { icon: iconName },
-            { headers: { Authorization: `Bearer ${token}` } }
+            { icon: iconName }
         ).then(() => {
             setPages(prev => prev.map(p => p.id === page.id ? { ...p, icon: iconName } : p));
         }).catch(err => alert('Failed to update page icon: ' + (err.response?.data?.error || 'Unknown error')));
@@ -159,8 +151,7 @@ export default function Sidebar() {
         setPages(prev => prev.map(p => p.id === draggedPageId ? { ...p, folderId: targetFolderId } : p));
 
         axios.put(`http://localhost:3000/api/builder/pages/${numericPageId}/move`,
-            { folderId: `f${numericFolderId}` },
-            { headers: { Authorization: `Bearer ${token}` } }
+            { folderId: `f${numericFolderId}` }
         ).catch(err => {
             setPages(prev => prev.map(p => p.id === draggedPageId ? { ...p, folderId: page.folderId } : p));
             alert('Failed to move page');
@@ -177,7 +168,7 @@ export default function Sidebar() {
     const confirmModal = () => {
         if (!modalInput.trim()) return;
 
-        const config = { headers: { Authorization: `Bearer ${token}` } };
+        const config = {};
 
         if (modal.type === 'FOLDER') {
             axios.post('http://localhost:3000/api/builder/folders', { name: modalInput }, config)

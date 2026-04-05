@@ -126,15 +126,15 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                     <User size={16} color="#888" /> Profile
                                 </button>
                                 <button 
-                                    style={{display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', borderTop: '1px solid #eaedf0', background: 'white', cursor: 'pointer', fontSize: '14px', color: '#ef4444', textAlign: 'left', transition: 'background 0.2s'}}
-                                    onMouseOver={(e) => e.currentTarget.style.background = '#fef2f2'}
+                                    style={{display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', borderTop: '1px solid #eaedf0', background: 'white', cursor: 'pointer', fontSize: '14px', color: '#6366f1', textAlign: 'left', transition: 'background 0.2s'}}
+                                    onMouseOver={(e) => e.currentTarget.style.background = '#f0f3ff'}
                                     onMouseOut={(e) => e.currentTarget.style.background = 'white'}
                                     onClick={() => {
                                         setProfileOpen(false);
-                                        if (logout) logout();
+                                        window.location.href = '/dashboard';
                                     }}
                                 >
-                                    <LogOut size={16} /> Logout
+                                    <MonitorDot size={16} /> Home
                                 </button>
                             </div>
                         </>
