@@ -104,7 +104,8 @@ function AppRoutes() {
                 path="/dashboard/sales-online"
                 element={
                     <PosLayout><OnlineOrders /></PosLayout>
-            
+                }
+            />
             {/* New Products Layout */}
             <Route
                 path="/products"
