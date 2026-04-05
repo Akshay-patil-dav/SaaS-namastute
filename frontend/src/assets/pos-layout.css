@@ -125,13 +125,21 @@ body {
 }
 
 /* Sidebar Menu */
+.pos-menu-divider {
+  height: 1px;
+  background-color: var(--pos-border);
+  margin: 15px 0 0;
+  width: 100%;
+  opacity: 0.6;
+}
+
 .pos-menu-section {
-  font-size: 11px;
-  text-transform: uppercase;
-  color: var(--pos-text-muted);
+  font-size: 12px;
+  color: var(--pos-dark-blue);
   font-weight: 700;
-  margin: 15px 20px 8px;
-  letter-spacing: 0.5px;
+  margin: 15px 20px 10px;
+  letter-spacing: 0.2px;
+  opacity: 0.9;
 }
 
 .pos-menu-list {
@@ -148,7 +156,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 8.5px 20px;
   color: var(--pos-text-main);
   text-decoration: none;
   font-weight: 500;
@@ -175,9 +183,9 @@ body {
 }
 
 .pos-menu-icon {
-  margin-right: 12px;
-  width: 18px;
-  height: 18px;
+  margin-right: 10px;
+  width: 16px;
+  height: 16px;
   text-align: center;
   color: var(--pos-text-muted);
 }
@@ -188,8 +196,8 @@ body {
 }
 
 .pos-menu-chevron {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   color: var(--pos-text-muted);
   transition: transform 0.2s;
 }
