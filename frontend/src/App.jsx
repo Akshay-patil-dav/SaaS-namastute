@@ -16,6 +16,19 @@ import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminContent from './pages/admin/AdminContent';
 import AdminRoles from './pages/admin/AdminRoles';
 import AdminNotifications from './pages/admin/AdminNotifications';
+import ProductLayout from './components/layout/ProductLayout.jsx';
+import Products from './pages/Products.jsx';
+import CreateProduct from './pages/CreateProduct.jsx';
+import ExpiredProducts from './pages/ExpiredProducts.jsx';
+import LowStocks from './pages/LowStocks.jsx';
+import Category from './pages/Category.jsx';
+import SubCategory from './pages/SubCategory.jsx';
+import Brands from './pages/Brands.jsx';
+import Units from './pages/Units.jsx';
+import VariantAttributes from './pages/VariantAttributes.jsx';
+import Warranties from './pages/Warranties.jsx';
+import PrintBarcode from './pages/PrintBarcode.jsx';
+import PrintQRCode from './pages/PrintQRCode.jsx';
 
 function AppRoutes() {
     return (
@@ -63,6 +76,80 @@ function AppRoutes() {
                 path="/dashboard/sales"
                 element={
                     <PosLayout><SalesDashboard /></PosLayout>
+                }
+            />
+            
+            {/* New Products Layout */}
+            <Route
+                path="/products"
+                element={
+                    <PosLayout><Products /></PosLayout>
+                }
+            />
+            <Route
+                path="/create-product"
+                element={
+                    <PosLayout><CreateProduct /></PosLayout>
+                }
+            />
+            <Route
+                path="/expired-products"
+                element={
+                    <PosLayout><ExpiredProducts /></PosLayout>
+                }
+            />
+            <Route
+                path="/low-stocks"
+                element={
+                    <PosLayout><LowStocks /></PosLayout>
+                }
+            />
+            <Route
+                path="/category"
+                element={
+                    <PosLayout><Category /></PosLayout>
+                }
+            />
+            <Route
+                path="/sub-category"
+                element={
+                    <PosLayout><SubCategory /></PosLayout>
+                }
+            />
+            <Route
+                path="/brands"
+                element={
+                    <PosLayout><Brands /></PosLayout>
+                }
+            />
+            <Route
+                path="/units"
+                element={
+                    <PosLayout><Units /></PosLayout>
+                }
+            />
+            <Route
+                path="/variant-attributes"
+                element={
+                    <PosLayout><VariantAttributes /></PosLayout>
+                }
+            />
+            <Route
+                path="/warranties"
+                element={
+                    <PosLayout><Warranties /></PosLayout>
+                }
+            />
+            <Route
+                path="/print-barcode"
+                element={
+                    <PosLayout><PrintBarcode /></PosLayout>
+                }
+            />
+            <Route
+                path="/print-qrcode"
+                element={
+                    <PosLayout><PrintQRCode /></PosLayout>
                 }
             />
 
