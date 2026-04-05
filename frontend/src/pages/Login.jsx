@@ -110,6 +110,15 @@ export default function Login() {
                             {loading ? 'Signing In...' : 'Sign In'}
                         </button>
 
+                        <button 
+                            type="button" 
+                            className="btn-signin" 
+                            style={{ marginTop: '10px', backgroundColor: '#6366f1' }}
+                            onClick={() => navigate('/dashboard')}
+                        >
+                            Explore as Guest
+                        </button>
+
                         <div className="register-link">
                             New on our platform? <Link to="/register">Create an account</Link>
                         </div>

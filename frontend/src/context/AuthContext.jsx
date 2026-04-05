@@ -1,50 +1,22 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('token') || null);
-    const [loading, setLoading] = useState(true);
+    // Hardcoded "Super Admin" user so all features are accessible
+    const [user] = useState({ 
+        identifier: 'super_admin_user', 
+        roles: ['SUPER_ADMIN'], 
+        isAuthenticated: true 
+    });
+    
+    const [token] = useState('guest_token');
+    const [loading] = useState(false);
 
-    // Check if user has admin role
-    const isAdmin = () => {
-        if (!user || !user.roles) return false;
-        return user.roles.includes('ADMIN') || user.roles.includes('SUPER_ADMIN') || user.roles.includes('ROLE_ADMIN');
-    };
-
-    useEffect(() => {
-        if (token) {
-            localStorage.setItem('token', token);
-            try {
-                const parts = token.split('.');
-                if (parts.length === 3) {
-                    const payload = JSON.parse(atob(parts[1]));
-                    setUser({ 
-                        identifier: payload.sub, 
-                        roles: payload.roles || ['CLIENT'], 
-                        isAuthenticated: true 
-                    });
-                } else {
-                    setUser({ isAuthenticated: true });
-                }
-            } catch (e) {
-                setUser({ isAuthenticated: true });
-            }
-        } else {
-            localStorage.removeItem('token');
-            setUser(null);
-        }
-        setLoading(false);
-    }, [token]);
-
-    const login = (jwtData) => {
-        setToken(jwtData.token);
-    };
-
-    const logout = () => {
-        setToken(null);
-    };
+    // Stub out methods so components using them don't crash
+    const isAdmin = () => true;
+    const login = () => {};
+    const logout = () => {};
 
     return (
         <AuthContext.Provider value={{ user, token, loading, login, logout, isAdmin }}>

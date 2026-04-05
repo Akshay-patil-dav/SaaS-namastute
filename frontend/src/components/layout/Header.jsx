@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Header({ onMenuClick }) {
-    const { user, logout, token } = useAuth();
+    const { user, isAdmin } = useAuth();
     const navigate = useNavigate();
     const { triggerRefresh } = useWorkspace() || {};
 
@@ -19,31 +19,24 @@ export default function Header({ onMenuClick }) {
     const notifRef = useRef(null);
     const profileRef = useRef(null);
 
-    const isClientOrAdmin = user?.roles?.some(r =>
-        ['CLIENT', 'OTHER', 'ROLE_CLIENT'].includes(r.toUpperCase())
-    );
+    const isClientOrAdmin = true;
 
     const fetchNotifications = useCallback(() => {
-        if (!token || !isClientOrAdmin) return;
         setNotifLoading(true);
-        axios.get('http://localhost:3000/api/builder/notifications', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        axios.get('http://localhost:3000/api/builder/notifications')
         .then(res => setNotifications(res.data || []))
         .catch(() => {})
         .finally(() => setNotifLoading(false));
-    }, [token, isClientOrAdmin]);
+    }, []);
 
     // On load: fetch any pending invitations the user missed while offline,
     // then open an SSE stream so future invitations arrive in real-time (0ms delay)
     useEffect(() => {
-        if (!token || !isClientOrAdmin) return;
-
         // 1. Initial HTTP fetch for accumulated pending invitations
         fetchNotifications();
 
-        // 2. SSE stream — token is passed as query param since EventSource cannot use headers
-        const url = `http://localhost:3000/api/builder/notifications/stream?token=${token}`;
+        // 2. SSE stream — Open access (no token)
+        const url = `http://localhost:3000/api/builder/notifications/stream`;
         const es = new EventSource(url);
 
         es.addEventListener('invitation', (e) => {
@@ -88,9 +81,7 @@ export default function Header({ onMenuClick }) {
     const handleAccept = async (notif) => {
         setProcessingId(notif.id);
         try {
-            await axios.post(`http://localhost:3000/api/builder/notifications/${notif.id}/accept`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axios.post(`http://localhost:3000/api/builder/notifications/${notif.id}/accept`, {});
             setNotifications(prev => prev.filter(n => n.id !== notif.id));
             // Refresh sidebar so the shared folder appears immediately
             if (triggerRefresh) triggerRefresh();
@@ -104,9 +95,7 @@ export default function Header({ onMenuClick }) {
     const handleReject = async (notif) => {
         setProcessingId(notif.id);
         try {
-            await axios.post(`http://localhost:3000/api/builder/notifications/${notif.id}/reject`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axios.post(`http://localhost:3000/api/builder/notifications/${notif.id}/reject`, {});
             setNotifications(prev => prev.filter(n => n.id !== notif.id));
         } catch (err) {
             alert('Failed to reject invitation');
@@ -371,11 +360,11 @@ export default function Header({ onMenuClick }) {
                             <div className="h-px bg-gray-50 my-1 mx-4"></div>
 
                             <button
-                                onClick={() => { logout(); setProfileOpen(false); }}
-                                className="w-[92%] mx-auto flex items-center gap-3 px-4 py-2.5 text-sm text-gray-500 hover:bg-rose-50 hover:text-rose-600 hover:translate-x-1 rounded-xl transition-all duration-200 group/logout"
+                                onClick={() => { navigate('/settings'); setProfileOpen(false); }}
+                                className="w-[92%] mx-auto flex items-center gap-3 px-4 py-2.5 text-sm text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 hover:translate-x-1 rounded-xl transition-all duration-200 group/logout"
                             >
-                                <LogOut size={18} className="text-gray-400 group-hover/logout:text-rose-500 transition-colors" />
-                                <span className="font-medium">Logout</span>
+                                <Users size={18} className="text-gray-400 group-hover/logout:text-indigo-500 transition-colors" />
+                                <span className="font-medium">Switch Account</span>
                             </button>
                         </div>
                     )}
