@@ -161,18 +161,6 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                     <div className="pos-menu-divider"></div>
                     <div className="pos-menu-section">Inventory</div>
                     <ul className="pos-menu-list">
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><Package className="pos-menu-icon" strokeWidth={1.5} /><span>Products</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><FilePlus className="pos-menu-icon" strokeWidth={1.5} /><span>Create Product</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><CalendarX className="pos-menu-icon" strokeWidth={1.5} /><span>Expired Products</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><TrendingDown className="pos-menu-icon" strokeWidth={1.5} /><span>Low Stocks</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><ListTree className="pos-menu-icon" strokeWidth={1.5} /><span>Category</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><List className="pos-menu-icon" strokeWidth={1.5} /><span>Sub Category</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><Tag className="pos-menu-icon" strokeWidth={1.5} /><span>Brands</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><Scale className="pos-menu-icon" strokeWidth={1.5} /><span>Units</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><Puzzle className="pos-menu-icon" strokeWidth={1.5} /><span>Variant Attributes</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><ShieldCheck className="pos-menu-icon" strokeWidth={1.5} /><span>Warranties</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><Barcode className="pos-menu-icon" strokeWidth={1.5} /><span>Print Barcode</span></div></a></li>
-                        <li className="pos-menu-item"><a className="pos-menu-link"><div className="pos-menu-link-content"><QrCode className="pos-menu-icon" strokeWidth={1.5} /><span>Print QR Code</span></div></a></li>
                         <li className="pos-menu-item"><NavLink to="/products" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Package className="pos-menu-icon" /><span>Products</span></div></NavLink></li>
                         <li className="pos-menu-item"><NavLink to="/create-product" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><FilePlus className="pos-menu-icon" /><span>Create Product</span></div></NavLink></li>
                         <li className="pos-menu-item"><NavLink to="/expired-products" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><CalendarX className="pos-menu-icon" /><span>Expired Products</span></div></NavLink></li>
