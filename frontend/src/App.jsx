@@ -16,6 +16,10 @@ import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminContent from './pages/admin/AdminContent';
 import AdminRoles from './pages/admin/AdminRoles';
 import AdminNotifications from './pages/admin/AdminNotifications';
+import ManageStock from './pages/ManageStock.jsx';
+import StockAdjustment from './pages/StockAdjustment.jsx';
+import StockTransfer from './pages/StockTransfer.jsx';
+import OnlineOrders from './pages/OnlineOrders.jsx';
 
 function AppRoutes() {
     return (
@@ -63,6 +67,30 @@ function AppRoutes() {
                 path="/dashboard/sales"
                 element={
                     <PosLayout><SalesDashboard /></PosLayout>
+                }
+            />
+            <Route
+                path="/dashboard/manage-stock"
+                element={
+                    <PosLayout><ManageStock /></PosLayout>
+                }
+            />
+            <Route
+                path="/dashboard/stock-adjustment"
+                element={
+                    <PosLayout><StockAdjustment /></PosLayout>
+                }
+            />
+            <Route
+                path="/dashboard/stock-transfer"
+                element={
+                    <PosLayout><StockTransfer /></PosLayout>
+                }
+            />
+            <Route
+                path="/dashboard/sales-online"
+                element={
+                    <PosLayout><OnlineOrders /></PosLayout>
                 }
             />
 
