@@ -11,7 +11,7 @@ import {
     Table, BarChart, Activity, Calendar, Search, Square
 } from 'lucide-react';
 
-const API_URL = 'http://localhost:3000/api/builder';
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/builder`;
 
 // Drag item types
 const ItemTypes = {

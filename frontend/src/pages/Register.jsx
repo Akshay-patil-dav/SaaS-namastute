@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, EyeOff, Eye, Facebook, Apple } from 'lucide-react';
 import './Login.css';
 
-const API_URL = 'http://localhost:3000/api/auth';
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
 export default function Register() {
     const [fullName, setFullName] = useState('');

@@ -14,7 +14,7 @@ export default function AcceptInvite() {
     useEffect(() => {
         if (!authToken) return;
 
-        axios.post(`http://localhost:3000/api/builder/invite/accept/${token}`, {}, {
+        axios.post(`${import.meta.env.VITE_API_BASE_URL}/builder/invite/accept/${token}`, {}, {
             headers: { Authorization: `Bearer ${authToken}` }
         })
         .then(() => {

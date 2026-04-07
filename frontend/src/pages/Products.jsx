@@ -20,7 +20,7 @@ import {
     X
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:3000/api/products';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/products`;
 
 // ── Fallback mock data (shown when DB is empty or API is offline) ──────────
 const mockData = [];

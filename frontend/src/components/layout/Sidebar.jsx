@@ -38,7 +38,7 @@ export default function Sidebar() {
     // Fetch user workspace files for the sidebar tree
     const fetchWorkspace = () => {
         setLoadingWorkspace(true);
-        axios.get('http://localhost:3000/api/builder/data')
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/builder/data`)
             .then(res => {
                 const incoming = res.data.folders || [];
                 setFolders(prev => incoming.map(f => {
@@ -55,7 +55,7 @@ export default function Sidebar() {
 
     // Listen for real-time workspace changes from OTHER users via SSE
     useEffect(() => {
-        const url = `http://localhost:3000/api/builder/notifications/stream`;
+        const url = `${import.meta.env.VITE_API_BASE_URL}/builder/notifications/stream`;
         const es = new EventSource(url);
         es.addEventListener('workspace_change', () => {
             fetchWorkspace();
@@ -92,7 +92,7 @@ export default function Sidebar() {
     const handleDeleteFolder = (folder) => {
         if (!window.confirm(`Delete folder "${folder.name}" and ALL its pages? This cannot be undone.`)) return;
         const numericId = folder.id.replace('f', '');
-        axios.delete(`http://localhost:3000/api/builder/folders/${numericId}`).then(() => {
+        axios.delete(`${import.meta.env.VITE_API_BASE_URL}/builder/folders/${numericId}`).then(() => {
             setFolders(prev => prev.filter(f => f.id !== folder.id));
             setPages(prev => prev.filter(p => p.folderId !== folder.id));
         }).catch(err => alert('Failed to delete folder: ' + (err.response?.data?.error || 'Unknown error')));
@@ -101,7 +101,7 @@ export default function Sidebar() {
     const handleDeletePage = (page) => {
         if (!window.confirm(`Delete page "${page.name}"? This cannot be undone.`)) return;
         const numericId = page.id.replace('p', '');
-        axios.delete(`http://localhost:3000/api/builder/pages/${numericId}`).then(() => {
+        axios.delete(`${import.meta.env.VITE_API_BASE_URL}/builder/pages/${numericId}`).then(() => {
             setPages(prev => prev.filter(p => p.id !== page.id));
         }).catch(err => alert('Failed to delete page: ' + (err.response?.data?.error || 'Unknown error')));
     };
@@ -109,7 +109,7 @@ export default function Sidebar() {
     // ICON UPDATE handlers
     const handleUpdateFolderIcon = (folder, iconName) => {
         const numericId = folder.id.replace('f', '');
-        axios.put(`http://localhost:3000/api/builder/folders/${numericId}/icon`,
+        axios.put(`${import.meta.env.VITE_API_BASE_URL}/builder/folders/${numericId}/icon`,
             { icon: iconName }
         ).then(() => {
             setFolders(prev => prev.map(f => f.id === folder.id ? { ...f, icon: iconName } : f));
@@ -118,7 +118,7 @@ export default function Sidebar() {
 
     const handleUpdatePageIcon = (page, iconName) => {
         const numericId = page.id.replace('p', '');
-        axios.put(`http://localhost:3000/api/builder/pages/${numericId}/icon`,
+        axios.put(`${import.meta.env.VITE_API_BASE_URL}/builder/pages/${numericId}/icon`,
             { icon: iconName }
         ).then(() => {
             setPages(prev => prev.map(p => p.id === page.id ? { ...p, icon: iconName } : p));
@@ -150,7 +150,7 @@ export default function Sidebar() {
 
         setPages(prev => prev.map(p => p.id === draggedPageId ? { ...p, folderId: targetFolderId } : p));
 
-        axios.put(`http://localhost:3000/api/builder/pages/${numericPageId}/move`,
+        axios.put(`${import.meta.env.VITE_API_BASE_URL}/builder/pages/${numericPageId}/move`,
             { folderId: `f${numericFolderId}` }
         ).catch(err => {
             setPages(prev => prev.map(p => p.id === draggedPageId ? { ...p, folderId: page.folderId } : p));
@@ -171,12 +171,12 @@ export default function Sidebar() {
         const config = {};
 
         if (modal.type === 'FOLDER') {
-            axios.post('http://localhost:3000/api/builder/folders', { name: modalInput }, config)
+            axios.post(`${import.meta.env.VITE_API_BASE_URL}/builder/folders`, { name: modalInput }, config)
                 .then(res => setFolders([...folders, { ...res.data, open: true }]))
                 .catch(err => alert("Failed to create folder"))
                 .finally(() => setModal({ isOpen: false }));
         } else if (modal.type === 'PAGE') {
-            axios.post('http://localhost:3000/api/builder/pages', { name: modalInput, folderId: modal.targetId }, config)
+            axios.post(`${import.meta.env.VITE_API_BASE_URL}/builder/pages`, { name: modalInput, folderId: modal.targetId }, config)
                 .then(res => {
                     const newPage = res.data;
                     setPages([...pages, newPage]);
@@ -188,7 +188,7 @@ export default function Sidebar() {
                 .catch(err => alert("Failed to auto-create page"))
                 .finally(() => setModal({ isOpen: false }));
         } else if (modal.type === 'INVITE') {
-            axios.post(`http://localhost:3000/api/builder/folders/${modal.targetId}/invite`, { email: modalInput }, config)
+            axios.post(`${import.meta.env.VITE_API_BASE_URL}/builder/folders/${modal.targetId}/invite`, { email: modalInput }, config)
                 .then(res => {
                     alert(`== INVITATION SECURE LINK GENERATED ==\nCopy and send this link to your teammate:\n\nhttp://localhost:3000/invite/accept/${res.data.token}`);
                 })
