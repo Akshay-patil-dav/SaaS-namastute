@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class BuilderService {
@@ -18,6 +19,9 @@ public class BuilderService {
     private final UserRepository userRepo;
     private final FolderInvitationRepository inviteRepo;
     private final NotificationEmitterService emitterService;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     public BuilderService(PageFolderRepository folderRepo, CustomPageRepository pageRepo, 
                           PageBlockRepository blockRepo, UserRepository userRepo, 
@@ -247,7 +251,7 @@ public class BuilderService {
         
         // Log the token to the console so the developer can click it
         System.out.println("====== INVITATION LINK GENERATED ======");
-        System.out.println("http://localhost:3000/invite/accept/" + token);
+        System.out.println(frontendUrl + "/invite/accept/" + token);
         System.out.println("=======================================");
 
         // Push a real-time SSE notification to the invitee

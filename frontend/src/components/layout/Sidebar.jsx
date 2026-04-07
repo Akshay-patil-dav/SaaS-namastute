@@ -190,7 +190,7 @@ export default function Sidebar() {
         } else if (modal.type === 'INVITE') {
             axios.post(`${import.meta.env.VITE_API_BASE_URL}/builder/folders/${modal.targetId}/invite`, { email: modalInput }, config)
                 .then(res => {
-                    alert(`== INVITATION SECURE LINK GENERATED ==\nCopy and send this link to your teammate:\n\nhttp://localhost:3000/invite/accept/${res.data.token}`);
+                    alert(`== INVITATION SECURE LINK GENERATED ==\nCopy and send this link to your teammate:\n\n${import.meta.env.VITE_FRONTEND_URL}/invite/accept/${res.data.token}`);
                 })
                 .catch(err => alert("Failed to generate invite. You must be the original folder owner."))
                 .finally(() => setModal({ isOpen: false }));
