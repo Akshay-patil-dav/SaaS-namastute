@@ -138,14 +138,14 @@ export default function Register() {
                     <div className="social-login" style={{ marginBottom: '30px' }}>
                         <button 
                             className="btn-social btn-social-fb" 
-                            onClick={() => window.location.href = 'http://localhost:3000/oauth2/authorization/facebook'}
+                            onClick={() => window.location.href = `${import.meta.env.VITE_BACKEND_BASE_URL}/oauth2/authorization/facebook`}
                             type="button"
                         >
                             <Facebook size={18} fill="currentColor" />
                         </button>
                         <button 
                             className="btn-social btn-social-google" 
-                            onClick={() => window.location.href = 'http://localhost:3000/oauth2/authorization/google'}
+                            onClick={() => window.location.href = `${import.meta.env.VITE_BACKEND_BASE_URL}/oauth2/authorization/google`}
                             type="button"
                         >
                             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{width: '18px', height: '18px'}} />
