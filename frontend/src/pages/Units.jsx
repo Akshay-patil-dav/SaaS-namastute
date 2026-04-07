@@ -12,17 +12,7 @@ import {
     Trash2
 } from 'lucide-react';
 
-const mockData = [
-    { id: 1, name: "Kilograms", shortName: "kg", products: 25, date: "24 Dec 2024", status: "Active" },
-    { id: 2, name: "Liters", shortName: "L", products: 18, date: "10 Dec 2024", status: "Active" },
-    { id: 3, name: "Dozen", shortName: "dz", products: 30, date: "27 Nov 2024", status: "Active" },
-    { id: 4, name: "Pieces", shortName: "pcs", products: 42, date: "18 Nov 2024", status: "Active" },
-    { id: 5, name: "Boxes", shortName: "bx", products: 60, date: "06 Nov 2024", status: "Active" },
-    { id: 6, name: "Tons", shortName: "t", products: 10, date: "25 Oct 2024", status: "Active" },
-    { id: 7, name: "Grams", shortName: "g", products: 70, date: "03 Oct 2024", status: "Active" },
-    { id: 8, name: "Meters", shortName: "m", products: 80, date: "20 Sep 2024", status: "Active" },
-    { id: 9, name: "Centimeters", shortName: "cm", products: 120, date: "10 Sep 2024", status: "Active" },
-];
+const mockData = [];
 
 const Units = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -129,7 +119,7 @@ const Units = () => {
                         ) : (
                             <tr>
                                 <td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No matching units found.
+                                    No product Avalable tehre
                                 </td>
                             </tr>
                         )}

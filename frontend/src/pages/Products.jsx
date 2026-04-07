@@ -1,109 +1,227 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Products.css';
-import { 
-    FileText, 
-    FileSpreadsheet, 
-    RefreshCw, 
-    ChevronUp, 
-    PlusCircle, 
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import {
+    FileText,
+    FileSpreadsheet,
+    RefreshCw,
+    ChevronUp,
+    PlusCircle,
     Download,
     Search,
     ChevronDown,
     Eye,
     Pencil,
-    Trash2
+    Trash2,
+    Package,
+    AlertCircle,
+    CheckCircle,
+    X
 } from 'lucide-react';
 
-const mockData = [
-    { id: 1, sku: "PT001", name: "Lenovo IdeaPad 3", category: "Computers", brand: "Lenovo", price: "$600", unit: "Pc", qty: 100, creator: "James Kirwin", img: "https://placehold.co/40x40/e2e8f0/64748b?text=LP", avatar: "https://placehold.co/40x40/f97316/ffffff?text=JK" },
-    { id: 2, sku: "PT002", name: "Beats Pro", category: "Electronics", brand: "Beats", price: "$160", unit: "Pc", qty: 140, creator: "Francis Chang", img: "https://placehold.co/40x40/e2e8f0/64748b?text=BP", avatar: "https://placehold.co/40x40/3b82f6/ffffff?text=FC" },
-    { id: 3, sku: "PT003", name: "Nike Jordan", category: "Shoe", brand: "Nike", price: "$110", unit: "Pc", qty: 300, creator: "Antonio Engle", img: "https://placehold.co/40x40/e2e8f0/64748b?text=NJ", avatar: "https://placehold.co/40x40/10b981/ffffff?text=AE" },
-    { id: 4, sku: "PT004", name: "Apple Series 5 Watch", category: "Electronics", brand: "Apple", price: "$120", unit: "Pc", qty: 450, creator: "Leo Kelly", img: "https://placehold.co/40x40/e2e8f0/64748b?text=AW", avatar: "https://placehold.co/40x40/f43f5e/ffffff?text=LK" },
-    { id: 5, sku: "PT005", name: "Amazon Echo Dot", category: "Electronics", brand: "Amazon", price: "$80", unit: "Pc", qty: 320, creator: "Annette Walker", img: "https://placehold.co/40x40/e2e8f0/64748b?text=ED", avatar: "https://placehold.co/40x40/8b5cf6/ffffff?text=AW" },
-    { id: 6, sku: "PT006", name: "Sanford Chair Sofa", category: "Furnitures", brand: "Modern Wave", price: "$320", unit: "Pc", qty: 650, creator: "John Weaver", img: "https://placehold.co/40x40/e2e8f0/64748b?text=SC", avatar: "https://placehold.co/40x40/0ea5e9/ffffff?text=JW" },
-    { id: 7, sku: "PT007", name: "Red Premium Satchel", category: "Bags", brand: "Dior", price: "$60", unit: "Pc", qty: 700, creator: "Gary Hennessy", img: "https://placehold.co/40x40/e2e8f0/64748b?text=RS", avatar: "https://placehold.co/40x40/64748b/ffffff?text=GH" },
-    { id: 8, sku: "PT008", name: "Iphone 14 Pro", category: "Phone", brand: "Apple", price: "$540", unit: "Pc", qty: 630, creator: "Eleanor Panek", img: "https://placehold.co/40x40/e2e8f0/64748b?text=IP", avatar: "https://placehold.co/40x40/d946ef/ffffff?text=EP" },
-    { id: 9, sku: "PT009", name: "Gaming Chair", category: "Furniture", brand: "Arlime", price: "$200", unit: "Pc", qty: 410, creator: "William Levy", img: "https://placehold.co/40x40/e2e8f0/64748b?text=GC", avatar: "https://placehold.co/40x40/06b6d4/ffffff?text=WL" },
-    { id: 10, sku: "PT010", name: "Borealis Backpack", category: "Bags", brand: "The North Face", price: "$45", unit: "Pc", qty: 550, creator: "Charlotte Klotz", img: "https://placehold.co/40x40/e2e8f0/64748b?text=BB", avatar: "https://placehold.co/40x40/eab308/ffffff?text=CK" },
-];
+const API_BASE = 'http://localhost:3000/api/products';
+
+// ── Fallback mock data (shown when DB is empty or API is offline) ──────────
+const mockData = [];
+
+// ── Colour mapping for category badges ────────────────────────────────────
+const categoryColors = {
+    'Electronics': '#3b82f6', 'Computers': '#6366f1', 'Phone': '#8b5cf6',
+    'Shoe': '#10b981', 'Bags': '#f59e0b', 'Furnitures': '#0ea5e9',
+    'Furniture': '#0ea5e9', 'Food & Beverages': '#22c55e', default: '#64748b',
+};
+const getCategoryColor = (cat) => categoryColors[cat] || categoryColors.default;
+
+// ── Initials avatar (for DB rows that have no avatar image) ───────────────
+const avatarColors = ['#f97316','#3b82f6','#10b981','#8b5cf6','#f43f5e','#eab308','#0ea5e9','#d946ef'];
+const getAvatarColor = (str) => avatarColors[(str?.charCodeAt(0) || 0) % avatarColors.length];
+const getInitials = (name) => (name || 'P').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
 
 const Products = () => {
-    const [searchTerm, setSearchTerm] = useState('');
+    const [dbProducts, setDbProducts]   = useState([]);
+    const [loading, setLoading]         = useState(true);
+    const [apiOnline, setApiOnline]     = useState(true);
+    const [searchTerm, setSearchTerm]   = useState('');
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [toast, setToast]             = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState(null); // id to delete
 
-    const filteredData = mockData.filter(item => {
+    // ── Fetch products from backend ──────────────────────────────────────
+    const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(API_BASE);
+            setDbProducts(res.data || []);
+            setApiOnline(true);
+        } catch {
+            setApiOnline(false);
+            setDbProducts([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+    // ── Merge: DB products first, then mock (only if DB is empty/offline) ─
+    const allProducts = dbProducts;
+
+    // ── Search filter ────────────────────────────────────────────────────
+    const filtered = allProducts.filter(item => {
         if (!searchTerm) return true;
-        const term = searchTerm.toLowerCase();
+        const t = searchTerm.toLowerCase();
         return (
-            item.name.toLowerCase().includes(term) ||
-            item.sku.toLowerCase().includes(term) ||
-            item.brand.toLowerCase().includes(term) ||
-            item.category.toLowerCase().includes(term) ||
-            item.creator.toLowerCase().includes(term)
+            (item.name        || '').toLowerCase().includes(t) ||
+            (item.sku         || '').toLowerCase().includes(t) ||
+            (item.brand       || '').toLowerCase().includes(t) ||
+            (item.category    || '').toLowerCase().includes(t)
         );
     });
 
+    // ── Pagination ───────────────────────────────────────────────────────
+    const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+    const paginated  = filtered.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
+    const goToPage = (p) => setCurrentPage(Math.min(Math.max(1, p), totalPages));
+
+    // ── Delete ───────────────────────────────────────────────────────────
+    const handleDelete = async (id) => {
+        if (typeof id === 'string' && id.startsWith('m')) {
+            showToast('error', 'Demo data cannot be deleted.');
+            setDeleteConfirm(null);
+            return;
+        }
+        try {
+            await axios.delete(`${API_BASE}/${id}`);
+            setDbProducts(prev => prev.filter(p => p.id !== id));
+            showToast('success', 'Product deleted successfully.');
+        } catch {
+            showToast('error', 'Failed to delete product.');
+        }
+        setDeleteConfirm(null);
+    };
+
+    // ── Toast ────────────────────────────────────────────────────────────
+    const showToast = (type, message) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 3500);
+    };
+
+    // ── Format price ─────────────────────────────────────────────────────
+    const formatPrice = (price) => {
+        if (price == null) return '—';
+        return `$${Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+
+    // ── Format date ──────────────────────────────────────────────────────
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '—';
+        return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    };
+
+    // ── Qty badge colour ─────────────────────────────────────────────────
+    const getQtyBadge = (qty) => {
+        if (qty <= 0)   return 'badge-danger';
+        if (qty < 50)   return 'badge-warning';
+        return 'badge-success';
+    };
+
     return (
         <div className="product-page-container">
-            {/* Header Section */}
+
+            {/* Toast */}
+            {toast && (
+                <div className={`prod-toast prod-toast-${toast.type}`}>
+                    {toast.type === 'success' ? <CheckCircle size={17} /> : <AlertCircle size={17} />}
+                    <span>{toast.message}</span>
+                    <button onClick={() => setToast(null)} className="toast-close"><X size={14} /></button>
+                </div>
+            )}
+
+            {/* Delete Confirm Modal */}
+            {deleteConfirm !== null && (
+                <div className="delete-overlay">
+                    <div className="delete-modal">
+                        <div className="delete-modal-icon"><Trash2 size={28} /></div>
+                        <h5>Delete Product?</h5>
+                        <p>This action cannot be undone.</p>
+                        <div className="delete-modal-actions">
+                            <button className="btn-cancel-del" onClick={() => setDeleteConfirm(null)}>Cancel</button>
+                            <button className="btn-confirm-del" onClick={() => handleDelete(deleteConfirm)}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Header */}
             <div className="product-page-header">
                 <div className="product-page-title">
                     <h4>Product List</h4>
-                    <p>Manage your products</p>
+                    <p>
+                        {loading ? 'Loading…' : (
+                            <>
+                                {dbProducts.length > 0
+                                    ? <span className="db-badge"><span className="db-dot live" />  {dbProducts.length} from database</span>
+                                    : <span className="db-badge"><span className="db-dot mock" />  Showing demo data</span>
+                                }
+                            </>
+                        )}
+                    </p>
                 </div>
-                
                 <div className="page-actions">
-                    <button className="btn-icon-action" title="PDF">
-                        <FileText size={18} className="icon-red" />
+                    <button className="btn-icon-action" title="PDF"><FileText size={18} className="icon-red" /></button>
+                    <button className="btn-icon-action" title="Excel"><FileSpreadsheet size={18} className="icon-green" /></button>
+                    <button className="btn-icon-action" title="Refresh" onClick={fetchProducts}>
+                        <RefreshCw size={18} className={loading ? 'spin' : ''} />
                     </button>
-                    <button className="btn-icon-action" title="Excel">
-                        <FileSpreadsheet size={18} className="icon-green" />
-                    </button>
-                    <button className="btn-icon-action" title="Refresh">
-                        <RefreshCw size={18} />
-                    </button>
-                    <button className="btn-icon-action" title="Collapse">
-                        <ChevronUp size={18} />
-                    </button>
-                    <button className="btn-orange">
+                    <button className="btn-icon-action" title="Collapse"><ChevronUp size={18} /></button>
+                    <Link to="/create-product" className="btn-orange text-decoration-none">
                         <PlusCircle size={18} /> Add Product
-                    </button>
-                    <button className="btn-dark-blue">
-                        <Download size={18} /> Import Product
-                    </button>
+                    </Link>
+                    <button className="btn-dark-blue"><Download size={18} /> Import Product</button>
                 </div>
             </div>
 
-            {/* Table Card Area */}
+            {/* API Offline Banner */}
+            {!apiOnline && !loading && (
+                <div className="api-offline-banner">
+                    <AlertCircle size={16} />
+                    Backend API is offline — showing demo data. Start the Spring Boot server to load real products.
+                </div>
+            )}
+
+            {/* Table Card */}
             <div className="product-table-card">
-                
+
                 {/* Filter Row */}
                 <div className="table-filter-row">
                     <div className="search-box">
                         <Search size={18} />
-                        <input 
-                            type="text" 
-                            placeholder="Search" 
+                        <input
+                            type="text"
+                            placeholder="Search by name, SKU, brand, category…"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                         />
+                        {searchTerm && (
+                            <button className="search-clear" onClick={() => setSearchTerm('')}><X size={14} /></button>
+                        )}
                     </div>
                     <div className="filter-dropdowns">
-                        <div className="filter-select">
-                            Category <ChevronDown size={16} />
-                        </div>
-                        <div className="filter-select">
-                            Brand <ChevronDown size={16} />
-                        </div>
+                        <div className="filter-select">Category <ChevronDown size={16} /></div>
+                        <div className="filter-select">Brand <ChevronDown size={16} /></div>
                     </div>
                 </div>
 
-                {/* Data Table */}
+                {/* Table */}
                 <table className="custom-table">
                     <thead>
                         <tr>
-                            <th style={{ width: '40px' }}>
-                                <input type="checkbox" className="custom-checkbox" />
-                            </th>
+                            <th style={{ width: '40px' }}><input type="checkbox" className="custom-checkbox" /></th>
                             <th>SKU</th>
                             <th>Product Name</th>
                             <th>Category</th>
@@ -111,54 +229,116 @@ const Products = () => {
                             <th>Price</th>
                             <th>Unit</th>
                             <th>Qty</th>
-                            <th>Created By</th>
+                            <th>Added On</th>
                             <th style={{ textAlign: 'center' }}>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredData.length > 0 ? (
-                            filteredData.map((item) => (
-                            <tr key={item.id}>
+                        {/* Loading skeletons */}
+                        {loading && Array.from({ length: 6 }).map((_, i) => (
+                            <tr key={`skel-${i}`} className="skeleton-row">
+                                <td><div className="skel skel-sm" /></td>
+                                <td><div className="skel skel-md" /></td>
                                 <td>
-                                    <input type="checkbox" className="custom-checkbox" />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                        <div className="skel skel-circle" />
+                                        <div className="skel skel-lg" />
+                                    </div>
                                 </td>
-                                <td>{item.sku}</td>
+                                <td><div className="skel skel-sm" /></td>
+                                <td><div className="skel skel-md" /></td>
+                                <td><div className="skel skel-sm" /></td>
+                                <td><div className="skel skel-sm" /></td>
+                                <td><div className="skel skel-sm" /></td>
+                                <td><div className="skel skel-md" /></td>
+                                <td><div className="skel skel-md" /></td>
+                            </tr>
+                        ))}
+
+                        {/* Actual rows */}
+                        {!loading && paginated.length > 0 && paginated.map((item) => (
+                            <tr key={item.id} className={item._isMock ? 'mock-row' : 'db-row'}>
+                                <td><input type="checkbox" className="custom-checkbox" /></td>
+                                <td>
+                                    <span className="sku-chip">{item.sku || '—'}</span>
+                                </td>
                                 <td>
                                     <div className="product-name-cell">
-                                        <img src={item.img} alt={item.name} className="product-img" />
-                                        <span>{item.name}</span>
+                                        {/* Show real product image if available, else initials avatar */}
+                                        {item.images && item.images.split(',')[0]?.trim() ? (
+                                            <img
+                                                src={item.images.split(',')[0].trim()}
+                                                alt={item.name}
+                                                className="product-thumb"
+                                                onError={(e) => {
+                                                    // Graceful fallback: hide broken image, show sibling avatar
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
+                                                }}
+                                            />
+                                        ) : null}
+                                        {/* Initials avatar — shown when no image or image fails */}
+                                        <div
+                                            className="product-avatar"
+                                            style={{
+                                                background: getAvatarColor(item.name),
+                                                display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex'
+                                            }}
+                                        >
+                                            {getInitials(item.name)}
+                                        </div>
+                                        <div>
+                                            <span className="product-name-text">{item.name}</span>
+                                            {item._isMock && <span className="demo-tag">demo</span>}
+                                        </div>
                                     </div>
                                 </td>
-                                <td>{item.category}</td>
-                                <td>{item.brand}</td>
-                                <td>{item.price}</td>
-                                <td>{item.unit}</td>
-                                <td>{item.qty}</td>
                                 <td>
-                                    <div className="created-by-cell">
-                                        <img src={item.avatar} alt={item.creator} className="avatar-img" />
-                                        <span>{item.creator}</span>
-                                    </div>
+                                    <span
+                                        className="category-badge"
+                                        style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category) }}
+                                    >
+                                        {item.category || '—'}
+                                    </span>
                                 </td>
+                                <td>{item.brand || '—'}</td>
+                                <td className="price-cell">{formatPrice(item.price)}</td>
+                                <td>{item.unit || 'Pc'}</td>
+                                <td>
+                                    <span className={`qty-badge ${getQtyBadge(item.quantity)}`}>
+                                        {item.quantity ?? 0}
+                                    </span>
+                                </td>
+                                <td className="date-cell">{formatDate(item.createdAt)}</td>
                                 <td>
                                     <div className="action-buttons">
-                                        <button className="action-btn" title="View">
-                                            <Eye size={16} />
-                                        </button>
-                                        <button className="action-btn" title="Edit">
-                                            <Pencil size={16} />
-                                        </button>
-                                        <button className="action-btn" title="Delete">
-                                            <Trash2 size={16} />
+                                        <button className="action-btn view-btn" title="View"><Eye size={15} /></button>
+                                        <button className="action-btn edit-btn" title="Edit"><Pencil size={15} /></button>
+                                        <button
+                                            className="action-btn delete-btn"
+                                            title="Delete"
+                                            onClick={() => setDeleteConfirm(item.id)}
+                                        >
+                                            <Trash2 size={15} />
                                         </button>
                                     </div>
                                 </td>
                             </tr>
-                        ))
-                        ) : (
+                        ))}
+
+                        {/* Empty state */}
+                        {!loading && paginated.length === 0 && (
                             <tr>
-                                <td colSpan="10" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No matching products found.
+                                <td colSpan="10">
+                                    <div className="empty-state">
+                                        <Package size={48} strokeWidth={1} />
+                                        <p>{searchTerm ? 'No products match your search.' : 'No product Avalable tehre'}</p>
+                                        {!searchTerm && (
+                                            <Link to="/create-product" className="btn-orange text-decoration-none" style={{ fontSize: '0.85rem', padding: '8px 18px' }}>
+                                                <PlusCircle size={16} /> Add Product
+                                            </Link>
+                                        )}
+                                    </div>
                                 </td>
                             </tr>
                         )}
@@ -166,24 +346,38 @@ const Products = () => {
                 </table>
 
                 {/* Pagination */}
-                <div className="pagination-row">
-                    <div>
-                        Row Per Page 
-                        <select className="entries-select" defaultValue="10">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select> 
-                        Entries
+                {!loading && filtered.length > 0 && (
+                    <div className="pagination-row">
+                        <div className="rows-per-page">
+                            Row Per Page&nbsp;
+                            <select
+                                className="entries-select"
+                                value={rowsPerPage}
+                                onChange={(e) => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                            >
+                                {ROWS_PER_PAGE_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
+                            </select>
+                            &nbsp;| Showing {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, filtered.length)} of {filtered.length}
+                        </div>
+                        <div className="pagination-controls">
+                            <button className="page-btn bg-light" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                                .reduce((acc, p, i, arr) => {
+                                    if (i > 0 && p - arr[i - 1] > 1) acc.push('...');
+                                    acc.push(p);
+                                    return acc;
+                                }, [])
+                                .map((p, i) =>
+                                    p === '...'
+                                        ? <span key={`ellipsis-${i}`} className="page-ellipsis">…</span>
+                                        : <button key={p} className={`page-btn ${p === currentPage ? 'active' : 'bg-light'}`} onClick={() => goToPage(p)}>{p}</button>
+                                )
+                            }
+                            <button className="page-btn bg-light" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>&gt;</button>
+                        </div>
                     </div>
-                    <div className="pagination-controls">
-                        <button className="page-btn bg-light">&lt;</button>
-                        <button className="page-btn active">1</button>
-                        <button className="page-btn bg-light">2</button>
-                        <button className="page-btn bg-light">&gt;</button>
-                    </div>
-                </div>
-
+                )}
             </div>
         </div>
     );
