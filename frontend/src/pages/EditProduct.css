@@ -1,0 +1,391 @@
+.cp-container {
+    padding: 0;
+    background-color: #f8f9fa;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.cp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.cp-title h4 {
+    margin: 0;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.25rem;
+}
+
+.cp-title p {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.cp-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.cp-card {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.cp-card-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: default;
+}
+
+.cp-card-title {
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+}
+
+.cp-card-title svg {
+    color: #f97316;
+}
+
+.cp-card-body {
+    padding: 24px;
+}
+
+.cp-form-group {
+    margin-bottom: 20px;
+}
+
+.cp-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cp-label .required {
+    color: #ef4444;
+    margin-left: 3px;
+}
+
+.cp-label .add-new {
+    color: #f97316;
+    font-weight: 500;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cp-input-group {
+    position: relative;
+    display: flex;
+}
+
+.cp-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #ffffff;
+    appearance: none;
+}
+
+select.cp-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+.cp-input:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.2);
+}
+
+.btn-generate {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    bottom: 6px;
+    background-color: #f97316;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.calendar-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+/* Rich Text Mock */
+.rt-editor {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.rt-toolbar {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    gap: 15px;
+    color: #64748b;
+    background-color: #f8fafc;
+}
+
+.rt-toolbar div {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    cursor: pointer;
+}
+
+.rt-toolbar span {
+    font-size: 0.85rem;
+}
+
+.rt-textarea {
+    width: 100%;
+    min-height: 120px;
+    border: none;
+    padding: 12px;
+    resize: none;
+    outline: none;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+.desc-hint {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+
+/* Radio buttons */
+.cp-radio-group {
+    display: flex;
+    gap: 24px;
+    margin-top: 10px;
+}
+
+.cp-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #475569;
+    cursor: pointer;
+}
+
+.cp-radio input[type="radio"] {
+    accent-color: #f97316;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+/* Images block */
+.images-container {
+    display: flex;
+    gap: 16px;
+}
+
+.add-image-box {
+    width: 100px;
+    height: 100px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    background-color: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-image-box:hover {
+    border-color: #f97316;
+    color: #f97316;
+}
+
+.add-image-box span {
+    font-size: 0.75rem;
+    margin-top: 4px;
+}
+
+.preview-image-box {
+    width: 100px;
+    height: 100px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    position: relative;
+    padding: 5px;
+    background-color: #ffffff;
+}
+
+.preview-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* Custom Field Checkboxes */
+.custom-fields-row {
+    display: flex;
+    gap: 24px;
+    background-color: #f8fafc;
+    padding: 12px 24px;
+    border-radius: 6px;
+    border: 1px solid #f1f5f9;
+    margin-bottom: 24px;
+}
+
+.cp-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.cp-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    accent-color: #f97316;
+}
+
+/* Footer layout */
+.cp-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+/* ── Toast notification ─────────────────────────────────────────────────── */
+.cp-toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease, fadeOut 0.4s ease 3.6s forwards;
+    min-width: 280px;
+}
+
+.cp-toast-success {
+    background: #ecfdf5;
+    border: 1px solid #6ee7b7;
+    color: #065f46;
+}
+
+.cp-toast-success svg {
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+.cp-toast-error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+}
+
+.cp-toast-error svg {
+    color: #ef4444;
+    flex-shrink: 0;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(60px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; pointer-events: none; }
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+.spin {
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Generate button flex layout ─────────────────────────────────────────── */
+.btn-generate {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-generate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
