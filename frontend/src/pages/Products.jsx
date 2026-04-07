@@ -49,6 +49,8 @@ const Products = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [toast, setToast]             = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState(null); // id to delete
+    const [viewProduct, setViewProduct]     = useState(null);   // product to view
+    const [activeImgIndex, setActiveImgIndex] = useState(0);    // for gallery
 
     // ── Fetch products from backend ──────────────────────────────────────
     const fetchProducts = useCallback(async () => {
@@ -312,8 +314,16 @@ const Products = () => {
                                 <td className="date-cell">{formatDate(item.createdAt)}</td>
                                 <td>
                                     <div className="action-buttons">
-                                        <button className="action-btn view-btn" title="View"><Eye size={15} /></button>
-                                        <button className="action-btn edit-btn" title="Edit"><Pencil size={15} /></button>
+                                        <button 
+                                            className="action-btn view-btn" 
+                                            title="View"
+                                            onClick={() => { setViewProduct(item); setActiveImgIndex(0); }}
+                                        >
+                                            <Eye size={15} />
+                                        </button>
+                                        <Link to={`/edit-product/${item.id}`} className="action-btn edit-btn" title="Edit">
+                                            <Pencil size={15} />
+                                        </Link>
                                         <button
                                             className="action-btn delete-btn"
                                             title="Delete"
@@ -379,6 +389,165 @@ const Products = () => {
                     </div>
                 )}
             </div>
+            {/* Enhanced Product View Modal */}
+            {viewProduct && (
+                <div className="view-overlay" onClick={() => setViewProduct(null)}>
+                    <div className="view-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="view-modal-close" onClick={() => setViewProduct(null)}>
+                            <X size={20} />
+                        </button>
+                        
+                        <div className="view-modal-content">
+                            {/* Left Side: Image Gallery */}
+                            <div className="view-modal-left">
+                                <div className="view-image-container">
+                                    {viewProduct.images && viewProduct.images.split(',')[activeImgIndex]?.trim() ? (
+                                        <img 
+                                            src={viewProduct.images.split(',')[activeImgIndex].trim()} 
+                                            alt={viewProduct.name} 
+                                            className="view-main-img" 
+                                        />
+                                    ) : (
+                                        <div 
+                                            className="view-img-placeholder"
+                                            style={{ background: getAvatarColor(viewProduct.name) }}
+                                        >
+                                            {getInitials(viewProduct.name)}
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {/* Thumbnails Gallery */}
+                                {viewProduct.images && viewProduct.images.split(',').length > 1 && (
+                                    <div className="view-thumbnails">
+                                        {viewProduct.images.split(',').map((imgUrl, idx) => (
+                                            <div 
+                                                key={`thumb-${idx}`}
+                                                className={`view-thumb-item ${idx === activeImgIndex ? 'active' : ''}`}
+                                                onClick={() => setActiveImgIndex(idx)}
+                                            >
+                                                <img src={imgUrl.trim()} alt="thumbnail" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* Right Side: Tabular Details */}
+                            <div className="view-modal-right">
+                                <div className="view-modal-scroll">
+                                    <div className="view-header">
+                                        <div className="view-header-top">
+                                            <span className="view-category-tag" style={{ background: `${getCategoryColor(viewProduct.category)}15`, color: getCategoryColor(viewProduct.category) }}>
+                                                {viewProduct.category || 'Uncategorized'} » {viewProduct.subCategory || '---'}
+                                            </span>
+                                            {viewProduct.sellingType && <span className="selling-tag">{viewProduct.sellingType}</span>}
+                                        </div>
+                                        <h2 className="view-title text-truncate" title={viewProduct.name}>{viewProduct.name}</h2>
+                                        <div className="view-sku-row">
+                                            <span className="view-label">SKU:</span>
+                                            <span className="view-value-sku">{viewProduct.sku || 'N/A'}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Description Section */}
+                                    {viewProduct.description && (
+                                        <div className="info-section">
+                                            <h6 className="section-title">Product Description</h6>
+                                            <p className="view-desc">{viewProduct.description}</p>
+                                        </div>
+                                    )}
+
+                                    {/* Section 1: Stock & Warehouse */}
+                                    <div className="info-section">
+                                        <h6 className="section-title">Inventory & Placement</h6>
+                                        <div className="view-grid">
+                                            <div className="view-item">
+                                                <span className="view-label">Store</span>
+                                                <span className="view-value text-truncate">{viewProduct.store || 'Main Store'}</span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Warehouse</span>
+                                                <span className="view-value text-truncate">{viewProduct.warehouse || 'Primary'}</span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Current Stock</span>
+                                                <span className={`qty-badge ${getQtyBadge(viewProduct.quantity)}`}>
+                                                    {viewProduct.quantity ?? 0} {viewProduct.unit || 'Pc'}
+                                                </span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Stock Alert Level</span>
+                                                <span className="view-value text-danger fw-bold">{viewProduct.quantityAlert || 0}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section 2: Pricing & Tax */}
+                                    <div className="info-section">
+                                        <h6 className="section-title">Pricing & Taxation</h6>
+                                        <div className="view-grid">
+                                            <div className="view-item">
+                                                <span className="view-label">Net Selling Price</span>
+                                                <span className="view-value-price">{formatPrice(viewProduct.price)}</span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Discount</span>
+                                                <span className="view-value">
+                                                    {viewProduct.discountValue ? `${viewProduct.discountValue} ${viewProduct.discountType === 'PERCENT' ? '%' : ''}` : '---'}
+                                                </span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Tax</span>
+                                                <span className="view-value">{viewProduct.tax || '0%'} ({viewProduct.taxType || 'Exclusive'})</span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Brand</span>
+                                                <span className="view-value">{viewProduct.brand || '---'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section 3: Manufacturing & Barcode */}
+                                    <div className="info-section no-border">
+                                        <h6 className="section-title">Manufacturing & Traceability</h6>
+                                        <div className="view-grid">
+                                            <div className="view-item">
+                                                <span className="view-label">Manufacturer</span>
+                                                <span className="view-value">{viewProduct.manufacturer || '---'}</span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Warranty</span>
+                                                <span className="view-value">{viewProduct.warranty || 'No Warranty'}</span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Barcode Type</span>
+                                                <span className="view-value">{viewProduct.barcodeSymbology || 'CODE128'}</span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Manufactured Date</span>
+                                                <span className="view-value">{formatDate(viewProduct.manufacturedDate)}</span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Expiry Date</span>
+                                                <span className="view-value text-danger">{formatDate(viewProduct.expiryDate)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="view-footer">
+                                    <div className="view-meta">
+                                        <AlertCircle size={14} />
+                                        <span>Last modified: {formatDate(viewProduct.updatedAt || viewProduct.createdAt)}</span>
+                                    </div>
+                                    <button className="view-btn-close" onClick={() => setViewProduct(null)}>Close Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

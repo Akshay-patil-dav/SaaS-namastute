@@ -19,6 +19,7 @@ import OnlineOrders from './pages/OnlineOrders.jsx';
 import PosOrders from './pages/PosOrders.jsx';
 import Products from './pages/Products.jsx';
 import CreateProduct from './pages/CreateProduct.jsx';
+import EditProduct from './pages/EditProduct.jsx';
 import ExpiredProducts from './pages/ExpiredProducts.jsx';
 import LowStocks from './pages/LowStocks.jsx';
 import Category from './pages/Category.jsx';
@@ -116,6 +117,10 @@ function AppRoutes() {
             <Route
                 path="/create-product"
                 element={<PosPage roles={ADMIN_ROLES}><CreateProduct /></PosPage>}
+            />
+            <Route
+                path="/edit-product/:id"
+                element={<PosPage roles={ADMIN_ROLES}><EditProduct /></PosPage>}
             />
             <Route
                 path="/expired-products"
