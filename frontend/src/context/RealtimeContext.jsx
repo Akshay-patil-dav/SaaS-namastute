@@ -46,7 +46,7 @@ export const RealtimeProvider = ({ children }) => {
 
         // Connect to SSE endpoint with token in query param (EventSource doesn't support custom headers)
         const connectSSE = () => {
-            const eventSource = new EventSource(`http://localhost:3000/api/builder/notifications/stream?token=${encodeURIComponent(token)}`);
+            const eventSource = new EventSource(`${import.meta.env.VITE_API_BASE_URL}/builder/notifications/stream?token=${encodeURIComponent(token)}`);
 
             eventSource.onopen = () => {
                 console.log('SSE connection established');
