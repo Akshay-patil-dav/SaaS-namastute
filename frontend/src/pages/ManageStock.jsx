@@ -42,6 +42,13 @@ export default function ManageStock() {
         );
     };
 
+    const filteredData = stockData.filter(item => 
+        item.warehouse.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.person.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="manage-stock-container">
             {/* Page Header */}
@@ -117,39 +124,47 @@ export default function ManageStock() {
                             </tr>
                         </thead>
                         <tbody>
-                            {stockData.map((item) => (
-                                <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
-                                    <td>
-                                        <input 
-                                            type="checkbox" 
-                                            checked={selectedRows.includes(item.id)}
-                                            onChange={() => toggleRow(item.id)}
-                                        />
-                                    </td>
-                                    <td>{item.warehouse}</td>
-                                    <td>{item.store}</td>
-                                    <td>
-                                        <div className="product-cell">
-                                            <img src={item.productImg} alt={item.product} className="product-img" />
-                                            <span>{item.product}</span>
-                                        </div>
-                                    </td>
-                                    <td>{item.date}</td>
-                                    <td>
-                                        <div className="person-cell">
-                                            <img src={item.personImg} alt={item.person} className="person-img" />
-                                            <span>{item.person}</span>
-                                        </div>
-                                    </td>
-                                    <td>{item.qty}</td>
-                                    <td>
-                                        <div className="action-btns">
-                                            <button className="action-btn btn-edit"><Edit size={14} /></button>
-                                            <button className="action-btn btn-delete"><Trash2 size={14} /></button>
-                                        </div>
+                            {filteredData.length > 0 ? (
+                                filteredData.map((item) => (
+                                    <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
+                                        <td>
+                                            <input 
+                                                type="checkbox" 
+                                                checked={selectedRows.includes(item.id)}
+                                                onChange={() => toggleRow(item.id)}
+                                            />
+                                        </td>
+                                        <td>{item.warehouse}</td>
+                                        <td>{item.store}</td>
+                                        <td>
+                                            <div className="product-cell">
+                                                <img src={item.productImg} alt={item.product} className="product-img" />
+                                                <span>{item.product}</span>
+                                            </div>
+                                        </td>
+                                        <td>{item.date}</td>
+                                        <td>
+                                            <div className="person-cell">
+                                                <img src={item.personImg} alt={item.person} className="person-img" />
+                                                <span>{item.person}</span>
+                                            </div>
+                                        </td>
+                                        <td>{item.qty}</td>
+                                        <td>
+                                            <div className="action-btns">
+                                                <button className="action-btn btn-edit"><Edit size={14} /></button>
+                                                <button className="action-btn btn-delete"><Trash2 size={14} /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="8" style={{ textAlign: 'center', padding: '20px', color: '#5b6670' }}>
+                                        No matching records found.
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

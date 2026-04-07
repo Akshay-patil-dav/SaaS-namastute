@@ -18,7 +18,7 @@ import {
 import './online-orders.css';
 import AddSalesModal from '../components/AddSalesModal';
 
-const salesData = [
+const posOrdersData = [
     { id: 1, customer: 'Carl Evans', ref: 'SL001', date: '24 Dec 2024', status: 'Completed', total: '$1000', paid: '$1000', due: '$0.00', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carl' },
     { id: 2, customer: 'Minerva Rameriz', ref: 'SL002', date: '10 Dec 2024', status: 'Pending', total: '$1500', paid: '$0.00', due: '$1500', payment: 'Unpaid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Minerva' },
     { id: 3, customer: 'Robert Lamon', ref: 'SL003', date: '08 Feb 2023', status: 'Completed', total: '$1500', paid: '$0.00', due: '$1500', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Robert' },
@@ -31,13 +31,13 @@ const salesData = [
     { id: 10, customer: 'Michelle Robison', ref: 'SL010', date: '29 May 2023', status: 'Pending', total: '$1700', paid: '$1700', due: '$0.00', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michelle' },
 ];
 
-export default function OnlineOrders() {
+export default function PosOrders() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRows, setSelectedRows] = useState([]);
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Outside click logic to close dropdown
+    // Close dropdown on outside click
     React.useEffect(() => {
         const handleClickOutside = (event) => {
             if (activeDropdown && !event.target.closest('.action-dropdown-container')) {
@@ -60,11 +60,11 @@ export default function OnlineOrders() {
 
     const toggleAll = () => {
         setSelectedRows(prev => 
-            prev.length === salesData.length ? [] : salesData.map(d => d.id)
+            prev.length === posOrdersData.length ? [] : posOrdersData.map(d => d.id)
         );
     };
 
-    const filteredData = salesData.filter(item => 
+    const filteredData = posOrdersData.filter(item => 
         item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.ref.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,8 +76,8 @@ export default function OnlineOrders() {
             {/* Page Header */}
             <div className="page-header-flex">
                 <div className="page-title-area">
-                    <h5>Sales</h5>
-                    <p className="page-subtitle">Manage Your Sales</p>
+                    <h5>POS Orders</h5>
+                    <p className="page-subtitle">Manage Your pos orders</p>
                 </div>
                 <div className="header-action-buttons">
                     <button className="action-icon-btn btn-pdf" title="Export PDF"><FileText size={16} /></button>
@@ -124,7 +124,7 @@ export default function OnlineOrders() {
                                 <th className="checkbox-col">
                                     <input 
                                         type="checkbox" 
-                                        checked={selectedRows.length === salesData.length}
+                                        checked={selectedRows.length === posOrdersData.length}
                                         onChange={toggleAll}
                                     />
                                 </th>

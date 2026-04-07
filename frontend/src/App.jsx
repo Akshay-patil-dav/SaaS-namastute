@@ -1,5 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+
+// ── Pages ──────────────────────────────────────────────────────────────────
+import Login from './pages/Login.jsx';
+import Unauthorized from './pages/Unauthorized.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Dashboard2 from './pages/Dashboard2.jsx';
 import SalesDashboard from './pages/SalesDashboard.jsx';
@@ -7,20 +12,11 @@ import SuperDashboard from './pages/SuperDashboard.jsx';
 import SuperCompanies from './pages/SuperCompanies.jsx';
 import SuperSubscriptions from './pages/SuperSubscriptions.jsx';
 import SuperPackages from './pages/SuperPackages.jsx';
-import PosLayout from './components/layout/PosLayout';
-import AdminLayout from './components/admin/AdminLayout';
-import AdminDashboard from './pages/admin/AdminDashboard.jsx';
-import UserManagement from './pages/admin/UserManagement';
-import AdminSettings from './pages/admin/AdminSettings';
-import AdminAnalytics from './pages/admin/AdminAnalytics';
-import AdminContent from './pages/admin/AdminContent';
-import AdminRoles from './pages/admin/AdminRoles';
-import AdminNotifications from './pages/admin/AdminNotifications';
 import ManageStock from './pages/ManageStock.jsx';
 import StockAdjustment from './pages/StockAdjustment.jsx';
 import StockTransfer from './pages/StockTransfer.jsx';
 import OnlineOrders from './pages/OnlineOrders.jsx';
-import ProductLayout from './components/layout/ProductLayout.jsx';
+import PosOrders from './pages/PosOrders.jsx';
 import Products from './pages/Products.jsx';
 import CreateProduct from './pages/CreateProduct.jsx';
 import ExpiredProducts from './pages/ExpiredProducts.jsx';
@@ -34,197 +30,163 @@ import Warranties from './pages/Warranties.jsx';
 import PrintBarcode from './pages/PrintBarcode.jsx';
 import PrintQRCode from './pages/PrintQRCode.jsx';
 
+// ── Admin Pages ─────────────────────────────────────────────────────────────
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import UserManagement from './pages/admin/UserManagement';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminContent from './pages/admin/AdminContent';
+import AdminRoles from './pages/admin/AdminRoles';
+import AdminNotifications from './pages/admin/AdminNotifications';
+
+// ── Layouts ─────────────────────────────────────────────────────────────────
+import PosLayout from './components/layout/PosLayout';
+import AdminLayout from './components/admin/AdminLayout';
+
+// ── Role constants ───────────────────────────────────────────────────────────
+const ALL_ROLES          = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
+const ADMIN_ROLES        = ['SUPER_ADMIN', 'ADMIN'];
+const SUPER_ADMIN_ROLES  = ['SUPER_ADMIN'];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const PosPage = ({ roles, children }) => (
+    <ProtectedRoute allowedRoles={roles}>
+        <PosLayout>{children}</PosLayout>
+    </ProtectedRoute>
+);
+
+const AdminPage = ({ children }) => (
+    <ProtectedRoute allowedRoles={ADMIN_ROLES}>
+        <AdminLayout>{children}</AdminLayout>
+    </ProtectedRoute>
+);
+
+// ── Routes ───────────────────────────────────────────────────────────────────
 function AppRoutes() {
     return (
         <Routes>
-            {/* Make Dashboard the root page */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            
+            {/* Public routes */}
+            <Route path="/login"        element={<Login />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+
+            {/* Root → login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
+            {/* ── CLIENT + ADMIN + SUPER ADMIN ───────────────────────── */}
             <Route
                 path="/dashboard"
-                element={
-                    <PosLayout><Dashboard /></PosLayout>
-                }
+                element={<PosPage roles={ALL_ROLES}><Dashboard /></PosPage>}
             />
-            <Route
-                path="/dashboard/super-dashboard"
-                element={
-                    <PosLayout><SuperDashboard /></PosLayout>
-                }
-            />
-            <Route
-                path="/dashboard/super-companies"
-                element={
-                    <PosLayout><SuperCompanies /></PosLayout>
-                }
-            />
-            <Route
-                path="/dashboard/super-subscriptions"
-                element={
-                    <PosLayout><SuperSubscriptions /></PosLayout>
-                }
-            />
-            <Route
-                path="/dashboard/super-packages"
-                element={
-                    <PosLayout><SuperPackages /></PosLayout>
-                }
-            />
+
+            {/* ── ADMIN + SUPER ADMIN ─────────────────────────────────── */}
             <Route
                 path="/dashboard/admin2"
-                element={
-                    <PosLayout><Dashboard2 /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><Dashboard2 /></PosPage>}
             />
             <Route
                 path="/dashboard/sales"
-                element={
-                    <PosLayout><SalesDashboard /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><SalesDashboard /></PosPage>}
             />
             <Route
                 path="/dashboard/manage-stock"
-                element={
-                    <PosLayout><ManageStock /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><ManageStock /></PosPage>}
             />
             <Route
                 path="/dashboard/stock-adjustment"
-                element={
-                    <PosLayout><StockAdjustment /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><StockAdjustment /></PosPage>}
             />
             <Route
                 path="/dashboard/stock-transfer"
-                element={
-                    <PosLayout><StockTransfer /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><StockTransfer /></PosPage>}
             />
             <Route
                 path="/dashboard/sales-online"
-                element={
-                    <PosLayout><OnlineOrders /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><OnlineOrders /></PosPage>}
             />
-            {/* New Products Layout */}
+            <Route
+                path="/dashboard/sales-pos"
+                element={<PosPage roles={ADMIN_ROLES}><PosOrders /></PosPage>}
+            />
+
+            {/* Products — ADMIN + SUPER ADMIN */}
             <Route
                 path="/products"
-                element={
-                    <PosLayout><Products /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><Products /></PosPage>}
             />
             <Route
                 path="/create-product"
-                element={
-                    <PosLayout><CreateProduct /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><CreateProduct /></PosPage>}
             />
             <Route
                 path="/expired-products"
-                element={
-                    <PosLayout><ExpiredProducts /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><ExpiredProducts /></PosPage>}
             />
             <Route
                 path="/low-stocks"
-                element={
-                    <PosLayout><LowStocks /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><LowStocks /></PosPage>}
             />
             <Route
                 path="/category"
-                element={
-                    <PosLayout><Category /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><Category /></PosPage>}
             />
             <Route
                 path="/sub-category"
-                element={
-                    <PosLayout><SubCategory /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><SubCategory /></PosPage>}
             />
             <Route
                 path="/brands"
-                element={
-                    <PosLayout><Brands /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><Brands /></PosPage>}
             />
             <Route
                 path="/units"
-                element={
-                    <PosLayout><Units /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><Units /></PosPage>}
             />
             <Route
                 path="/variant-attributes"
-                element={
-                    <PosLayout><VariantAttributes /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><VariantAttributes /></PosPage>}
             />
             <Route
                 path="/warranties"
-                element={
-                    <PosLayout><Warranties /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><Warranties /></PosPage>}
             />
             <Route
                 path="/print-barcode"
-                element={
-                    <PosLayout><PrintBarcode /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><PrintBarcode /></PosPage>}
             />
             <Route
                 path="/print-qrcode"
-                element={
-                    <PosLayout><PrintQRCode /></PosLayout>
-                }
+                element={<PosPage roles={ADMIN_ROLES}><PrintQRCode /></PosPage>}
             />
 
-            {/* Admin Routes */}
+            {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
             <Route
-                path="/admin"
-                element={
-                    <AdminLayout><AdminDashboard /></AdminLayout>
-                }
+                path="/dashboard/super-dashboard"
+                element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperDashboard /></PosPage>}
             />
             <Route
-                path="/admin/users"
-                element={
-                    <AdminLayout><UserManagement /></AdminLayout>
-                }
+                path="/dashboard/super-companies"
+                element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperCompanies /></PosPage>}
             />
             <Route
-                path="/admin/analytics"
-                element={
-                    <AdminLayout><AdminAnalytics /></AdminLayout>
-                }
+                path="/dashboard/super-subscriptions"
+                element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperSubscriptions /></PosPage>}
             />
             <Route
-                path="/admin/content"
-                element={
-                    <AdminLayout><AdminContent /></AdminLayout>
-                }
-            />
-            <Route
-                path="/admin/roles"
-                element={
-                    <AdminLayout><AdminRoles /></AdminLayout>
-                }
-            />
-            <Route
-                path="/admin/notifications"
-                element={
-                    <AdminLayout><AdminNotifications /></AdminLayout>
-                }
-            />
-            <Route
-                path="/admin/settings"
-                element={
-                    <AdminLayout><AdminSettings /></AdminLayout>
-                }
+                path="/dashboard/super-packages"
+                element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperPackages /></PosPage>}
             />
 
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            {/* ── Admin Layout (ADMIN + SUPER ADMIN) ─────────────────── */}
+            <Route path="/admin"                  element={<AdminPage><AdminDashboard /></AdminPage>} />
+            <Route path="/admin/users"            element={<AdminPage><UserManagement /></AdminPage>} />
+            <Route path="/admin/analytics"        element={<AdminPage><AdminAnalytics /></AdminPage>} />
+            <Route path="/admin/content"          element={<AdminPage><AdminContent /></AdminPage>} />
+            <Route path="/admin/roles"            element={<AdminPage><AdminRoles /></AdminPage>} />
+            <Route path="/admin/notifications"    element={<AdminPage><AdminNotifications /></AdminPage>} />
+            <Route path="/admin/settings"         element={<AdminPage><AdminSettings /></AdminPage>} />
+
+            {/* Catch-all → login */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
     );
 }

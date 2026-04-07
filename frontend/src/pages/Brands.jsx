@@ -12,18 +12,7 @@ import {
     Trash2
 } from 'lucide-react';
 
-const mockData = [
-    { id: 1, name: "Apple", desc: "Electronics company", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=AP" },
-    { id: 2, name: "Samsung", desc: "Electronics company", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=SM" },
-    { id: 3, name: "Nike", desc: "Sports brand", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=NK" },
-    { id: 4, name: "Adidas", desc: "Sports brand", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=AD" },
-    { id: 5, name: "Lenovo", desc: "Computer hardware", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=LN" },
-    { id: 6, name: "Dell", desc: "Computer hardware", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=DL" },
-    { id: 7, name: "Asus", desc: "Electronics", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=AS" },
-    { id: 8, name: "Puma", desc: "Sports apparel", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=PM" },
-    { id: 9, name: "Reebok", desc: "Sports gear", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=RB" },
-    { id: 10, name: "Zara", desc: "Clothing", status: "Active", img: "https://placehold.co/40x40/e2e8f0/64748b?text=ZR" },
-];
+const mockData = [];
 
 const Brands = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -132,7 +121,7 @@ const Brands = () => {
                         ) : (
                             <tr>
                                 <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No matching brands found.
+                                    No product Avalable tehre
                                 </td>
                             </tr>
                         )}

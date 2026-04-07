@@ -82,6 +82,26 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <!-- Suppress "restricted method" warnings on Java 17+ with Tomcat native -->
+          <jvmArguments>
+            --enable-native-access=ALL-UNNAMED
+            -XX:+TieredCompilation
+          </jvmArguments>
+        </configuration>
+      </plugin>
+
+      <!-- Compiler: use release 21 for compatibility even if JDK 26 is installed -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>21</release>
+          <compilerArgs>
+            <!-- suppress unchecked/null warnings treated as errors -->
+            <arg>-Xlint:-unchecked</arg>
+          </compilerArgs>
+        </configuration>
       </plugin>
     </plugins>
   </build>

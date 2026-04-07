@@ -12,18 +12,7 @@ import {
     Trash2
 } from 'lucide-react';
 
-const mockData = [
-    { id: 1, categoryCode: "CT001", description: "Efficient Productivity", status: "Active" },
-    { id: 2, categoryCode: "CT002", description: "Compact Design", status: "Active" },
-    { id: 3, categoryCode: "CT003", description: "Dynamic Grip", status: "Active" },
-    { id: 4, categoryCode: "CT004", description: "Stylish Comfort", status: "Active" },
-    { id: 5, categoryCode: "CT005", description: "Seamless Connectivity", status: "Active" },
-    { id: 6, categoryCode: "CT006", description: "Reliable Sound", status: "Active" },
-    { id: 7, categoryCode: "CT007", description: "Compact Carry", status: "Active" },
-    { id: 8, categoryCode: "CT008", description: "Travel Ready", status: "Active" },
-    { id: 9, categoryCode: "CT009", description: "Cozy Comfort", status: "Active" },
-    { id: 10, categoryCode: "CT010", description: "Stylish Comfort", status: "Active" },
-];
+const mockData = [];
 
 const SubCategory = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -130,7 +119,7 @@ const SubCategory = () => {
                         ) : (
                             <tr>
                                 <td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No matching sub categories found.
+                                    No product Avalable tehre
                                 </td>
                             </tr>
                         )}

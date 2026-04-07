@@ -11,18 +11,7 @@ import {
     Trash2
 } from 'lucide-react';
 
-const mockData = [
-    { id: 1, sku: "PT001", name: "Lenovo 3rd Generation", mfgDate: "24 Dec 2024", expDate: "20 Dec 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=LP" },
-    { id: 2, sku: "PT002", name: "Beats Pro", mfgDate: "10 Dec 2024", expDate: "07 Dec 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=BP" },
-    { id: 3, sku: "PT003", name: "Nike Jordan", mfgDate: "27 Nov 2024", expDate: "20 Nov 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=NJ" },
-    { id: 4, sku: "PT004", name: "Apple Series 5 Watch", mfgDate: "18 Nov 2024", expDate: "15 Nov 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=AW" },
-    { id: 5, sku: "PT005", name: "Amazon Echo Dot", mfgDate: "06 Nov 2024", expDate: "04 Nov 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=ED" },
-    { id: 6, sku: "PT006", name: "Sanford Chair Sofa", mfgDate: "25 Oct 2024", expDate: "20 Oct 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=SC" },
-    { id: 7, sku: "PT007", name: "Red Premium Satchel", mfgDate: "14 Oct 2024", expDate: "10 Oct 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=RS" },
-    { id: 8, sku: "PT008", name: "Iphone 14 Pro", mfgDate: "03 Oct 2024", expDate: "01 Oct 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=IP" },
-    { id: 9, sku: "PT009", name: "Gaming Chair", mfgDate: "20 Sep 2024", expDate: "16 Sep 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=GC" },
-    { id: 10, sku: "PT010", name: "Borealis Backpack", mfgDate: "10 Sep 2024", expDate: "06 Sep 2026", img: "https://placehold.co/40x40/e2e8f0/64748b?text=BB" },
-];
+const mockData = [];
 
 const ExpiredProducts = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -130,7 +119,7 @@ const ExpiredProducts = () => {
                         ) : (
                             <tr>
                                 <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No matching expired products found.
+                                    No product Avalable tehre
                                 </td>
                             </tr>
                         )}

@@ -12,18 +12,7 @@ import {
     Mail
 } from 'lucide-react';
 
-const mockData = [
-    { id: 1, warehouse: "Lavish Warehouse", store: "Electro Mart", name: "Lenovo IdeaPad 3", category: "Computers", sku: "PT001", qty: 20, alert: 15, img: "https://placehold.co/40x40/e2e8f0/64748b?text=LP" },
-    { id: 2, warehouse: "Quaint Warehouse", store: "Quantum Gadgets", name: "Beats Pro", category: "Electronics", sku: "PT002", qty: 25, alert: 20, img: "https://placehold.co/40x40/e2e8f0/64748b?text=BP" },
-    { id: 3, warehouse: "Traditional Warehouse", store: "Prime Bazaar", name: "Nike Jordan", category: "Shoe", sku: "PT003", qty: 40, alert: 35, img: "https://placehold.co/40x40/e2e8f0/64748b?text=NJ" },
-    { id: 4, warehouse: "Cool Warehouse", store: "Gadget World", name: "Apple Series 5 Watch", category: "Electronics", sku: "PT004", qty: 50, alert: 45, img: "https://placehold.co/40x40/e2e8f0/64748b?text=AW" },
-    { id: 5, warehouse: "Overflow Warehouse", store: "Volt Vault", name: "Amazon Echo Dot", category: "Electronics", sku: "PT005", qty: 30, alert: 25, img: "https://placehold.co/40x40/e2e8f0/64748b?text=ED" },
-    { id: 6, warehouse: "Nova Storage Hub", store: "Elite Retail", name: "Sanford Chair Sofa", category: "Furniture", sku: "PT006", qty: 10, alert: 8, img: "https://placehold.co/40x40/e2e8f0/64748b?text=SC" },
-    { id: 7, warehouse: "Retail Supply Hub", store: "Prime Mart", name: "Red Premium Satchel", category: "Bags", sku: "PT007", qty: 70, alert: 60, img: "https://placehold.co/40x40/e2e8f0/64748b?text=RS" },
-    { id: 8, warehouse: "EdgeWare Solutions", store: "NeoTech Store", name: "Iphone 14 Pro", category: "Phone", sku: "PT008", qty: 35, alert: 30, img: "https://placehold.co/40x40/e2e8f0/64748b?text=IP" },
-    { id: 9, warehouse: "North Zone Warehouse", store: "Urban Mart", name: "Gaming Chair", category: "Furniture", sku: "PT009", qty: 15, alert: 10, img: "https://placehold.co/40x40/e2e8f0/64748b?text=GC" },
-    { id: 10, warehouse: "Fulfillment Hub", store: "Travel Mart", name: "Borealis Backpack", category: "Bags", sku: "PT010", qty: 45, alert: 40, img: "https://placehold.co/40x40/e2e8f0/64748b?text=BB" },
-];
+const mockData = [];
 
 const LowStocks = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -176,7 +165,7 @@ const LowStocks = () => {
                         ) : (
                             <tr>
                                 <td colSpan="9" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No matching low stocks found.
+                                    No product Avalable tehre
                                 </td>
                             </tr>
                         )}

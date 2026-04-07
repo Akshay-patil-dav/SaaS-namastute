@@ -12,18 +12,7 @@ import {
     Trash2
 } from 'lucide-react';
 
-const mockData = [
-    { id: 1, name: "Standard Warranty", desc: "Covers manufacturing faulty items", duration: "2 Year", status: "Active" },
-    { id: 2, name: "Extended Plus", desc: "Service at the customer's location", duration: "1 Year", status: "Active" },
-    { id: 3, name: "Screen Protection", desc: "Accidental screen damage", duration: "6 Months", status: "Active" },
-    { id: 4, name: "Labor Only", desc: "Covers labor fees, not parts", duration: "6 Months", status: "Active" },
-    { id: 5, name: "Basic Refund", desc: "Free returns during warranty period", duration: "3 Months", status: "Active" },
-    { id: 6, name: "Water Damage", desc: "Liquid-related damage", duration: "6 Months", status: "Active" },
-    { id: 7, name: "Battery Guarantee", desc: "Covers fast battery aging issues", duration: "1 Year", status: "Active" },
-    { id: 8, name: "Short Term", desc: "Brief coverage for specified period", duration: "3 Months", status: "Active" },
-    { id: 9, name: "Component Care", desc: "Specific heat-related issues", duration: "6 Months", status: "Active" },
-    { id: 10, name: "Surge Protection", desc: "Damage from power surges", duration: "6 Months", status: "Active" },
-];
+const mockData = [];
 
 const Warranties = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -128,7 +117,7 @@ const Warranties = () => {
                         ) : (
                             <tr>
                                 <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No matching warranties found.
+                                    No product Avalable tehre
                                 </td>
                             </tr>
                         )}

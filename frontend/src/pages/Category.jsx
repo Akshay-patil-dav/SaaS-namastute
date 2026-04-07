@@ -12,18 +12,7 @@ import {
     Trash2
 } from 'lucide-react';
 
-const mockData = [
-    { id: 1, name: "Computers", slug: "computers", date: "24 Dec 2024", status: "Active" },
-    { id: 2, name: "Electronics", slug: "electronics", date: "10 Dec 2024", status: "Active" },
-    { id: 3, name: "Shoe", slug: "shoe", date: "27 Nov 2024", status: "Active" },
-    { id: 4, name: "Cosmetics", slug: "cosmetics", date: "18 Nov 2024", status: "Active" },
-    { id: 5, name: "Groceries", slug: "groceries", date: "06 Nov 2024", status: "Active" },
-    { id: 6, name: "Furniture", slug: "furniture", date: "25 Oct 2024", status: "Active" },
-    { id: 7, name: "Bags", slug: "bags", date: "14 Oct 2024", status: "Active" },
-    { id: 8, name: "Phone", slug: "phone", date: "03 Oct 2024", status: "Active" },
-    { id: 9, name: "Appliances", slug: "appliances", date: "20 Sep 2024", status: "Active" },
-    { id: 10, name: "Clothing", slug: "clothing", date: "10 Sep 2024", status: "Active" },
-];
+const mockData = [];
 
 const Category = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -128,7 +117,7 @@ const Category = () => {
                         ) : (
                             <tr>
                                 <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No matching categories found.
+                                    No product Avalable tehre
                                 </td>
                             </tr>
                         )}
