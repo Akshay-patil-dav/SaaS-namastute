@@ -12,7 +12,9 @@ import {
     ChevronRight,
     Menu,
     X,
-    ShieldCheck
+    ShieldCheck,
+    Layers,
+    ListTree
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -23,6 +25,8 @@ const menuItems = [
     { path: '/admin/content', label: 'Content', icon: FileText },
     { path: '/admin/roles', label: 'Roles', icon: Shield },
     { path: '/admin/notifications', label: 'Notifications', icon: Bell },
+    { path: '/admin/category', label: 'Category', icon: Layers },
+    { path: '/admin/sub-category', label: 'Sub Category', icon: ListTree },
     { path: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

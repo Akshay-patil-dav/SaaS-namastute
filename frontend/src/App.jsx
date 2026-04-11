@@ -188,6 +188,8 @@ function AppRoutes() {
             <Route path="/admin/content"          element={<AdminPage><AdminContent /></AdminPage>} />
             <Route path="/admin/roles"            element={<AdminPage><AdminRoles /></AdminPage>} />
             <Route path="/admin/notifications"    element={<AdminPage><AdminNotifications /></AdminPage>} />
+            <Route path="/admin/category"         element={<AdminPage><Category /></AdminPage>} />
+            <Route path="/admin/sub-category"     element={<AdminPage><SubCategory /></AdminPage>} />
             <Route path="/admin/settings"         element={<AdminPage><AdminSettings /></AdminPage>} />
 
             {/* Catch-all → login */}

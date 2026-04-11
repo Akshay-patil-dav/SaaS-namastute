@@ -1,0 +1,330 @@
+.add-sub-category-modal {
+    max-width: 650px !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1) !important;
+}
+
+.add-sub-category-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: #fff;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.header-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-icon {
+    width: 36px;
+    height: 36px;
+    background: #fff7ed;
+    color: #ff9b29;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-sub-category-modal .modal-header h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.close-btn {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.add-sub-category-modal .modal-body {
+    padding: 30px;
+    background: #fff;
+}
+
+.modal-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Image Upload UI */
+.image-upload-wrapper {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px dashed #e2e8f0;
+}
+
+.image-preview-box {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.image-preview-box:hover {
+    border-color: #ff9b29;
+    box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.1);
+}
+
+.image-preview-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #94a3b8;
+}
+
+.upload-placeholder span {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.upload-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-browse {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-browse:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.upload-limit {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 0;
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 8px;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.form-input-custom, .form-select-custom, .form-textarea-custom {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.form-input-custom:focus, .form-select-custom:focus, .form-textarea-custom:focus {
+    border-color: #ff9b29;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.1);
+}
+
+.form-textarea-custom {
+    resize: none;
+    min-height: 80px;
+}
+
+/* Status Toggle */
+.status-toggle-row {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-label {
+    display: flex;
+    flex-direction: column;
+}
+
+.status-label strong {
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.status-label span {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.switch-custom {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.switch-custom input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider-custom {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #e2e8f0;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider-custom:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.switch-custom input:checked + .slider-custom {
+    background-color: #28c76f;
+}
+
+.switch-custom input:checked + .slider-custom:before {
+    transform: translateX(24px);
+}
+
+/* Footer Actions */
+.modal-footer-custom {
+    padding: 20px 30px;
+    background: #f8fafc;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.btn-cancel-custom {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel-custom:hover {
+    background: #f1f5f9;
+}
+
+.btn-submit-custom {
+    background: #ff9b29;
+    border: none;
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(255, 155, 41, 0.2);
+}
+
+.btn-submit-custom:hover {
+    background: #e68a1f;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(255, 155, 41, 0.3);
+}
+
+.alert-error-custom {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
