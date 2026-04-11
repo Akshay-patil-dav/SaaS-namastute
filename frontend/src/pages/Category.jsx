@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import './Products.css';
+import './inventory-pages-custom.css';
 import { 
     FileText, 
     FileSpreadsheet, 
@@ -14,12 +14,15 @@ import {
     CheckCircle,
     AlertCircle,
     X,
-    Loader
+    Loader,
+    Layers,
+    TrendingUp,
+    LayoutGrid,
+    Tag
 } from 'lucide-react';
 import AddCategoryModal from '../components/AddCategoryModal';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/categories`;
-
 
 const Category = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,11 +41,11 @@ const Category = () => {
             if (res.data && Array.isArray(res.data)) {
                 setCategories(res.data);
             } else {
-                console.warn('Backend did not return an array of categories:', res.data);
                 setCategories([]);
             }
         } catch (err) {
             console.error('Failed to fetch categories:', err);
+            showToast('error', 'Failed to fetch categories');
         } finally {
             setLoading(false);
         }
@@ -107,13 +110,16 @@ const Category = () => {
         if (!item) return false;
         if (!searchTerm) return true;
         const term = searchTerm.toLowerCase();
-        const name = (item.name || '').toLowerCase();
-        const slug = (item.slug || '').toLowerCase();
-        return name.includes(term) || slug.includes(term);
+        return (item.name || '').toLowerCase().includes(term) || (item.slug || '').toLowerCase().includes(term);
     }) : [];
 
+    // Stats
+    const totalCount = categories.length;
+    const activeCount = categories.filter(c => c.status).length;
+    const inactiveCount = totalCount - activeCount;
+
     return (
-        <div className="product-page-container">
+        <div className="sub-category-page">
             {/* Toast */}
             {toast && (
                 <div className={`prod-toast prod-toast-${toast.type}`}>
@@ -129,7 +135,7 @@ const Category = () => {
                     <div className="delete-modal">
                         <div className="delete-modal-icon"><Trash2 size={28} /></div>
                         <h5>Delete Category?</h5>
-                        <p>This action cannot be undone.</p>
+                        <p>This action cannot be undone. All related sub-categories may be affected.</p>
                         <div className="delete-modal-actions">
                             <button className="btn-cancel-del" onClick={() => setDeleteConfirm(null)}>Cancel</button>
                             <button className="btn-confirm-del" onClick={() => handleDelete(deleteConfirm)}>Delete</button>
@@ -139,142 +145,218 @@ const Category = () => {
             )}
 
             {/* Header Section */}
-            <div className="product-page-header">
-                <div className="product-page-title">
-                    <h4>Category</h4>
-                    <p>Manage your categories</p>
+            <div className="ss-header-row">
+                <div>
+                    <h1 className="ss-page-title">Category</h1>
+                    <p className="ss-page-subtitle">Manage your primary product categories</p>
                 </div>
                 
-                <div className="page-actions">
-                    <button className="btn-icon-action" title="PDF">
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" title="PDF">
                         <FileText size={18} className="icon-red" />
                     </button>
-                    <button className="btn-icon-action" title="Excel">
+                    <button className="ss-btn-icon-square" title="Excel">
                         <FileSpreadsheet size={18} className="icon-green" />
                     </button>
-                    <button className="btn-icon-action" title="Refresh" onClick={fetchCategories}>
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchCategories}>
                         <RefreshCw size={18} className={loading ? 'spin' : ''} />
                     </button>
-                    <button className="btn-icon-action" title="Collapse">
+                    <button className="ss-btn-icon-square" title="Collapse">
                         <ChevronUp size={18} />
                     </button>
                     {selectedIds.length > 0 && (
-                        <button className="btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ea5455', color: '#ea5455', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s' }}>
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '8px', border: '1px solid #ef4444', color: '#ef4444', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s' }}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <button className="btn-orange" onClick={() => { setEditingCategory(null); setIsModalOpen(true); }}>
+                    <button className="ss-btn-orange" onClick={() => { setEditingCategory(null); setIsModalOpen(true); }}>
                         <PlusCircle size={18} /> Add Category
                     </button>
                 </div>
             </div>
 
-            {/* Table Card Area */}
-            <div className="product-table-card">
+            {/* Stats Cards Area */}
+            <div className="ss-stats-container">
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Total Categories</h4>
+                            <p>{totalCount}</p>
+                        </div>
+                        <div className="ss-btn-icon-square icon-blue">
+                            <Layers size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom">
+                        <TrendingUp size={14} /> Major product groups
+                    </div>
+                </div>
+
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Active</h4>
+                            <p>{activeCount}</p>
+                        </div>
+                        <div className="ss-btn-icon-square icon-green">
+                            <CheckCircle size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom">
+                        <TrendingUp size={14} /> Available in storefront
+                    </div>
+                </div>
+
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Inactive</h4>
+                            <p>{inactiveCount}</p>
+                        </div>
+                        <div className="ss-btn-icon-square icon-red">
+                            <AlertCircle size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom" style={{ color: '#ef4444' }}>
+                        Hidden from customers
+                    </div>
+                </div>
+
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Quick Filter</h4>
+                            <p>Recent</p>
+                        </div>
+                        <div className="ss-btn-icon-square icon-orange">
+                            <Tag size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom">
+                        <TrendingUp size={14} /> Updated recently
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Panel Area */}
+            <div className="ss-main-panel">
                 
-                {/* Filter Row */}
-                <div className="table-filter-row">
-                    <div className="search-box" style={{ maxWidth: '400px' }}>
+                {/* Table Controls */}
+                <div className="ss-table-controls">
+                    <div className="ss-search-wrap">
                         <Search size={18} />
                         <input 
                             type="text" 
-                            placeholder="Search" 
+                            className="ss-search-input"
+                            placeholder="Search categories..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="filter-dropdowns">
-                        <div className="filter-select">
-                            Status <ChevronDown size={16} />
-                        </div>
+                    <div className="ss-filters-wrap">
+                        <select className="ss-filter-select">
+                            <option>Status</option>
+                        </select>
+                        <select className="ss-filter-select">
+                            <option>Sort By: A-Z</option>
+                        </select>
                     </div>
                 </div>
 
                 {/* Data Table */}
-                <table className="custom-table" style={{ minWidth: '700px' }}>
-                    <thead>
-                        <tr>
-                            <th style={{ width: '40px' }}>
-                                <input 
-                                    type="checkbox" 
-                                    className="custom-checkbox" 
-                                    checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
-                                    onChange={(e) => handleSelectAll(e.target.checked)}
-                                />
-                            </th>
-                            <th>Category</th>
-                            <th>Category slug</th>
-                            <th>Created On</th>
-                            <th>Status</th>
-                            <th style={{ textAlign: 'center' }}>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
+                <div className="ss-table-wrapper">
+                    <table className="ss-table">
+                        <thead>
                             <tr>
-                                <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                                    <Loader className="spin" size={24} style={{ color: '#ff9b29' }} />
-                                </td>
-                            </tr>
-                        ) : filteredData.length > 0 ? (
-                            filteredData.map((item) => (
-                            <tr key={item.id}>
-                                <td>
+                                <th style={{ width: '40px' }}>
                                     <input 
                                         type="checkbox" 
-                                        className="custom-checkbox" 
-                                        checked={selectedIds.includes(item.id)}
-                                        onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                        className="ss-checkbox" 
+                                        checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
+                                        onChange={(e) => handleSelectAll(e.target.checked)}
                                     />
-                                </td>
-                                <td>{item.name}</td>
-                                <td>{item.slug}</td>
-                                <td>{formatDate(item.createdAt)}</td>
-                                <td>
-                                    <span className={item.status ? "badge-success" : "badge-danger"} style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>
-                                        {item.status ? 'Active' : 'Inactive'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div className="action-buttons justify-content-center">
-                                        <button className="action-btn" title="Edit" onClick={() => { setEditingCategory(item); setIsModalOpen(true); }}>
-                                            <Pencil size={16} />
-                                        </button>
-                                        <button className="action-btn" title="Delete" onClick={() => setDeleteConfirm(item.id)}>
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </td>
+                                </th>
+                                <th>Category</th>
+                                <th>Category Slug</th>
+                                <th>Created On</th>
+                                <th>Status</th>
+                                <th style={{ textAlign: 'center' }}>Action</th>
                             </tr>
-                        ))
-                        ) : (
-                            <tr>
-                                <td colSpan="6" style={{ textAlign: 'center', padding: '20px', color: '#6c757d' }}>
-                                    No categories available.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
+                                        <Loader className="spin mx-auto mb-2" size={24} style={{ color: '#ff9b29' }} />
+                                        <p style={{ color: '#94a3b8', fontSize: '14px' }}>Loading categories...</p>
+                                    </td>
+                                </tr>
+                            ) : filteredData.length > 0 ? (
+                                filteredData.map((item) => (
+                                <tr key={item.id}>
+                                    <td>
+                                        <input 
+                                            type="checkbox" 
+                                            className="ss-checkbox" 
+                                            checked={selectedIds.includes(item.id)}
+                                            onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                        />
+                                    </td>
+                                    <td className="ss-item-name">{item.name}</td>
+                                    <td>
+                                        <code style={{ background: '#f8fafc', padding: '2px 6px', borderRadius: '4px', fontSize: '12px' }}>
+                                            {item.slug}
+                                        </code>
+                                    </td>
+                                    <td>{formatDate(item.createdAt)}</td>
+                                    <td>
+                                        <span className={`ss-status-badge ${item.status ? "ss-status-active" : "ss-status-inactive"}`}>
+                                            {item.status ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div className="ss-actions-group justify-content-center">
+                                            <button className="ss-action-btn" title="Edit" onClick={() => { setEditingCategory(item); setIsModalOpen(true); }}>
+                                                <Pencil size={14} />
+                                            </button>
+                                            <button className="ss-action-btn delete" title="Delete" onClick={() => setDeleteConfirm(item.id)}>
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
+                                        <div style={{ color: '#94a3b8' }}>
+                                            <LayoutGrid size={40} strokeWidth={1} style={{ marginBottom: '12px', opacity: 0.5 }} />
+                                            <p>No categories available</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
                 {/* Pagination */}
-                <div className="pagination-row">
-                    <div>
+                <div className="ss-pagination-row">
+                    <div className="ss-page-size">
                         Row Per Page 
-                        <select className="entries-select" defaultValue="10">
+                        <select defaultValue="10">
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
                         </select> 
                         Entries
                     </div>
-                    <div className="pagination-controls">
-                        <button className="page-btn bg-light">&lt;</button>
-                        <button className="page-btn active">1</button>
-                        <button className="page-btn bg-light">&gt;</button>
+                    <div className="ss-page-controls">
+                        <button className="ss-page-btn" disabled>&lt;</button>
+                        <button className="ss-page-btn active">1</button>
+                        <button className="ss-page-btn">&gt;</button>
                     </div>
                 </div>
-
             </div>
 
             <AddCategoryModal 
@@ -288,3 +370,4 @@ const Category = () => {
 };
 
 export default Category;
+
