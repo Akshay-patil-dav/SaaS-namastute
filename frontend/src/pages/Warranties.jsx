@@ -16,15 +16,42 @@ const mockData = [];
 
 const Warranties = () => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [data, setData] = useState(mockData);
 
-    const filteredData = mockData.filter(item => {
+    const filteredData = data.filter(item => {
         if (!searchTerm) return true;
         const term = searchTerm.toLowerCase();
         return (
-            item.name.toLowerCase().includes(term) ||
-            item.desc.toLowerCase().includes(term)
+            (item.name || '').toLowerCase().includes(term) ||
+            (item.desc || '').toLowerCase().includes(term)
         );
     });
+
+    const handleSelectAll = (isChecked) => {
+        if (isChecked) {
+            setSelectedIds(filteredData.map(item => item.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelectItem = (id, isChecked) => {
+        if (isChecked) {
+            setSelectedIds(prev => [...prev, id]);
+        } else {
+            setSelectedIds(prev => prev.filter(item => item !== id));
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (!selectedIds.length) return;
+        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} warranties?`)) return;
+        
+        setData(prev => prev.filter(item => !selectedIds.includes(item.id)));
+        setSelectedIds([]);
+        alert('Simulated deletion: Backend connection pending for this entity.');
+    };
 
     return (
         <div className="product-page-container">
@@ -48,6 +75,11 @@ const Warranties = () => {
                     <button className="btn-icon-action" title="Collapse">
                         <ChevronUp size={18} />
                     </button>
+                    {selectedIds.length > 0 && (
+                        <button className="btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ea5455', color: '#ea5455', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s' }}>
+                            <Trash2 size={16} /> Delete Selected ({selectedIds.length})
+                        </button>
+                    )}
                     <button className="btn-orange">
                         <PlusCircle size={18} /> Add Warranty
                     </button>
@@ -80,7 +112,12 @@ const Warranties = () => {
                     <thead>
                         <tr>
                             <th style={{ width: '40px' }}>
-                                <input type="checkbox" className="custom-checkbox" />
+                                <input 
+                                    type="checkbox" 
+                                    className="custom-checkbox" 
+                                    checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
+                                    onChange={(e) => handleSelectAll(e.target.checked)}
+                                />
                             </th>
                             <th>Name</th>
                             <th>Description</th>
@@ -94,7 +131,12 @@ const Warranties = () => {
                             filteredData.map((item) => (
                             <tr key={item.id}>
                                 <td>
-                                    <input type="checkbox" className="custom-checkbox" />
+                                    <input 
+                                        type="checkbox" 
+                                        className="custom-checkbox" 
+                                        checked={selectedIds.includes(item.id)}
+                                        onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                    />
                                 </td>
                                 <td>{item.name}</td>
                                 <td>{item.desc}</td>

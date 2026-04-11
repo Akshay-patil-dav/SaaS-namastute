@@ -27,6 +27,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
+    /** GET /api/products/expired — list expired items */
+    @GetMapping("/expired")
+    public ResponseEntity<List<Product>> getExpiredProducts() {
+        return ResponseEntity.ok(productService.getExpiredProducts());
+    }
+
     /** GET /api/products/{id} — get one */
     @GetMapping("/{id}")
     public ResponseEntity<?> getProduct(@PathVariable Long id) {
@@ -63,13 +69,28 @@ public class ProductController {
                         .body(Map.of("error", "Product not found")));
     }
 
-    /** DELETE /api/products/{id} — delete */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         if (productService.deleteProduct(id)) {
             return ResponseEntity.ok(Map.of("message", "Product deleted successfully"));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Product not found"));
+    }
+
+    /** POST /api/products/delete-bulk — bulk delete */
+    @PostMapping("/delete-bulk")
+    public ResponseEntity<?> bulkDeleteProducts(@RequestBody Map<String, List<Long>> payload) {
+        try {
+            List<Long> ids = payload.get("ids");
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No IDs provided"));
+            }
+            productService.bulkDeleteProducts(ids);
+            return ResponseEntity.ok(Map.of("message", "Products deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     /** GET /api/products/generate-sku — generate unique SKU */

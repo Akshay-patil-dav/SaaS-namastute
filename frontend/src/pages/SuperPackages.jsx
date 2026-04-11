@@ -16,11 +16,6 @@ import {
 import './super-packages.css';
 
 export default function SuperPackages() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [accessTrial, setAccessTrial] = useState(false);
-  const [isRecommended, setIsRecommended] = useState(false);
-
   const tableData = [
     { name: 'Basic', type: 'Monthly', subscribers: 56, price: '$50', date: '14 Jan 2024', status: 'Active' },
     { name: 'Advanced', type: 'Monthly', subscribers: 99, price: '$200', date: '21 Jan 2024', status: 'Active' },
@@ -32,10 +27,42 @@ export default function SuperPackages() {
     { name: 'Enterprise', type: 'Yearly', subscribers: 17, price: '$4800', date: '16 Apr 2024', status: 'Active' },
   ];
 
-  const filteredData = tableData.filter(item => 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [accessTrial, setAccessTrial] = useState(false);
+  const [isRecommended, setIsRecommended] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [data, setData] = useState(tableData);
+
+  const filteredData = data.filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     item.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleSelectAll = (isChecked) => {
+    if (isChecked) {
+      setSelectedIds(filteredData.map((_, index) => index));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectItem = (index, isChecked) => {
+    if (isChecked) {
+      setSelectedIds(prev => [...prev, index]);
+    } else {
+      setSelectedIds(prev => prev.filter(item => item !== index));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (!selectedIds.length) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} packages?`)) return;
+    
+    setData(prev => prev.filter((_, index) => !selectedIds.includes(index)));
+    setSelectedIds([]);
+    alert('Simulated deletion: Backend connection pending for Super Admin entities.');
+  };
 
   const modules = [
     'Employees', 'Invoices', 'Reports', 'Contacts',
@@ -57,6 +84,11 @@ export default function SuperPackages() {
           <button className="sp-btn-icon-square" title="Export Excel"><FileSpreadsheet size={16} color="#22c55e" /></button>
           <button className="sp-btn-icon-square" title="Refresh" onClick={() => window.location.reload()}><RefreshCw size={16} /></button>
           <button className="sp-btn-icon-square" title="Collapse"><ChevronUp size={16} /></button>
+          {selectedIds.length > 0 && (
+            <button className="sp-btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ef4444', color: '#ef4444', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s', marginLeft: '10px' }}>
+              <Trash2 size={16} /> Delete Selected ({selectedIds.length})
+            </button>
+          )}
           <button className="sp-btn-add" onClick={() => setIsAddModalOpen(true)}>
             <PlusCircle size={16} /> Add Packages
           </button>
@@ -137,7 +169,14 @@ export default function SuperPackages() {
           <table className="sp-table">
             <thead>
               <tr>
-                <th style={{ width: '40px' }}><input type="checkbox" className="sp-checkbox" /></th>
+                <th style={{ width: '40px' }}>
+                  <input 
+                    type="checkbox" 
+                    className="sp-checkbox" 
+                    checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                  />
+                </th>
                 <th>Plan Name</th>
                 <th>Plan Type</th>
                 <th>Total Subscribers</th>
@@ -151,7 +190,14 @@ export default function SuperPackages() {
               {filteredData.length > 0 ? (
                 filteredData.map((row, index) => (
                   <tr key={index}>
-                    <td><input type="checkbox" className="sp-checkbox" /></td>
+                    <td>
+                      <input 
+                        type="checkbox" 
+                        className="sp-checkbox" 
+                        checked={selectedIds.includes(index)}
+                        onChange={(e) => handleSelectItem(index, e.target.checked)}
+                      />
+                    </td>
                     <td className="sp-plan-name">{row.name}</td>
                     <td>{row.type}</td>
                     <td>{row.subscribers}</td>

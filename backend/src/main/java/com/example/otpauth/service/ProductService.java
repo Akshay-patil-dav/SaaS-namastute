@@ -27,6 +27,11 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    /** List expired products */
+    public List<Product> getExpiredProducts() {
+        return productRepository.findByExpiryDateBefore(LocalDate.now());
+    }
+
     /** Get single product */
     public Optional<Product> getProductById(@NonNull Long id) {
         return productRepository.findById(Objects.requireNonNull(id));
@@ -61,12 +66,18 @@ public class ProductService {
 
     /** Delete a product */
     public boolean deleteProduct(@NonNull Long id) {
-        long safeId = Objects.requireNonNull(id);
-        if (productRepository.existsById(safeId)) {
-            productRepository.deleteById(safeId);
+        if (productRepository.existsById(Objects.requireNonNull(id))) {
+            productRepository.deleteById(id);
             return true;
         }
         return false;
+    }
+
+
+    public void bulkDeleteProducts(List<Long> ids) {
+        if (ids != null && !ids.isEmpty()) {
+            productRepository.deleteAllByIdInBatch(ids);
+        }
     }
 
     /** Generate a new unique SKU */

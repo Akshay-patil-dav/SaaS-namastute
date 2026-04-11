@@ -51,6 +51,7 @@ const Products = () => {
     const [deleteConfirm, setDeleteConfirm] = useState(null); // id to delete
     const [viewProduct, setViewProduct]     = useState(null);   // product to view
     const [activeImgIndex, setActiveImgIndex] = useState(0);    // for gallery
+    const [selectedIds, setSelectedIds]       = useState([]);
 
     // ── Fetch products from backend ──────────────────────────────────────
     const fetchProducts = useCallback(async () => {
@@ -107,7 +108,36 @@ const Products = () => {
         setDeleteConfirm(null);
     };
 
-    // ── Toast ────────────────────────────────────────────────────────────
+    const handleBulkDelete = async () => {
+        if (!selectedIds.length) return;
+        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} products?`)) return;
+
+        try {
+            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            showToast('success', `${selectedIds.length} products deleted successfully.`);
+            setSelectedIds([]);
+            fetchProducts();
+        } catch (err) {
+            showToast('error', 'Failed to delete products.');
+        }
+    };
+
+    const handleSelectAll = (isChecked) => {
+        if (isChecked) {
+            setSelectedIds(paginated.map(item => item.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelectItem = (id, isChecked) => {
+        if (isChecked) {
+            setSelectedIds(prev => [...prev, id]);
+        } else {
+            setSelectedIds(prev => prev.filter(item => item !== id));
+        }
+    };
+
     const showToast = (type, message) => {
         setToast({ type, message });
         setTimeout(() => setToast(null), 3500);
@@ -181,6 +211,11 @@ const Products = () => {
                         <RefreshCw size={18} className={loading ? 'spin' : ''} />
                     </button>
                     <button className="btn-icon-action" title="Collapse"><ChevronUp size={18} /></button>
+                    {selectedIds.length > 0 && (
+                        <button className="btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ea5455', color: '#ea5455', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s', textDecoration: 'none' }}>
+                            <Trash2 size={16} /> Delete Selected ({selectedIds.length})
+                        </button>
+                    )}
                     <Link to="/create-product" className="btn-orange text-decoration-none">
                         <PlusCircle size={18} /> Add Product
                     </Link>
@@ -223,7 +258,14 @@ const Products = () => {
                 <table className="custom-table">
                     <thead>
                         <tr>
-                            <th style={{ width: '40px' }}><input type="checkbox" className="custom-checkbox" /></th>
+                            <th style={{ width: '40px' }}>
+                                <input 
+                                    type="checkbox" 
+                                    className="custom-checkbox" 
+                                    checked={paginated.length > 0 && selectedIds.length === paginated.length}
+                                    onChange={(e) => handleSelectAll(e.target.checked)}
+                                />
+                            </th>
                             <th>SKU</th>
                             <th>Product Name</th>
                             <th>Category</th>
@@ -260,7 +302,14 @@ const Products = () => {
                         {/* Actual rows */}
                         {!loading && paginated.length > 0 && paginated.map((item) => (
                             <tr key={item.id} className={item._isMock ? 'mock-row' : 'db-row'}>
-                                <td><input type="checkbox" className="custom-checkbox" /></td>
+                                <td>
+                                    <input 
+                                        type="checkbox" 
+                                        className="custom-checkbox" 
+                                        checked={selectedIds.includes(item.id)}
+                                        onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                    />
+                                </td>
                                 <td>
                                     <span className="sku-chip">{item.sku || '—'}</span>
                                 </td>
