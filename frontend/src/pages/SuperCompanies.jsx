@@ -25,11 +25,6 @@ import {
 import './super-companies.css';
 
 export default function SuperCompanies() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-
   const tableData = [
     {
       company: 'BrightWave Innovations',
@@ -123,11 +118,43 @@ export default function SuperCompanies() {
     }
   ];
 
-  const filteredData = tableData.filter(item => 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [data, setData] = useState(tableData);
+
+  const filteredData = data.filter(item => 
     item.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
     item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.url.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleSelectAll = (isChecked) => {
+    if (isChecked) {
+      setSelectedIds(filteredData.map((_, index) => index));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectItem = (index, isChecked) => {
+    if (isChecked) {
+      setSelectedIds(prev => [...prev, index]);
+    } else {
+      setSelectedIds(prev => prev.filter(item => item !== index));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (!selectedIds.length) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} companies?`)) return;
+    
+    setData(prev => prev.filter((_, index) => !selectedIds.includes(index)));
+    setSelectedIds([]);
+    alert('Simulated deletion: Backend connection pending for Super Admin entities.');
+  };
 
   return (
     <div className="super-companies-page">
@@ -142,6 +169,11 @@ export default function SuperCompanies() {
           <button className="sc-btn-icon-square" title="Export Excel"><FileSpreadsheet size={16} color="#22c55e" /></button>
           <button className="sc-btn-icon-square" title="Refresh" onClick={() => window.location.reload()}><RefreshCw size={16} /></button>
           <button className="sc-btn-icon-square" title="Collapse"><ChevronUp size={16} /></button>
+          {selectedIds.length > 0 && (
+            <button className="sc-btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ef4444', color: '#ef4444', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s', marginLeft: '10px' }}>
+              <Trash2 size={16} /> Delete Selected ({selectedIds.length})
+            </button>
+          )}
           <button className="sc-btn-add" onClick={() => setIsAddModalOpen(true)}>
             <PlusCircle size={16} /> Add Company
           </button>
@@ -242,7 +274,14 @@ export default function SuperCompanies() {
           <table className="sc-table">
             <thead>
               <tr>
-                <th style={{ width: '40px' }}><input type="checkbox" className="sc-checkbox" /></th>
+                <th style={{ width: '40px' }}>
+                  <input 
+                    type="checkbox" 
+                    className="sc-checkbox" 
+                    checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                  />
+                </th>
                 <th>Company Name</th>
                 <th>Email</th>
                 <th>Account URL</th>
@@ -256,7 +295,14 @@ export default function SuperCompanies() {
               {filteredData.length > 0 ? (
                 filteredData.map((row, index) => (
                   <tr key={index}>
-                    <td><input type="checkbox" className="sc-checkbox" /></td>
+                    <td>
+                      <input 
+                        type="checkbox" 
+                        className="sc-checkbox" 
+                        checked={selectedIds.includes(index)}
+                        onChange={(e) => handleSelectItem(index, e.target.checked)}
+                      />
+                    </td>
                     <td>
                       <div className="sc-company-info">
                         <div className="sc-company-logo">

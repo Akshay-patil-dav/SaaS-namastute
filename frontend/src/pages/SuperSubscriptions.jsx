@@ -18,8 +18,6 @@ import {
 import './super-subscriptions.css';
 
 export default function SuperSubscriptions() {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  
   const tableData = [
     {
       subscriber: 'BrightWave Innovations',
@@ -133,11 +131,40 @@ export default function SuperSubscriptions() {
     }
   ];
 
-  const filteredData = tableData.filter(item => 
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedIds, setSelectedIds] = React.useState([]);
+  const [data, setData] = React.useState(tableData);
+
+  const filteredData = data.filter(item => 
     item.subscriber.toLowerCase().includes(searchQuery.toLowerCase()) || 
     item.plan.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.paymentMethod.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleSelectAll = (isChecked) => {
+    if (isChecked) {
+      setSelectedIds(filteredData.map((_, index) => index));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectItem = (index, isChecked) => {
+    if (isChecked) {
+      setSelectedIds(prev => [...prev, index]);
+    } else {
+      setSelectedIds(prev => prev.filter(item => item !== index));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (!selectedIds.length) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} subscriptions?`)) return;
+    
+    setData(prev => prev.filter((_, index) => !selectedIds.includes(index)));
+    setSelectedIds([]);
+    alert('Simulated deletion: Backend connection pending for Super Admin entities.');
+  };
 
   return (
     <div className="super-subscriptions-page">
@@ -152,6 +179,11 @@ export default function SuperSubscriptions() {
           <button className="ss-btn-icon-square" title="Export Excel"><FileSpreadsheet size={16} color="#22c55e" /></button>
           <button className="ss-btn-icon-square" title="Refresh" onClick={() => window.location.reload()}><RefreshCw size={16} /></button>
           <button className="ss-btn-icon-square" title="Collapse"><ChevronUp size={16} /></button>
+          {selectedIds.length > 0 && (
+            <button className="ss-btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ef4444', color: '#ef4444', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s', marginLeft: '10px' }}>
+              <Trash2 size={16} /> Delete Selected ({selectedIds.length})
+            </button>
+          )}
         </div>
       </div>
 
@@ -249,7 +281,14 @@ export default function SuperSubscriptions() {
           <table className="ss-table">
             <thead>
               <tr>
-                <th style={{ width: '40px' }}><input type="checkbox" className="ss-checkbox" /></th>
+                <th style={{ width: '40px' }}>
+                  <input 
+                    type="checkbox" 
+                    className="ss-checkbox" 
+                    checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                  />
+                </th>
                 <th>Subscriber</th>
                 <th>Plan</th>
                 <th>Billing Cycle</th>
@@ -265,7 +304,14 @@ export default function SuperSubscriptions() {
               {filteredData.length > 0 ? (
                 filteredData.map((row, index) => (
                   <tr key={index}>
-                    <td><input type="checkbox" className="ss-checkbox" /></td>
+                    <td>
+                      <input 
+                        type="checkbox" 
+                        className="ss-checkbox" 
+                        checked={selectedIds.includes(index)}
+                        onChange={(e) => handleSelectItem(index, e.target.checked)}
+                      />
+                    </td>
                     <td>
                       <div className="ss-subscriber-info">
                         <div className="ss-subscriber-logo">

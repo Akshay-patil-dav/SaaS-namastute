@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import AddCategoryModal from '../components/AddCategoryModal';
 import './CreateProduct.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -64,6 +65,24 @@ const CreateProduct = () => {
     const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
     const [generatingSku, setGeneratingSku] = useState(false);
     const [generatingBarcode, setGeneratingBarcode] = useState(false);
+    
+    // Dynamic categories
+    const [categories, setCategories] = useState([]);
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+
+    // Fetch categories on mount
+    const fetchCategories = async () => {
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`);
+            setCategories(res.data || []);
+        } catch (err) {
+            console.error('Failed to fetch categories', err);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     const showToast = (type, message) => {
@@ -309,16 +328,15 @@ const CreateProduct = () => {
                             <div className="col-md-6 cp-form-group">
                                 <label className="cp-label">
                                     <span>Category <span className="required">*</span></span>
-                                    <div className="add-new"><PlusCircle size={14} /> Add New</div>
+                                    <div className="add-new" onClick={() => setIsCategoryModalOpen(true)} style={{cursor: 'pointer'}}>
+                                        <PlusCircle size={14} /> Add New
+                                    </div>
                                 </label>
                                 <select name="category" className="cp-input text-muted" value={form.category} onChange={handleChange}>
                                     <option value="">Select</option>
-                                    <option>Electronics</option>
-                                    <option>Clothing</option>
-                                    <option>Food & Beverages</option>
-                                    <option>Health & Beauty</option>
-                                    <option>Sports</option>
-                                    <option>Home & Garden</option>
+                                    {categories.filter(c => c.status).map(cat => (
+                                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="col-md-6 cp-form-group">
@@ -675,6 +693,14 @@ const CreateProduct = () => {
                 </div>
 
             </form>
+            
+            <AddCategoryModal 
+                isOpen={isCategoryModalOpen} 
+                onClose={() => setIsCategoryModalOpen(false)} 
+                onCategoryAdded={() => {
+                    fetchCategories();
+                }}
+            />
         </div>
     );
 };
