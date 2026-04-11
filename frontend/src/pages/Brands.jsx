@@ -11,13 +11,36 @@ import {
     Pencil,
     Trash2
 } from 'lucide-react';
+import axios from 'axios';
+import AddBrandModal from '../components/AddBrandModal';
 
-const mockData = [];
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/brands`;
 
 const Brands = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
-    const [data, setData] = useState(mockData);
+    const [data, setData] = useState([]);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingBrand, setEditingBrand] = useState(null);
+
+    const fetchBrands = async () => {
+        try {
+            const res = await axios.get(API_BASE);
+            if (res.data && Array.isArray(res.data)) {
+                setData(res.data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch brands:', err);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchBrands();
+    }, []);
+
+    const handleBrandAdded = () => {
+        fetchBrands();
+    };
 
     const filteredData = data.filter(item => {
         if (!searchTerm) return true;
@@ -44,13 +67,18 @@ const Brands = () => {
         }
     };
 
-    const handleBulkDelete = () => {
+    const handleBulkDelete = async () => {
         if (!selectedIds.length) return;
         if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} brands?`)) return;
         
-        setData(prev => prev.filter(item => !selectedIds.includes(item.id)));
-        setSelectedIds([]);
-        alert('Simulated deletion: Backend connection pending for this entity.');
+        try {
+            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            setSelectedIds([]);
+            fetchBrands();
+        } catch (err) {
+            console.error('Failed to delete brands:', err);
+            alert('Failed to delete brands.');
+        }
     };
 
     return (
@@ -69,7 +97,7 @@ const Brands = () => {
                     <button className="btn-icon-action" title="Excel">
                         <FileSpreadsheet size={18} className="icon-green" />
                     </button>
-                    <button className="btn-icon-action" title="Refresh">
+                    <button className="btn-icon-action" title="Refresh" onClick={fetchBrands}>
                         <RefreshCw size={18} />
                     </button>
                     <button className="btn-icon-action" title="Collapse">
@@ -80,7 +108,7 @@ const Brands = () => {
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <button className="btn-orange">
+                    <button className="btn-orange" onClick={() => { setEditingBrand(null); setIsAddModalOpen(true); }}>
                         <PlusCircle size={18} /> Add Brand
                     </button>
                 </div>
@@ -141,19 +169,31 @@ const Brands = () => {
                                 <td>{item.name}</td>
                                 <td>
                                     <div className="product-name-cell p-0 py-1">
-                                        <img src={item.img} alt={item.name} className="product-img m-0" />
+                                        <img src={item.img || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random`} alt={item.name} className="product-img m-0" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
                                     </div>
                                 </td>
                                 <td>{item.desc}</td>
                                 <td>
-                                    <span className="badge-active">{item.status}</span>
+                                    <span className={item.status ? "badge-active" : "badge-inactive"}>
+                                        {item.status ? 'Active' : 'Inactive'}
+                                    </span>
                                 </td>
                                 <td>
                                     <div className="action-buttons justify-content-center">
-                                        <button className="action-btn" title="Edit">
+                                        <button className="action-btn" title="Edit" onClick={() => { setEditingBrand(item); setIsAddModalOpen(true); }}>
                                             <Pencil size={16} />
                                         </button>
-                                        <button className="action-btn" title="Delete">
+                                        <button className="action-btn" title="Delete" onClick={async () => {
+                                            if (window.confirm('Are you sure you want to delete this brand?')) {
+                                                try {
+                                                    await axios.delete(`${API_BASE}/${item.id}`);
+                                                    fetchBrands();
+                                                } catch (err) {
+                                                    console.error(err);
+                                                    alert('Failed to delete brand');
+                                                }
+                                            }
+                                        }}>
                                             <Trash2 size={16} />
                                         </button>
                                     </div>
@@ -189,6 +229,13 @@ const Brands = () => {
                 </div>
 
             </div>
+
+            <AddBrandModal 
+                isOpen={isAddModalOpen} 
+                onClose={() => { setIsAddModalOpen(false); setEditingBrand(null); }}
+                onBrandAdded={handleBrandAdded}
+                brandData={editingBrand}
+            />
         </div>
     );
 };
