@@ -68,20 +68,25 @@ const CreateProduct = () => {
     
     // Dynamic categories
     const [categories, setCategories] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
-    // Fetch categories on mount
-    const fetchCategories = async () => {
+    // Fetch categories and sub-categories on mount
+    const fetchInitialData = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`);
-            setCategories(res.data || []);
+            const [catRes, subRes] = await Promise.all([
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`),
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/subcategories`)
+            ]);
+            setCategories(catRes.data || []);
+            setSubCategories(subRes.data || []);
         } catch (err) {
-            console.error('Failed to fetch categories', err);
+            console.error('Failed to fetch initial data', err);
         }
     };
 
     useEffect(() => {
-        fetchCategories();
+        fetchInitialData();
     }, []);
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -92,7 +97,17 @@ const CreateProduct = () => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+        
+        setForm(prev => {
+            const newState = { ...prev, [name]: type === 'checkbox' ? checked : value };
+            
+            // If Category changes, reset Sub Category to avoid invalid combos
+            if (name === 'category') {
+                newState.subCategory = '';
+            }
+            
+            return newState;
+        });
 
         // Auto-generate slug from name
         if (name === 'name') {
@@ -341,12 +356,20 @@ const CreateProduct = () => {
                             </div>
                             <div className="col-md-6 cp-form-group">
                                 <label className="cp-label">Sub Category</label>
-                                <select name="subCategory" className="cp-input text-muted" value={form.subCategory} onChange={handleChange}>
-                                    <option value="">Select</option>
-                                    <option>Smartphones</option>
-                                    <option>Laptops</option>
-                                    <option>Tablets</option>
-                                    <option>Accessories</option>
+                                <select 
+                                    name="subCategory" 
+                                    className="cp-input text-muted" 
+                                    value={form.subCategory} 
+                                    onChange={handleChange}
+                                    disabled={!form.category}
+                                >
+                                    <option value="">{form.category ? "Select Sub Category" : "Select Category First"}</option>
+                                    {subCategories
+                                        .filter(sub => sub.status && sub.category?.name === form.category)
+                                        .map(sub => (
+                                            <option key={sub.id} value={sub.name}>{sub.name}</option>
+                                        ))
+                                    }
                                 </select>
                             </div>
                             <div className="col-md-6 cp-form-group">
@@ -698,7 +721,7 @@ const CreateProduct = () => {
                 isOpen={isCategoryModalOpen} 
                 onClose={() => setIsCategoryModalOpen(false)} 
                 onCategoryAdded={() => {
-                    fetchCategories();
+                    fetchInitialData();
                 }}
             />
         </div>
