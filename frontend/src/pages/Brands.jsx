@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import AddBrandModal from '../components/AddBrandModal';
+import { useConfirm } from '../context/ConfirmContext';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/brands`;
 
@@ -22,6 +23,7 @@ const Brands = () => {
     const [data, setData] = useState([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingBrand, setEditingBrand] = useState(null);
+    const { confirm } = useConfirm();
 
     const fetchBrands = async () => {
         try {
@@ -69,7 +71,11 @@ const Brands = () => {
 
     const handleBulkDelete = async () => {
         if (!selectedIds.length) return;
-        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} brands?`)) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Brands',
+            message: `Are you sure you want to delete ${selectedIds.length} brands?`
+        });
+        if (!isConfirmed) return;
         
         try {
             await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
@@ -78,6 +84,21 @@ const Brands = () => {
         } catch (err) {
             console.error('Failed to delete brands:', err);
             alert('Failed to delete brands.');
+        }
+    };
+
+    const handleDelete = async (id) => {
+        const isConfirmed = await confirm({
+            title: 'Delete Brand',
+            message: 'Are you sure you want to delete this brand?'
+        });
+        if (!isConfirmed) return;
+        try {
+            await axios.delete(`${API_BASE}/${id}`);
+            fetchBrands();
+        } catch (err) {
+            console.error(err);
+            alert('Failed to delete brand');
         }
     };
 
@@ -183,17 +204,7 @@ const Brands = () => {
                                         <button className="action-btn" title="Edit" onClick={() => { setEditingBrand(item); setIsAddModalOpen(true); }}>
                                             <Pencil size={16} />
                                         </button>
-                                        <button className="action-btn" title="Delete" onClick={async () => {
-                                            if (window.confirm('Are you sure you want to delete this brand?')) {
-                                                try {
-                                                    await axios.delete(`${API_BASE}/${item.id}`);
-                                                    fetchBrands();
-                                                } catch (err) {
-                                                    console.error(err);
-                                                    alert('Failed to delete brand');
-                                                }
-                                            }
-                                        }}>
+                                        <button className="action-btn" title="Delete" onClick={() => handleDelete(item.id)}>
                                             <Trash2 size={16} />
                                         </button>
                                     </div>

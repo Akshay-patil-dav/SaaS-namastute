@@ -13,6 +13,7 @@ import {
   FileText,
   FileSpreadsheet
 } from 'lucide-react';
+import { useConfirm } from '../context/ConfirmContext';
 import './super-packages.css';
 
 export default function SuperPackages() {
@@ -33,6 +34,7 @@ export default function SuperPackages() {
   const [isRecommended, setIsRecommended] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [data, setData] = useState(tableData);
+  const { confirm } = useConfirm();
 
   const filteredData = data.filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -55,12 +57,27 @@ export default function SuperPackages() {
     }
   };
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (!selectedIds.length) return;
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} packages?`)) return;
+    const isConfirmed = await confirm({
+        title: 'Delete Packages',
+        message: `Are you sure you want to delete ${selectedIds.length} packages?`
+    });
+    if (!isConfirmed) return;
     
     setData(prev => prev.filter((_, index) => !selectedIds.includes(index)));
     setSelectedIds([]);
+    alert('Simulated deletion: Backend connection pending for Super Admin entities.');
+  };
+
+  const handleDelete = async (index) => {
+    const isConfirmed = await confirm({
+        title: 'Delete Package',
+        message: 'Are you sure you want to delete this package?'
+    });
+    if (!isConfirmed) return;
+    
+    setData(prev => prev.filter((_, i) => i !== index));
     alert('Simulated deletion: Backend connection pending for Super Admin entities.');
   };
 
@@ -211,7 +228,7 @@ export default function SuperPackages() {
                     <td>
                       <div className="sp-actions-group">
                         <button className="sp-action-btn" title="Edit"><Edit size={14} /></button>
-                        <button className="sp-action-btn" title="Delete"><Trash2 size={14} /></button>
+                        <button className="sp-action-btn" title="Delete" onClick={() => handleDelete(index)}><Trash2 size={14} /></button>
                       </div>
                     </td>
                   </tr>

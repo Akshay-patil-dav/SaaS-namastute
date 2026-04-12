@@ -21,6 +21,7 @@ import {
     Tag
 } from 'lucide-react';
 import AddCategoryModal from '../components/AddCategoryModal';
+import { useConfirm } from '../context/ConfirmContext';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/categories`;
 
@@ -30,9 +31,10 @@ const Category = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
-    const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [editingCategory, setEditingCategory] = useState(null);
     const [selectedIds, setSelectedIds] = useState([]);
+    
+    const { confirm } = useConfirm();
 
     const fetchCategories = useCallback(async () => {
         setLoading(true);
@@ -61,6 +63,13 @@ const Category = () => {
     };
 
     const handleDelete = async (id) => {
+        const isConfirmed = await confirm({
+            title: 'Delete Category',
+            message: 'Are you sure you want to delete this category? All related sub-categories may be affected.'
+        });
+
+        if (!isConfirmed) return;
+
         try {
             await axios.delete(`${API_BASE}/${id}`);
             setCategories(prev => prev.filter(c => c.id !== id));
@@ -68,12 +77,15 @@ const Category = () => {
         } catch {
             showToast('error', 'Failed to delete category.');
         }
-        setDeleteConfirm(null);
     };
 
     const handleBulkDelete = async () => {
         if (!selectedIds.length) return;
-        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} categories?`)) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Categories',
+            message: `Are you sure you want to delete ${selectedIds.length} categories?`
+        });
+        if (!isConfirmed) return;
 
         try {
             await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
@@ -129,20 +141,6 @@ const Category = () => {
                 </div>
             )}
 
-            {/* Delete Confirm Modal */}
-            {deleteConfirm !== null && (
-                <div className="delete-overlay">
-                    <div className="delete-modal">
-                        <div className="delete-modal-icon"><Trash2 size={28} /></div>
-                        <h5>Delete Category?</h5>
-                        <p>This action cannot be undone. All related sub-categories may be affected.</p>
-                        <div className="delete-modal-actions">
-                            <button className="btn-cancel-del" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-                            <button className="btn-confirm-del" onClick={() => handleDelete(deleteConfirm)}>Delete</button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Header Section */}
             <div className="ss-header-row">
@@ -319,7 +317,7 @@ const Category = () => {
                                             <button className="ss-action-btn" title="Edit" onClick={() => { setEditingCategory(item); setIsModalOpen(true); }}>
                                                 <Pencil size={14} />
                                             </button>
-                                            <button className="ss-action-btn delete" title="Delete" onClick={() => setDeleteConfirm(item.id)}>
+                                            <button className="ss-action-btn delete" title="Delete" onClick={() => handleDelete(item.id)}>
                                                 <Trash2 size={14} />
                                             </button>
                                         </div>

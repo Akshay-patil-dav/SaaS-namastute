@@ -71,17 +71,23 @@ const EditProduct = () => {
     // Dynamic categories
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
+    const [units, setUnits] = useState([]);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
     // ── Fetch initial data ──────────────────────────────────────────────────
     const fetchInitialData = async () => {
         try {
-            const [catRes, subRes] = await Promise.all([
+            const [catRes, subRes, brandRes, unitRes] = await Promise.all([
                 axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/subcategories`)
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/subcategories`),
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/brands`),
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/units`)
             ]);
             setCategories(Array.isArray(catRes.data) ? catRes.data : []);
             setSubCategories(Array.isArray(subRes.data) ? subRes.data : []);
+            setBrands(Array.isArray(brandRes.data) ? brandRes.data : []);
+            setUnits(Array.isArray(unitRes.data) ? unitRes.data : []);
         } catch (err) {
             console.error('Failed to fetch initial data', err);
         }
@@ -440,22 +446,18 @@ const EditProduct = () => {
                                 <label className="cp-label">Brand</label>
                                 <select name="brand" className="cp-input text-muted" value={form.brand} onChange={handleChange}>
                                     <option value="">Select</option>
-                                    <option>Apple</option>
-                                    <option>Samsung</option>
-                                    <option>Nike</option>
-                                    <option>Adidas</option>
-                                    <option>Generic</option>
+                                    {brands.filter(b => b.status !== false).map(b => (
+                                        <option key={b.id} value={b.name}>{b.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="col-md-6 cp-form-group">
                                 <label className="cp-label">Unit</label>
                                 <select name="unit" className="cp-input text-muted" value={form.unit} onChange={handleChange}>
                                     <option value="">Select</option>
-                                    <option>Piece</option>
-                                    <option>Kg</option>
-                                    <option>Litre</option>
-                                    <option>Box</option>
-                                    <option>Pack</option>
+                                    {units.filter(u => u.status !== false).map(u => (
+                                        <option key={u.id} value={u.name}>{u.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="col-md-6 cp-form-group">

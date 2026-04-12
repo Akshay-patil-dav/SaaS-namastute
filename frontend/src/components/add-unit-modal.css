@@ -1,0 +1,128 @@
+.add-unit-modal {
+    max-width: 500px !important;
+}
+
+.add-unit-modal .modal-header {
+    padding: 20px 25px;
+}
+
+.add-unit-modal .modal-header h4 {
+    font-size: 20px;
+}
+
+.add-unit-modal .close-btn-red {
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+}
+
+.add-unit-modal .status-toggle-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-bottom: 15px;
+}
+
+.add-unit-modal .status-toggle-container label {
+    margin-bottom: 0 !important;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b2850;
+}
+
+.add-unit-modal .switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.add-unit-modal .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.add-unit-modal .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.add-unit-modal .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.add-unit-modal input:checked + .slider {
+    background-color: #28c76f;
+}
+
+.add-unit-modal input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.add-unit-modal .btn-add-unit {
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    background: #ff9b29;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(255, 155, 41, 0.3);
+}
+
+.add-unit-modal .btn-add-unit:hover {
+    background: #e68a1f;
+    transform: translateY(-1px);
+}
+
+.add-unit-modal .btn-cancel-dark {
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    background: #002347;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 35, 71, 0.3);
+}
+
+.add-unit-modal .btn-cancel-dark:hover {
+    background: #001a35;
+    transform: translateY(-1px);
+}
+
+.add-unit-modal .modal-body {
+    padding: 30px 25px;
+}
+
+.add-unit-modal .modal-footer {
+    padding: 20px 25px;
+    border-top: 1px solid #f1f3f5;
+}
+
+.add-unit-modal .form-input {
+    height: 45px;
+    border-radius: 8px;
+    margin-top: 5px;
+}

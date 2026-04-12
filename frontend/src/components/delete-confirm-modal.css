@@ -1,0 +1,101 @@
+.global-delete-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInBg 0.2s ease-out;
+}
+
+@keyframes fadeInBg { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+}
+
+.global-delete-modal {
+    background: white;
+    border-radius: 12px;
+    padding: 32px 36px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    width: 380px;
+    max-width: 90%;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.global-delete-icon-wrapper {
+    width: 64px; 
+    height: 64px;
+    border-radius: 50%;
+    background: #fef2f2;
+    color: #ef4444;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.global-delete-icon-wrapper svg {
+    width: 32px;
+    height: 32px;
+}
+
+.global-delete-modal h4 {
+    font-size: 1.25rem; 
+    font-weight: 600; 
+    color: #0f172a; 
+    margin: 0 0 10px; 
+}
+
+.global-delete-modal p {
+    font-size: 0.95rem; 
+    color: #64748b; 
+    margin: 0 0 28px; 
+    line-height: 1.5;
+}
+
+.global-delete-actions { 
+    display: flex; 
+    gap: 16px; 
+    justify-content: center; 
+}
+
+.btn-cancel-global {
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    background: #0f172a;
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel-global:hover {
+    background: #1e293b;
+}
+
+.btn-confirm-global {
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    background: #f97316;
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-confirm-global:hover {
+    background: #ea580c;
+}
