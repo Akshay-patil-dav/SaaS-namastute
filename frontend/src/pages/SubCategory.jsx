@@ -21,6 +21,7 @@ import {
     LayoutGrid
 } from 'lucide-react';
 import AddSubCategoryModal from '../components/AddSubCategoryModal';
+import { useConfirm } from '../context/ConfirmContext';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/subcategories`;
 
@@ -32,7 +33,8 @@ const SubCategory = () => {
     const [editingSubCategory, setEditingSubCategory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
-    const [deleteConfirm, setDeleteConfirm] = useState(null);
+    
+    const { confirm } = useConfirm();
 
     const fetchSubCategories = useCallback(async () => {
         setLoading(true);
@@ -85,7 +87,11 @@ const SubCategory = () => {
 
     const handleBulkDelete = async () => {
         if (!selectedIds.length) return;
-        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} sub-categories?`)) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Sub-categories',
+            message: `Are you sure you want to delete ${selectedIds.length} sub-categories?`
+        });
+        if (!isConfirmed) return;
         
         try {
             await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
@@ -99,6 +105,13 @@ const SubCategory = () => {
     };
 
     const handleDelete = async (id) => {
+        const isConfirmed = await confirm({
+            title: 'Delete Sub-category',
+            message: 'Are you sure you want to delete this sub-category? All related data will be removed.'
+        });
+
+        if (!isConfirmed) return;
+
         try {
             await axios.delete(`${API_BASE}/${id}`);
             showToast('success', 'Sub-category deleted successfully');
@@ -107,7 +120,6 @@ const SubCategory = () => {
             console.error('Delete failed:', err);
             showToast('error', 'Failed to delete sub-category');
         }
-        setDeleteConfirm(null);
     };
 
     const handleEdit = (item) => {
@@ -136,20 +148,6 @@ const SubCategory = () => {
                 </div>
             )}
 
-            {/* Custom Delete Confirmation Modal */}
-            {deleteConfirm !== null && (
-                <div className="delete-overlay">
-                    <div className="delete-modal">
-                        <div className="delete-modal-icon"><Trash2 size={28} /></div>
-                        <h5>Delete Sub-category?</h5>
-                        <p>This action cannot be undone. All related data will be removed.</p>
-                        <div className="delete-modal-actions">
-                            <button className="btn-cancel-del" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-                            <button className="btn-confirm-del" onClick={() => handleDelete(deleteConfirm)}>Delete</button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Header Section */}
             <div className="ss-header-row">
@@ -347,7 +345,7 @@ const SubCategory = () => {
                                             <button className="ss-action-btn" title="Edit" onClick={() => handleEdit(item)}>
                                                 <Pencil size={14} />
                                             </button>
-                                            <button className="ss-action-btn delete" title="Delete" onClick={() => setDeleteConfirm(item.id)}>
+                                            <button className="ss-action-btn delete" title="Delete" onClick={() => handleDelete(item.id)}>
                                                 <Trash2 size={14} />
                                             </button>
                                         </div>

@@ -15,6 +15,7 @@ import {
   Wind,
   TrendingUp
 } from 'lucide-react';
+import { useConfirm } from '../context/ConfirmContext';
 import './super-subscriptions.css';
 
 export default function SuperSubscriptions() {
@@ -134,6 +135,7 @@ export default function SuperSubscriptions() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedIds, setSelectedIds] = React.useState([]);
   const [data, setData] = React.useState(tableData);
+  const { confirm } = useConfirm();
 
   const filteredData = data.filter(item => 
     item.subscriber.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -157,12 +159,27 @@ export default function SuperSubscriptions() {
     }
   };
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (!selectedIds.length) return;
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} subscriptions?`)) return;
+    const isConfirmed = await confirm({
+        title: 'Delete Subscriptions',
+        message: `Are you sure you want to delete ${selectedIds.length} subscriptions?`
+    });
+    if (!isConfirmed) return;
     
     setData(prev => prev.filter((_, index) => !selectedIds.includes(index)));
     setSelectedIds([]);
+    alert('Simulated deletion: Backend connection pending for Super Admin entities.');
+  };
+
+  const handleDelete = async (index) => {
+    const isConfirmed = await confirm({
+        title: 'Delete Subscription',
+        message: 'Are you sure you want to delete this subscription?'
+    });
+    if (!isConfirmed) return;
+    
+    setData(prev => prev.filter((_, i) => i !== index));
     alert('Simulated deletion: Backend connection pending for Super Admin entities.');
   };
 
@@ -335,7 +352,7 @@ export default function SuperSubscriptions() {
                       <div className="ss-actions-group">
                         <button className="ss-action-btn" title="View"><Eye size={14} /></button>
                         <button className="ss-action-btn" title="Download"><Download size={14} /></button>
-                        <button className="ss-action-btn" title="Delete"><Trash2 size={14} /></button>
+                        <button className="ss-action-btn" title="Delete" onClick={() => handleDelete(index)}><Trash2 size={14} /></button>
                       </div>
                     </td>
                   </tr>

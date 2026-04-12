@@ -19,6 +19,7 @@ import {
     CheckCircle,
     X
 } from 'lucide-react';
+import { useConfirm } from '../context/ConfirmContext';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/products`;
 
@@ -48,10 +49,11 @@ const Products = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [toast, setToast]             = useState(null);
-    const [deleteConfirm, setDeleteConfirm] = useState(null); // id to delete
     const [viewProduct, setViewProduct]     = useState(null);   // product to view
     const [activeImgIndex, setActiveImgIndex] = useState(0);    // for gallery
     const [selectedIds, setSelectedIds]       = useState([]);
+    
+    const { confirm } = useConfirm();
 
     // ── Fetch products from backend ──────────────────────────────────────
     const fetchProducts = useCallback(async () => {
@@ -95,9 +97,16 @@ const Products = () => {
     const handleDelete = async (id) => {
         if (typeof id === 'string' && id.startsWith('m')) {
             showToast('error', 'Demo data cannot be deleted.');
-            setDeleteConfirm(null);
             return;
         }
+
+        const isConfirmed = await confirm({
+            title: 'Delete Product',
+            message: 'Are you sure you want to delete this product?'
+        });
+
+        if (!isConfirmed) return;
+
         try {
             await axios.delete(`${API_BASE}/${id}`);
             setDbProducts(prev => prev.filter(p => p.id !== id));
@@ -105,12 +114,15 @@ const Products = () => {
         } catch {
             showToast('error', 'Failed to delete product.');
         }
-        setDeleteConfirm(null);
     };
 
     const handleBulkDelete = async () => {
         if (!selectedIds.length) return;
-        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} products?`)) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Products',
+            message: `Are you sure you want to delete ${selectedIds.length} products?`
+        });
+        if (!isConfirmed) return;
 
         try {
             await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
@@ -174,20 +186,6 @@ const Products = () => {
                 </div>
             )}
 
-            {/* Delete Confirm Modal */}
-            {deleteConfirm !== null && (
-                <div className="delete-overlay">
-                    <div className="delete-modal">
-                        <div className="delete-modal-icon"><Trash2 size={28} /></div>
-                        <h5>Delete Product?</h5>
-                        <p>This action cannot be undone.</p>
-                        <div className="delete-modal-actions">
-                            <button className="btn-cancel-del" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-                            <button className="btn-confirm-del" onClick={() => handleDelete(deleteConfirm)}>Delete</button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Header */}
             <div className="product-page-header">
@@ -376,7 +374,7 @@ const Products = () => {
                                         <button
                                             className="action-btn delete-btn"
                                             title="Delete"
-                                            onClick={() => setDeleteConfirm(item.id)}
+                                            onClick={() => handleDelete(item.id)}
                                         >
                                             <Trash2 size={15} />
                                         </button>

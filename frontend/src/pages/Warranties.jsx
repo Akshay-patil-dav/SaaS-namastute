@@ -11,6 +11,7 @@ import {
     Pencil,
     Trash2
 } from 'lucide-react';
+import { useConfirm } from '../context/ConfirmContext';
 
 const mockData = [];
 
@@ -18,6 +19,7 @@ const Warranties = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
     const [data, setData] = useState(mockData);
+    const { confirm } = useConfirm();
 
     const filteredData = data.filter(item => {
         if (!searchTerm) return true;
@@ -44,12 +46,27 @@ const Warranties = () => {
         }
     };
 
-    const handleBulkDelete = () => {
+    const handleBulkDelete = async () => {
         if (!selectedIds.length) return;
-        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} warranties?`)) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Warranties',
+            message: `Are you sure you want to delete ${selectedIds.length} warranties?`
+        });
+        if (!isConfirmed) return;
         
         setData(prev => prev.filter(item => !selectedIds.includes(item.id)));
         setSelectedIds([]);
+        alert('Simulated deletion: Backend connection pending for this entity.');
+    };
+
+    const handleDelete = async (id) => {
+        const isConfirmed = await confirm({
+            title: 'Delete Warranty',
+            message: 'Are you sure you want to delete this warranty?'
+        });
+        if (!isConfirmed) return;
+        
+        setData(prev => prev.filter(item => item.id !== id));
         alert('Simulated deletion: Backend connection pending for this entity.');
     };
 
@@ -149,7 +166,7 @@ const Warranties = () => {
                                         <button className="action-btn" title="Edit">
                                             <Pencil size={16} />
                                         </button>
-                                        <button className="action-btn" title="Delete">
+                                        <button className="action-btn" title="Delete" onClick={() => handleDelete(item.id)}>
                                             <Trash2 size={16} />
                                         </button>
                                     </div>

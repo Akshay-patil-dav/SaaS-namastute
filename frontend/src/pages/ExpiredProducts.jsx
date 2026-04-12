@@ -16,6 +16,7 @@ import {
     X,
     Package
 } from 'lucide-react';
+import { useConfirm } from '../context/ConfirmContext';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/products`;
 const EXPIRED_API = `${API_BASE}/expired`;
@@ -35,8 +36,8 @@ const ExpiredProducts = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [toast, setToast]             = useState(null);
-    const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [selectedIds, setSelectedIds] = useState([]);
+    const { confirm } = useConfirm();
 
     // ── Fetch products from backend ──────────────────────────────────────
     const fetchExpiredProducts = useCallback(async () => {
@@ -74,6 +75,11 @@ const ExpiredProducts = () => {
 
     // ── Delete ───────────────────────────────────────────────────────────
     const handleDelete = async (id) => {
+        const isConfirmed = await confirm({
+            title: 'Delete Expired Product',
+            message: 'Are you sure you want to delete this expired product?'
+        });
+        if (!isConfirmed) return;
         try {
             await axios.delete(`${API_BASE}/${id}`);
             setDbProducts(prev => prev.filter(p => p.id !== id));
@@ -81,12 +87,15 @@ const ExpiredProducts = () => {
         } catch {
             showToast('error', 'Failed to delete product.');
         }
-        setDeleteConfirm(null);
     };
 
     const handleBulkDelete = async () => {
         if (!selectedIds.length) return;
-        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} expired products?`)) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Expired Products',
+            message: `Are you sure you want to delete ${selectedIds.length} expired products?`
+        });
+        if (!isConfirmed) return;
 
         try {
             await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
@@ -135,21 +144,6 @@ const ExpiredProducts = () => {
                     {toast.type === 'success' ? <CheckCircle size={17} /> : <AlertCircle size={17} />}
                     <span>{toast.message}</span>
                     <button onClick={() => setToast(null)} className="toast-close"><X size={14} /></button>
-                </div>
-            )}
-
-            {/* Delete Confirm Modal */}
-            {deleteConfirm !== null && (
-                <div className="delete-overlay">
-                    <div className="delete-modal">
-                        <div className="delete-modal-icon"><Trash2 size={28} /></div>
-                        <h5>Delete Product?</h5>
-                        <p>This action cannot be undone.</p>
-                        <div className="delete-modal-actions">
-                            <button className="btn-cancel-del" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-                            <button className="btn-confirm-del" onClick={() => handleDelete(deleteConfirm)}>Delete</button>
-                        </div>
-                    </div>
                 </div>
             )}
 
@@ -304,7 +298,7 @@ const ExpiredProducts = () => {
                                         <button 
                                             className="action-btn delete-btn" 
                                             title="Delete"
-                                            onClick={() => setDeleteConfirm(item.id)}
+                                            onClick={() => handleDelete(item.id)}
                                         >
                                             <Trash2 size={15} />
                                         </button>

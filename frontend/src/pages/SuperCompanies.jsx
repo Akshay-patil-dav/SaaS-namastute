@@ -22,6 +22,7 @@ import {
   Image as ImageIcon,
   EyeOff
 } from 'lucide-react';
+import { useConfirm } from '../context/ConfirmContext';
 import './super-companies.css';
 
 export default function SuperCompanies() {
@@ -124,6 +125,7 @@ export default function SuperCompanies() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
   const [data, setData] = useState(tableData);
+  const { confirm } = useConfirm();
 
   const filteredData = data.filter(item => 
     item.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -147,12 +149,27 @@ export default function SuperCompanies() {
     }
   };
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (!selectedIds.length) return;
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} companies?`)) return;
+    const isConfirmed = await confirm({
+        title: 'Delete Companies',
+        message: `Are you sure you want to delete ${selectedIds.length} companies?`
+    });
+    if (!isConfirmed) return;
     
     setData(prev => prev.filter((_, index) => !selectedIds.includes(index)));
     setSelectedIds([]);
+    alert('Simulated deletion: Backend connection pending for Super Admin entities.');
+  };
+
+  const handleDelete = async (index) => {
+    const isConfirmed = await confirm({
+        title: 'Delete Company',
+        message: 'Are you sure you want to delete this company?'
+    });
+    if (!isConfirmed) return;
+    
+    setData(prev => prev.filter((_, i) => i !== index));
     alert('Simulated deletion: Backend connection pending for Super Admin entities.');
   };
 
@@ -327,7 +344,7 @@ export default function SuperCompanies() {
                       <div className="sc-actions-group">
                         <button className="sc-action-btn" title="View"><Eye size={14} /></button>
                         <button className="sc-action-btn" title="Edit"><Edit size={14} /></button>
-                        <button className="sc-action-btn" title="Delete"><Trash2 size={14} /></button>
+                        <button className="sc-action-btn" title="Delete" onClick={() => handleDelete(index)}><Trash2 size={14} /></button>
                       </div>
                     </td>
                   </tr>

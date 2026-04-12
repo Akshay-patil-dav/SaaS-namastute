@@ -15,6 +15,7 @@ import {
     Package,
     AlertCircle
 } from 'lucide-react';
+import { useConfirm } from '../context/ConfirmContext';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/products`;
 
@@ -39,6 +40,7 @@ const LowStocks = () => {
     const [activeTab, setActiveTab]     = useState('low'); // 'low' or 'out'
     const [notify, setNotify]           = useState(true);
     const [selectedIds, setSelectedIds] = useState([]);
+    const { confirm } = useConfirm();
 
     // ── Fetch products from backend ──────────────────────────────────────
     const fetchProducts = useCallback(async () => {
@@ -59,7 +61,11 @@ const LowStocks = () => {
 
     const handleBulkDelete = async () => {
         if (!selectedIds.length) return;
-        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} products?`)) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Products',
+            message: `Are you sure you want to delete ${selectedIds.length} products?`
+        });
+        if (!isConfirmed) return;
 
         try {
             await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
@@ -68,6 +74,20 @@ const LowStocks = () => {
             fetchProducts();
         } catch (err) {
             console.error('Failed to delete products', err);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        const isConfirmed = await confirm({
+            title: 'Delete Product',
+            message: 'Are you sure you want to delete this product?'
+        });
+        if (!isConfirmed) return;
+        try {
+            await axios.delete(`${API_BASE}/${id}`);
+            fetchProducts();
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -284,7 +304,7 @@ const LowStocks = () => {
                                             <Link to={`/edit-product/${item.id}`} className="action-btn edit-btn" title="Edit">
                                                 <Pencil size={15} />
                                             </Link>
-                                            <button className="action-btn delete-btn" title="Delete">
+                                            <button className="action-btn delete-btn" title="Delete" onClick={() => handleDelete(item.id)}>
                                                 <Trash2 size={15} />
                                             </button>
                                         </div>
