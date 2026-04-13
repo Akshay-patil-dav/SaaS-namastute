@@ -33,6 +33,16 @@ public class ProductController {
         return ResponseEntity.ok(productService.getExpiredProducts());
     }
 
+    /** GET /api/products/search?q=... — search by name/barcode */
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchProducts(@RequestParam("q") String query) {
+        if (query == null || query.length() < 2) {
+            return ResponseEntity.ok(List.of());
+        }
+        return ResponseEntity.ok(productService.searchProducts(query));
+    }
+
+
     /** GET /api/products/{id} — get one */
     @GetMapping("/{id}")
     public ResponseEntity<?> getProduct(@PathVariable Long id) {
