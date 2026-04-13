@@ -6,6 +6,7 @@ com\example\otpauth\model\Role.class
 com\example\otpauth\config\PasswordConfig.class
 com\example\otpauth\repository\PageBlockRepository.class
 com\example\otpauth\model\Category.class
+com\example\otpauth\controller\UnitController.class
 com\example\otpauth\service\SmsService.class
 com\example\otpauth\dto\BuilderDto$CreateFolderRequest.class
 com\example\otpauth\dto\BuilderDto$PageBlockDto.class
@@ -38,11 +39,15 @@ com\example\otpauth\model\PageBlock.class
 com\example\otpauth\service\CategoryService.class
 com\example\otpauth\controller\BuilderController.class
 com\example\otpauth\dto\BuilderDto$MovePageRequest.class
+com\example\otpauth\config\DataSeeder.class
 com\example\otpauth\controller\CategoryController.class
 com\example\otpauth\dto\BuilderDto$FolderDto.class
 com\example\otpauth\repository\BrandRepository.class
+com\example\otpauth\repository\UnitRepository.class
 com\example\otpauth\model\SubCategory.class
 com\example\otpauth\service\SubCategoryService.class
+com\example\otpauth\service\UnitService.class
+com\example\otpauth\model\Unit.class
 com\example\otpauth\repository\ProductRepository.class
 com\example\otpauth\dto\BuilderDto$BuilderDataResponse.class
 com\example\otpauth\controller\AuthController.class
@@ -50,6 +55,7 @@ com\example\otpauth\config\OAuth2AuthenticationSuccessHandler.class
 com\example\otpauth\service\BuilderService.class
 com\example\otpauth\repository\RoleRepository.class
 com\example\otpauth\repository\UserRepository.class
+com\example\otpauth\dto\UnitRequest.class
 com\example\otpauth\service\NotificationEmitterService.class
 com\example\otpauth\config\CustomOAuth2UserService.class
 com\example\otpauth\dto\SubCategoryRequest.class

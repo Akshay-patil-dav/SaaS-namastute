@@ -14,4 +14,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsBySlug(String slug);
     Optional<Product> findBySku(String sku);
     List<Product> findByExpiryDateBefore(LocalDate date);
+    int countByUnit(String unit);
 }

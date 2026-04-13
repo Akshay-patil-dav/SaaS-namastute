@@ -28,7 +28,7 @@ import Category from './pages/Category.jsx';
 import SubCategory from './pages/SubCategory.jsx';
 import Brands from './pages/Brands.jsx';
 import Units from './pages/Units.jsx';
-import VariantAttributes from './pages/VariantAttributes.jsx';
+// import VariantAttributes from './pages/VariantAttributes.jsx';
 import Warranties from './pages/Warranties.jsx';
 import PrintBarcode from './pages/PrintBarcode.jsx';
 import PrintQRCode from './pages/PrintQRCode.jsx';
@@ -148,10 +148,10 @@ function AppRoutes() {
                 path="/units"
                 element={<PosPage roles={ADMIN_ROLES}><Units /></PosPage>}
             />
-            <Route
+{/* <Route
                 path="/variant-attributes"
                 element={<PosPage roles={ADMIN_ROLES}><VariantAttributes /></PosPage>}
-            />
+            /> */}
             <Route
                 path="/warranties"
                 element={<PosPage roles={ADMIN_ROLES}><Warranties /></PosPage>}

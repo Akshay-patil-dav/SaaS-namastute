@@ -71,21 +71,24 @@ const CreateProduct = () => {
     const [subCategories, setSubCategories] = useState([]);
     const [brands, setBrands] = useState([]);
     const [units, setUnits] = useState([]);
+    const [warranties, setWarranties] = useState([]);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
     // Fetch categories, sub-categories, brands and units on mount
     const fetchInitialData = async () => {
         try {
-            const [catRes, subRes, brandRes, unitRes] = await Promise.all([
+            const [catRes, subRes, brandRes, unitRes, warrantyRes] = await Promise.all([
                 axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`),
                 axios.get(`${import.meta.env.VITE_API_BASE_URL}/subcategories`),
                 axios.get(`${import.meta.env.VITE_API_BASE_URL}/brands`),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/units`)
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/units`),
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/warranties`)
             ]);
             setCategories(catRes.data || []);
             setSubCategories(subRes.data || []);
             setBrands(brandRes.data || []);
             setUnits(unitRes.data || []);
+            setWarranties(warrantyRes.data || []);
         } catch (err) {
             console.error('Failed to fetch initial data', err);
         }
@@ -644,12 +647,11 @@ const CreateProduct = () => {
                                 <div className="col-md-6 cp-form-group">
                                     <label className="cp-label">Warranty</label>
                                     <select name="warranty" className="cp-input text-muted" value={form.warranty} onChange={handleChange}>
-                                        <option value="">Select</option>
-                                        <option>No Warranty</option>
-                                        <option>3 Months</option>
-                                        <option>6 Months</option>
-                                        <option>1 Year</option>
-                                        <option>2 Years</option>
+                                        <option value="">Select Warranty</option>
+                                        <option value="No Warranty">No Warranty</option>
+                                        {warranties.filter(w => w.status).map(w => (
+                                            <option key={w.id} value={w.name}>{w.name} ({w.duration})</option>
+                                        ))}
                                     </select>
                                 </div>
                             )}

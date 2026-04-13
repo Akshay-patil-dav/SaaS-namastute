@@ -163,7 +163,7 @@ const Units = () => {
                 </div>
 
                 {/* Data Table */}
-                <div style={{ position: 'relative', minHeight: '200px' }}>
+                <div className="table-responsive">
                     <table className="custom-table" style={{ minWidth: '700px' }}>
                         <thead>
                             <tr>

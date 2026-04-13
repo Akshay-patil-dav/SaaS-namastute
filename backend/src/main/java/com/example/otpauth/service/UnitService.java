@@ -3,6 +3,7 @@ package com.example.otpauth.service;
 import com.example.otpauth.dto.UnitRequest;
 import com.example.otpauth.model.Unit;
 import com.example.otpauth.repository.UnitRepository;
+import com.example.otpauth.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,13 +13,19 @@ import java.util.Optional;
 public class UnitService {
 
     private final UnitRepository unitRepository;
+    private final ProductRepository productRepository;
 
-    public UnitService(UnitRepository unitRepository) {
+    public UnitService(UnitRepository unitRepository, ProductRepository productRepository) {
         this.unitRepository = unitRepository;
+        this.productRepository = productRepository;
     }
 
     public List<Unit> getAllUnits() {
-        return unitRepository.findAll();
+        List<Unit> units = unitRepository.findAll();
+        units.forEach(unit -> {
+            unit.setProducts(productRepository.countByUnit(unit.getName()));
+        });
+        return units;
     }
 
     public Unit createUnit(UnitRequest request) {

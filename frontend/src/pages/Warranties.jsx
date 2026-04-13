@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Products.css';
 import { 
     FileText, 
@@ -11,22 +11,45 @@ import {
     Pencil,
     Trash2
 } from 'lucide-react';
+import axios from 'axios';
 import { useConfirm } from '../context/ConfirmContext';
+import AddWarrantyModal from '../components/AddWarrantyModal';
 
-const mockData = [];
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/warranties`;
 
 const Warranties = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
-    const [data, setData] = useState(mockData);
+    const [data, setData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { confirm } = useConfirm();
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingWarranty, setEditingWarranty] = useState(null);
+
+    const fetchWarranties = async () => {
+        setIsLoading(true);
+        try {
+            const res = await axios.get(API_BASE);
+            setData(Array.isArray(res.data) ? res.data : []);
+        } catch (err) {
+            console.error('Fetch error:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchWarranties();
+    }, []);
 
     const filteredData = data.filter(item => {
         if (!searchTerm) return true;
         const term = searchTerm.toLowerCase();
         return (
             (item.name || '').toLowerCase().includes(term) ||
-            (item.desc || '').toLowerCase().includes(term)
+            (item.description || item.desc || '').toLowerCase().includes(term)
         );
     });
 
@@ -54,9 +77,14 @@ const Warranties = () => {
         });
         if (!isConfirmed) return;
         
-        setData(prev => prev.filter(item => !selectedIds.includes(item.id)));
-        setSelectedIds([]);
-        alert('Simulated deletion: Backend connection pending for this entity.');
+        try {
+            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            setSelectedIds([]);
+            fetchWarranties();
+        } catch (err) {
+            console.error('Bulk delete error:', err);
+            alert('Failed to delete warranties');
+        }
     };
 
     const handleDelete = async (id) => {
@@ -66,8 +94,27 @@ const Warranties = () => {
         });
         if (!isConfirmed) return;
         
-        setData(prev => prev.filter(item => item.id !== id));
-        alert('Simulated deletion: Backend connection pending for this entity.');
+        try {
+            await axios.delete(`${API_BASE}/${id}`);
+            fetchWarranties();
+        } catch (err) {
+            console.error('Delete error:', err);
+            alert('Failed to delete warranty');
+        }
+    };
+
+    const handleAddClick = () => {
+        setEditingWarranty(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditClick = (warranty) => {
+        setEditingWarranty(warranty);
+        setIsModalOpen(true);
+    };
+
+    const handleWarrantyAdded = () => {
+        fetchWarranties();
     };
 
     return (
@@ -97,7 +144,7 @@ const Warranties = () => {
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <button className="btn-orange">
+                    <button className="btn-orange" onClick={handleAddClick}>
                         <PlusCircle size={18} /> Add Warranty
                     </button>
                 </div>
@@ -156,14 +203,16 @@ const Warranties = () => {
                                     />
                                 </td>
                                 <td>{item.name}</td>
-                                <td>{item.desc}</td>
+                                <td>{item.description || item.desc}</td>
                                 <td>{item.duration}</td>
                                 <td>
-                                    <span className="badge-active">&#8226; {item.status}</span>
+                                    <span className={(item.status === 'Active' || item.status === true) ? 'badge-active' : 'badge-inactive'}>
+                                        &#8226; {(item.status === 'Active' || item.status === true) ? 'Active' : 'Inactive'}
+                                    </span>
                                 </td>
                                 <td>
                                     <div className="action-buttons justify-content-center">
-                                        <button className="action-btn" title="Edit">
+                                        <button className="action-btn" title="Edit" onClick={() => handleEditClick(item)}>
                                             <Pencil size={16} />
                                         </button>
                                         <button className="action-btn" title="Delete" onClick={() => handleDelete(item.id)}>
@@ -176,7 +225,7 @@ const Warranties = () => {
                         ) : (
                             <tr>
                                 <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No product Avalable tehre
+                                    No warranty available.
                                 </td>
                             </tr>
                         )}
@@ -202,6 +251,14 @@ const Warranties = () => {
                 </div>
 
             </div>
+
+            {/* Add/Edit Modal */}
+            <AddWarrantyModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onWarrantyAdded={handleWarrantyAdded}
+                warrantyData={editingWarranty}
+            />
         </div>
     );
 };
