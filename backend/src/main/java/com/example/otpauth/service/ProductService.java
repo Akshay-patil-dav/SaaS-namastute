@@ -32,6 +32,12 @@ public class ProductService {
         return productRepository.findByExpiryDateBefore(LocalDate.now());
     }
 
+    /** Search products by name or barcode */
+    public List<Product> searchProducts(String query) {
+        return productRepository.findByNameContainingIgnoreCaseOrItemBarcodeContainingIgnoreCase(query, query);
+    }
+
+
     /** Get single product */
     public Optional<Product> getProductById(@NonNull Long id) {
         return productRepository.findById(Objects.requireNonNull(id));

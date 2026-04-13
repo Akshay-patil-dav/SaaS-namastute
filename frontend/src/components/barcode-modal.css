@@ -1,0 +1,160 @@
+.barcode-modal-content {
+    background: #fff;
+    width: 95%;
+    max-width: 900px;
+    max-height: 90vh;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: modal-slide-up 0.3s ease-out;
+}
+
+@keyframes modal-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.barcode-modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.barcode-modal-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.barcode-modal-body {
+    padding: 30px;
+    overflow-y: auto;
+    background-color: #f8fafc;
+}
+
+.print-actions-top {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+
+.btn-print-barcode {
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(255, 0, 0, 0.2);
+}
+
+.btn-print-barcode:hover {
+    background-color: #cc0000;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 10px -1px rgba(255, 0, 0, 0.3);
+}
+
+.product-group {
+    margin-bottom: 35px;
+}
+
+.product-group-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 20px;
+}
+
+.barcode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.barcode-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: box-shadow 0.2s;
+}
+
+.barcode-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.store-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 4px;
+}
+
+.product-name {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.product-price {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.barcode-image-container {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.barcode-image {
+    width: 100%;
+    height: auto;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+.barcode-sku {
+    font-size: 12px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.close-btn-red {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.close-btn-red:hover {
+    background: #dc2626;
+}

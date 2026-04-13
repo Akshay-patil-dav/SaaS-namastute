@@ -15,4 +15,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySku(String sku);
     List<Product> findByExpiryDateBefore(LocalDate date);
     int countByUnit(String unit);
+    List<Product> findByNameContainingIgnoreCaseOrItemBarcodeContainingIgnoreCase(String name, String barcode);
 }
+
