@@ -12,13 +12,20 @@ import {
     Trash2
 } from 'lucide-react';
 import { useConfirm } from '../context/ConfirmContext';
+import AddVariantModal from '../components/AddVariantModal';
 
-const mockData = [];
+const mockData = [
+    { id: 1, variant: 'Size', values: 'S, M, L, XL', date: '12-04-2024', status: 'Active' },
+    { id: 2, variant: 'Color', values: 'Red, Blue, Green, Black', date: '11-04-2024', status: 'Active' },
+    { id: 3, variant: 'Material', values: 'Cotton, Polyester, Silk', date: '10-04-2024', status: 'Inactive' }
+];
 
 const VariantAttributes = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
     const [data, setData] = useState(mockData);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingVariant, setEditingVariant] = useState(null);
     const { confirm } = useConfirm();
 
     const filteredData = data.filter(item => {
@@ -56,7 +63,6 @@ const VariantAttributes = () => {
         
         setData(prev => prev.filter(item => !selectedIds.includes(item.id)));
         setSelectedIds([]);
-        alert('Simulated deletion: Backend connection pending for this entity.');
     };
 
     const handleDelete = async (id) => {
@@ -67,7 +73,24 @@ const VariantAttributes = () => {
         if (!isConfirmed) return;
         
         setData(prev => prev.filter(item => item.id !== id));
-        alert('Simulated deletion: Backend connection pending for this entity.');
+    };
+
+    const handleAddClick = () => {
+        setEditingVariant(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditClick = (variant) => {
+        setEditingVariant(variant);
+        setIsModalOpen(true);
+    };
+
+    const handleVariantSaved = (variant) => {
+        if (editingVariant) {
+            setData(prev => prev.map(item => item.id === variant.id ? variant : item));
+        } else {
+            setData(prev => [variant, ...prev]);
+        }
     };
 
     return (
@@ -86,7 +109,7 @@ const VariantAttributes = () => {
                     <button className="btn-icon-action" title="Excel">
                         <FileSpreadsheet size={18} className="icon-green" />
                     </button>
-                    <button className="btn-icon-action" title="Refresh">
+                    <button className="btn-icon-action" title="Refresh" onClick={() => window.location.reload()}>
                         <RefreshCw size={18} />
                     </button>
                     <button className="btn-icon-action" title="Collapse">
@@ -97,7 +120,7 @@ const VariantAttributes = () => {
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <button className="btn-orange">
+                    <button className="btn-orange" onClick={handleAddClick}>
                         <PlusCircle size={18} /> Add Variant
                     </button>
                 </div>
@@ -116,11 +139,6 @@ const VariantAttributes = () => {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                    </div>
-                    <div className="filter-dropdowns">
-                        <div className="filter-select">
-                            Status <ChevronDown size={16} />
-                        </div>
                     </div>
                 </div>
 
@@ -159,11 +177,13 @@ const VariantAttributes = () => {
                                 <td>{item.values}</td>
                                 <td>{item.date}</td>
                                 <td>
-                                    <span className="badge-active">&#8226; {item.status}</span>
+                                    <span className={item.status === 'Active' ? 'badge-active' : 'badge-inactive'}>
+                                        &#8226; {item.status}
+                                    </span>
                                 </td>
                                 <td>
                                     <div className="action-buttons justify-content-center">
-                                        <button className="action-btn" title="Edit">
+                                        <button className="action-btn" title="Edit" onClick={() => handleEditClick(item)}>
                                             <Pencil size={16} />
                                         </button>
                                         <button className="action-btn" title="Delete" onClick={() => handleDelete(item.id)}>
@@ -176,7 +196,7 @@ const VariantAttributes = () => {
                         ) : (
                             <tr>
                                 <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No product Avalable tehre
+                                    No variants available
                                 </td>
                             </tr>
                         )}
@@ -202,6 +222,13 @@ const VariantAttributes = () => {
                 </div>
 
             </div>
+
+            <AddVariantModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onVariantSaved={handleVariantSaved}
+                variantData={editingVariant}
+            />
         </div>
     );
 };
