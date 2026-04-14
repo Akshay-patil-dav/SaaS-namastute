@@ -1,17 +1,17 @@
-.barcode-modal-content {
+.qrcode-modal-content {
     background: #fff;
     width: 95%;
-    max-width: 900px;
+    max-width: 600px;
     max-height: 90vh;
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     overflow: hidden;
-    animation: modal-slide-up 0.3s ease-out;
+    animation: qrcode-modal-slide-up 0.3s ease-out;
 }
 
-@keyframes modal-slide-up {
+@keyframes qrcode-modal-slide-up {
     from {
         opacity: 0;
         transform: translateY(20px);
@@ -22,25 +22,25 @@
     }
 }
 
-.barcode-modal-header {
-    padding: 20px 25px;
+.qrcode-modal-header {
+    padding: 15px 25px;
     border-bottom: 1px solid #f1f5f9;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.barcode-modal-header h4 {
+.qrcode-modal-header h4 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: #1e293b;
 }
 
-.barcode-modal-body {
-    padding: 30px;
+.qrcode-modal-body {
+    padding: 25px;
     overflow-y: auto;
-    background-color: #f8fafc;
+    background-color: #fff;
 }
 
 .print-actions-top {
@@ -49,96 +49,79 @@
     margin-bottom: 25px;
 }
 
-.btn-print-barcode {
+.btn-print-qrcode {
     background-color: #ff0000;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 8px 18px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-weight: 600;
     font-size: 14px;
     transition: all 0.2s;
-    box-shadow: 0 4px 6px -1px rgba(255, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(255, 0, 0, 0.2);
 }
 
-.btn-print-barcode:hover {
-    background-color: #cc0000;
+.btn-print-qrcode:hover {
+    background-color: #e60000;
     transform: translateY(-1px);
-    box-shadow: 0 6px 10px -1px rgba(255, 0, 0, 0.3);
+    box-shadow: 0 4px 6px rgba(255, 0, 0, 0.3);
 }
 
-.product-group {
-    margin-bottom: 35px;
+.qrcode-product-group {
+    margin-bottom: 30px;
 }
 
-.product-group-title {
-    font-size: 1.1rem;
+.qrcode-product-group-title {
+    font-size: 1.15rem;
     font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 20px;
+    color: #0c2b4d;
+    margin-bottom: 15px;
 }
 
-.barcode-grid {
+.qrcode-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
 }
 
-.barcode-card {
+.qrcode-card {
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-    transition: box-shadow 0.2s;
+    transition: transform 0.2s;
 }
 
-.barcode-card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+.qrcode-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
 }
 
-.store-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e3a8a;
-    margin-bottom: 4px;
+.qrcode-image-container {
+    width: 140px;
+    height: 140px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.product-name {
-    font-size: 14px;
-    color: #64748b;
-    margin-bottom: 4px;
-}
-
-.product-price {
-    font-size: 14px;
-    color: #64748b;
-    margin-bottom: 12px;
-}
-
-.barcode-image-container {
+.qrcode-image {
     width: 100%;
-    margin-bottom: 8px;
-}
-
-.barcode-image {
-    width: 100%;
-    height: auto;
-    max-height: 80px;
+    height: 100%;
     object-fit: contain;
 }
 
-.barcode-sku {
-    font-size: 12px;
+.qrcode-ref-text {
+    font-size: 14px;
     color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-weight: 500;
 }
 
 .close-btn-red {
@@ -146,8 +129,8 @@
     color: white;
     border: none;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -159,19 +142,19 @@
     background: #dc2626;
 }
 
-/* Print Styles for Barcodes */
+/* Print Styles */
 @media print {
     /* Hide everything on the page */
     body * {
         visibility: hidden;
     }
     
-    /* Show only the Barcode container */
+    /* Show only the QR Code container */
     .modal-overlay,
-    .barcode-modal-content,
-    .barcode-modal-body,
-    .barcode-print-area,
-    .barcode-print-area * {
+    .qrcode-modal-content,
+    .qrcode-modal-body,
+    .qrcode-print-area,
+    .qrcode-print-area * {
         visibility: visible !important;
     }
 
@@ -187,7 +170,7 @@
         z-index: auto !important;
     }
 
-    .barcode-modal-content {
+    .qrcode-modal-content {
         position: static !important;
         width: 100% !important;
         max-width: none !important;
@@ -199,88 +182,88 @@
     }
 
     /* Hide non-print elements */
-    .barcode-modal-header,
+    .qrcode-modal-header,
     .print-actions-top,
     .close-btn-red,
-    .product-group-title {
+    .qrcode-product-group-title {
         display: none !important;
     }
 
-    /* Layout for labels - optimized for thermal printers/stickers */
-    .barcode-grid {
+    /* Layout for labels */
+    .qrcode-grid {
         display: grid !important;
-        grid-template-columns: repeat(auto-fill, minmax(50mm, 1fr)) !important;
+        grid-template-columns: repeat(auto-fill, minmax(40mm, 1fr)) !important;
         gap: 5mm !important;
         padding: 5mm !important;
     }
 
     /* Size: 36mm */
-    .barcode-print-area.36mm-1.4-inch .barcode-grid {
+    .qrcode-print-area.36mm-1.4-inch .qrcode-grid {
         grid-template-columns: repeat(auto-fill, minmax(36mm, 1fr)) !important;
     }
-    .barcode-print-area.36mm-1.4-inch .barcode-card {
+    .qrcode-print-area.36mm-1.4-inch .qrcode-card {
         padding: 2mm !important;
+    }
+    .qrcode-print-area.36mm-1.4-inch .qrcode-image-container {
+        width: 30mm !important;
+        height: 30mm !important;
     }
 
     /* Size: 12mm */
-    .barcode-print-area.12mm-0.47-inch .barcode-grid {
+    .qrcode-print-area.12mm-0.47-inch .qrcode-grid {
         grid-template-columns: repeat(auto-fill, minmax(12mm, 1fr)) !important;
     }
-    .barcode-print-area.12mm-0.47-inch .barcode-card {
+    .qrcode-print-area.12mm-0.47-inch .qrcode-card {
         padding: 1mm !important;
     }
-    .barcode-print-area.12mm-0.47-inch .barcode-image {
-        max-height: 10mm !important;
+    .qrcode-print-area.12mm-0.47-inch .qrcode-image-container {
+        width: 10mm !important;
+        height: 10mm !important;
+    }
+    .qrcode-print-area.12mm-0.47-inch .qrcode-ref-text {
+        font-size: 6pt !important;
     }
 
     /* Size: 20mm */
-    .barcode-print-area.20mm-0.79-inch .barcode-grid {
+    .qrcode-print-area.20mm-0.79-inch .qrcode-grid {
         grid-template-columns: repeat(auto-fill, minmax(20mm, 1fr)) !important;
+    }
+    .qrcode-print-area.20mm-0.79-inch .qrcode-image-container {
+        width: 18mm !important;
+        height: 18mm !important;
     }
 
     /* Size: A4 */
-    .barcode-print-area.a4 .barcode-grid {
-        grid-template-columns: repeat(auto-fill, minmax(60mm, 1fr)) !important;
+    .qrcode-print-area.a4 .qrcode-grid {
+        grid-template-columns: repeat(auto-fill, minmax(50mm, 1fr)) !important;
     }
-    .barcode-print-area.a4 {
-        padding: 10mm !important;
+    .qrcode-print-area.a4 {
+        padding: 15mm !important;
     }
 
-    .barcode-card {
+    .qrcode-card {
         border: 1px solid #000 !important;
         border-radius: 0 !important;
         padding: 5mm !important;
         width: auto !important;
-        height: auto !important;
         break-inside: avoid;
-        box-shadow: none !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
     }
 
-    .barcode-image-container {
-        width: 100% !important;
+    .qrcode-image-container {
+        width: 35mm !important;
+        height: 35mm !important;
         margin-bottom: 2mm !important;
         display: flex !important;
         justify-content: center !important;
     }
 
-    .barcode-image {
-        width: 100% !important;
-        height: auto !important;
-        max-height: 20mm !important;
-        filter: grayscale(100%);
-        object-fit: contain !important;
-    }
-
-    .store-name, .product-name, .product-price, .barcode-sku {
+    .qrcode-ref-text {
+        font-size: 10pt !important;
         color: #000 !important;
         font-weight: 600 !important;
-    }
-    
-    .barcode-sku {
-        font-size: 10pt !important;
     }
 }

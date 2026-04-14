@@ -3,7 +3,7 @@ import { X, Printer } from 'lucide-react';
 import './barcode-modal.css';
 import './add-sales-modal.css'; // Reuse modal-overlay
 
-const BarcodeModal = ({ isOpen, onClose, products = [] }) => {
+const BarcodeModal = ({ isOpen, onClose, products = [], pageSize = '36mm' }) => {
     if (!isOpen) return null;
 
     // Use default products if none provided (matching the user image for demonstration)
@@ -27,14 +27,15 @@ const BarcodeModal = ({ isOpen, onClose, products = [] }) => {
                 <div className="barcode-modal-body">
                     {/* Top Print Button */}
                     <div className="print-actions-top">
-                        <button className="btn-print-barcode">
+                        <button className="btn-print-barcode" onClick={() => window.print()}>
                             <Printer size={18} />
                             Print Barcode
                         </button>
                     </div>
 
                     {/* Product Groups */}
-                    {displayProducts.map((product, pIndex) => (
+                    <div className={`barcode-print-area ${pageSize.replace(/[\(\)]/g, '').replace(/\s+/g, '-').toLowerCase()}`}>
+                        {displayProducts.map((product, pIndex) => (
                         <div key={pIndex} className="product-group">
                             <h5 className="product-group-title">{product.name}</h5>
                             <div className="barcode-grid">
@@ -58,7 +59,8 @@ const BarcodeModal = ({ isOpen, onClose, products = [] }) => {
                                 ))}
                             </div>
                         </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

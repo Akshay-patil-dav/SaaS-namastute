@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import BarcodeModal from '../components/BarcodeModal';
+import QRCodeModal from '../components/QRCodeModal';
 import axios from 'axios';
 
 
@@ -20,6 +21,8 @@ import {
 
 const PrintBarcode = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+    const [pageSize, setPageSize] = useState('36mm (1.4 inch)');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -119,6 +122,14 @@ const PrintBarcode = () => {
             return;
         }
         setIsModalOpen(true);
+    };
+
+    const handleGenerateQRCode = () => {
+        if (selectedProducts.length === 0) {
+            alert('Please add at least one product to the table.');
+            return;
+        }
+        setIsQRModalOpen(true);
     };
 
     const handleReset = () => {
@@ -297,9 +308,15 @@ const PrintBarcode = () => {
                 {/* Configuration Options */}
                 <div className="row align-items-center mb-5">
                     <div className="col-md-5">
-                        <select className="form-select custom-input" defaultValue="36mm (1.4 inch)">
+                        <select 
+                            className="form-select custom-input" 
+                            value={pageSize}
+                            onChange={(e) => setPageSize(e.target.value)}
+                        >
                             <option value="36mm (1.4 inch)">36mm (1.4 inch)</option>
                             <option value="12mm (0.47 inch)">12mm (0.47 inch)</option>
+                            <option value="20mm (0.79 inch)">20mm (0.79 inch)</option>
+                            <option value="A4">A4 (Standard Page)</option>
                         </select>
                     </div>
                     <div className="col-md-7 d-flex justify-content-end align-items-center gap-5">
@@ -338,6 +355,14 @@ const PrintBarcode = () => {
                     </button>
 
                     <button 
+                        className="btn-orange text-white d-flex align-items-center justify-content-center gap-2" 
+                        style={{ height: '40px', padding: '0 20px', borderRadius: '4px', border: 'none', fontWeight: '500', fontSize: '14px' }}
+                        onClick={handleGenerateQRCode}
+                    >
+                        <Eye size={16} /> Generate QR Code
+                    </button>
+
+                    <button 
                         className="btn d-flex align-items-center justify-content-center gap-2" 
                         style={{ height: '40px', padding: '0 20px', borderRadius: '4px', border: 'none', backgroundColor: '#0f172a', color: 'white', fontWeight: '500', fontSize: '14px' }}
                         onClick={handleReset}
@@ -345,7 +370,18 @@ const PrintBarcode = () => {
                         <Power size={16} /> Reset Barcode
                     </button>
 
-                    <button className="btn d-flex align-items-center justify-content-center gap-2" style={{ height: '40px', padding: '0 20px', borderRadius: '4px', border: 'none', backgroundColor: '#ef4444', color: 'white', fontWeight: '500', fontSize: '14px' }}>
+                    <button 
+                        className="btn d-flex align-items-center justify-content-center gap-2" 
+                        style={{ height: '40px', padding: '0 20px', borderRadius: '4px', border: 'none', backgroundColor: '#ef4444', color: 'white', fontWeight: '500', fontSize: '14px' }}
+                        onClick={() => {
+                            if (selectedProducts.length === 0) {
+                                alert('Please add at least one product to the table.');
+                                return;
+                            }
+                            setIsModalOpen(true);
+                            setTimeout(() => window.print(), 500);
+                        }}
+                    >
                         <Printer size={16} /> Print Barcode
                     </button>
                 </div>
@@ -357,6 +393,14 @@ const PrintBarcode = () => {
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)} 
                 products={selectedProducts}
+                pageSize={pageSize}
+            />
+
+            <QRCodeModal 
+                isOpen={isQRModalOpen} 
+                onClose={() => setIsQRModalOpen(false)} 
+                products={selectedProducts}
+                pageSize={pageSize}
             />
 
         </div>
