@@ -1,8 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Calendar, Search, Maximize, Minus } from 'lucide-react';
+import axios from 'axios';
 import './add-sales-modal.css';
 
 const AddSalesModal = ({ isOpen, onClose }) => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const searchRef = useRef(null);
+
+    // Handle clicks outside search results to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Search logic with simple debouncing effect
+    useEffect(() => {
+        if (!isOpen) return;
+        
+        const searchProducts = async () => {
+            let url = searchQuery.length > 0 
+                ? `${import.meta.env.VITE_API_BASE_URL}/products/search?q=${searchQuery}`
+                : `${import.meta.env.VITE_API_BASE_URL}/products`;
+
+            try {
+                const response = await axios.get(url);
+                setSearchResults(searchQuery.length > 0 ? response.data : response.data.slice(0, 10));
+                if (searchQuery.length > 0 || searchQuery === '') {
+                    // Logic to show suggestions
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        };
+
+        const timeoutId = setTimeout(searchProducts, 300);
+        setActiveSuggestionIndex(-1);
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery, isOpen]);
+
+    const handleSelectProduct = (product) => {
+        const existing = selectedProducts.find(p => p.id === product.id);
+        if (existing) {
+            setSelectedProducts(selectedProducts.map(p => 
+                p.id === product.id ? { ...p, count: (p.count || 0) + 1 } : p
+            ));
+        } else {
+            setSelectedProducts([...selectedProducts, { ...product, count: 1 }]);
+        }
+        setSearchQuery('');
+        setShowSuggestions(false);
+    };
+
+    const handleKeyDown = (e) => {
+        if (showSuggestions && searchResults.length > 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActiveSuggestionIndex(prev => (prev < searchResults.length - 1 ? prev + 1 : prev));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActiveSuggestionIndex(prev => (prev > 0 ? prev - 1 : 0));
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (activeSuggestionIndex >= 0 && activeSuggestionIndex < searchResults.length) {
+                    handleSelectProduct(searchResults[activeSuggestionIndex]);
+                }
+            } else if (e.key === 'Escape') {
+                setShowSuggestions(false);
+            }
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -59,12 +135,62 @@ const AddSalesModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Product Search */}
-                    <div className="form-group mt-3">
+                    <div className="form-group mt-3 position-relative" ref={searchRef}>
                         <label>Product <span className="required">*</span></label>
                         <div className="input-icon-wrapper">
-                            <input type="text" placeholder="Please type product code and select" className="form-input" />
+                            <input 
+                                type="text" 
+                                placeholder="Search by name or Item Code (e.g. 6633445943263)" 
+                                className="form-input" 
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setShowSuggestions(true);
+                                }}
+                                onKeyDown={handleKeyDown}
+                                onFocus={() => setShowSuggestions(true)}
+                            />
                             <Maximize className="input-icon-right gray-icon" size={16} />
                         </div>
+
+                        {showSuggestions && (
+                            <div className="search-suggestions-container border rounded shadow-sm position-absolute bg-white" 
+                                style={{ zIndex: 1050, width: '100%', marginTop: '2px', maxHeight: '250px', overflowY: 'auto', left: 0 }}>
+                                {searchResults.length > 0 ? (
+                                    <ul className="list-unstyled mb-0">
+                                        {searchResults.map((product, index) => (
+                                            <li 
+                                                key={product.id} 
+                                                className={`suggestion-item ${index === activeSuggestionIndex ? 'active' : ''}`}
+                                                style={{ padding: '10px 15px', borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }}
+                                                onClick={() => handleSelectProduct(product)}
+                                            >
+                                                <div className="d-flex align-items-center gap-3">
+                                                    <div className="suggestion-img-wrapper" style={{ width: '32px', height: '32px' }}>
+                                                        {product.images && product.images.split(',')[0]?.trim() ? (
+                                                            <img src={product.images.split(',')[0].trim()} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
+                                                        ) : (
+                                                            <div style={{ width: '100%', height: '100%', background: '#f1f5f9', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: '#64748b' }}>
+                                                                {product.name.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-grow-1">
+                                                        <div style={{ fontWeight: '600', fontSize: '13px' }}>{product.name}</div>
+                                                        <div style={{ fontSize: '11px', color: '#64748b' }}>SKU: {product.sku} | Price: ${product.price}</div>
+                                                    </div>
+                                                    <div style={{ fontSize: '10px', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+                                                        {product.itemBarcode}
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="p-3 text-muted text-center" style={{ fontSize: '13px' }}>No products found</div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Middle Section: Summary Table */}

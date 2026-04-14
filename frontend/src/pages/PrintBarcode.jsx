@@ -14,7 +14,8 @@ import {
     MinusSquare,
     PlusSquare,
     Minus,
-    Plus
+    Plus,
+    Search
 } from 'lucide-react';
 
 const PrintBarcode = () => {
@@ -23,6 +24,7 @@ const PrintBarcode = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
+    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
     const searchRef = useRef(null);
 
     // Handle clicks outside search results to close dropdown
@@ -39,15 +41,16 @@ const PrintBarcode = () => {
     // Search logic with simple debouncing effect
     useEffect(() => {
         const searchProducts = async () => {
-            if (searchQuery.length < 2) {
-                setSearchResults([]);
-                setShowSuggestions(false);
-                return;
-            }
+            // If empty, we can either show all or show nothing. 
+            // The user said "Apply it" to showing all on empty.
+            let url = searchQuery.length > 0 
+                ? `${import.meta.env.VITE_API_BASE_URL}/products/search?q=${searchQuery}`
+                : `${import.meta.env.VITE_API_BASE_URL}/products`;
 
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/search?q=${searchQuery}`);
-                setSearchResults(response.data);
+                const response = await axios.get(url);
+                // Limit to 10 suggestions for performance if empty, otherwise show search results
+                setSearchResults(searchQuery.length > 0 ? response.data : response.data.slice(0, 10));
                 setShowSuggestions(true);
             } catch (error) {
                 console.error('Search error:', error);
@@ -55,8 +58,28 @@ const PrintBarcode = () => {
         };
 
         const timeoutId = setTimeout(searchProducts, 300);
+        setActiveSuggestionIndex(-1); // Reset index on query change
         return () => clearTimeout(timeoutId);
     }, [searchQuery]);
+
+    const handleKeyDown = (e) => {
+        if (showSuggestions && searchResults.length > 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActiveSuggestionIndex(prev => (prev < searchResults.length - 1 ? prev + 1 : prev));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActiveSuggestionIndex(prev => (prev > 0 ? prev - 1 : 0));
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (activeSuggestionIndex >= 0 && activeSuggestionIndex < searchResults.length) {
+                    handleSelectProduct(searchResults[activeSuggestionIndex]);
+                }
+            } else if (e.key === 'Escape') {
+                setShowSuggestions(false);
+            }
+        }
+    };
 
     const handleSelectProduct = (product) => {
         const existing = selectedProducts.find(p => p.id === product.id);
@@ -147,34 +170,51 @@ const PrintBarcode = () => {
 
                 <div className="row mb-4">
                     <div className="col-12 position-relative" ref={searchRef}>
-                        <input 
-                            type="text" 
-                            className="form-control custom-input" 
-                            placeholder="Search Product by Name or Barcode Number" 
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
-                        />
+                        <div className="search-input-wrapper">
+                            <Search className="search-icon-left" size={18} />
+                            <input 
+                                type="text" 
+                                className="form-control custom-input with-icon" 
+                                placeholder="Search by Product Name or Item Code (e.g. 6633445943263)" 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                onFocus={() => setShowSuggestions(true)}
+                            />
+                        </div>
                         
                         {showSuggestions && (
-                            <div className="search-suggestions-container border rounded shadow-sm position-absolute bg-white" style={{ zIndex: 1000, width: 'calc(100% - 24px)', marginTop: '2px', maxHeight: '300px', overflowY: 'auto' }}>
+                            <div className="search-suggestions-container border rounded shadow-sm position-absolute bg-white" style={{ zIndex: 1000, width: 'calc(100% - 24px)', marginTop: '2px', maxHeight: '400px', overflowY: 'auto' }}>
                                 {searchResults.length > 0 ? (
                                     <ul className="list-unstyled mb-0">
-                                        {searchResults.map(product => (
+                                        {searchResults.map((product, index) => (
                                             <li 
                                                 key={product.id} 
-                                                className="p-3 border-bottom suggestion-item" 
-                                                style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                                                className={`suggestion-item ${index === activeSuggestionIndex ? 'active' : ''}`}
                                                 onClick={() => handleSelectProduct(product)}
-                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
-                                                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                                             >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <div style={{ fontWeight: '600', color: '#1e293b' }}>{product.name}</div>
-                                                        <div style={{ fontSize: '12px', color: '#64748b' }}>SKU: {product.sku} | Price: ${product.price}</div>
+                                                <div className="d-flex align-items-center gap-3">
+                                                    {/* Product tiny thumb */}
+                                                    <div className="suggestion-img-wrapper">
+                                                        {product.images && product.images.split(',')[0]?.trim() ? (
+                                                            <img src={product.images.split(',')[0].trim()} alt="" className="suggestion-thumb" />
+                                                        ) : (
+                                                            <div className="suggestion-avatar" style={{ background: '#f1f5f9', color: '#64748b' }}>
+                                                                {product.name.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <div style={{ fontSize: '11px', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', color: '#475569' }}>
+                                                    
+                                                    <div className="flex-grow-1">
+                                                        <div className="suggestion-name">{product.name}</div>
+                                                        <div className="suggestion-details">
+                                                            <span>SKU: {product.sku}</span>
+                                                            <span className="separator">•</span>
+                                                            <span>Price: ${product.price}</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="suggestion-barcode-badge">
                                                         {product.itemBarcode}
                                                     </div>
                                                 </div>
@@ -182,7 +222,10 @@ const PrintBarcode = () => {
                                         ))}
                                     </ul>
                                 ) : (
-                                    <div className="p-3 text-muted text-center" style={{ fontSize: '13px' }}>No products found</div>
+                                    <div className="p-4 text-center">
+                                        <div className="text-muted mb-1" style={{ fontSize: '14px', fontWeight: '500' }}>No products found</div>
+                                        <div style={{ fontSize: '12px', color: '#94a3b8' }}>Try searching by different name or barcode</div>
+                                    </div>
                                 )}
                             </div>
                         )}
