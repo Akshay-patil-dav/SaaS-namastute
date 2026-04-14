@@ -20,7 +20,6 @@ import {
     Puzzle, 
     ShieldCheck, 
     Barcode, 
-    QrCode, 
     Box, 
     SlidersHorizontal, 
     ArrowRightLeft,
@@ -185,7 +184,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 {/* <li className="pos-menu-item"><NavLink to="/variant-attributes" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Puzzle className="pos-menu-icon" /><span>Variant Attributes</span></div></NavLink></li> */}
                                 <li className="pos-menu-item"><NavLink to="/warranties" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><ShieldCheck className="pos-menu-icon" /><span>Warranties</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/print-barcode" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Barcode className="pos-menu-icon" /><span>Print Barcode</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/print-qrcode" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><QrCode className="pos-menu-icon" /><span>Print QR Code</span></div></NavLink></li>
+
                             </ul>
                         </>
                     )}
