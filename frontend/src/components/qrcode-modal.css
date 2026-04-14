@@ -142,6 +142,25 @@
     background: #dc2626;
 }
 
+.qrcode-store-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 4px;
+}
+
+.qrcode-name-text {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.qrcode-price-text {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
 /* Print Styles */
 @media print {
     /* Hide everything on the page */
@@ -261,7 +280,10 @@
         justify-content: center !important;
     }
 
-    .qrcode-ref-text {
+    .qrcode-ref-text,
+    .qrcode-store-text,
+    .qrcode-name-text,
+    .qrcode-price-text {
         font-size: 10pt !important;
         color: #000 !important;
         font-weight: 600 !important;

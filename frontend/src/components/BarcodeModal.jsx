@@ -3,7 +3,15 @@ import { X, Printer } from 'lucide-react';
 import './barcode-modal.css';
 import './add-sales-modal.css'; // Reuse modal-overlay
 
-const BarcodeModal = ({ isOpen, onClose, products = [], pageSize = '36mm' }) => {
+const BarcodeModal = ({ 
+    isOpen, 
+    onClose, 
+    products = [], 
+    pageSize = '36mm',
+    showStoreName = true,
+    showProductName = true,
+    showPrice = true
+}) => {
     if (!isOpen) return null;
 
     // Use default products if none provided (matching the user image for demonstration)
@@ -41,9 +49,9 @@ const BarcodeModal = ({ isOpen, onClose, products = [], pageSize = '36mm' }) => 
                             <div className="barcode-grid">
                                 {Array.from({ length: product.count || 1 }).map((_, i) => (
                                     <div key={i} className="barcode-card">
-                                        <div className="store-name">Grocery Alpha</div>
-                                        <div className="product-name">{product.name}</div>
-                                        <div className="product-price">Price: {product.price}</div>
+                                        {showStoreName && <div className="store-name">Grocery Alpha</div>}
+                                        {showProductName && <div className="product-name">{product.name}</div>}
+                                        {showPrice && <div className="product-price">Price: {product.price}</div>}
                                         
                                         <div className="barcode-image-container">
                                             <img 
