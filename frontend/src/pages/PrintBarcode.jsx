@@ -23,6 +23,9 @@ const PrintBarcode = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isQRModalOpen, setIsQRModalOpen] = useState(false);
     const [pageSize, setPageSize] = useState('36mm (1.4 inch)');
+    const [showStoreName, setShowStoreName] = useState(true);
+    const [showProductName, setShowProductName] = useState(true);
+    const [showPrice, setShowPrice] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -323,21 +326,33 @@ const PrintBarcode = () => {
                         <div className="d-flex flex-column align-items-center">
                             <span className="mb-2" style={{fontSize: '13px', fontWeight: '600', color: '#4b5563'}}>Show Store Name</span>
                             <label className="switch mb-0">
-                                <input type="checkbox" defaultChecked />
+                                <input 
+                                    type="checkbox" 
+                                    checked={showStoreName}
+                                    onChange={(e) => setShowStoreName(e.target.checked)}
+                                />
                                 <span className="slider round"></span>
                             </label>
                         </div>
                         <div className="d-flex flex-column align-items-center">
                             <span className="mb-2" style={{fontSize: '13px', fontWeight: '600', color: '#4b5563'}}>Show Product Name</span>
                             <label className="switch mb-0">
-                                <input type="checkbox" defaultChecked />
+                                <input 
+                                    type="checkbox" 
+                                    checked={showProductName}
+                                    onChange={(e) => setShowProductName(e.target.checked)}
+                                />
                                 <span className="slider round"></span>
                             </label>
                         </div>
                         <div className="d-flex flex-column align-items-center">
                             <span className="mb-2" style={{fontSize: '13px', fontWeight: '600', color: '#4b5563'}}>Show Price</span>
                             <label className="switch mb-0">
-                                <input type="checkbox" defaultChecked />
+                                <input 
+                                    type="checkbox" 
+                                    checked={showPrice}
+                                    onChange={(e) => setShowPrice(e.target.checked)}
+                                />
                                 <span className="slider round"></span>
                             </label>
                         </div>
@@ -394,6 +409,9 @@ const PrintBarcode = () => {
                 onClose={() => setIsModalOpen(false)} 
                 products={selectedProducts}
                 pageSize={pageSize}
+                showStoreName={showStoreName}
+                showProductName={showProductName}
+                showPrice={showPrice}
             />
 
             <QRCodeModal 
@@ -401,6 +419,9 @@ const PrintBarcode = () => {
                 onClose={() => setIsQRModalOpen(false)} 
                 products={selectedProducts}
                 pageSize={pageSize}
+                showStoreName={showStoreName}
+                showProductName={showProductName}
+                showPrice={showPrice}
             />
 
         </div>

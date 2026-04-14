@@ -3,7 +3,15 @@ import { X, Printer } from 'lucide-react';
 import './qrcode-modal.css';
 import './add-sales-modal.css'; // Reuse modal-overlay
 
-const QRCodeModal = ({ isOpen, onClose, products = [], pageSize = '36mm' }) => {
+const QRCodeModal = ({ 
+    isOpen, 
+    onClose, 
+    products = [], 
+    pageSize = '36mm',
+    showStoreName = true,
+    showProductName = true,
+    showPrice = true
+}) => {
     if (!isOpen) return null;
 
     // Use default products if none provided (matching the user image for demonstration)
@@ -36,11 +44,14 @@ const QRCodeModal = ({ isOpen, onClose, products = [], pageSize = '36mm' }) => {
                     <div className={`qrcode-print-area ${pageSize.replace(/[\(\)]/g, '').replace(/\s+/g, '-').toLowerCase()}`}>
                         {displayProducts.map((product, pIndex) => (
                             <div key={pIndex} className="qrcode-product-group">
-                                <h5 className="qrcode-product-group-title">{product.name}</h5>
+                                {showProductName && <h5 className="qrcode-product-group-title">{product.name}</h5>}
                                 
                                 <div className="qrcode-grid">
                                     {Array.from({ length: product.count || 1 }).map((_, i) => (
                                         <div key={i} className="qrcode-card">
+                                            {showStoreName && <div className="qrcode-store-text">Grocery Alpha</div>}
+                                            {showProductName && <div className="qrcode-name-text">{product.name}</div>}
+                                            {showPrice && <div className="qrcode-price-text">Price: {product.price}</div>}
                                             <div className="qrcode-image-container">
                                                 <img 
                                                     src={`https://bwipjs-api.metafloor.com/?bcid=qrcode&text=${encodeURIComponent(product.sku || product.itemBarcode || 'N/A')}&scale=4`} 
