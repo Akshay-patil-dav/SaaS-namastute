@@ -214,6 +214,15 @@
         padding: 5mm !important;
     }
 
+ 
+
+    /* Size: A4 */
+    .barcode-print-area.a4 .barcode-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60mm, 1fr)) !important;
+    }
+    .barcode-print-area.a4 {
+        padding: 10mm !important;
+    }
   
 
     .barcode-card {
