@@ -6,6 +6,7 @@ import { ConfirmProvider } from './context/ConfirmContext';
 
 // ── Pages ──────────────────────────────────────────────────────────────────
 import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import Unauthorized from './pages/Unauthorized.jsx';
 import Dashboard from './pages/Dashboard.jsx';
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Routes>
             {/* Public routes */}
             <Route path="/login"        element={<Login />} />
+            <Route path="/register"     element={<Register />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* Root → landing page */}
