@@ -214,37 +214,7 @@
         padding: 5mm !important;
     }
 
-    /* Size: 36mm */
-    .barcode-print-area.size-36mm .barcode-grid {
-        grid-template-columns: repeat(auto-fill, minmax(36mm, 1fr)) !important;
-    }
-    .barcode-print-area.size-36mm .barcode-card {
-        padding: 2mm !important;
-    }
-
-    /* Size: 12mm */
-    .barcode-print-area.size-12mm .barcode-grid {
-        grid-template-columns: repeat(auto-fill, minmax(12mm, 1fr)) !important;
-    }
-    .barcode-print-area.size-12mm .barcode-card {
-        padding: 1mm !important;
-    }
-    .barcode-print-area.size-12mm .barcode-image {
-        max-height: 10mm !important;
-    }
-
-    /* Size: 20mm */
-    .barcode-print-area.size-20mm .barcode-grid {
-        grid-template-columns: repeat(auto-fill, minmax(20mm, 1fr)) !important;
-    }
-
-    /* Size: A4 */
-    .barcode-print-area.a4 .barcode-grid {
-        grid-template-columns: repeat(auto-fill, minmax(60mm, 1fr)) !important;
-    }
-    .barcode-print-area.a4 {
-        padding: 10mm !important;
-    }
+  
 
     .barcode-card {
         border: 1px solid #000 !important;
