@@ -54,8 +54,8 @@ public class AuthService {
                 request.getFullName()
         );
 
-        Role defaultRole = roleRepository.findByName(RoleName.OTHER).orElseGet(() -> {
-            Role newRole = new Role(RoleName.OTHER);
+        Role defaultRole = roleRepository.findByName(RoleName.CLIENT).orElseGet(() -> {
+            Role newRole = new Role(RoleName.CLIENT);
             return roleRepository.save(newRole);
         });
         user.getRoles().add(defaultRole);
@@ -68,7 +68,7 @@ public class AuthService {
                 .map(r -> r.getName().name())
                 .collect(Collectors.toList());
 
-        return new AuthResponse(token, user.getEmail(), roles);
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -86,6 +86,6 @@ public class AuthService {
                 .map(r -> r.getName().name())
                 .collect(Collectors.toList());
 
-        return new AuthResponse(token, user.getEmail(), roles);
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles);
     }
 }

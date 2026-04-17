@@ -19,10 +19,7 @@ export default function Login() {
         setError('');
         setIsLoading(true);
 
-        // Small delay for UX feel
-        await new Promise((r) => setTimeout(r, 600));
-
-        const result = login({ email, password });
+        const result = await login({ email, password });
 
         if (!result.success) {
             setError(result.error);
@@ -38,20 +35,6 @@ export default function Login() {
         }
     };
 
-    // Quick-fill demo credentials
-    const fillDemo = (role) => {
-        if (role === 'superadmin') {
-            setEmail('superadmin@namastute.com');
-            setPassword('superadmin123');
-        } else if (role === 'admin') {
-            setEmail('admin@namastute.com');
-            setPassword('admin123');
-        } else {
-            setEmail('client@namastute.com');
-            setPassword('client123');
-        }
-        setError('');
-    };
 
     return (
         <div className="login-container">
@@ -167,39 +150,6 @@ export default function Login() {
                         </div>
                     </form>
 
-                    {/* ── Demo Quick Access ─────────────────────────────── */}
-                    <div className="demo-section">
-                        <div className="demo-label">Quick Demo Access</div>
-                        <div className="demo-cards">
-                            <button
-                                id="demo-superadmin"
-                                className="demo-card demo-superadmin"
-                                onClick={() => fillDemo('superadmin')}
-                                type="button"
-                            >
-                                <Crown size={14} />
-                                Super Admin
-                            </button>
-                            <button
-                                id="demo-admin"
-                                className="demo-card demo-admin"
-                                onClick={() => fillDemo('admin')}
-                                type="button"
-                            >
-                                <ShieldCheck size={14} />
-                                Admin
-                            </button>
-                            <button
-                                id="demo-client"
-                                className="demo-card demo-client"
-                                onClick={() => fillDemo('client')}
-                                type="button"
-                            >
-                                <User size={14} />
-                                Client
-                            </button>
-                        </div>
-                    </div>
 
                     <div className="login-footer">
                         Copyright © 2026 Namustute POS
