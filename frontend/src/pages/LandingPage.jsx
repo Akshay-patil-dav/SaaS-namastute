@@ -76,7 +76,7 @@ function PricingCard({ plan, price, desc, features, popular, cta }) {
             </ul>
             <button
                 className={`lp-btn-pricing ${popular ? 'fill' : 'outline'}`}
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/register')}
             >
                 {cta}
             </button>
@@ -277,7 +277,7 @@ export default function LandingPage() {
 
                 <div className="lp-nav-cta">
                     <button className="lp-btn-ghost" onClick={() => navigate('/login')}>Log In</button>
-                    <button className="lp-btn-primary" onClick={() => navigate('/login')}>Get Started Free</button>
+                    <button className="lp-btn-primary" onClick={() => navigate('/register')}>Get Started Free</button>
                 </div>
 
                 <button
@@ -297,7 +297,7 @@ export default function LandingPage() {
                 <a href="#testimonials" onClick={() => scrollTo('testimonials')}>Reviews</a>
                 <div className="lp-mobile-menu-cta">
                     <a href="#" className="lp-btn-ghost" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Log In</a>
-                    <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Get Started Free</a>
+                    <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/register'); }}>Get Started Free</a>
                 </div>
             </div>
 
@@ -328,7 +328,7 @@ export default function LandingPage() {
                         <button
                             id="hero-get-started"
                             className="lp-btn-hero"
-                            onClick={() => navigate('/login')}
+                            onClick={() => navigate('/register')}
                         >
                             Get Started Free →
                         </button>
@@ -465,7 +465,7 @@ export default function LandingPage() {
                         <button
                             id="cta-get-started"
                             className="lp-btn-cta-white"
-                            onClick={() => navigate('/login')}
+                            onClick={() => navigate('/register')}
                         >
                             Get Started Free →
                         </button>

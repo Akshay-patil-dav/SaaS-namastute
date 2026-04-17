@@ -160,6 +160,11 @@ export default function Login() {
                                 </span>
                             ) : 'Sign In'}
                         </button>
+
+                        <div className="register-link" style={{ textAlign: 'center' }}>
+                            Don't have an account?{' '}
+                            <Link to="/register">Sign Up</Link>
+                        </div>
                     </form>
 
                     {/* ── Demo Quick Access ─────────────────────────────── */}
