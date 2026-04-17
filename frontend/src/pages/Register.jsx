@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import {
     User, Mail, Lock, EyeOff, Eye,
@@ -7,8 +7,6 @@ import {
 } from 'lucide-react';
 import './Login.css';
 import './LoginNew.css';
-
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
 export default function Register() {
     const [fullName, setFullName]         = useState('');
@@ -20,6 +18,7 @@ export default function Register() {
     const [agreed, setAgreed]             = useState(false);
     const [error, setError]               = useState('');
     const [isLoading, setIsLoading]       = useState(false);
+    const { register } = useAuth();
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
@@ -36,13 +35,15 @@ export default function Register() {
         }
 
         setIsLoading(true);
-        await new Promise((r) => setTimeout(r, 600));
 
         try {
-            await axios.post(`${API_URL}/register`, { fullName, email, password });
-            navigate('/login');
-        } catch (err) {
-            setError(err.response?.data?.message || err.response?.data || 'Failed to create account. Please try again.');
+            const result = await register({ fullName, email, password });
+            if (!result.success) {
+                setError(result.error);
+                return;
+            }
+            // Auto-logged-in after registration → redirect to dashboard
+            navigate('/dashboard');
         } finally {
             setIsLoading(false);
         }

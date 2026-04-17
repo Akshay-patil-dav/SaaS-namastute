@@ -139,6 +139,7 @@ export default function LandingPage() {
     const pricingRef    = useReveal();
     const testimonialRef = useReveal();
     const ctaRef        = useReveal();
+    const blogRef       = useReveal();
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20);
@@ -273,6 +274,7 @@ export default function LandingPage() {
                     <li><a href="#how-it-works"  onClick={() => scrollTo('how-it-works')}>How It Works</a></li>
                     <li><a href="#pricing"       onClick={() => scrollTo('pricing')}>Pricing</a></li>
                     <li><a href="#testimonials"  onClick={() => scrollTo('testimonials')}>Reviews</a></li>
+                    <li><Link to="/blog" style={{ color: 'var(--primary)', fontWeight: 700 }}>Blog</Link></li>
                 </ul>
 
                 <div className="lp-nav-cta">
@@ -295,6 +297,7 @@ export default function LandingPage() {
                 <a href="#how-it-works" onClick={() => scrollTo('how-it-works')}>How It Works</a>
                 <a href="#pricing"      onClick={() => scrollTo('pricing')}>Pricing</a>
                 <a href="#testimonials" onClick={() => scrollTo('testimonials')}>Reviews</a>
+                <Link to="/blog" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'block', fontSize: 15 }}>Blog</Link>
                 <div className="lp-mobile-menu-cta">
                     <a href="#" className="lp-btn-ghost" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Log In</a>
                     <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/register'); }}>Get Started Free</a>
@@ -456,6 +459,60 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* ── Blog Preview ────────────────── */}
+            <section className="lp-section lp-section-alt" id="blog">
+                <div className="lp-reveal" ref={blogRef}>
+                    <div className="lp-section-label">Blog</div>
+                    <h2 className="lp-section-title">Latest from Our Team</h2>
+                    <p className="lp-section-sub">
+                        Insights on software, development, and retail technology — straight from the Namastute team.
+                    </p>
+                </div>
+                <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 1200, margin: '0 auto' }}>
+                    {[
+                        { emoji: '📦', color: 'linear-gradient(135deg,#6366f1,#8b5cf6)', cat: 'Software',    title: 'How Namastute Transformed Retail Inventory', slug: 'namastute-retail-inventory' },
+                        { emoji: '🏗️', color: 'linear-gradient(135deg,#10b981,#06b6d4)', cat: 'Development', title: 'Building a Multi-Tenant SaaS with Spring Boot',  slug: 'multi-tenant-saas-spring-boot' },
+                        { emoji: '🚀', color: 'linear-gradient(135deg,#ff902f,#ff5f1f)', cat: 'Updates',     title: 'Namastute v2.0 Launch: What\'s New',           slug: 'namastute-v2-launch' },
+                    ].map((b, i) => (
+                        <div
+                            key={i}
+                            onClick={() => navigate(`/blog/${b.slug}`)}
+                            style={{
+                                background: 'var(--glass-bg)',
+                                backdropFilter: 'var(--glass-blur)',
+                                border: '1.5px solid var(--glass-border)',
+                                borderRadius: 20,
+                                overflow: 'hidden',
+                                cursor: 'pointer',
+                                flex: '1 1 280px',
+                                maxWidth: 360,
+                                boxShadow: 'var(--shadow-sm)',
+                                transition: 'all 0.3s',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
+                        >
+                            <div style={{ height: 140, background: b.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 52, opacity: 0.85 }}>{b.emoji}</div>
+                            <div style={{ padding: 22 }}>
+                                <span style={{ background: 'var(--primary-pale)', color: 'var(--primary-d)', borderRadius: 50, padding: '3px 12px', fontSize: 11, fontWeight: 700 }}>{b.cat}</span>
+                                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginTop: 12, lineHeight: 1.4, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{b.title}</div>
+                                <div style={{ marginTop: 14, color: 'var(--primary)', fontWeight: 700, fontSize: 13 }}>Read Article →</div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div style={{ textAlign: 'center', marginTop: 40 }}>
+                    <button
+                        id="landing-view-all-blogs"
+                        className="lp-btn-outline"
+                        onClick={() => navigate('/blog')}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    >
+                        View All Articles →
+                    </button>
+                </div>
+            </section>
+
             {/* ── CTA ─────────────────────────── */}
             <section className="lp-cta">
                 <div ref={ctaRef} className="lp-cta-inner lp-reveal">
@@ -502,7 +559,7 @@ export default function LandingPage() {
                         <div className="lp-footer-col-title">Company</div>
                         <ul className="lp-footer-links">
                             <li><a href="#">About Us</a></li>
-                            <li><a href="#">Blog</a></li>
+                            <li><Link to="/blog" style={{ color: 'inherit', textDecoration: 'none' }}>Blog</Link></li>
                             <li><a href="#">Careers</a></li>
                             <li><a href="#">Contact</a></li>
                         </ul>

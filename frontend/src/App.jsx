@@ -8,6 +8,8 @@ import { ConfirmProvider } from './context/ConfirmContext';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import LandingPage from './pages/LandingPage.jsx';
+import BlogPage from './pages/BlogPage.jsx';
+import BlogDetail from './pages/BlogDetail.jsx';
 import Unauthorized from './pages/Unauthorized.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Dashboard2 from './pages/Dashboard2.jsx';
@@ -42,6 +44,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminContent from './pages/admin/AdminContent';
 import AdminRoles from './pages/admin/AdminRoles';
+import AdminBlog from './pages/admin/AdminBlog';
 import AdminNotifications from './pages/admin/AdminNotifications';
 
 // ── Layouts ─────────────────────────────────────────────────────────────────
@@ -77,6 +80,10 @@ function AppRoutes() {
 
             {/* Root → landing page */}
             <Route path="/" element={<LandingPage />} />
+
+            {/* Blog routes – public */}
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogDetail />} />
 
             {/* ── CLIENT + ADMIN + SUPER ADMIN ───────────────────────── */}
             <Route
@@ -196,6 +203,7 @@ function AppRoutes() {
             <Route path="/admin/category"         element={<AdminPage><Category /></AdminPage>} />
             <Route path="/admin/sub-category"     element={<AdminPage><SubCategory /></AdminPage>} />
             <Route path="/admin/settings"         element={<AdminPage><AdminSettings /></AdminPage>} />
+            <Route path="/admin/blog"             element={<AdminPage><AdminBlog /></AdminPage>} />
 
             {/* Catch-all → login */}
             <Route path="*" element={<Navigate to="/login" replace />} />

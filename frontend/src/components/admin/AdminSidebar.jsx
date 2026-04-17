@@ -14,7 +14,8 @@ import {
     X,
     ShieldCheck,
     Layers,
-    ListTree
+    ListTree,
+    PenLine
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -23,6 +24,7 @@ const menuItems = [
     { path: '/admin/users', label: 'Users', icon: Users },
     { path: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/admin/content', label: 'Content', icon: FileText },
+    { path: '/admin/blog', label: 'Blog Manager', icon: PenLine },
     { path: '/admin/roles', label: 'Roles', icon: Shield },
     { path: '/admin/notifications', label: 'Notifications', icon: Bell },
     { path: '/admin/category', label: 'Category', icon: Layers },
