@@ -217,37 +217,37 @@
     }
 
     /* Size: 36mm */
-    .qrcode-print-area.36mm-1.4-inch .qrcode-grid {
+    .qrcode-print-area.size-36mm .qrcode-grid {
         grid-template-columns: repeat(auto-fill, minmax(36mm, 1fr)) !important;
     }
-    .qrcode-print-area.36mm-1.4-inch .qrcode-card {
+    .qrcode-print-area.size-36mm .qrcode-card {
         padding: 2mm !important;
     }
-    .qrcode-print-area.36mm-1.4-inch .qrcode-image-container {
+    .qrcode-print-area.size-36mm .qrcode-image-container {
         width: 30mm !important;
         height: 30mm !important;
     }
 
     /* Size: 12mm */
-    .qrcode-print-area.12mm-0.47-inch .qrcode-grid {
+    .qrcode-print-area.size-12mm .qrcode-grid {
         grid-template-columns: repeat(auto-fill, minmax(12mm, 1fr)) !important;
     }
-    .qrcode-print-area.12mm-0.47-inch .qrcode-card {
+    .qrcode-print-area.size-12mm .qrcode-card {
         padding: 1mm !important;
     }
-    .qrcode-print-area.12mm-0.47-inch .qrcode-image-container {
+    .qrcode-print-area.size-12mm .qrcode-image-container {
         width: 10mm !important;
         height: 10mm !important;
     }
-    .qrcode-print-area.12mm-0.47-inch .qrcode-ref-text {
+    .qrcode-print-area.size-12mm .qrcode-ref-text {
         font-size: 6pt !important;
     }
 
     /* Size: 20mm */
-    .qrcode-print-area.20mm-0.79-inch .qrcode-grid {
+    .qrcode-print-area.size-20mm .qrcode-grid {
         grid-template-columns: repeat(auto-fill, minmax(20mm, 1fr)) !important;
     }
-    .qrcode-print-area.20mm-0.79-inch .qrcode-image-container {
+    .qrcode-print-area.size-20mm .qrcode-image-container {
         width: 18mm !important;
         height: 18mm !important;
     }
