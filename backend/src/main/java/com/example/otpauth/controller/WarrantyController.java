@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/warranties")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174" , "https://saa-s-namastute.vercel.app" , "https://vulcanizable-jedidiah-clownishly.ngrok-free.dev", "http://localhost:5175", "http://localhost:3000", "http://localhost:8080"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:3000", "http://localhost:8080"})
 public class WarrantyController {
 
     private static final Logger logger = LoggerFactory.getLogger(WarrantyController.class);
