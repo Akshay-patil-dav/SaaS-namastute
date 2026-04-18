@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import GuestRoute from './components/auth/GuestRoute';
 import { ConfirmProvider } from './context/ConfirmContext';
 
 
@@ -73,9 +74,9 @@ const AdminPage = ({ children }) => (
 function AppRoutes() {
     return (
         <Routes>
-            {/* Public routes */}
-            <Route path="/login"        element={<Login />} />
-            <Route path="/register"     element={<Register />} />
+            {/* Public routes — guests only (logged-in users are redirected to dashboard) */}
+            <Route path="/login"        element={<GuestRoute><Login /></GuestRoute>} />
+            <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* Root → landing page */}

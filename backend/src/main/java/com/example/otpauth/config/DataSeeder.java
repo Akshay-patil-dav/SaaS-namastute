@@ -55,18 +55,32 @@ public class DataSeeder {
                 return roleRepository.save(r);
             });
 
-            // ── 3. Seed SUPER_ADMIN user ─────────────────────────────────────
-            String superAdminEmail = "superadmin@gmail.com";
-            if (userRepository.findByEmail(superAdminEmail).isEmpty()) {
-                User superAdmin = new User(
-                        superAdminEmail,
-                        passwordEncoder.encode("Admin@123"),
-                        "Super Admin"
-                );
-                superAdmin.getRoles().add(superAdminRole);
-                userRepository.save(superAdmin);
-                System.out.println("DataSeeder: Super admin user seeded → " + superAdminEmail);
-            }
+            // ── 3. Upsert SUPER_ADMIN user (always sync password on startup) ──
+            String superAdminEmail    = "admin@gmail.com";
+            String superAdminPassword = "Admin@12345";
+            String superAdminName     = "Super Admin";
+
+            userRepository.findByEmail(superAdminEmail).ifPresentOrElse(
+                existing -> {
+                    // Always update password so it stays in sync with this file
+                    existing.setPassword(passwordEncoder.encode(superAdminPassword));
+                    existing.setFullName(superAdminName);
+                    // Ensure SUPER_ADMIN role is assigned
+                    existing.getRoles().add(superAdminRole);
+                    userRepository.save(existing);
+                    System.out.println("DataSeeder: Super admin password synced → " + superAdminEmail);
+                },
+                () -> {
+                    User superAdmin = new User(
+                            superAdminEmail,
+                            passwordEncoder.encode(superAdminPassword),
+                            superAdminName
+                    );
+                    superAdmin.getRoles().add(superAdminRole);
+                    userRepository.save(superAdmin);
+                    System.out.println("DataSeeder: Super admin user created → " + superAdminEmail);
+                }
+            );
         };
     }
 }

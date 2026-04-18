@@ -1,0 +1,11 @@
+# Backend .dockerignore — speeds up Docker build context
+target/
+*.log
+build_output.txt
+restart-backend.ps1
+.git
+.gitignore
+*.md
+.vscode
+.idea
+*.iml
