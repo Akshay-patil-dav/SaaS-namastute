@@ -81,6 +81,8 @@ public class SecurityConfig {
             frontendUrl,
             "http://localhost:5173", 
             "http://localhost:5174", 
+            "https://vulcanizable-jedidiah-clownishly.ngrok-free.dev",
+            "https://saa-s-namastute.vercel.app",
             "http://localhost:3000", 
             "http://localhost:8080"
         ));
