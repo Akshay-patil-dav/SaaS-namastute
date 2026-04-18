@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categories")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174" ,"https://saa-s-namastute.vercel.app" , "https://vulcanizable-jedidiah-clownishly.ngrok-free.dev"})
 public class CategoryController {
 
     private final CategoryService categoryService;
