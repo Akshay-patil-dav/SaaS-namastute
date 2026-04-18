@@ -1,0 +1,98 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Namustute POS — Docker Compose
+#
+#  Services:
+#    postgres  → PostgreSQL 16 (port 5432)
+#    backend   → Spring Boot API  (port 3000)
+#    frontend  → Nginx serving Vite build (port 5173 → 80 inside container)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL Database ────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: namastute-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-otp_auth_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-root}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-otp_auth_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - namastute-net
+
+  # ── Spring Boot Backend ────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: namastute-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-otp_auth_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-root}
+      # App URLs
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      # OAuth2 (optional — set in .env file)
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID:-}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET:-}
+    ports:
+      - "3000:3000"
+    networks:
+      - namastute-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/actuator/health || curl -f http://localhost:3000/api/auth/health || exit 0"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+
+  # ── Vite / React Frontend (served via Nginx) ───────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000/api}
+        VITE_BACKEND_BASE_URL: ${VITE_BACKEND_BASE_URL:-http://localhost:3000}
+        VITE_FRONTEND_URL: ${VITE_FRONTEND_URL:-http://localhost:5173}
+    container_name: namastute-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    networks:
+      - namastute-net
+
+# ── Volumes ──────────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    name: namastute-postgres-data
+
+# ── Networks ─────────────────────────────────────────────────────────────────
+networks:
+  namastute-net:
+    name: namastute-network
+    driver: bridge

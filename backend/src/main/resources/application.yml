@@ -3,9 +3,9 @@ spring:
     name: namastute-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/otp_auth_db
-    username: postgres
-    password: root
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/otp_auth_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -22,22 +22,21 @@ spring:
       client:
         registration:
           google:
-            client-id: YOUR_GOOGLE_CLIENT_ID
-            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID:YOUR_GOOGLE_CLIENT_ID}
+            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET:YOUR_GOOGLE_CLIENT_SECRET}
             scope: email, profile
           facebook:
-            client-id: YOUR_FACEBOOK_CLIENT_ID
-            client-secret: YOUR_FACEBOOK_CLIENT_SECRET
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_ID:YOUR_FACEBOOK_CLIENT_ID}
+            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET:YOUR_FACEBOOK_CLIENT_SECRET}
             scope: email, public_profile
 
 server:
   port: 3000
-
 
 app:
   base-url: ${APP_BASE_URL:http://localhost:3000}
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
 
 jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 86400000 # 1 day in ms
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_EXPIRATION:86400000}

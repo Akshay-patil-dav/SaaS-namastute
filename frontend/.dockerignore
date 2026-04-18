@@ -1,0 +1,11 @@
+# Frontend .dockerignore — speeds up Docker build context
+node_modules/
+dist/
+.env
+.env.*
+*.log
+.git
+.gitignore
+*.md
+.vscode
+.DS_Store
