@@ -9,3 +9,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Global Modal Background Blur - Applied to all popups */
+[class*="overlay"], [class*="modal-backdrop"], .modal-overlay, .stock-modal-overlay, .global-delete-overlay {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}

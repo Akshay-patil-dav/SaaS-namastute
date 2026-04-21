@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Search, 
     FileText, 
@@ -8,27 +8,45 @@ import {
     Plus, 
     Edit, 
     Trash2, 
+    Eye,
     ChevronLeft, 
     ChevronRight 
 } from 'lucide-react';
+import axios from 'axios';
 import './manage-stock.css';
+import AddStockModal from '../components/AddStockModal';
+import ViewStockModal from '../components/ViewStockModal';
+import EditStockModal from '../components/EditStockModal';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
-const stockData = [
-    { id: 1, warehouse: 'Lavish Warehouse', store: 'Electro Mart', product: 'Lenovo IdeaPad 3', date: '24 Dec 2024', person: 'James Kirwin', qty: 100, productImg: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James' },
-    { id: 2, warehouse: 'Quaint Warehouse', store: 'Quantum Gadgets', product: 'Beats Pro', date: '10 Dec 2024', person: 'Francis Chang', qty: 140, productImg: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Francis' },
-    { id: 3, warehouse: 'Lobar Handy', store: 'Prime Bazaar', product: 'Nike Jordan', date: '25 Jul 2023', person: 'Steven', qty: 120, productImg: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Steven' },
-    { id: 4, warehouse: 'Quaint Warehouse', store: 'Gadget World', product: 'Apple Series 5 Watch', date: '28 Jul 2023', person: 'Gravely', qty: 130, productImg: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Gravely' },
-    { id: 5, warehouse: 'Traditional Warehouse', store: 'Volt Vault', product: 'Amazon Echo Dot', date: '24 Jul 2023', person: 'Kevin', qty: 140, productImg: 'https://images.unsplash.com/photo-1543512214-318c7553f230?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin' },
-    { id: 6, warehouse: 'Cool Warehouse', store: 'Elite Retail', product: 'Lobar Handy', date: '15 Jul 2023', person: 'Grillo', qty: 150, productImg: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Grillo' },
-    { id: 7, warehouse: 'Retail Supply Hub', store: 'Prime Mart', product: 'Red Premium Satchel', date: '14 Oct 2024', person: 'Gary Hennessy', qty: 700, productImg: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Gary' },
-    { id: 8, warehouse: 'EdgeWare Solutions', store: 'NeoTech Store', product: 'Iphone 14 Pro', date: '03 Oct 2024', person: 'Eleanor Panek', qty: 630, productImg: 'https://images.unsplash.com/photo-1663499482523-1c0c1bae4ce1?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Eleanor' },
-    { id: 9, warehouse: 'North Zone Warehouse', store: 'Urban Mart', product: 'Gaming Chair', date: '20 Sep 2024', person: 'William Levy', qty: 410, productImg: 'https://images.unsplash.com/photo-1598550874175-4d0fe4a2c906?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=William' },
-    { id: 10, warehouse: 'Fulfillment Hub', store: 'Travel Mart', product: 'Borealis Backpack', date: '10 Sep 2024', person: 'Charlotte Klotz', qty: 550, productImg: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlotte' },
-];
+
 
 export default function ManageStock() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRows, setSelectedRows] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedStock, setSelectedStock] = useState(null);
+    const [stocks, setStocks] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchStocks = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/stocks`);
+            setStocks(response.data);
+        } catch (error) {
+            console.error('Error fetching stocks:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchStocks();
+    }, []);
 
     const toggleRow = (id) => {
         setSelectedRows(prev => 
@@ -38,15 +56,42 @@ export default function ManageStock() {
 
     const toggleAll = () => {
         setSelectedRows(prev => 
-            prev.length === stockData.length ? [] : stockData.map(d => d.id)
+            prev.length === stocks.length ? [] : stocks.map(d => d.id)
         );
     };
 
-    const filteredData = stockData.filter(item => 
-        item.warehouse.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.person.toLowerCase().includes(searchTerm.toLowerCase())
+    const handleView = (stock) => {
+        setSelectedStock(stock);
+        setIsViewModalOpen(true);
+    };
+
+    const handleEdit = (stock) => {
+        setSelectedStock(stock);
+        setIsEditModalOpen(true);
+    };
+
+    const handleDeleteClick = (stock) => {
+        setSelectedStock(stock);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/stocks/${selectedStock.id}`);
+            fetchStocks();
+            setIsDeleteModalOpen(false);
+            setSelectedStock(null);
+        } catch (error) {
+            console.error('Error deleting stock:', error);
+            alert('Failed to delete stock. Please try again.');
+        }
+    };
+
+    const filteredData = stocks.filter(item => 
+        (item.warehouse?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.store?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.responsiblePerson?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
@@ -62,7 +107,7 @@ export default function ManageStock() {
                     <button className="action-icon-btn btn-excel" title="Export Excel"><Download size={16} /></button>
                     <button className="action-icon-btn" title="Refresh"><RotateCcw size={16} /></button>
                     <button className="action-icon-btn" title="Collapse"><ChevronUp size={16} /></button>
-                    <button className="btn-add-stock">
+                    <button className="btn-add-stock" onClick={() => setIsModalOpen(true)}>
                         <Plus size={16} />
                         Add Stock
                     </button>
@@ -110,7 +155,7 @@ export default function ManageStock() {
                                 <th className="checkbox-col">
                                     <input 
                                         type="checkbox" 
-                                        checked={selectedRows.length === stockData.length}
+                                        checked={stocks.length > 0 && selectedRows.length === stocks.length}
                                         onChange={toggleAll}
                                     />
                                 </th>
@@ -138,22 +183,18 @@ export default function ManageStock() {
                                         <td>{item.store}</td>
                                         <td>
                                             <div className="product-cell">
-                                                <img src={item.productImg} alt={item.product} className="product-img" />
-                                                <span>{item.product}</span>
+                                                <img src={item.productImg || 'https://via.placeholder.com/40'} alt={item.productName} className="product-img" />
+                                                <span>{item.productName}</span>
                                             </div>
                                         </td>
                                         <td>{item.date}</td>
-                                        <td>
-                                            <div className="person-cell">
-                                                <img src={item.personImg} alt={item.person} className="person-img" />
-                                                <span>{item.person}</span>
-                                            </div>
-                                        </td>
-                                        <td>{item.qty}</td>
+                                        <td>{item.responsiblePerson}</td>
+                                        <td>{item.quantity}</td>
                                         <td>
                                             <div className="action-btns">
-                                                <button className="action-btn btn-edit"><Edit size={14} /></button>
-                                                <button className="action-btn btn-delete"><Trash2 size={14} /></button>
+                                                <button className="action-btn btn-view" onClick={() => handleView(item)} title="View Detail"><Eye size={14} /></button>
+                                                <button className="action-btn btn-edit" onClick={() => handleEdit(item)} title="Edit Entry"><Edit size={14} /></button>
+                                                <button className="action-btn btn-delete" onClick={() => handleDeleteClick(item)} title="Delete Entry"><Trash2 size={14} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -197,6 +238,33 @@ export default function ManageStock() {
                     Designed & Developed by <span>Dreams</span>
                 </div>
             </footer>
+
+            <AddStockModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                onSuccess={fetchStocks}
+            />
+
+            <ViewStockModal 
+                isOpen={isViewModalOpen}
+                onClose={() => setIsViewModalOpen(false)}
+                stock={selectedStock}
+            />
+
+            <EditStockModal 
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                stock={selectedStock}
+                onSuccess={fetchStocks}
+            />
+
+            <DeleteConfirmModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Stock Entry"
+                message="Are you sure you want to delete this stock entry? This will reverse the stock quantity for this product."
+            />
         </div>
     );
 }
