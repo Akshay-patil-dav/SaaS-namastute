@@ -205,6 +205,9 @@
 .btn-edit { color: #5b6670; }
 .btn-edit:hover { background: #f0f3ff; color: #6366f1; border-color: #6366f1; }
 
+.btn-view { color: #5b6670; }
+.btn-view:hover { background: #e9f9ef; color: #28c76f; border-color: #28c76f; }
+
 .btn-delete { color: #5b6670; }
 .btn-delete:hover { background: #fff1f1; color: #ea5455; border-color: #ea5455; }
 

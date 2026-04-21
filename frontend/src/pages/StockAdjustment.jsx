@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import './stock-adjustment.css';
 
-const adjustmentData = [
+const initialAdjustmentData = [
     { id: 1, warehouse: 'Lavish Warehouse', store: 'Electro Mart', product: 'Lenovo IdeaPad 3', date: '24 Dec 2024', person: 'James Kirwin', qty: 100, productImg: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James' },
     { id: 2, warehouse: 'Quaint Warehouse', store: 'Quantum Gadgets', product: 'Beats Pro', date: '10 Dec 2024', person: 'Francis Chang', qty: 140, productImg: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Francis' },
     { id: 3, warehouse: 'Overflow Warehouse', store: 'Prime Bazaar', product: 'Nike Jordan', date: '25 Jul 2023', person: 'Antonio Engle', qty: 120, productImg: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Antonio' },
@@ -27,9 +27,51 @@ const adjustmentData = [
     { id: 10, warehouse: 'Fulfillment Hub', store: 'Travel Mart', product: 'Borealis Backpack', date: '10 Sep 2024', person: 'Charlotte Klotz', qty: 550, productImg: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlotte' },
 ];
 
+import axios from 'axios';
+import AddAdjustmentModal from '../components/AddAdjustmentModal';
+import ViewAdjustmentModal from '../components/ViewAdjustmentModal';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
+
 export default function StockAdjustment() {
+    const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRows, setSelectedRows] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedAdjustment, setSelectedAdjustment] = useState(null);
+
+    const fetchStocks = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/stocks`);
+            setData(response.data.map(item => ({
+                id: item.id,
+                warehouse: item.warehouse || '',
+                store: item.store || '',
+                product: item.productName || 'Unknown',
+                date: item.date || item.createdAt?.substring(0, 10) || '',
+                person: item.responsiblePerson || '',
+                qty: item.quantity || 0,
+                productImg: item.productImg || 'https://via.placeholder.com/40',
+                personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + item.responsiblePerson,
+                // store original object to use mapped standard names for View
+                original: item
+            })));
+        } catch (error) {
+            console.error('Error fetching stocks:', error);
+            alert('Failed to load adjustments.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchStocks();
+    }, []);
 
     const toggleRow = (id) => {
         setSelectedRows(prev => 
@@ -39,16 +81,88 @@ export default function StockAdjustment() {
 
     const toggleAll = () => {
         setSelectedRows(prev => 
-            prev.length === adjustmentData.length ? [] : adjustmentData.map(d => d.id)
+            prev.length === data.length ? [] : data.map(d => d.id)
         );
     };
 
-    const filteredData = adjustmentData.filter(item => 
+    const filteredData = data.filter(item => 
         item.warehouse.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.person.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleOpenAddModal = () => {
+        setSelectedAdjustment(null);
+        setIsModalOpen(true);
+    };
+
+    const handleOpenEditModal = (item) => {
+        setSelectedAdjustment(item);
+        setIsModalOpen(true);
+    };
+
+    const handleOpenViewModal = (item) => {
+        setSelectedAdjustment(item);
+        setIsViewModalOpen(true);
+    };
+
+    const handleModalSuccess = async (saveData) => {
+        try {
+            if (selectedAdjustment) {
+                // Edit existing
+                const product = saveData.products[0];
+                const payload = {
+                    warehouse: saveData.warehouse,
+                    store: saveData.store,
+                    responsiblePerson: saveData.person,
+                    quantity: saveData.products.reduce((acc, p) => acc + (p.quantity || 0), 0),
+                    productId: product?.productId,
+                    productName: product?.name,
+                    productSku: product?.sku,
+                    productCategory: product?.category,
+                    productImg: product?.img
+                };
+                await axios.put(`${import.meta.env.VITE_API_BASE_URL}/stocks/${selectedAdjustment.id}`, payload);
+            } else {
+                // Add new
+                const payload = {
+                    warehouse: saveData.warehouse,
+                    store: saveData.store,
+                    responsiblePerson: saveData.person,
+                    products: saveData.products.map(p => ({
+                        productId: p.productId,
+                        quantity: p.quantity,
+                        productName: p.name,
+                        productImg: p.img
+                    }))
+                };
+                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/stocks`, payload);
+            }
+            fetchStocks();
+        } catch (error) {
+            console.error('Error saving stock adjustment:', error);
+            alert('Failed to save adjustment.');
+        }
+    };
+
+    const handleDeleteClick = (item) => {
+        setSelectedAdjustment(item);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!selectedAdjustment) return;
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/stocks/${selectedAdjustment.id}`);
+            fetchStocks();
+            setIsDeleteModalOpen(false);
+            setSelectedAdjustment(null);
+        } catch (error) {
+            console.error('Error deleting stock:', error);
+            alert('Failed to delete adjustment.');
+        }
+    };
 
     return (
         <div className="stock-adjustment-container">
@@ -63,7 +177,7 @@ export default function StockAdjustment() {
                     <button className="action-icon-btn btn-excel" title="Export Excel"><Download size={16} /></button>
                     <button className="action-icon-btn" title="Refresh"><RotateCcw size={16} /></button>
                     <button className="action-icon-btn" title="Collapse"><ChevronUp size={16} /></button>
-                    <button className="btn-add-adjustment">
+                    <button className="btn-add-adjustment" onClick={handleOpenAddModal}>
                         <Plus size={16} />
                         Add Adjustment
                     </button>
@@ -106,7 +220,7 @@ export default function StockAdjustment() {
                                 <th className="checkbox-col">
                                     <input 
                                         type="checkbox" 
-                                        checked={selectedRows.length === adjustmentData.length}
+                                        checked={selectedRows.length === data.length && data.length > 0}
                                         onChange={toggleAll}
                                     />
                                 </th>
@@ -120,7 +234,13 @@ export default function StockAdjustment() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredData.length > 0 ? (
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="8" style={{ textAlign: 'center', padding: '20px', color: '#5b6670' }}>
+                                        Loading Data...
+                                    </td>
+                                </tr>
+                            ) : filteredData.length > 0 ? (
                                 filteredData.map((item) => (
                                     <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
                                         <td>
@@ -148,9 +268,9 @@ export default function StockAdjustment() {
                                         <td>{item.qty}</td>
                                         <td>
                                             <div className="action-btns">
-                                                <button className="action-btn btn-view"><FileSearch size={14} /></button>
-                                                <button className="action-btn btn-edit"><Edit size={14} /></button>
-                                                <button className="action-btn btn-delete"><Trash2 size={14} /></button>
+                                                <button className="action-btn btn-view" onClick={() => handleOpenViewModal(item)}><FileSearch size={14} /></button>
+                                                <button className="action-btn btn-edit" onClick={() => handleOpenEditModal(item)}><Edit size={14} /></button>
+                                                <button className="action-btn btn-delete" onClick={() => handleDeleteClick(item)}><Trash2 size={14} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -194,6 +314,24 @@ export default function StockAdjustment() {
                     Designed & Developed by <span>Dreams</span>
                 </div>
             </footer>
+            <AddAdjustmentModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={handleModalSuccess}
+                initialData={selectedAdjustment}
+            />
+            <ViewAdjustmentModal 
+                isOpen={isViewModalOpen}
+                onClose={() => setIsViewModalOpen(false)}
+                adjustment={selectedAdjustment}
+            />
+            <DeleteConfirmModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Adjustment"
+                message="Are you sure you want to delete this adjustment entry? This action implies reverting the related quantities."
+            />
         </div>
     );
 }

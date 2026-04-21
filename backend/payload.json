@@ -1,0 +1,11 @@
+{
+  "warehouse": "Lavish Warehouse",
+  "store": "Electro Mart",
+  "responsiblePerson": "James Kirwin",
+  "products": [
+    {
+      "productId": 9,
+      "quantity": 30
+    }
+  ]
+}

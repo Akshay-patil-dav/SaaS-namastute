@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/units")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174" ,"https://saa-s-namastute.vercel.app","https://vulcanizable-jedidiah-clownishly.ngrok-free.dev/"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class UnitController {
 
     private final UnitService unitService;
