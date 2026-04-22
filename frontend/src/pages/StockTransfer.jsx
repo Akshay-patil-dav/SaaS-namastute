@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Search, 
     FileText, 
@@ -10,26 +10,68 @@ import {
     Trash2, 
     ChevronLeft, 
     ChevronRight,
-    Upload
+    Upload,
+    Eye
 } from 'lucide-react';
+import axios from 'axios';
 import './stock-transfer.css';
-
-const transferData = [
-    { id: 1, from: 'Lavish Warehouse', to: 'North Zone Warehouse', products: '20', qty: '15', ref: '#458924', date: '24 Dec 2024' },
-    { id: 2, from: 'Lobar Handy', to: 'Nova Storage Hub', products: '04', qty: '14', ref: '#145445', date: '25 Jul 2023' },
-    { id: 3, from: 'Quaint Warehouse', to: 'Cool Warehouse', products: '21', qty: '10', ref: '#135478', date: '28 Jul 2023' },
-    { id: 4, from: 'Traditional Warehouse', to: 'Retail Supply Hub', products: '15', qty: '14', ref: '#145124', date: '24 Jul 2023' },
-    { id: 5, from: 'Cool Warehouse', to: 'EdgeWare Solutions', products: '14', qty: '74', ref: '#474541', date: '15 Jul 2023' },
-    { id: 6, from: 'Overflow Warehouse', to: 'Quaint Warehouse', products: '30', qty: '20', ref: '#366713', date: '06 Nov 2024' },
-    { id: 7, from: 'Nova Storage Hub', to: 'Traditional Warehouse', products: '10', qty: '06', ref: '#327814', date: '25 Oct 2024' },
-    { id: 8, from: 'Retail Supply Hub', to: 'Overflow Warehouse', products: '70', qty: '60', ref: '#274509', date: '14 Oct 2024' },
-    { id: 9, from: 'EdgeWare Solutions', to: 'Lavish Warehouse', products: '35', qty: '30', ref: '#239073', date: '03 Oct 2024' },
-    { id: 10, from: 'North Zone Warehouse', to: 'Fulfillment Hub', products: '15', qty: '10', ref: '#187204', date: '20 Sep 2024' },
-];
+import AddTransferModal from '../components/AddTransferModal';
+import ImportTransferModal from '../components/ImportTransferModal';
+import EditTransferModal from '../components/EditTransferModal';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 export default function StockTransfer() {
+    const [transfers, setTransfers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRows, setSelectedRows] = useState([]);
+    
+    // Modals state
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [transferToDelete, setTransferToDelete] = useState(null);
+    
+    // Edit/View state
+    const [editModalData, setEditModalData] = useState(null);
+    const [isViewMode, setIsViewMode] = useState(false);
+
+    const fetchTransfers = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/transfers`);
+            setTransfers(response.data);
+        } catch (error) {
+            console.error('Error fetching transfers:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchTransfers();
+    }, []);
+
+    const openDeleteModal = (id) => {
+        setTransferToDelete(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!transferToDelete) return;
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/transfers/${transferToDelete}`);
+            fetchTransfers();
+            setIsDeleteModalOpen(false);
+            setTransferToDelete(null);
+        } catch (error) {
+            console.error('Error deleting transfer:', error);
+            alert('Failed to delete transfer');
+        }
+    };
+
+    const handleEdit = (transfer, viewMode = false) => {
+        setEditModalData(transfer);
+        setIsViewMode(viewMode);
+        setIsEditModalOpen(true);
+    };
 
     const toggleRow = (id) => {
         setSelectedRows(prev => 
@@ -39,15 +81,20 @@ export default function StockTransfer() {
 
     const toggleAll = () => {
         setSelectedRows(prev => 
-            prev.length === transferData.length ? [] : transferData.map(d => d.id)
+            prev.length === transfers.length ? [] : transfers.map(d => d.id)
         );
     };
 
-    const filteredData = transferData.filter(item => 
-        item.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.to.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.ref.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredData = transfers.filter(item => {
+        const fromWarehouse = item.fromWarehouse || '';
+        const toWarehouse = item.toWarehouse || '';
+        const refNo = item.referenceNo || '';
+        const st = searchTerm.toLowerCase();
+        
+        return fromWarehouse.toLowerCase().includes(st) ||
+               toWarehouse.toLowerCase().includes(st) ||
+               refNo.toLowerCase().includes(st);
+    });
 
     return (
         <div className="stock-transfer-container">
@@ -62,11 +109,11 @@ export default function StockTransfer() {
                     <button className="action-icon-btn btn-excel" title="Export Excel"><Download size={16} /></button>
                     <button className="action-icon-btn" title="Refresh"><RotateCcw size={16} /></button>
                     <button className="action-icon-btn" title="Collapse"><ChevronUp size={16} /></button>
-                    <button className="btn-add-new">
+                    <button className="btn-add-new" onClick={() => setIsAddModalOpen(true)}>
                         <Plus size={16} />
                         Add New
                     </button>
-                    <button className="btn-import">
+                    <button className="btn-import" onClick={() => setIsImportModalOpen(true)}>
                         <Upload size={16} />
                         Import Transfer
                     </button>
@@ -113,7 +160,7 @@ export default function StockTransfer() {
                                 <th className="checkbox-col">
                                     <input 
                                         type="checkbox" 
-                                        checked={selectedRows.length === transferData.length}
+                                        checked={selectedRows.length === transfers.length && transfers.length > 0}
                                         onChange={toggleAll}
                                     />
                                 </th>
@@ -137,16 +184,17 @@ export default function StockTransfer() {
                                                 onChange={() => toggleRow(item.id)}
                                             />
                                         </td>
-                                        <td>{item.from}</td>
-                                        <td>{item.to}</td>
-                                        <td>{item.products}</td>
-                                        <td>{item.qty}</td>
-                                        <td><span className="ref-badge">{item.ref}</span></td>
-                                        <td>{item.date}</td>
+                                        <td>{item.fromWarehouse}</td>
+                                        <td>{item.toWarehouse}</td>
+                                        <td>{item.noOfProducts || 0}</td>
+                                        <td>{item.quantityTransferred || 0}</td>
+                                        <td><span className="ref-badge">{item.referenceNo}</span></td>
+                                        <td>{item.formattedDate || item.date}</td>
                                         <td>
                                             <div className="action-btns">
-                                                <button className="action-btn btn-edit"><Edit size={14} /></button>
-                                                <button className="action-btn btn-delete"><Trash2 size={14} /></button>
+                                                <button className="action-btn btn-view" onClick={() => handleEdit(item, true)}><Eye size={14} /></button>
+                                                <button className="action-btn btn-edit" onClick={() => handleEdit(item, false)}><Edit size={14} /></button>
+                                                <button className="action-btn btn-delete" onClick={() => openDeleteModal(item.id)}><Trash2 size={14} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -191,6 +239,31 @@ export default function StockTransfer() {
                     Designed & Developed by <span>Dreams</span>
                 </div>
             </footer>
+
+            <AddTransferModal 
+                isOpen={isAddModalOpen} 
+                onClose={() => setIsAddModalOpen(false)} 
+                onSuccess={fetchTransfers}
+            />
+            <ImportTransferModal 
+                isOpen={isImportModalOpen} 
+                onClose={() => setIsImportModalOpen(false)} 
+                onSuccess={fetchTransfers}
+            />
+            <EditTransferModal 
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onSuccess={fetchTransfers}
+                initialData={editModalData}
+                isView={isViewMode}
+            />
+            <DeleteConfirmModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Transfer"
+                message="Are you sure you want to delete this transfer?"
+            />
         </div>
     );
 }
