@@ -1,0 +1,354 @@
+.stock-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.stock-modal-content {
+    background: #fff;
+    width: 650px;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    animation: modalPopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPopIn {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.stock-modal-header {
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.stock-modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.stock-modal-close {
+    background: #ff0000;
+    border: none;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.stock-modal-close:hover {
+    background: #e60000;
+}
+
+.stock-modal-body {
+    padding: 25px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.stock-form-group {
+    margin-bottom: 18px;
+}
+
+.stock-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.text-danger {
+    color: #ff4d4f;
+    margin-left: 4px;
+}
+
+.stock-modal-select,
+.stock-modal-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s ease;
+    background-color: #f8fafc;
+}
+
+.stock-modal-select:focus,
+.stock-modal-input:focus {
+    border-color: #ff9f43;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 159, 67, 0.1);
+}
+
+.stock-search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.stock-search-icon {
+    position: absolute;
+    left: 12px;
+    color: #888;
+}
+
+.search-product-input {
+    padding-left: 40px !important;
+}
+
+/* Search Suggestions */
+.stock-suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1010;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.stock-suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f9f9f9;
+}
+
+.stock-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.stock-suggestion-item:hover {
+    background-color: #f0f7ff;
+}
+
+.suggestion-img {
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+}
+
+.suggestion-img img {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.suggestion-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.suggestion-sku {
+    font-size: 0.75rem;
+    color: #777;
+}
+
+.no-suggestions {
+    padding: 15px;
+    text-align: center;
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.selected-products-container {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.selected-products-table-wrapper {
+    position: relative;
+}
+
+.selected-products-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.selected-products-table th {
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #777;
+    padding-bottom: 12px;
+}
+
+.selected-products-table td {
+    padding: 12px 0;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.product-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.product-info-cell img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.qty-btn {
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.qty-btn:hover {
+    border-color: #ff9f43;
+    color: #ff9f43;
+}
+
+.qty-value {
+    font-weight: 500;
+    min-width: 20px;
+    text-align: center;
+}
+
+.remove-item-btn {
+    background: transparent;
+    border: none;
+    color: #ff4d4f;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.remove-item-btn:hover {
+    color: #ff7875;
+}
+
+.empty-stock-placeholder {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    font-size: 0.9rem;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+/* Decoration line at the bottom of the table area */
+.table-indicator-line {
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.indicator-progress {
+    width: 60%;
+    height: 100%;
+    background: #ff9f43;
+}
+
+.stock-modal-footer {
+    padding: 20px 25px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #f1f1f1;
+    background: #fff;
+}
+
+.btn-stock-cancel {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    background: #002147;
+    color: #fff;
+    transition: opacity 0.2s;
+}
+
+.btn-stock-save {
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    background: #ff9f43;
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(255, 159, 67, 0.35);
+    transition: all 0.2s;
+    text-transform: capitalize;
+}
+
+.btn-stock-cancel:hover {
+    background: #001a38;
+    transform: translateY(-1px);
+}
+
+.btn-stock-save:hover {
+    background: #f38d2c;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(255, 159, 67, 0.45);
+}
+
+.btn-stock-cancel:active,
+.btn-stock-save:active {
+    transform: translateY(0);
+}
