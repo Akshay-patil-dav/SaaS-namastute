@@ -37,6 +37,31 @@ public class StockTransferController {
         }
     }
 
+    @PostMapping("/import")
+    public ResponseEntity<?> importTransfer(@RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+                                            @RequestParam("warehouseFrom") String warehouseFrom,
+                                            @RequestParam("warehouseTo") String warehouseTo,
+                                            @RequestParam("status") String status,
+                                            @RequestParam("shipping") String shipping,
+                                            @RequestParam(value = "description", required = false) String description) {
+        try {
+            TransferRequest request = new TransferRequest();
+            request.setWarehouseFrom(warehouseFrom);
+            request.setWarehouseTo(warehouseTo);
+            request.setStatus(status);
+            request.setShipping(shipping);
+            request.setDescription(description);
+            request.setReferenceNo("#IMP" + (long)(Math.random() * 1000000));
+            request.setNotes("Imported via CSV");
+
+            StockTransfer created = stockTransferService.importTransferFromCsv(file, request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getTransfer(@PathVariable Long id) {
         return stockTransferService.getTransferById(id)

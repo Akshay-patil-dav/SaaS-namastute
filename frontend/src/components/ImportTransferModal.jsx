@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, UploadCloud } from 'lucide-react';
+import axios from 'axios';
 import './import-transfer-modal.css';
 
-const ImportTransferModal = ({ isOpen, onClose }) => {
+const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         from: '',
         to: '',
@@ -12,27 +13,68 @@ const ImportTransferModal = ({ isOpen, onClose }) => {
     });
     
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [csvFile, setCsvFile] = useState(null);
+    const fileInputRef = useRef(null);
 
     if (!isOpen) return null;
+
+    const handleDownloadSample = () => {
+        const csvContent = "productId,name,sku,category,quantity\n1,Nike Jordan,PT002,Nike,2\n2,Apple Watch,PT003,Apple,5";
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "transfer_sample.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setCsvFile(file);
+    };
 
     const handleSave = async () => {
         if (!formData.from || !formData.to || !formData.status || !formData.shipping) {
             alert('Please fill all required fields (*).');
             return;
         }
+
+        if (!csvFile) {
+            alert('Please upload a valid CSV file.');
+            return;
+        }
         
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false);
+        try {
+            const formDataPayload = new FormData();
+            formDataPayload.append('file', csvFile);
+            formDataPayload.append('warehouseFrom', formData.from);
+            formDataPayload.append('warehouseTo', formData.to);
+            formDataPayload.append('status', formData.status);
+            formDataPayload.append('shipping', formData.shipping);
+            formDataPayload.append('description', formData.description);
+
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/transfers/import`, formDataPayload, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            if (onSuccess) onSuccess();
             onClose();
-        }, 1000);
+        } catch (error) {
+            console.error('Error importing transfer:', error);
+            alert('Failed to import transfer. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <div className="import-modal-overlay">
             <div className="import-modal-content">
-                {/* Modal Header */}
                 <div className="import-modal-header">
                     <h3>Import Transfer</h3>
                     <button className="import-modal-close" onClick={onClose}>
@@ -41,7 +83,6 @@ const ImportTransferModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="import-modal-body">
-                    {/* Top Selects */}
                     <div className="import-form-grid-3">
                         <div className="import-form-group">
                             <label>From <span className="text-danger">*</span></label>
@@ -81,23 +122,35 @@ const ImportTransferModal = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Download Sample */}
                     <div className="download-sample-wrapper">
-                        <button className="btn-download-sample">Download Sample File</button>
+                        <button className="btn-download-sample" onClick={handleDownloadSample}>Download Sample File</button>
                     </div>
 
-                    {/* Upload Area */}
                     <div className="import-form-group">
                         <label>Upload CSV File</label>
-                        <div className="file-upload-area">
+                        <div 
+                            className="file-upload-area" 
+                            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <input 
+                                type="file" 
+                                accept=".csv" 
+                                style={{ display: 'none' }} 
+                                ref={fileInputRef}
+                                onChange={handleFileUpload}
+                            />
                             <UploadCloud className="file-upload-icon" color="#ff9f43" size={64} />
                             <div className="file-upload-text">
-                                Drag and drop a <span>file to upload</span>
+                                {csvFile ? (
+                                    <span>Selected file: <strong>{csvFile.name}</strong></span>
+                                ) : (
+                                    <>Drag and drop a <span>file to upload</span> or click here</>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Shipping Field */}
                     <div className="import-form-group">
                         <label>Shipping <span className="text-danger">*</span></label>
                         <input 
@@ -108,7 +161,6 @@ const ImportTransferModal = ({ isOpen, onClose }) => {
                         />
                     </div>
 
-                    {/* Description Field */}
                     <div className="import-form-group">
                         <label>Description</label>
                         <textarea 
