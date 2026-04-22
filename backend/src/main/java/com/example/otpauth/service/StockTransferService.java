@@ -7,8 +7,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class StockTransferService {
@@ -39,6 +43,49 @@ public class StockTransferService {
         StockTransfer transfer = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transfer not found"));
         mapRequestToEntity(request, transfer);
+        return repository.save(transfer);
+    }
+
+    public StockTransfer importTransferFromCsv(MultipartFile file, TransferRequest request) throws Exception {
+        StockTransfer transfer = new StockTransfer();
+        
+        List<TransferRequest.TransferProduct> products = new ArrayList<>();
+        
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String line;
+            boolean isFirstLine = true;
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue; // Skip header
+                }
+                if (line.trim().isEmpty()) continue;
+                
+                String[] columns = line.split(",");
+                if (columns.length >= 5) {
+                    TransferRequest.TransferProduct product = new TransferRequest.TransferProduct();
+                    try {
+                        product.setProductId(Long.parseLong(columns[0].trim()));
+                    } catch (NumberFormatException e) {
+                        product.setProductId((long) (Math.random() * 1000));
+                    }
+                    product.setName(columns[1].trim());
+                    product.setSku(columns[2].trim());
+                    product.setCategory(columns[3].trim());
+                    try {
+                        product.setQuantity(Integer.parseInt(columns[4].trim()));
+                    } catch (NumberFormatException e) {
+                        product.setQuantity(1);
+                    }
+                    product.setImg("");
+                    products.add(product);
+                }
+            }
+        }
+        
+        request.setProducts(products);
+        mapRequestToEntity(request, transfer);
+        
         return repository.save(transfer);
     }
 
