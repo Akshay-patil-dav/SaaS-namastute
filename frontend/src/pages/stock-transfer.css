@@ -47,6 +47,15 @@
     background: #f8f9fa;
 }
 
+.action-icon-btn.spin svg {
+    animation: spinIcon 0.8s linear infinite;
+}
+
+@keyframes spinIcon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 .btn-pdf { color: #ea5455; border-color: #fbdada; background: #fff1f1; }
 .btn-excel { color: #28c76f; border-color: #d4f4e2; background: #e9f9ef; }
 
@@ -183,6 +192,31 @@
     color: #1b2850;
 }
 
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-completed {
+    background: #d4f4e2;
+    color: #22863a;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #842029;
+}
+
 .action-btns {
     display: flex;
     gap: 5px;
@@ -201,11 +235,18 @@
     transition: all 0.2s;
 }
 
+.btn-view { color: #5b6670; }
+.btn-view:hover { background: #ecfdf5; color: #10b981; border-color: #10b981; }
+
 .btn-edit { color: #5b6670; }
 .btn-edit:hover { background: #f0f3ff; color: #6366f1; border-color: #6366f1; }
 
 .btn-delete { color: #5b6670; }
 .btn-delete:hover { background: #fff1f1; color: #ea5455; border-color: #ea5455; }
+
+.row-selected td {
+    background-color: #fff8f0;
+}
 
 /* Pagination Wrap */
 .pagination-wrap {

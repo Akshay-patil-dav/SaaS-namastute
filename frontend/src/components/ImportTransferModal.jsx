@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, UploadCloud } from 'lucide-react';
 import axios from 'axios';
 import './import-transfer-modal.css';
@@ -15,6 +15,15 @@ const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [csvFile, setCsvFile] = useState(null);
     const fileInputRef = useRef(null);
+
+    // Reset state when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            setFormData({ from: '', to: '', status: '', shipping: '', description: '' });
+            setCsvFile(null);
+            setIsSubmitting(false);
+        }
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
