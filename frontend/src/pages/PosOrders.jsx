@@ -2,14 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     Search, FileText, Download, RotateCcw,
     ChevronUp, Plus, ChevronLeft, ChevronRight,
-    Eye, Edit, Trash2, AlertCircle,
+    Eye, Edit, Trash2, AlertCircle, Receipt,
 } from 'lucide-react';
 import axios from 'axios';
 import './online-orders.css';
 import AddPosModal        from '../components/AddPosModal';
 import EditPosModal       from '../components/EditPosModal';
-import ViewSalesModal     from '../components/ViewSalesModal';   // read-only — reusable
+import ViewSalesModal     from '../components/ViewSalesModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import InvoiceModal       from '../components/InvoiceModal';
 
 const BASE_URL     = import.meta.env.VITE_API_BASE_URL;
 const ROWS_OPTIONS = [10, 25, 50];
@@ -35,12 +36,13 @@ export default function PosOrders() {
     const [currentPage,  setCurrentPage]  = useState(1);
 
     /* ── modals ──────────────────────────────────────────── */
-    const [addOpen,     setAddOpen]     = useState(false);
-    const [editOpen,    setEditOpen]    = useState(false);
-    const [viewOpen,    setViewOpen]    = useState(false);
-    const [deleteOpen,  setDeleteOpen]  = useState(false);
-    const [activeOrder, setActiveOrder] = useState(null);
-    const [deleting,    setDeleting]    = useState(false);
+    const [addOpen,      setAddOpen]      = useState(false);
+    const [editOpen,     setEditOpen]     = useState(false);
+    const [viewOpen,     setViewOpen]     = useState(false);
+    const [deleteOpen,   setDeleteOpen]   = useState(false);
+    const [invoiceOpen,  setInvoiceOpen]  = useState(false);
+    const [activeOrder,  setActiveOrder]  = useState(null);
+    const [deleting,     setDeleting]     = useState(false);
 
     /* ── fetch — hits its own /api/pos-sales table ───────── */
     const fetchOrders = useCallback(async () => {
@@ -89,11 +91,12 @@ export default function PosOrders() {
     const customers = [...new Set(orders.map(o => o.customerName).filter(Boolean))];
 
     /* ── modal helpers ───────────────────────────────────── */
-    const openView   = o => { setActiveOrder(o); setViewOpen(true);   };
-    const openEdit   = o => { setActiveOrder(o); setEditOpen(true);   };
-    const openDelete = o => { setActiveOrder(o); setDeleteOpen(true); };
-    const closeAll   = () => {
-        setViewOpen(false); setEditOpen(false); setDeleteOpen(false);
+    const openView    = o => { setActiveOrder(o); setViewOpen(true);    };
+    const openEdit    = o => { setActiveOrder(o); setEditOpen(true);    };
+    const openDelete  = o => { setActiveOrder(o); setDeleteOpen(true);  };
+    const openInvoice = o => { setActiveOrder(o); setInvoiceOpen(true); };
+    const closeAll    = () => {
+        setViewOpen(false); setEditOpen(false); setDeleteOpen(false); setInvoiceOpen(false);
         setActiveOrder(null);
     };
 
@@ -285,9 +288,10 @@ export default function PosOrders() {
 
                                         <td>
                                             <div className="oo-action-btns">
-                                                <button className="oo-action-btn view"   title="View"   onClick={() => openView(item)}><Eye    size={14} /></button>
-                                                <button className="oo-action-btn edit"   title="Edit"   onClick={() => openEdit(item)}><Edit   size={14} /></button>
-                                                <button className="oo-action-btn delete" title="Delete" onClick={() => openDelete(item)}><Trash2 size={14} /></button>
+                                                <button className="oo-action-btn view"    title="View Detail" onClick={() => openView(item)}><Eye     size={14} /></button>
+                                                <button className="oo-action-btn invoice" title="View Invoice" onClick={() => openInvoice(item)}><Receipt size={14} /></button>
+                                                <button className="oo-action-btn edit"    title="Edit"        onClick={() => openEdit(item)}><Edit    size={14} /></button>
+                                                <button className="oo-action-btn delete"  title="Delete"      onClick={() => openDelete(item)}><Trash2  size={14} /></button>
                                             </div>
                                         </td>
 
@@ -380,6 +384,13 @@ export default function PosOrders() {
                 title="Delete POS Sale"
                 message={`Delete POS sale ${activeOrder?.referenceNo} for ${activeOrder?.customerName}? This cannot be undone.`}
                 isDeleting={deleting}
+            />
+
+            <InvoiceModal
+                isOpen={invoiceOpen}
+                order={activeOrder}
+                onClose={closeAll}
+                orderType="POS"
             />
         </div>
     );
