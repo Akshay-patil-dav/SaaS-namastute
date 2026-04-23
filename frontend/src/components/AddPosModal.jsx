@@ -6,7 +6,7 @@ import './add-sales-modal.css';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const EMPTY = { customerName:'', date: new Date().toISOString().split('T')[0], status:'Pending', paymentStatus:'Unpaid', orderTax:0, discount:0, shipping:0, paidAmount:0, biller:'Admin', notes:'' };
 
-const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
+const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
     const [form, setForm]           = useState(EMPTY);
     const [products, setProducts]   = useState([]);
     const [searchQ, setSearchQ]     = useState('');
@@ -40,23 +40,23 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
 
     const selectProduct = p => {
         const existing = products.find(x => x.productId === p.id);
-        if (existing) setProducts(prev => prev.map(x => x.productId === p.id ? {...x, quantity: x.quantity+1} : x));
+        if (existing) setProducts(prev => prev.map(x => x.productId===p.id ? {...x, quantity: x.quantity+1} : x));
         else setProducts(prev => [...prev, { productId:p.id, name:p.name, sku:p.sku||'', img: p.images?p.images.split(',')[0].trim():'', quantity:1, unitPrice:parseFloat(p.price)||0, discount:0, taxPercent:0 }]);
         setSearchQ(''); setShowDrop(false);
     };
 
     const updateField = (idx, field, raw) => {
-        const val = field === 'quantity' ? Math.max(1, parseInt(raw)||1) : parseFloat(raw)||0;
+        const val = field==='quantity' ? Math.max(1,parseInt(raw)||1) : parseFloat(raw)||0;
         setProducts(prev => prev.map((p,i) => i===idx ? {...p,[field]:val} : p));
     };
 
     const lineTotal = p => { const base = p.unitPrice*p.quantity - p.discount; return Math.max(0, base + base*(p.taxPercent/100)); };
-    const subtotal   = products.reduce((s,p) => s + lineTotal(p), 0);
+    const subtotal   = products.reduce((s,p) => s+lineTotal(p), 0);
     const grandTotal = Math.max(0, subtotal + +form.orderTax + +form.shipping - +form.discount);
     const due        = Math.max(0, grandTotal - +form.paidAmount);
 
     const onKey = e => {
-        if (!showDrop || !results.length) return;
+        if (!showDrop||!results.length) return;
         if (e.key==='ArrowDown') { e.preventDefault(); setActiveIdx(i=>Math.min(i+1,results.length-1)); }
         else if (e.key==='ArrowUp') { e.preventDefault(); setActiveIdx(i=>Math.max(i-1,0)); }
         else if (e.key==='Enter') { e.preventDefault(); if (activeIdx>=0) selectProduct(results[activeIdx]); }
@@ -68,9 +68,12 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
         if (!products.length) return setError('Add at least one product.');
         setError(''); setSubmitting(true);
         try {
-            await axios.post(`${BASE_URL}/sales`, { ...form, orderTax:+form.orderTax, discount:+form.discount, shipping:+form.shipping, paidAmount:+form.paidAmount, products });
+            await axios.post(`${BASE_URL}/pos-sales`, {
+                ...form, orderTax:+form.orderTax, discount:+form.discount,
+                shipping:+form.shipping, paidAmount:+form.paidAmount, products
+            });
             onSuccess?.(); onClose();
-        } catch (err) { setError(err.response?.data?.error || 'Failed to create sale.'); }
+        } catch (err) { setError(err.response?.data?.error || 'Failed to create POS sale.'); }
         finally { setSubmitting(false); }
     };
 
@@ -80,7 +83,7 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
         <div className="sm-overlay" onClick={e => e.target===e.currentTarget && onClose()}>
             <div className="sm-modal">
                 <div className="sm-header">
-                    <h4>Add Sales</h4>
+                    <h4>Add POS Sale</h4>
                     <button className="sm-close-btn" onClick={onClose}><X size={16}/></button>
                 </div>
                 <div className="sm-body">
@@ -92,7 +95,7 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
                     )}
                     {products.length > 0 && (
                         <div className="sm-prod-rows">
-                            {products.map((p, idx) => (
+                            {products.map((p,idx) => (
                                 <div className="sm-prod-row" key={idx}>
                                     <div className="sm-prod-info">
                                         {p.img ? <img src={p.img} alt="" className="sm-prod-img"/> : <div className="sm-prod-placeholder">{p.name.charAt(0)}</div>}
@@ -140,10 +143,7 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
                                                     <div className="sm-sug-img-wrap">
                                                         {r.images&&r.images.split(',')[0]?.trim() ? <img src={r.images.split(',')[0].trim()} alt=""/> : <div className="sm-sug-placeholder">{r.name.charAt(0)}</div>}
                                                     </div>
-                                                    <div>
-                                                        <div className="sm-sug-name">{r.name}</div>
-                                                        <div className="sm-sug-meta">SKU: {r.sku} · ${r.price}</div>
-                                                    </div>
+                                                    <div><div className="sm-sug-name">{r.name}</div><div className="sm-sug-meta">SKU: {r.sku} · ${r.price}</div></div>
                                                 </li>
                                             ))}
                                         </ul>
@@ -189,16 +189,15 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
                             <input className="sm-input" type="text" placeholder="Optional…" value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))}/>
                         </div>
                     </div>
-
                     {error && <div className="sm-error">{error}</div>}
                 </div>
                 <div className="sm-footer">
                     <button className="sm-btn-cancel" onClick={onClose} disabled={submitting}>Cancel</button>
-                    <button className="sm-btn-submit" onClick={submit} disabled={submitting}>{submitting?'Saving…':'Submit Sale'}</button>
+                    <button className="sm-btn-submit" onClick={submit} disabled={submitting}>{submitting?'Saving…':'Submit POS Sale'}</button>
                 </div>
             </div>
         </div>
     );
 };
 
-export default AddSalesModal;
+export default AddPosModal;

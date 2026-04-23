@@ -1,257 +1,385 @@
-import React, { useState } from 'react';
-import { 
-    Search, 
-    FileText, 
-    Download, 
-    RotateCcw, 
-    ChevronUp, 
-    Plus, 
-    ChevronLeft, 
-    ChevronRight,
-    MoreVertical,
-    Eye,
-    Edit,
-    DollarSign,
-    PlusCircle,
-    Trash2
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+    Search, FileText, Download, RotateCcw,
+    ChevronUp, Plus, ChevronLeft, ChevronRight,
+    Eye, Edit, Trash2, AlertCircle,
 } from 'lucide-react';
+import axios from 'axios';
 import './online-orders.css';
-import AddSalesModal from '../components/AddSalesModal';
+import AddPosModal        from '../components/AddPosModal';
+import EditPosModal       from '../components/EditPosModal';
+import ViewSalesModal     from '../components/ViewSalesModal';   // read-only — reusable
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
-const posOrdersData = [
-    { id: 1, customer: 'Carl Evans', ref: 'SL001', date: '24 Dec 2024', status: 'Completed', total: '$1000', paid: '$1000', due: '$0.00', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carl' },
-    { id: 2, customer: 'Minerva Rameriz', ref: 'SL002', date: '10 Dec 2024', status: 'Pending', total: '$1500', paid: '$0.00', due: '$1500', payment: 'Unpaid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Minerva' },
-    { id: 3, customer: 'Robert Lamon', ref: 'SL003', date: '08 Feb 2023', status: 'Completed', total: '$1500', paid: '$0.00', due: '$1500', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Robert' },
-    { id: 4, customer: 'Patricia Lewis', ref: 'SL004', date: '12 Feb 2023', status: 'Completed', total: '$2000', paid: '$1000', due: '$1000', payment: 'Overdue', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Patricia' },
-    { id: 5, customer: 'Mark Joslyn', ref: 'SL005', date: '17 Mar 2023', status: 'Completed', total: '$800', paid: '$800', due: '$0.00', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mark' },
-    { id: 6, customer: 'Marsha Betts', ref: 'SL006', date: '24 Mar 2023', status: 'Pending', total: '$750', paid: '$0.00', due: '$750', payment: 'Unpaid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marsha' },
-    { id: 7, customer: 'Daniel Jude', ref: 'SL007', date: '06 Apr 2023', status: 'Completed', total: '$1300', paid: '$1300', due: '$0.00', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Daniel' },
-    { id: 8, customer: 'Emma Bates', ref: 'SL008', date: '16 Apr 2023', status: 'Completed', total: '$1100', paid: '$1100', due: '$0.00', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma' },
-    { id: 9, customer: 'Richard Fralick', ref: 'SL009', date: '04 May 2023', status: 'Pending', total: '$2300', paid: '$2300', due: '$0.00', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Richard' },
-    { id: 10, customer: 'Michelle Robison', ref: 'SL010', date: '29 May 2023', status: 'Pending', total: '$1700', paid: '$1700', due: '$0.00', payment: 'Paid', biller: 'Admin', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michelle' },
-];
+const BASE_URL     = import.meta.env.VITE_API_BASE_URL;
+const ROWS_OPTIONS = [10, 25, 50];
+const STATUSES     = ['Completed', 'Pending', 'Cancelled'];
+const PAYMENTS     = ['Paid', 'Unpaid', 'Overdue'];
 
 export default function PosOrders() {
-    const [searchTerm, setSearchTerm] = useState('');
+
+    /* ── data ────────────────────────────────────────────── */
+    const [orders,     setOrders]     = useState([]);
+    const [loading,    setLoading]    = useState(true);
+    const [fetchError, setFetchError] = useState('');
+
+    /* ── filters ─────────────────────────────────────────── */
+    const [searchTerm,     setSearchTerm]     = useState('');
+    const [filterStatus,   setFilterStatus]   = useState('');
+    const [filterPayment,  setFilterPayment]  = useState('');
+    const [filterCustomer, setFilterCustomer] = useState('');
+
+    /* ── table ───────────────────────────────────────────── */
     const [selectedRows, setSelectedRows] = useState([]);
-    const [activeDropdown, setActiveDropdown] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [rowsPerPage,  setRowsPerPage]  = useState(10);
+    const [currentPage,  setCurrentPage]  = useState(1);
 
-    // Close dropdown on outside click
-    React.useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (activeDropdown && !event.target.closest('.action-dropdown-container')) {
-                setActiveDropdown(null);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [activeDropdown]);
+    /* ── modals ──────────────────────────────────────────── */
+    const [addOpen,     setAddOpen]     = useState(false);
+    const [editOpen,    setEditOpen]    = useState(false);
+    const [viewOpen,    setViewOpen]    = useState(false);
+    const [deleteOpen,  setDeleteOpen]  = useState(false);
+    const [activeOrder, setActiveOrder] = useState(null);
+    const [deleting,    setDeleting]    = useState(false);
 
-    const toggleDropdown = (id) => {
-        setActiveDropdown(prev => (prev === id ? null : id));
+    /* ── fetch — hits its own /api/pos-sales table ───────── */
+    const fetchOrders = useCallback(async () => {
+        setLoading(true);
+        setFetchError('');
+        try {
+            const res = await axios.get(`${BASE_URL}/pos-sales`);
+            setOrders(Array.isArray(res.data) ? res.data : []);
+        } catch {
+            setFetchError('Could not load POS orders. Check backend is running.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => { fetchOrders(); }, [fetchOrders]);
+
+    /* ── filter / paginate ───────────────────────────────── */
+    const filtered = orders.filter(o => {
+        const q = searchTerm.toLowerCase();
+        if (q && !(
+            (o.customerName  || '').toLowerCase().includes(q) ||
+            (o.referenceNo   || '').toLowerCase().includes(q) ||
+            (o.status        || '').toLowerCase().includes(q) ||
+            (o.paymentStatus || '').toLowerCase().includes(q) ||
+            (o.biller        || '').toLowerCase().includes(q)
+        )) return false;
+        if (filterStatus   && o.status        !== filterStatus)   return false;
+        if (filterPayment  && o.paymentStatus !== filterPayment)  return false;
+        if (filterCustomer && o.customerName  !== filterCustomer) return false;
+        return true;
+    });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+    const page       = Math.min(currentPage, totalPages);
+    const rows       = filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+    const resetPage  = () => setCurrentPage(1);
+
+    /* ── selection ───────────────────────────────────────── */
+    const toggleRow = id =>
+        setSelectedRows(p => p.includes(id) ? p.filter(r => r !== id) : [...p, id]);
+    const toggleAll = () =>
+        setSelectedRows(p => p.length === rows.length ? [] : rows.map(r => r.id));
+
+    /* ── unique filter options ───────────────────────────── */
+    const customers = [...new Set(orders.map(o => o.customerName).filter(Boolean))];
+
+    /* ── modal helpers ───────────────────────────────────── */
+    const openView   = o => { setActiveOrder(o); setViewOpen(true);   };
+    const openEdit   = o => { setActiveOrder(o); setEditOpen(true);   };
+    const openDelete = o => { setActiveOrder(o); setDeleteOpen(true); };
+    const closeAll   = () => {
+        setViewOpen(false); setEditOpen(false); setDeleteOpen(false);
+        setActiveOrder(null);
     };
 
-    const toggleRow = (id) => {
-        setSelectedRows(prev => 
-            prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
-        );
+    const confirmDelete = async () => {
+        if (!activeOrder) return;
+        setDeleting(true);
+        try {
+            await axios.delete(`${BASE_URL}/pos-sales/${activeOrder.id}`);
+            setDeleteOpen(false);
+            setActiveOrder(null);
+            fetchOrders();
+        } finally {
+            setDeleting(false);
+        }
     };
 
-    const toggleAll = () => {
-        setSelectedRows(prev => 
-            prev.length === posOrdersData.length ? [] : posOrdersData.map(d => d.id)
-        );
+    /* ── export CSV ──────────────────────────────────────── */
+    const exportCSV = () => {
+        const header = ['Reference','Customer','Date','Status','Grand Total','Paid','Due','Payment Status','Biller'];
+        const body   = filtered.map(o => [
+            o.referenceNo, o.customerName, o.formattedDate || o.date,
+            o.status, o.grandTotal, o.paidAmount, o.dueAmount, o.paymentStatus, o.biller
+        ]);
+        const csv  = [header, ...body].map(r => r.map(v => `"${v ?? ''}"`).join(',')).join('\n');
+        const link = Object.assign(document.createElement('a'), {
+            href:     URL.createObjectURL(new Blob([csv], { type: 'text/csv' })),
+            download: 'pos_orders.csv',
+        });
+        link.click();
     };
 
-    const filteredData = posOrdersData.filter(item => 
-        item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.ref.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.biller.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    /* ── helpers ─────────────────────────────────────────── */
+    const money = v => { const n = parseFloat(v); return isNaN(n) ? '$0.00' : `$${n.toFixed(2)}`; };
 
+    const avatarSrc = name =>
+        `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name||'U')}&backgroundColor=e2e8f0&textColor=374151&fontSize=40`;
+
+    const statusClass  = s => s==='Completed' ? 'oo-badge-completed' : s==='Cancelled' ? 'oo-badge-cancelled' : 'oo-badge-pending';
+    const paymentClass = p => p==='Paid' ? 'oo-pay-badge-paid' : p==='Overdue' ? 'oo-pay-badge-overdue' : 'oo-pay-badge-unpaid';
+
+    /* ── smart page list ─────────────────────────────────── */
+    const pageList = Array.from({ length: totalPages }, (_, i) => i + 1)
+        .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+        .reduce((acc, p, i, arr) => {
+            if (i > 0 && p - arr[i - 1] > 1) acc.push('…');
+            acc.push(p);
+            return acc;
+        }, []);
+
+    /* ─────────────────────────────────────────────────────── */
     return (
         <div className="online-orders-container">
-            {/* Page Header */}
-            <div className="page-header-flex">
-                <div className="page-title-area">
+
+            {/* Header */}
+            <div className="oo-page-header">
+                <div className="oo-title-area">
                     <h5>POS Orders</h5>
-                    <p className="page-subtitle">Manage Your pos orders</p>
+                    <p className="oo-subtitle">Manage Your Point-of-Sale Orders</p>
                 </div>
-                <div className="header-action-buttons">
-                    <button className="action-icon-btn btn-pdf" title="Export PDF"><FileText size={16} /></button>
-                    <button className="action-icon-btn btn-excel" title="Export Excel"><Download size={16} /></button>
-                    <button className="action-icon-btn" title="Refresh"><RotateCcw size={16} /></button>
-                    <button className="action-icon-btn" title="Collapse"><ChevronUp size={16} /></button>
-                    <button className="btn-add-sales" onClick={() => setIsModalOpen(true)}>
-                        <Plus size={16} />
-                        Add Sales
+                <div className="oo-header-actions">
+                    <button className="oo-icon-btn pdf"   title="Print"     onClick={() => window.print()}><FileText size={15} /></button>
+                    <button className="oo-icon-btn excel" title="Export CSV" onClick={exportCSV}><Download size={15} /></button>
+                    <button className="oo-icon-btn"       title="Refresh"   onClick={fetchOrders}><RotateCcw size={15} /></button>
+                    <button className="oo-icon-btn"       title="Collapse"><ChevronUp size={15} /></button>
+                    <button className="oo-btn-add" onClick={() => setAddOpen(true)}>
+                        <Plus size={15} /> Add POS Sale
                     </button>
                 </div>
             </div>
 
-            {/* Main Content Area */}
-            <div className="orders-card">
-                {/* Filters */}
-                <div className="filter-bar">
-                    <div className="search-wrapper">
-                        <Search className="search-icon" size={16} />
-                        <input 
-                            type="text" 
-                            className="search-input" 
-                            placeholder="Search" 
+            {/* Card */}
+            <div className="oo-card">
+
+                {/* Filter bar */}
+                <div className="oo-filter-bar">
+                    <div className="oo-search-wrap">
+                        <Search className="oo-search-icon" size={14} />
+                        <input
+                            type="text"
+                            className="oo-search-input"
+                            placeholder="Search customer, ref, status…"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={e => { setSearchTerm(e.target.value); resetPage(); }}
                         />
                     </div>
-                    <div className="filter-dropdowns">
-                        <select className="filter-select"><option>Customer</option></select>
-                        <select className="filter-select"><option>Status</option></select>
-                        <select className="filter-select"><option>Payment Status</option></select>
-                        <select className="filter-select" style={{ minWidth: '160px' }}>
-                            <option>Sort By : Last 7 Days</option>
-                            <option>Last 30 Days</option>
+
+                    <div className="oo-filter-controls">
+                        <select className="oo-select" value={filterCustomer} onChange={e => { setFilterCustomer(e.target.value); resetPage(); }}>
+                            <option value="">All Customers</option>
+                            {customers.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+
+                        <select className="oo-select" value={filterStatus} onChange={e => { setFilterStatus(e.target.value); resetPage(); }}>
+                            <option value="">All Statuses</option>
+                            {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+
+                        <select className="oo-select" value={filterPayment} onChange={e => { setFilterPayment(e.target.value); resetPage(); }}>
+                            <option value="">All Payments</option>
+                            {PAYMENTS.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
                     </div>
                 </div>
 
-                {/* Table Section */}
-                <div className="orders-table-wrapper">
-                    <table className="orders-table">
-                        <thead>
-                            <tr>
-                                <th className="checkbox-col">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={selectedRows.length === posOrdersData.length}
-                                        onChange={toggleAll}
-                                    />
-                                </th>
-                                <th>Customer</th>
-                                <th>Reference</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Grand Total</th>
-                                <th>Paid</th>
-                                <th>Due</th>
-                                <th>Payment Status</th>
-                                <th>Biller</th>
-                                <th style={{textAlign: 'center'}}>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredData.length > 0 ? (
-                                filteredData.map((item) => (
-                                    <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
+                {/* Loading */}
+                {loading && (
+                    <div className="oo-state-row">
+                        <div className="oo-spinner" />
+                        <span>Loading POS orders…</span>
+                    </div>
+                )}
+
+                {/* Error */}
+                {!loading && fetchError && (
+                    <div className="oo-state-row oo-error">
+                        <AlertCircle size={16} />
+                        <span>{fetchError}</span>
+                        <button className="oo-retry-btn" onClick={fetchOrders}>Retry</button>
+                    </div>
+                )}
+
+                {/* Table */}
+                {!loading && !fetchError && (
+                    <div className="oo-table-wrap">
+                        <table className="oo-table">
+                            <thead>
+                                <tr>
+                                    <th className="oo-cb-col">
+                                        <input type="checkbox"
+                                            checked={rows.length > 0 && selectedRows.length === rows.length}
+                                            onChange={toggleAll}
+                                        />
+                                    </th>
+                                    <th>Customer</th>
+                                    <th>Reference</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Grand Total</th>
+                                    <th>Paid</th>
+                                    <th>Due</th>
+                                    <th>Payment</th>
+                                    <th>Biller</th>
+                                    <th style={{ textAlign: 'center' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rows.length > 0 ? rows.map(item => (
+                                    <tr key={item.id} className={selectedRows.includes(item.id) ? 'oo-row-selected' : ''}>
+
                                         <td>
-                                            <input 
-                                                type="checkbox" 
+                                            <input type="checkbox"
                                                 checked={selectedRows.includes(item.id)}
                                                 onChange={() => toggleRow(item.id)}
                                             />
                                         </td>
+
                                         <td>
-                                            <div className="customer-cell">
-                                                <img src={item.avatar} alt="" className="customer-avatar" />
-                                                <span>{item.customer}</span>
+                                            <div className="oo-customer-cell">
+                                                <img className="oo-avatar" src={avatarSrc(item.customerName)} alt="" />
+                                                <span className="oo-customer-name">{item.customerName || '—'}</span>
                                             </div>
                                         </td>
-                                        <td>{item.ref}</td>
-                                        <td>{item.date}</td>
+
+                                        <td><span className="oo-ref-badge">{item.referenceNo}</span></td>
+
+                                        <td>{item.formattedDate || item.date || '—'}</td>
+
                                         <td>
-                                            <span className={`badge-status ${item.status === 'Completed' ? 'status-completed' : 'status-pending'}`}>
+                                            <span className={`oo-badge ${statusClass(item.status)}`}>
                                                 {item.status}
                                             </span>
                                         </td>
-                                        <td>{item.total}</td>
-                                        <td>{item.paid}</td>
-                                        <td>{item.due}</td>
+
+                                        <td className="oo-money">{money(item.grandTotal)}</td>
+                                        <td>{money(item.paidAmount)}</td>
+
+                                        <td className={parseFloat(item.dueAmount) > 0 ? 'oo-money-due-pos' : 'oo-money-due-zero'}>
+                                            {money(item.dueAmount)}
+                                        </td>
+
                                         <td>
-                                            <span className={`badge-payment ${item.payment === 'Paid' ? 'payment-paid' : item.payment === 'Unpaid' ? 'payment-unpaid' : 'payment-overdue'}`}>
-                                                <span className={`dot ${item.payment === 'Paid' ? 'dot-green' : item.payment === 'Unpaid' ? 'dot-red' : 'dot-orange'}`}></span>
-                                                {item.payment}
+                                            <span className={`oo-pay-badge ${paymentClass(item.paymentStatus)}`}>
+                                                <span className="oo-dot" />
+                                                {item.paymentStatus}
                                             </span>
                                         </td>
-                                        <td>{item.biller}</td>
-                                        <td style={{textAlign: 'center'}}>
-                                            <div className="action-dropdown-container">
-                                                <button 
-                                                    className={`action-btn-dots ${activeDropdown === item.id ? 'active' : ''}`}
-                                                    onClick={() => toggleDropdown(item.id)}
-                                                >
-                                                    <MoreVertical size={16} />
-                                                </button>
-                                                {activeDropdown === item.id && (
-                                                    <div className="action-dropdown-menu">
-                                                        <button className="dropdown-item">
-                                                            <Eye size={14} /> Sale Detail
-                                                        </button>
-                                                        <button className="dropdown-item">
-                                                            <Edit size={14} /> Edit Sale
-                                                        </button>
-                                                        <button className="dropdown-item">
-                                                            <DollarSign size={14} /> Show Payments
-                                                        </button>
-                                                        <button className="dropdown-item">
-                                                            <PlusCircle size={14} /> Create Payment
-                                                        </button>
-                                                        <button className="dropdown-item">
-                                                            <Download size={14} /> Download pdf
-                                                        </button>
-                                                        <button className="dropdown-item delete">
-                                                            <Trash2 size={14} /> Delete Sale
-                                                        </button>
-                                                    </div>
-                                                )}
+
+                                        <td>{item.biller || 'Admin'}</td>
+
+                                        <td>
+                                            <div className="oo-action-btns">
+                                                <button className="oo-action-btn view"   title="View"   onClick={() => openView(item)}><Eye    size={14} /></button>
+                                                <button className="oo-action-btn edit"   title="Edit"   onClick={() => openEdit(item)}><Edit   size={14} /></button>
+                                                <button className="oo-action-btn delete" title="Delete" onClick={() => openDelete(item)}><Trash2 size={14} /></button>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                )) : (
+                                    <tr>
+                                        <td colSpan="11" className="oo-empty-cell">
+                                            <div className="oo-empty-inner">
+                                                <FileText size={40} />
+                                                <span>
+                                                    {(searchTerm || filterStatus || filterPayment || filterCustomer)
+                                                        ? 'No POS orders match your filters.'
+                                                        : 'No POS orders yet. Click "Add POS Sale" to create one.'}
+                                                </span>
                                             </div>
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="11" style={{ textAlign: 'center', padding: '20px', color: '#5b6670' }}>
-                                        No matching records found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
 
                 {/* Pagination */}
-                <div className="pagination-wrap">
-                    <div className="entries-info">
-                        <span>Row Per Page</span>
-                        <select className="filter-select" style={{ minWidth: '70px', padding: '5px 25px 5px 10px' }}>
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option>
-                        </select>
-                        <span>Entries</span>
+                {!loading && !fetchError && filtered.length > 0 && (
+                    <div className="oo-pagination-wrap">
+                        <div className="oo-entries-info">
+                            <span>Rows per page</span>
+                            <select
+                                className="oo-select"
+                                style={{ minWidth: '64px', height: '30px', fontSize: '12px' }}
+                                value={rowsPerPage}
+                                onChange={e => { setRowsPerPage(Number(e.target.value)); resetPage(); }}
+                            >
+                                {ROWS_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
+                            </select>
+                            <span>
+                                {Math.min((page - 1) * rowsPerPage + 1, filtered.length)}–{Math.min(page * rowsPerPage, filtered.length)} of {filtered.length}
+                            </span>
+                        </div>
+
+                        <div className="oo-page-nav">
+                            <button className="oo-page-btn" disabled={page === 1} onClick={() => setCurrentPage(p => p - 1)}>
+                                <ChevronLeft size={14} />
+                            </button>
+                            {pageList.map((p, i) =>
+                                p === '…'
+                                    ? <span key={`e${i}`} className="oo-page-btn" style={{ cursor: 'default' }}>…</span>
+                                    : <button key={p} className={`oo-page-btn ${p === page ? 'oo-page-btn-active' : ''}`}
+                                              onClick={() => setCurrentPage(p)}>{p}</button>
+                            )}
+                            <button className="oo-page-btn" disabled={page === totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+                                <ChevronRight size={14} />
+                            </button>
+                        </div>
                     </div>
-                    <div className="pagination-nav">
-                        <button className="page-btn" disabled><ChevronLeft size={16} /></button>
-                        <button className="page-btn active">1</button>
-                        <button className="page-btn">2</button>
-                        <button className="page-btn"><ChevronRight size={16} /></button>
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* Footer */}
-            <footer className="manage-stock-footer">
-                <div className="footer-copyright">
-                    2014 - 2026 © DreamsPOS. All Right Reserved
-                </div>
-                <div className="footer-designer">
-                    Designed & Developed by <span>Dreams</span>
-                </div>
+            <footer className="oo-footer">
+                <div>2014 - 2026 © Namastute. All Rights Reserved</div>
+                <div>Designed &amp; Developed by <span>Namastute</span></div>
             </footer>
 
-            <AddSalesModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
+            {/* ── Modals ────────────────────────────────────── */}
+            <AddPosModal
+                isOpen={addOpen}
+                onClose={() => setAddOpen(false)}
+                onSuccess={() => { fetchOrders(); resetPage(); }}
+            />
+
+            <EditPosModal
+                isOpen={editOpen}
+                order={activeOrder}
+                onClose={closeAll}
+                onSuccess={fetchOrders}
+            />
+
+            <ViewSalesModal
+                isOpen={viewOpen}
+                order={activeOrder}
+                onClose={closeAll}
+            />
+
+            <DeleteConfirmModal
+                isOpen={deleteOpen}
+                onClose={closeAll}
+                onConfirm={confirmDelete}
+                title="Delete POS Sale"
+                message={`Delete POS sale ${activeOrder?.referenceNo} for ${activeOrder?.customerName}? This cannot be undone.`}
+                isDeleting={deleting}
             />
         </div>
     );
