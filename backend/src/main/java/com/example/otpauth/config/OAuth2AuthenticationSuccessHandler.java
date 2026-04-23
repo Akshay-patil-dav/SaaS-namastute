@@ -24,7 +24,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String token = jwtUtil.generateToken(userDetails);
         
         // Redirect to React frontend with JWT token in URL query parameter
-        String targetUrl = "http://localhost:5173/oauth2/redirect?token=" + token;
+        String targetUrl = "https://vulcanizable-jedidiah-clownishly.ngrok-free.dev/oauth2/redirect?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Trash2 } from 'lucide-react';
 import './delete-confirm-modal.css';
 
-const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
+const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, title, message, isDeleting }) => {
     if (!isOpen) return null;
 
     return (
@@ -11,14 +11,14 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
                 <div className="global-delete-icon-wrapper">
                     <Trash2 size={32} />
                 </div>
-                <h4>{title || "Delete Product"}</h4>
-                <p>{message || "Are you sure you want to delete product?"}</p>
+                <h4>{title || "Delete"}</h4>
+                <p>{message || "Are you sure you want to delete this item?"}</p>
                 <div className="global-delete-actions">
-                    <button className="btn-cancel-global" onClick={onClose}>
+                    <button className="btn-cancel-global" onClick={onClose} disabled={isDeleting}>
                         Cancel
                     </button>
-                    <button className="btn-confirm-global" onClick={onConfirm}>
-                        Yes Delete
+                    <button className="btn-confirm-global" onClick={onConfirm} disabled={isDeleting}>
+                        {isDeleting ? 'Deleting…' : 'Yes, Delete'}
                     </button>
                 </div>
             </div>
@@ -27,3 +27,4 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
 };
 
 export default DeleteConfirmModal;
+
