@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
     Search, 
     FileText, 
     Download, 
     RotateCcw, 
     ChevronUp, 
+    ChevronDown,
     Plus, 
     Edit, 
     Trash2, 
@@ -20,16 +21,26 @@ import ImportTransferModal from '../components/ImportTransferModal';
 import EditTransferModal from '../components/EditTransferModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
+const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
+
 export default function StockTransfer() {
     const [transfers, setTransfers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRows, setSelectedRows] = useState([]);
-    
+    const [filterFrom, setFilterFrom] = useState('');
+    const [filterTo, setFilterTo] = useState('');
+    const [sortDays, setSortDays] = useState('');
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
     // Modals state
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [transferToDelete, setTransferToDelete] = useState(null);
     
     // Edit/View state
@@ -37,17 +48,25 @@ export default function StockTransfer() {
     const [isViewMode, setIsViewMode] = useState(false);
 
     const fetchTransfers = async () => {
+        setIsRefreshing(true);
         try {
             const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/transfers`);
             setTransfers(response.data);
         } catch (error) {
             console.error('Error fetching transfers:', error);
+        } finally {
+            setIsRefreshing(false);
         }
     };
 
     useEffect(() => {
         fetchTransfers();
     }, []);
+
+    // Reset page when filters/search change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filterFrom, filterTo, sortDays, rowsPerPage]);
 
     const openDeleteModal = (id) => {
         setTransferToDelete(id);
@@ -56,6 +75,7 @@ export default function StockTransfer() {
 
     const confirmDelete = async () => {
         if (!transferToDelete) return;
+        setIsDeleting(true);
         try {
             await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/transfers/${transferToDelete}`);
             fetchTransfers();
@@ -63,7 +83,9 @@ export default function StockTransfer() {
             setTransferToDelete(null);
         } catch (error) {
             console.error('Error deleting transfer:', error);
-            alert('Failed to delete transfer');
+            alert('Failed to delete transfer. Please try again.');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -79,22 +101,106 @@ export default function StockTransfer() {
         );
     };
 
+    // Derive unique warehouse names for filter dropdowns
+    const uniqueFromWarehouses = useMemo(() => {
+        const names = transfers.map(t => t.fromWarehouse).filter(Boolean);
+        return [...new Set(names)].sort();
+    }, [transfers]);
+
+    const uniqueToWarehouses = useMemo(() => {
+        const names = transfers.map(t => t.toWarehouse).filter(Boolean);
+        return [...new Set(names)].sort();
+    }, [transfers]);
+
+    // Filter + search + sort
+    const filteredData = useMemo(() => {
+        let data = [...transfers];
+
+        // Search
+        const st = searchTerm.toLowerCase();
+        if (st) {
+            data = data.filter(item => {
+                return (
+                    (item.fromWarehouse || '').toLowerCase().includes(st) ||
+                    (item.toWarehouse || '').toLowerCase().includes(st) ||
+                    (item.referenceNo || '').toLowerCase().includes(st) ||
+                    (item.notes || '').toLowerCase().includes(st)
+                );
+            });
+        }
+
+        // From warehouse filter
+        if (filterFrom) {
+            data = data.filter(item => item.fromWarehouse === filterFrom);
+        }
+
+        // To warehouse filter
+        if (filterTo) {
+            data = data.filter(item => item.toWarehouse === filterTo);
+        }
+
+        // Sort by date
+        if (sortDays) {
+            const days = parseInt(sortDays, 10);
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - days);
+            data = data.filter(item => {
+                const d = item.date ? new Date(item.date) : null;
+                return d && d >= cutoff;
+            });
+        }
+
+        return data;
+    }, [transfers, searchTerm, filterFrom, filterTo, sortDays]);
+
+    // Pagination
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+    const safePage = Math.min(currentPage, totalPages);
+    const pagedData = filteredData.slice((safePage - 1) * rowsPerPage, safePage * rowsPerPage);
+
     const toggleAll = () => {
-        setSelectedRows(prev => 
-            prev.length === transfers.length ? [] : transfers.map(d => d.id)
-        );
+        const pageIds = pagedData.map(d => d.id);
+        const allSelected = pageIds.every(id => selectedRows.includes(id));
+        if (allSelected) {
+            setSelectedRows(prev => prev.filter(id => !pageIds.includes(id)));
+        } else {
+            setSelectedRows(prev => [...new Set([...prev, ...pageIds])]);
+        }
     };
 
-    const filteredData = transfers.filter(item => {
-        const fromWarehouse = item.fromWarehouse || '';
-        const toWarehouse = item.toWarehouse || '';
-        const refNo = item.referenceNo || '';
-        const st = searchTerm.toLowerCase();
-        
-        return fromWarehouse.toLowerCase().includes(st) ||
-               toWarehouse.toLowerCase().includes(st) ||
-               refNo.toLowerCase().includes(st);
-    });
+    const allPageSelected = pagedData.length > 0 && pagedData.every(d => selectedRows.includes(d.id));
+
+    const exportCSV = () => {
+        const headers = ['From Warehouse', 'To Warehouse', 'No of Products', 'Qty Transferred', 'Ref Number', 'Date', 'Status'];
+        const rows = filteredData.map(item => [
+            item.fromWarehouse || '',
+            item.toWarehouse || '',
+            item.noOfProducts ?? 0,
+            item.quantityTransferred ?? 0,
+            item.referenceNo || '',
+            item.formattedDate || item.date || '',
+            item.status || ''
+        ]);
+        const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'stock_transfers.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const getStatusClass = (status) => {
+        if (!status) return 'status-badge status-pending';
+        switch (status.toLowerCase()) {
+            case 'completed': return 'status-badge status-completed';
+            case 'pending': return 'status-badge status-pending';
+            case 'cancelled': return 'status-badge status-cancelled';
+            default: return 'status-badge status-pending';
+        }
+    };
 
     return (
         <div className="stock-transfer-container">
@@ -102,13 +208,30 @@ export default function StockTransfer() {
             <div className="page-header-flex">
                 <div className="page-title-area">
                     <h5>Stock Transfer</h5>
-                    <p className="page-subtitle">Manage your stock transfer</p>
+                    <p className="page-subtitle">Manage your stock transfers</p>
                 </div>
                 <div className="header-action-buttons">
-                    <button className="action-icon-btn btn-pdf" title="Export PDF"><FileText size={16} /></button>
-                    <button className="action-icon-btn btn-excel" title="Export Excel"><Download size={16} /></button>
-                    <button className="action-icon-btn" title="Refresh"><RotateCcw size={16} /></button>
-                    <button className="action-icon-btn" title="Collapse"><ChevronUp size={16} /></button>
+                    <button className="action-icon-btn btn-pdf" title="Export PDF" onClick={() => window.print()}>
+                        <FileText size={16} />
+                    </button>
+                    <button className="action-icon-btn btn-excel" title="Export CSV" onClick={exportCSV}>
+                        <Download size={16} />
+                    </button>
+                    <button
+                        className={`action-icon-btn${isRefreshing ? ' spin' : ''}`}
+                        title="Refresh"
+                        onClick={fetchTransfers}
+                        disabled={isRefreshing}
+                    >
+                        <RotateCcw size={16} />
+                    </button>
+                    <button
+                        className="action-icon-btn"
+                        title={isCollapsed ? 'Expand' : 'Collapse'}
+                        onClick={() => setIsCollapsed(c => !c)}
+                    >
+                        {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                    </button>
                     <button className="btn-add-new" onClick={() => setIsAddModalOpen(true)}>
                         <Plus size={16} />
                         Add New
@@ -121,114 +244,197 @@ export default function StockTransfer() {
             </div>
 
             {/* Main Content Area */}
-            <div className="transfer-card">
-                {/* Filters */}
-                <div className="filter-bar">
-                    <div className="search-wrapper">
-                        <Search className="search-icon" size={16} />
-                        <input 
-                            type="text" 
-                            className="search-input" 
-                            placeholder="Search" 
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+            {!isCollapsed && (
+                <div className="transfer-card">
+                    {/* Filters */}
+                    <div className="filter-bar">
+                        <div className="search-wrapper">
+                            <Search className="search-icon" size={16} />
+                            <input 
+                                type="text" 
+                                className="search-input" 
+                                placeholder="Search by warehouse, ref no…" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="filter-dropdowns">
+                            <select
+                                className="filter-select"
+                                value={filterFrom}
+                                onChange={(e) => setFilterFrom(e.target.value)}
+                            >
+                                <option value="">From Warehouse</option>
+                                {uniqueFromWarehouses.map(w => (
+                                    <option key={w} value={w}>{w}</option>
+                                ))}
+                            </select>
+                            <select
+                                className="filter-select"
+                                value={filterTo}
+                                onChange={(e) => setFilterTo(e.target.value)}
+                            >
+                                <option value="">To Warehouse</option>
+                                {uniqueToWarehouses.map(w => (
+                                    <option key={w} value={w}>{w}</option>
+                                ))}
+                            </select>
+                            <select
+                                className="filter-select"
+                                style={{ minWidth: '160px' }}
+                                value={sortDays}
+                                onChange={(e) => setSortDays(e.target.value)}
+                            >
+                                <option value="">All Time</option>
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                            </select>
+                        </div>
                     </div>
-                    <div className="filter-dropdowns">
-                        <select className="filter-select">
-                            <option>From Warehouse</option>
-                            <option>Lavish Warehouse</option>
-                            <option>Lobar Handy</option>
-                        </select>
-                        <select className="filter-select">
-                            <option>To Warehouse</option>
-                            <option>North Zone</option>
-                            <option>Nova Storage</option>
-                        </select>
-                        <select className="filter-select" style={{ minWidth: '160px' }}>
-                            <option>Sort By : Last 7 Days</option>
-                            <option>Last 30 Days</option>
-                        </select>
-                    </div>
-                </div>
 
-                {/* Table Section */}
-                <div className="transfer-table-wrapper">
-                    <table className="transfer-table">
-                        <thead>
-                            <tr>
-                                <th className="checkbox-col">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={selectedRows.length === transfers.length && transfers.length > 0}
-                                        onChange={toggleAll}
-                                    />
-                                </th>
-                                <th>From Warehouse</th>
-                                <th>To Warehouse</th>
-                                <th>No of Products</th>
-                                <th>Quantity Transferred</th>
-                                <th>Ref Number</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredData.length > 0 ? (
-                                filteredData.map((item) => (
-                                    <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
-                                        <td>
-                                            <input 
-                                                type="checkbox" 
-                                                checked={selectedRows.includes(item.id)}
-                                                onChange={() => toggleRow(item.id)}
-                                            />
-                                        </td>
-                                        <td>{item.fromWarehouse}</td>
-                                        <td>{item.toWarehouse}</td>
-                                        <td>{item.noOfProducts || 0}</td>
-                                        <td>{item.quantityTransferred || 0}</td>
-                                        <td><span className="ref-badge">{item.referenceNo}</span></td>
-                                        <td>{item.formattedDate || item.date}</td>
-                                        <td>
-                                            <div className="action-btns">
-                                                <button className="action-btn btn-view" onClick={() => handleEdit(item, true)}><Eye size={14} /></button>
-                                                <button className="action-btn btn-edit" onClick={() => handleEdit(item, false)}><Edit size={14} /></button>
-                                                <button className="action-btn btn-delete" onClick={() => openDeleteModal(item.id)}><Trash2 size={14} /></button>
-                                            </div>
+                    {/* Table Section */}
+                    <div className="transfer-table-wrapper">
+                        <table className="transfer-table">
+                            <thead>
+                                <tr>
+                                    <th className="checkbox-col">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={allPageSelected}
+                                            onChange={toggleAll}
+                                        />
+                                    </th>
+                                    <th>From Warehouse</th>
+                                    <th>To Warehouse</th>
+                                    <th>No of Products</th>
+                                    <th>Qty Transferred</th>
+                                    <th>Ref Number</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {pagedData.length > 0 ? (
+                                    pagedData.map((item) => (
+                                        <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
+                                            <td>
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={selectedRows.includes(item.id)}
+                                                    onChange={() => toggleRow(item.id)}
+                                                />
+                                            </td>
+                                            <td>{item.fromWarehouse || '—'}</td>
+                                            <td>{item.toWarehouse || '—'}</td>
+                                            <td>{item.noOfProducts ?? 0}</td>
+                                            <td>{item.quantityTransferred ?? 0}</td>
+                                            <td><span className="ref-badge">{item.referenceNo || '—'}</span></td>
+                                            <td>
+                                                <span className={getStatusClass(item.status)}>
+                                                    {item.status || 'Pending'}
+                                                </span>
+                                            </td>
+                                            <td>{item.formattedDate || item.date || '—'}</td>
+                                            <td>
+                                                <div className="action-btns">
+                                                    <button
+                                                        className="action-btn btn-view"
+                                                        title="View"
+                                                        onClick={() => handleEdit(item, true)}
+                                                    >
+                                                        <Eye size={14} />
+                                                    </button>
+                                                    <button
+                                                        className="action-btn btn-edit"
+                                                        title="Edit"
+                                                        onClick={() => handleEdit(item, false)}
+                                                    >
+                                                        <Edit size={14} />
+                                                    </button>
+                                                    <button
+                                                        className="action-btn btn-delete"
+                                                        title="Delete"
+                                                        onClick={() => openDeleteModal(item.id)}
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="9" style={{ textAlign: 'center', padding: '40px 20px', color: '#5b6670' }}>
+                                            {isRefreshing ? 'Loading…' : 'No matching records found.'}
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="8" style={{ textAlign: 'center', padding: '20px', color: '#5b6670' }}>
-                                        No matching records found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-                {/* Pagination */}
-                <div className="pagination-wrap">
-                    <div className="entries-info">
-                        <span>Row Per Page</span>
-                        <select className="filter-select" style={{ minWidth: '70px', padding: '5px 25px 5px 10px' }}>
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option>
-                        </select>
-                        <span>Entries</span>
-                    </div>
-                    <div className="pagination-nav">
-                        <button className="page-btn" disabled><ChevronLeft size={16} /></button>
-                        <button className="page-btn active">1</button>
-                        <button className="page-btn">2</button>
-                        <button className="page-btn"><ChevronRight size={16} /></button>
+                    {/* Pagination */}
+                    <div className="pagination-wrap">
+                        <div className="entries-info">
+                            <span>Row Per Page</span>
+                            <select
+                                className="filter-select"
+                                style={{ minWidth: '70px', padding: '5px 25px 5px 10px' }}
+                                value={rowsPerPage}
+                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                            >
+                                {ROWS_PER_PAGE_OPTIONS.map(n => (
+                                    <option key={n} value={n}>{n}</option>
+                                ))}
+                            </select>
+                            <span>
+                                {filteredData.length === 0 ? '0' : `${(safePage - 1) * rowsPerPage + 1}–${Math.min(safePage * rowsPerPage, filteredData.length)}`} of {filteredData.length} entries
+                            </span>
+                        </div>
+                        <div className="pagination-nav">
+                            <button
+                                className="page-btn"
+                                disabled={safePage <= 1}
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                .filter(p => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+                                .reduce((acc, p, idx, arr) => {
+                                    if (idx > 0 && p - arr[idx - 1] > 1) {
+                                        acc.push('...');
+                                    }
+                                    acc.push(p);
+                                    return acc;
+                                }, [])
+                                .map((p, idx) =>
+                                    p === '...' ? (
+                                        <span key={`ellipsis-${idx}`} className="page-btn" style={{ border: 'none', cursor: 'default' }}>…</span>
+                                    ) : (
+                                        <button
+                                            key={p}
+                                            className={`page-btn${safePage === p ? ' active' : ''}`}
+                                            onClick={() => setCurrentPage(p)}
+                                        >
+                                            {p}
+                                        </button>
+                                    )
+                                )
+                            }
+                            <button
+                                className="page-btn"
+                                disabled={safePage >= totalPages}
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Footer */}
             <footer className="manage-stock-footer">
@@ -236,7 +442,7 @@ export default function StockTransfer() {
                     2014 - 2026 © DreamsPOS. All Right Reserved
                 </div>
                 <div className="footer-designer">
-                    Designed & Developed by <span>Dreams</span>
+                    Designed &amp; Developed by <span>Dreams</span>
                 </div>
             </footer>
 
@@ -259,10 +465,11 @@ export default function StockTransfer() {
             />
             <DeleteConfirmModal 
                 isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
+                onClose={() => { setIsDeleteModalOpen(false); setTransferToDelete(null); }}
                 onConfirm={confirmDelete}
                 title="Delete Transfer"
-                message="Are you sure you want to delete this transfer?"
+                message="Are you sure you want to delete this transfer? This action cannot be undone."
+                isDeleting={isDeleting}
             />
         </div>
     );

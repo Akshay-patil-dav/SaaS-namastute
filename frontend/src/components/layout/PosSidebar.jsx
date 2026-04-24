@@ -40,7 +40,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
     const isDashboardActive = location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/dashboard/admin2' || location.pathname === '/dashboard/sales';
     const isSuperAdminActive = location.pathname.startsWith('/dashboard/super-');
-    const isSalesActive = location.pathname.startsWith('/dashboard/sales-');
+    const isSalesActive = location.pathname.startsWith('/dashboard/sales-') && !location.pathname.startsWith('/dashboard/sales-return');
 
     const [openMenus, setOpenMenus] = useState({
         dashboard: isDashboardActive,
@@ -258,12 +258,12 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     </a>
                                 </li>
                                 <li className="pos-menu-item">
-                                    <a className="pos-menu-link">
+                                    <NavLink to="/dashboard/sales-return" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                         <div className="pos-menu-link-content">
                                             <RotateCcw className="pos-menu-icon" strokeWidth={1.5} />
                                             <span>Sales Return</span>
                                         </div>
-                                    </a>
+                                    </NavLink>
                                 </li>
                                 <li className="pos-menu-item">
                                     <a className="pos-menu-link">

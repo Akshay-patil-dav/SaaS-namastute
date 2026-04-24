@@ -26,7 +26,14 @@ public class StockTransferService {
     }
 
     public List<StockTransfer> getAllTransfers() {
-        return repository.findAll();
+        return repository.findAll().stream()
+                .sorted((a, b) -> {
+                    if (a.getCreatedAt() == null && b.getCreatedAt() == null) return 0;
+                    if (a.getCreatedAt() == null) return 1;
+                    if (b.getCreatedAt() == null) return -1;
+                    return b.getCreatedAt().compareTo(a.getCreatedAt());
+                })
+                .collect(java.util.stream.Collectors.toList());
     }
 
     public Optional<StockTransfer> getTransferById(Long id) {
