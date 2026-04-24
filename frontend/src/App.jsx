@@ -24,6 +24,7 @@ import StockAdjustment from './pages/StockAdjustment.jsx';
 import StockTransfer from './pages/StockTransfer.jsx';
 import OnlineOrders from './pages/OnlineOrders.jsx';
 import PosOrders from './pages/PosOrders.jsx';
+import SalesReturn from './pages/SalesReturn.jsx';
 import Products from './pages/Products.jsx';
 import CreateProduct from './pages/CreateProduct.jsx';
 import EditProduct from './pages/EditProduct.jsx';
@@ -120,6 +121,10 @@ function AppRoutes() {
             <Route
                 path="/dashboard/sales-pos"
                 element={<PosPage roles={ADMIN_ROLES}><PosOrders /></PosPage>}
+            />
+            <Route
+                path="/dashboard/sales-return"
+                element={<PosPage roles={ADMIN_ROLES}><SalesReturn /></PosPage>}
             />
 
             {/* Products — ADMIN + SUPER ADMIN */}
