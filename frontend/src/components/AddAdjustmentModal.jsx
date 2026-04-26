@@ -99,7 +99,7 @@ const AddAdjustmentModal = ({ isOpen, onClose, onSuccess, initialData = null }) 
                 id: product.id, 
                 name: product.name, 
                 sku: product.sku, 
-                category: product.categoryName || 'General', 
+                category: product.category || 'General', 
                 qty: 1,
                 img: product.images ? product.images.split(',')[0].trim() : 'https://api.dicebear.com/7.x/shapes/svg?seed=' + product.name
             }]);

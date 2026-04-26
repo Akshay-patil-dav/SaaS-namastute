@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './Products.css';
+import './inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -188,36 +189,37 @@ const Products = () => {
 
 
             {/* Header */}
-            <div className="product-page-header">
-                <div className="product-page-title">
-                    <h4>Product List</h4>
-                    <p>
+            <div className="ss-header-row">
+                <div className="ss-page-title-area">
+                    <h2 className="ss-page-title">Product List</h2>
+                    <p className="ss-page-subtitle">
                         {loading ? 'Loading…' : (
                             <>
                                 {dbProducts.length > 0
-                                    ? <span className="db-badge"><span className="db-dot live" />  {dbProducts.length} from database</span>
-                                    : <span className="db-badge"><span className="db-dot mock" />  Showing demo data</span>
+                                    ? <span>{dbProducts.length} from database</span>
+                                    : <span>Showing demo data</span>
                                 }
                             </>
                         )}
                     </p>
                 </div>
-                <div className="page-actions">
-                    <button className="btn-icon-action" title="PDF"><FileText size={18} className="icon-red" /></button>
-                    <button className="btn-icon-action" title="Excel"><FileSpreadsheet size={18} className="icon-green" /></button>
-                    <button className="btn-icon-action" title="Refresh" onClick={fetchProducts}>
-                        <RefreshCw size={18} className={loading ? 'spin' : ''} />
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF"><FileText size={16} /></button>
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel"><FileSpreadsheet size={16} /></button>
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchProducts}>
+                        <RefreshCw size={16} className={loading ? 'spin' : ''} />
                     </button>
-                    <button className="btn-icon-action" title="Collapse"><ChevronUp size={18} /></button>
                     {selectedIds.length > 0 && (
-                        <button className="btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ea5455', color: '#ea5455', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s', textDecoration: 'none' }}>
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <Link to="/create-product" className="btn-orange text-decoration-none">
+                    <Link to="/create-product" className="ss-btn-orange" style={{ textDecoration: 'none' }}>
                         <PlusCircle size={18} /> Add Product
                     </Link>
-                    <button className="btn-dark-blue"><Download size={18} /> Import Product</button>
+                    <button className="ss-btn-orange" style={{ background: '#5b6670', borderColor: '#5b6670' }}>
+                        <Download size={18} /> Import Product
+                    </button>
                 </div>
             </div>
 
@@ -230,51 +232,54 @@ const Products = () => {
             )}
 
             {/* Table Card */}
-            <div className="product-table-card">
+            <div className="ss-main-panel">
 
                 {/* Filter Row */}
-                <div className="table-filter-row">
-                    <div className="search-box">
+                <div className="ss-table-controls">
+                    <div className="ss-search-wrap">
                         <Search size={18} />
                         <input
                             type="text"
+                            className="ss-search-input"
                             placeholder="Search by name, SKU, brand, category…"
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                         />
-                        {searchTerm && (
-                            <button className="search-clear" onClick={() => setSearchTerm('')}><X size={14} /></button>
-                        )}
                     </div>
-                    <div className="filter-dropdowns">
-                        <div className="filter-select">Category <ChevronDown size={16} /></div>
-                        <div className="filter-select">Brand <ChevronDown size={16} /></div>
+                    <div className="ss-filters-wrap">
+                        <select className="ss-filter-select">
+                            <option value="">Category</option>
+                        </select>
+                        <select className="ss-filter-select">
+                            <option value="">Brand</option>
+                        </select>
                     </div>
                 </div>
 
                 {/* Table */}
-                <table className="custom-table">
-                    <thead>
-                        <tr>
-                            <th style={{ width: '40px' }}>
-                                <input 
-                                    type="checkbox" 
-                                    className="custom-checkbox" 
-                                    checked={paginated.length > 0 && selectedIds.length === paginated.length}
-                                    onChange={(e) => handleSelectAll(e.target.checked)}
-                                />
-                            </th>
-                            <th>SKU</th>
-                            <th>Product Name</th>
-                            <th>Category</th>
-                            <th>Brand</th>
-                            <th>Price</th>
-                            <th>Unit</th>
-                            <th>Qty</th>
-                            <th>Added On</th>
-                            <th style={{ textAlign: 'center' }}>Action</th>
-                        </tr>
-                    </thead>
+                <div className="ss-table-wrapper">
+                    <table className="ss-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '40px' }}>
+                                    <input 
+                                        type="checkbox" 
+                                        className="ss-checkbox" 
+                                        checked={paginated.length > 0 && selectedIds.length === paginated.length}
+                                        onChange={(e) => handleSelectAll(e.target.checked)}
+                                    />
+                                </th>
+                                <th>SKU</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Price</th>
+                                <th>Unit</th>
+                                <th>Qty</th>
+                                <th>Added On</th>
+                                <th style={{ textAlign: 'center' }}>Action</th>
+                            </tr>
+                        </thead>
                     <tbody>
                         {/* Loading skeletons */}
                         {loading && Array.from({ length: 6 }).map((_, i) => (
@@ -303,24 +308,23 @@ const Products = () => {
                                 <td>
                                     <input 
                                         type="checkbox" 
-                                        className="custom-checkbox" 
+                                        className="ss-checkbox" 
                                         checked={selectedIds.includes(item.id)}
                                         onChange={(e) => handleSelectItem(item.id, e.target.checked)}
                                     />
                                 </td>
                                 <td>
-                                    <span className="sku-chip">{item.sku || '—'}</span>
+                                    <span className="ss-code-badge">{item.sku || '—'}</span>
                                 </td>
                                 <td>
-                                    <div className="product-name-cell">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                         {/* Show real product image if available, else initials avatar */}
                                         {item.images && item.images.split(',')[0]?.trim() ? (
                                             <img
                                                 src={item.images.split(',')[0].trim()}
                                                 alt={item.name}
-                                                className="product-thumb"
+                                                style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
                                                 onError={(e) => {
-                                                    // Graceful fallback: hide broken image, show sibling avatar
                                                     e.target.style.display = 'none';
                                                     e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
                                                 }}
@@ -328,51 +332,52 @@ const Products = () => {
                                         ) : null}
                                         {/* Initials avatar — shown when no image or image fails */}
                                         <div
-                                            className="product-avatar"
                                             style={{
+                                                width: '28px', height: '28px', borderRadius: '4px',
                                                 background: getAvatarColor(item.name),
-                                                display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex'
+                                                display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex',
+                                                alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px', fontWeight: '600'
                                             }}
                                         >
                                             {getInitials(item.name)}
                                         </div>
                                         <div>
-                                            <span className="product-name-text">{item.name}</span>
-                                            {item._isMock && <span className="demo-tag">demo</span>}
+                                            <span className="ss-item-name">{item.name}</span>
+                                            {item._isMock && <span style={{ marginLeft: '5px', fontSize: '10px', color: '#999', fontStyle: 'italic' }}>demo</span>}
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <span
-                                        className="category-badge"
-                                        style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category) }}
+                                        className="ss-status-badge ss-status-active"
+                                        style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category), borderColor: 'transparent' }}
                                     >
                                         {item.category || '—'}
                                     </span>
                                 </td>
                                 <td>{item.brand || '—'}</td>
-                                <td className="price-cell">{formatPrice(item.price)}</td>
+                                <td style={{ fontWeight: '600' }}>{formatPrice(item.price)}</td>
                                 <td>{item.unit || 'Pc'}</td>
                                 <td>
-                                    <span className={`qty-badge ${getQtyBadge(item.quantity)}`}>
+                                    <span className={`ss-status-badge ${item.quantity <= 0 ? 'ss-status-inactive' : item.quantity < 50 ? 'ss-status-pending' : 'ss-status-active'}`}>
                                         {item.quantity ?? 0}
                                     </span>
                                 </td>
-                                <td className="date-cell">{formatDate(item.createdAt)}</td>
+                                <td style={{ color: '#5b6670', fontSize: '13px' }}>{formatDate(item.createdAt)}</td>
                                 <td>
-                                    <div className="action-buttons">
+                                    <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
                                         <button 
-                                            className="action-btn view-btn" 
+                                            className="ss-action-btn view" 
                                             title="View"
                                             onClick={() => { setViewProduct(item); setActiveImgIndex(0); }}
                                         >
                                             <Eye size={15} />
                                         </button>
-                                        <Link to={`/edit-product/${item.id}`} className="action-btn edit-btn" title="Edit">
+                                        <Link to={`/edit-product/${item.id}`} className="ss-action-btn edit" title="Edit">
                                             <Pencil size={15} />
                                         </Link>
                                         <button
-                                            className="action-btn delete-btn"
+                                            className="ss-action-btn delete"
                                             title="Delete"
                                             onClick={() => handleDelete(item.id)}
                                         >
@@ -389,7 +394,7 @@ const Products = () => {
                                 <td colSpan="10">
                                     <div className="empty-state">
                                         <Package size={48} strokeWidth={1} />
-                                        <p>{searchTerm ? 'No products match your search.' : 'No product Avalable tehre'}</p>
+                                        <p>{searchTerm ? 'No products match your search.' : 'No products available.'}</p>
                                         {!searchTerm && (
                                             <Link to="/create-product" className="btn-orange text-decoration-none" style={{ fontSize: '0.85rem', padding: '8px 18px' }}>
                                                 <PlusCircle size={16} /> Add Product
@@ -401,14 +406,14 @@ const Products = () => {
                         )}
                     </tbody>
                 </table>
+                </div>
 
                 {/* Pagination */}
                 {!loading && filtered.length > 0 && (
-                    <div className="pagination-row">
-                        <div className="rows-per-page">
+                    <div className="ss-pagination-row">
+                        <div className="ss-page-size">
                             Row Per Page&nbsp;
                             <select
-                                className="entries-select"
                                 value={rowsPerPage}
                                 onChange={(e) => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1); }}
                             >
@@ -416,8 +421,8 @@ const Products = () => {
                             </select>
                             &nbsp;| Showing {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, filtered.length)} of {filtered.length}
                         </div>
-                        <div className="pagination-controls">
-                            <button className="page-btn bg-light" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
+                        <div className="ss-page-controls">
+                            <button className="ss-page-btn" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
                             {Array.from({ length: totalPages }, (_, i) => i + 1)
                                 .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
                                 .reduce((acc, p, i, arr) => {
@@ -427,11 +432,11 @@ const Products = () => {
                                 }, [])
                                 .map((p, i) =>
                                     p === '...'
-                                        ? <span key={`ellipsis-${i}`} className="page-ellipsis">…</span>
-                                        : <button key={p} className={`page-btn ${p === currentPage ? 'active' : 'bg-light'}`} onClick={() => goToPage(p)}>{p}</button>
+                                        ? <span key={`ellipsis-${i}`} style={{ color: '#adb5bd', margin: '0 5px' }}>…</span>
+                                        : <button key={p} className={`ss-page-btn ${p === currentPage ? 'active' : ''}`} onClick={() => goToPage(p)}>{p}</button>
                                 )
                             }
-                            <button className="page-btn bg-light" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>&gt;</button>
+                            <button className="ss-page-btn" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>&gt;</button>
                         </div>
                     </div>
                 )}

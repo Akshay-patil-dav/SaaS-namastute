@@ -156,61 +156,67 @@
 
 /* Controls */
 .ss-table-controls {
-  padding: 20px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #eaedf0;
-  background: #fafbfd;
+  border-bottom: 1px solid #f1f1f1;
+  background: #fff;
+  gap: 15px;
 }
 
 .ss-search-wrap {
   position: relative;
-  width: 300px;
+  flex: 1;
+  max-width: 600px;
 }
 
 .ss-search-wrap svg {
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: #adb5bd;
 }
 
 .ss-search-input {
   width: 100%;
-  padding: 10px 12px 10px 40px;
-  border: 1px solid #e2e8f0;
+  padding: 10px 12px 10px 42px;
+  border: 1px solid #e9ecef;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   outline: none;
   transition: all 0.2s;
+  background-color: #fff;
+  color: #495057;
 }
 
 .ss-search-input:focus {
   border-color: #ff9b29;
-  box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.05);
 }
 
 .ss-filters-wrap {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .ss-filter-select {
-  padding: 8px 36px 8px 16px;
-  border: 1px solid #e2e8f0;
+  padding: 10px 36px 10px 16px;
+  border: 1px solid #e9ecef;
   border-radius: 8px;
-  font-size: 13px;
-  color: #475569;
+  font-size: 14px;
+  color: #495057;
   background-color: white;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23adb5bd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 14px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 400;
+  min-width: 140px;
   transition: all 0.2s;
 }
 
@@ -226,29 +232,30 @@
 .ss-table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
 }
 
 .ss-table th {
   text-align: left;
   padding: 16px 20px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #475569;
-  background: #f8fafc;
-  border-bottom: 1px solid #eaedf0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1b2850;
+  background: #f8f9fa;
+  border-bottom: 1px solid #f1f1f1;
   white-space: nowrap;
 }
 
 .ss-table td {
   padding: 16px 20px;
-  font-size: 13px;
-  color: #64748b;
-  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  color: #5b6670;
+  border-bottom: 1px solid #f1f1f1;
   vertical-align: middle;
 }
 
 .ss-table tbody tr:hover {
-  background-color: #f8fafc;
+  background-color: #fdfdfd;
 }
 
 .ss-checkbox {
@@ -258,6 +265,10 @@
   border-radius: 4px;
   cursor: pointer;
   accent-color: #ff9b29;
+}
+
+.row-selected {
+  background-color: #fff9f2 !important;
 }
 
 .ss-item-name {
@@ -308,6 +319,39 @@
   color: white;
 }
 
+.ss-status-pending {
+  background: #ff9b29;
+  color: white;
+}
+
+.ss-status-paid {
+  background: #28c76f15;
+  color: #28c76f;
+  border: 1px solid #28c76f30;
+}
+
+.ss-status-unpaid {
+  background: #ea545515;
+  color: #ea5455;
+  border: 1px solid #ea545530;
+}
+
+.ss-status-overdue {
+  background: #7367f015;
+  color: #7367f0;
+  border: 1px solid #7367f030;
+}
+
+.ss-status-completed {
+  background: #28c76f;
+  color: white;
+}
+
+.ss-status-cancelled {
+  background: #ea5455;
+  color: white;
+}
+
 .ss-description-cell {
   max-width: 250px;
   overflow: hidden;
@@ -350,17 +394,29 @@
   align-items: center;
   justify-content: center;
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  color: #94a3b8;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  color: #adb5bd;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .ss-action-btn:hover {
-  background: #f8fafc;
+  background: #f8f9fa;
   color: #ff9b29;
   border-color: #ff9b29;
+}
+
+.ss-action-btn.view:hover {
+  background: #f0fdf4;
+  color: #22c55e;
+  border-color: #22c55e;
+}
+
+.ss-action-btn.edit:hover {
+  background: #eff6ff;
+  color: #3b82f6;
+  border-color: #3b82f6;
 }
 
 .ss-action-btn.delete:hover {
@@ -375,36 +431,37 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  color: #94a3b8;
-  font-size: 13px;
-  background: #fafbfd;
-  border-top: 1px solid #eaedf0;
+  color: #5b6670;
+  font-size: 14px;
+  background: #fff;
+  border-top: 1px solid #f1f1f1;
 }
 
 .ss-page-size {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .ss-page-size select {
-  padding: 6px 24px 6px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 13px;
+  padding: 8px 30px 8px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
   outline: none;
   background-color: white;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23adb5bd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 10px center;
   background-size: 12px;
+  min-width: 70px;
 }
 
 .ss-page-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .ss-page-btn {
@@ -413,20 +470,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
   background: white;
-  color: #64748b;
+  color: #5b6670;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .ss-page-btn:hover:not(:disabled) {
-  background: #f8fafc;
+  background: #f8f9fa;
   color: #ff9b29;
-  border-color: #ff9b29;
 }
 
 .ss-page-btn.active {

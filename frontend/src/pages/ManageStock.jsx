@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import './manage-stock.css';
+import './inventory-pages-custom.css';
 import AddStockModal from '../components/AddStockModal';
 import ViewStockModal from '../components/ViewStockModal';
 import EditStockModal from '../components/EditStockModal';
@@ -97,17 +98,16 @@ export default function ManageStock() {
     return (
         <div className="manage-stock-container">
             {/* Page Header */}
-            <div className="page-header-flex">
-                <div className="page-title-area">
-                    <h5>Manage Stock</h5>
-                    <p className="page-subtitle">Manage your stock</p>
+            <div className="ss-header-row">
+                <div className="ss-page-title-area">
+                    <h2 className="ss-page-title">Manage Stock</h2>
+                    <p className="ss-page-subtitle">Manage your stock</p>
                 </div>
-                <div className="header-action-buttons">
-                    <button className="action-icon-btn btn-pdf" title="Export PDF"><FileText size={16} /></button>
-                    <button className="action-icon-btn btn-excel" title="Export Excel"><Download size={16} /></button>
-                    <button className="action-icon-btn" title="Refresh"><RotateCcw size={16} /></button>
-                    <button className="action-icon-btn" title="Collapse"><ChevronUp size={16} /></button>
-                    <button className="btn-add-stock" onClick={() => setIsModalOpen(true)}>
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="Export PDF"><FileText size={16} /></button>
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Export Excel"><Download size={16} /></button>
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchStocks}><RotateCcw size={16} /></button>
+                    <button className="ss-btn-orange" onClick={() => setIsModalOpen(true)}>
                         <Plus size={16} />
                         Add Stock
                     </button>
@@ -115,31 +115,31 @@ export default function ManageStock() {
             </div>
 
             {/* Main Content Area */}
-            <div className="stock-card">
+            <div className="ss-main-panel">
                 {/* Filters */}
-                <div className="filter-bar">
-                    <div className="search-wrapper">
-                        <Search className="search-icon" size={16} />
+                <div className="ss-table-controls">
+                    <div className="ss-search-wrap">
+                        <Search size={16} />
                         <input 
                             type="text" 
-                            className="search-input" 
+                            className="ss-search-input" 
                             placeholder="Search" 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="filter-dropdowns">
-                        <select className="filter-select">
+                    <div className="ss-filters-wrap">
+                        <select className="ss-filter-select">
                             <option>Warehouse</option>
                             <option>Lavish Warehouse</option>
                             <option>Quaint Warehouse</option>
                         </select>
-                        <select className="filter-select">
+                        <select className="ss-filter-select">
                             <option>Store</option>
                             <option>Electro Mart</option>
                             <option>Quantum Gadgets</option>
                         </select>
-                        <select className="filter-select">
+                        <select className="ss-filter-select">
                             <option>Product</option>
                             <option>Lenovo IdeaPad 3</option>
                             <option>Beats Pro</option>
@@ -148,13 +148,14 @@ export default function ManageStock() {
                 </div>
 
                 {/* Table Section */}
-                <div className="stock-table-wrapper">
-                    <table className="stock-table">
+                <div className="ss-table-wrapper">
+                    <table className="ss-table">
                         <thead>
                             <tr>
-                                <th className="checkbox-col">
+                                <th className="checkbox-col" style={{ width: '40px' }}>
                                     <input 
                                         type="checkbox" 
+                                        className="ss-checkbox"
                                         checked={stocks.length > 0 && selectedRows.length === stocks.length}
                                         onChange={toggleAll}
                                     />
@@ -165,7 +166,7 @@ export default function ManageStock() {
                                 <th>Date</th>
                                 <th>Person</th>
                                 <th>Qty</th>
-                                <th>Action</th>
+                                <th style={{ textAlign: 'center' }}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -175,26 +176,29 @@ export default function ManageStock() {
                                         <td>
                                             <input 
                                                 type="checkbox" 
+                                                className="ss-checkbox"
                                                 checked={selectedRows.includes(item.id)}
                                                 onChange={() => toggleRow(item.id)}
                                             />
                                         </td>
-                                        <td>{item.warehouse}</td>
+                                        <td className="ss-item-name">{item.warehouse}</td>
                                         <td>{item.store}</td>
                                         <td>
-                                            <div className="product-cell">
-                                                <img src={item.productImg || 'https://via.placeholder.com/40'} alt={item.productName} className="product-img" />
-                                                <span>{item.productName}</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <div className="ss-table-img-wrapper">
+                                                    <img src={item.productImg || 'https://via.placeholder.com/40'} alt={item.productName} className="ss-table-img" />
+                                                </div>
+                                                <span className="ss-item-name">{item.productName}</span>
                                             </div>
                                         </td>
                                         <td>{item.date}</td>
                                         <td>{item.responsiblePerson}</td>
                                         <td>{item.quantity}</td>
                                         <td>
-                                            <div className="action-btns">
-                                                <button className="action-btn btn-view" onClick={() => handleView(item)} title="View Detail"><Eye size={14} /></button>
-                                                <button className="action-btn btn-edit" onClick={() => handleEdit(item)} title="Edit Entry"><Edit size={14} /></button>
-                                                <button className="action-btn btn-delete" onClick={() => handleDeleteClick(item)} title="Delete Entry"><Trash2 size={14} /></button>
+                                            <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                                <button className="ss-action-btn view" onClick={() => handleView(item)} title="View Detail"><Eye size={14} /></button>
+                                                <button className="ss-action-btn edit" onClick={() => handleEdit(item)} title="Edit Entry"><Edit size={14} /></button>
+                                                <button className="ss-action-btn delete" onClick={() => handleDeleteClick(item)} title="Delete Entry"><Trash2 size={14} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -211,20 +215,20 @@ export default function ManageStock() {
                 </div>
 
                 {/* Pagination */}
-                <div className="pagination-wrap">
-                    <div className="entries-info">
+                <div className="ss-pagination-row">
+                    <div className="ss-page-size">
                         <span>Row Per Page</span>
-                        <select className="filter-select" style={{ minWidth: '70px', padding: '5px 25px 5px 10px' }}>
+                        <select>
                             <option>10</option>
                             <option>25</option>
                             <option>50</option>
                         </select>
                         <span>Entries</span>
                     </div>
-                    <div className="pagination-nav">
-                        <button className="page-btn" disabled><ChevronLeft size={16} /></button>
-                        <button className="page-btn active">1</button>
-                        <button className="page-btn" disabled><ChevronRight size={16} /></button>
+                    <div className="ss-page-controls">
+                        <button className="ss-page-btn" disabled><ChevronLeft size={16} /></button>
+                        <button className="ss-page-btn active">1</button>
+                        <button className="ss-page-btn" disabled><ChevronRight size={16} /></button>
                     </div>
                 </div>
             </div>
@@ -232,7 +236,7 @@ export default function ManageStock() {
             {/* Footer */}
             <footer className="manage-stock-footer">
                 <div className="footer-copyright">
-                    2014 - 2026 © DreamsPOS. All Right Reserved
+                    2014 - 2026 © DreamsPOS. All Rights Reserved
                 </div>
                 <div className="footer-designer">
                     Designed & Developed by <span>Dreams</span>

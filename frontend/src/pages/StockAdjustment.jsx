@@ -13,6 +13,7 @@ import {
     FileSearch
 } from 'lucide-react';
 import './stock-adjustment.css';
+import './inventory-pages-custom.css';
 
 const initialAdjustmentData = [
     { id: 1, warehouse: 'Lavish Warehouse', store: 'Electro Mart', product: 'Lenovo IdeaPad 3', date: '24 Dec 2024', person: 'James Kirwin', qty: 100, productImg: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James' },
@@ -167,17 +168,16 @@ export default function StockAdjustment() {
     return (
         <div className="stock-adjustment-container">
             {/* Page Header */}
-            <div className="page-header-flex">
-                <div className="page-title-area">
-                    <h5>Stock Adjustment</h5>
-                    <p className="page-subtitle">Manage your stock adjustment</p>
+            <div className="ss-header-row">
+                <div className="ss-page-title-area">
+                    <h2 className="ss-page-title">Stock Adjustment</h2>
+                    <p className="ss-page-subtitle">Manage your stock adjustment</p>
                 </div>
-                <div className="header-action-buttons">
-                    <button className="action-icon-btn btn-pdf" title="Export PDF"><FileText size={16} /></button>
-                    <button className="action-icon-btn btn-excel" title="Export Excel"><Download size={16} /></button>
-                    <button className="action-icon-btn" title="Refresh"><RotateCcw size={16} /></button>
-                    <button className="action-icon-btn" title="Collapse"><ChevronUp size={16} /></button>
-                    <button className="btn-add-adjustment" onClick={handleOpenAddModal}>
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="Export PDF"><FileText size={16} /></button>
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Export Excel"><Download size={16} /></button>
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchStocks}><RotateCcw size={16} /></button>
+                    <button className="ss-btn-orange" onClick={handleOpenAddModal}>
                         <Plus size={16} />
                         Add Adjustment
                     </button>
@@ -185,26 +185,26 @@ export default function StockAdjustment() {
             </div>
 
             {/* Main Content Area */}
-            <div className="adjustment-card">
+            <div className="ss-main-panel">
                 {/* Filters */}
-                <div className="filter-bar">
-                    <div className="search-wrapper">
-                        <Search className="search-icon" size={16} />
+                <div className="ss-table-controls">
+                    <div className="ss-search-wrap">
+                        <Search size={16} />
                         <input 
                             type="text" 
-                            className="search-input" 
+                            className="ss-search-input" 
                             placeholder="Search" 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="filter-dropdowns">
-                        <select className="filter-select">
+                    <div className="ss-filters-wrap">
+                        <select className="ss-filter-select">
                             <option>Warehouse</option>
                             <option>Lavish Warehouse</option>
                             <option>Quaint Warehouse</option>
                         </select>
-                        <select className="filter-select" style={{ minWidth: '160px' }}>
+                        <select className="ss-filter-select">
                             <option>Sort By : Last 7 Days</option>
                             <option>Last 30 Days</option>
                             <option>This Month</option>
@@ -213,13 +213,14 @@ export default function StockAdjustment() {
                 </div>
 
                 {/* Table Section */}
-                <div className="adjustment-table-wrapper">
-                    <table className="adjustment-table">
+                <div className="ss-table-wrapper">
+                    <table className="ss-table">
                         <thead>
                             <tr>
-                                <th className="checkbox-col">
+                                <th className="checkbox-col" style={{ width: '40px' }}>
                                     <input 
                                         type="checkbox" 
+                                        className="ss-checkbox"
                                         checked={selectedRows.length === data.length && data.length > 0}
                                         onChange={toggleAll}
                                     />
@@ -230,7 +231,7 @@ export default function StockAdjustment() {
                                 <th>Date</th>
                                 <th>Person</th>
                                 <th>Qty</th>
-                                <th>Action</th>
+                                <th style={{ textAlign: 'center' }}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -246,31 +247,34 @@ export default function StockAdjustment() {
                                         <td>
                                             <input 
                                                 type="checkbox" 
+                                                className="ss-checkbox"
                                                 checked={selectedRows.includes(item.id)}
                                                 onChange={() => toggleRow(item.id)}
                                             />
                                         </td>
-                                        <td>{item.warehouse}</td>
+                                        <td className="ss-item-name">{item.warehouse}</td>
                                         <td>{item.store}</td>
                                         <td>
-                                            <div className="product-cell">
-                                                <img src={item.productImg} alt={item.product} className="product-img" />
-                                                <span>{item.product}</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <div className="ss-table-img-wrapper">
+                                                    <img src={item.productImg} alt={item.product} className="ss-table-img" />
+                                                </div>
+                                                <span className="ss-item-name">{item.product}</span>
                                             </div>
                                         </td>
                                         <td>{item.date}</td>
                                         <td>
-                                            <div className="person-cell">
-                                                <img src={item.personImg} alt={item.person} className="person-img" />
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <img src={item.personImg} alt={item.person} style={{ width: '28px', height: '28px', borderRadius: '50%' }} />
                                                 <span>{item.person}</span>
                                             </div>
                                         </td>
                                         <td>{item.qty}</td>
                                         <td>
-                                            <div className="action-btns">
-                                                <button className="action-btn btn-view" onClick={() => handleOpenViewModal(item)}><FileSearch size={14} /></button>
-                                                <button className="action-btn btn-edit" onClick={() => handleOpenEditModal(item)}><Edit size={14} /></button>
-                                                <button className="action-btn btn-delete" onClick={() => handleDeleteClick(item)}><Trash2 size={14} /></button>
+                                            <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                                <button className="ss-action-btn view" onClick={() => handleOpenViewModal(item)}><FileSearch size={14} /></button>
+                                                <button className="ss-action-btn edit" onClick={() => handleOpenEditModal(item)}><Edit size={14} /></button>
+                                                <button className="ss-action-btn delete" onClick={() => handleDeleteClick(item)}><Trash2 size={14} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -287,20 +291,20 @@ export default function StockAdjustment() {
                 </div>
 
                 {/* Pagination */}
-                <div className="pagination-wrap">
-                    <div className="entries-info">
+                <div className="ss-pagination-row">
+                    <div className="ss-page-size">
                         <span>Row Per Page</span>
-                        <select className="filter-select" style={{ minWidth: '70px', padding: '5px 25px 5px 10px' }}>
+                        <select>
                             <option>10</option>
                             <option>25</option>
                             <option>50</option>
                         </select>
                         <span>Entries</span>
                     </div>
-                    <div className="pagination-nav">
-                        <button className="page-btn" disabled><ChevronLeft size={16} /></button>
-                        <button className="page-btn active">1</button>
-                        <button className="page-btn" disabled><ChevronRight size={16} /></button>
+                    <div className="ss-page-controls">
+                        <button className="ss-page-btn" disabled><ChevronLeft size={16} /></button>
+                        <button className="ss-page-btn active">1</button>
+                        <button className="ss-page-btn" disabled><ChevronRight size={16} /></button>
                     </div>
                 </div>
             </div>

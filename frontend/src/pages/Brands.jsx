@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Products.css';
+import './inventory-pages-custom.css';
 import { 
     FileText, 
     FileSpreadsheet, 
@@ -105,76 +106,77 @@ const Brands = () => {
     return (
         <div className="product-page-container">
             {/* Header Section */}
-            <div className="product-page-header">
-                <div className="product-page-title">
-                    <h4>Brands</h4>
-                    <p>Manage your brands</p>
+            <div className="ss-header-row">
+                <div className="ss-page-title-area">
+                    <h2 className="ss-page-title">Brands</h2>
+                    <p className="ss-page-subtitle">Manage your brands</p>
                 </div>
                 
-                <div className="page-actions">
-                    <button className="btn-icon-action" title="PDF">
-                        <FileText size={18} className="icon-red" />
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF">
+                        <FileText size={16} />
                     </button>
-                    <button className="btn-icon-action" title="Excel">
-                        <FileSpreadsheet size={18} className="icon-green" />
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel">
+                        <FileSpreadsheet size={16} />
                     </button>
-                    <button className="btn-icon-action" title="Refresh" onClick={fetchBrands}>
-                        <RefreshCw size={18} />
-                    </button>
-                    <button className="btn-icon-action" title="Collapse">
-                        <ChevronUp size={18} />
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchBrands}>
+                        <RefreshCw size={16} />
                     </button>
                     {selectedIds.length > 0 && (
-                        <button className="btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ea5455', color: '#ea5455', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s' }}>
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <button className="btn-orange" onClick={() => { setEditingBrand(null); setIsAddModalOpen(true); }}>
+                    <button className="ss-btn-orange" onClick={() => { setEditingBrand(null); setIsAddModalOpen(true); }}>
                         <PlusCircle size={18} /> Add Brand
                     </button>
                 </div>
             </div>
 
             {/* Table Card Area */}
-            <div className="product-table-card">
+            <div className="ss-main-panel">
                 
                 {/* Filter Row */}
-                <div className="table-filter-row justify-content-end">
-                    <div className="search-box me-auto" style={{ maxWidth: '400px' }}>
+                <div className="ss-table-controls">
+                    <div className="ss-search-wrap">
                         <Search size={18} />
                         <input 
                             type="text" 
+                            className="ss-search-input"
                             placeholder="Search" 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="filter-dropdowns">
-                        <div className="filter-select">
-                            Status <ChevronDown size={16} />
-                        </div>
+                    <div className="ss-filters-wrap">
+                        <select className="ss-filter-select">
+                            <option value="">Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                     </div>
                 </div>
 
                 {/* Data Table */}
-                <table className="custom-table" style={{ minWidth: '700px' }}>
-                    <thead>
-                        <tr>
-                            <th style={{ width: '40px' }}>
-                                <input 
-                                    type="checkbox" 
-                                    className="custom-checkbox" 
-                                    checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
-                                    onChange={(e) => handleSelectAll(e.target.checked)}
-                                />
-                            </th>
-                            <th>Brand</th>
-                            <th>Logo</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                            <th style={{ textAlign: 'center' }}>Action</th>
-                        </tr>
-                    </thead>
+                <div className="ss-table-wrapper">
+                    <table className="ss-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '40px' }}>
+                                    <input 
+                                        type="checkbox" 
+                                        className="ss-checkbox" 
+                                        checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
+                                        onChange={(e) => handleSelectAll(e.target.checked)}
+                                    />
+                                </th>
+                                <th>Brand</th>
+                                <th>Logo</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th style={{ textAlign: 'center' }}>Action</th>
+                            </tr>
+                        </thead>
                     <tbody>
                         {filteredData.length > 0 ? (
                             filteredData.map((item) => (
@@ -182,29 +184,29 @@ const Brands = () => {
                                 <td>
                                     <input 
                                         type="checkbox" 
-                                        className="custom-checkbox" 
+                                        className="ss-checkbox" 
                                         checked={selectedIds.includes(item.id)}
                                         onChange={(e) => handleSelectItem(item.id, e.target.checked)}
                                     />
                                 </td>
-                                <td>{item.name}</td>
+                                <td className="ss-item-name">{item.name}</td>
                                 <td>
-                                    <div className="product-name-cell p-0 py-1">
-                                        <img src={item.img || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random`} alt={item.name} className="product-img m-0" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                                    <div className="ss-table-img-wrapper">
+                                        <img src={item.img || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random`} alt={item.name} className="ss-table-img" />
                                     </div>
                                 </td>
                                 <td>{item.desc}</td>
                                 <td>
-                                    <span className={item.status ? "badge-active" : "badge-inactive"}>
+                                    <span className={item.status ? "ss-status-badge ss-status-active" : "ss-status-badge ss-status-inactive"}>
                                         {item.status ? 'Active' : 'Inactive'}
                                     </span>
                                 </td>
                                 <td>
-                                    <div className="action-buttons justify-content-center">
-                                        <button className="action-btn" title="Edit" onClick={() => { setEditingBrand(item); setIsAddModalOpen(true); }}>
+                                    <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                        <button className="ss-action-btn edit" title="Edit" onClick={() => { setEditingBrand(item); setIsAddModalOpen(true); }}>
                                             <Pencil size={16} />
                                         </button>
-                                        <button className="action-btn" title="Delete" onClick={() => handleDelete(item.id)}>
+                                        <button className="ss-action-btn delete" title="Delete" onClick={() => handleDelete(item.id)}>
                                             <Trash2 size={16} />
                                         </button>
                                     </div>
@@ -221,25 +223,25 @@ const Brands = () => {
                     </tbody>
                 </table>
 
-                {/* Pagination */}
-                <div className="pagination-row">
-                    <div>
+                {/* Pagination Section */}
+                <div className="ss-pagination-row">
+                    <div className="ss-page-size">
                         Row Per Page 
-                        <select className="entries-select" defaultValue="10">
+                        <select defaultValue="10">
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
                         </select> 
                         Entries
                     </div>
-                    <div className="pagination-controls">
-                        <button className="page-btn bg-light">&lt;</button>
-                        <button className="page-btn active">1</button>
-                        <button className="page-btn bg-light">&gt;</button>
+                    <div className="ss-page-controls">
+                        <button className="ss-page-btn">&lt;</button>
+                        <button className="ss-page-btn active">1</button>
+                        <button className="ss-page-btn">&gt;</button>
                     </div>
                 </div>
-
             </div>
+        </div>
 
             <AddBrandModal 
                 isOpen={isAddModalOpen} 

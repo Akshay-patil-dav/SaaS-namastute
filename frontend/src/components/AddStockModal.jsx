@@ -66,7 +66,7 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
                 id: product.id, 
                 name: product.name, 
                 sku: product.sku, 
-                category: product.categoryName || 'General', 
+                category: product.category || 'General', 
                 qty: 1,
                 img: product.images ? product.images.split(',')[0].trim() : 'https://api.dicebear.com/7.x/shapes/svg?seed=' + product.name
             }]);
@@ -79,6 +79,10 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
         setSelectedProducts(prev => prev.map(p => 
             p.id === id ? { ...p, qty: Math.max(1, p.qty + delta) } : p
         ));
+    };
+
+    const removeProduct = (id) => {
+        setSelectedProducts(prev => prev.filter(p => p.id !== id));
     };
 
     const handleSave = async () => {

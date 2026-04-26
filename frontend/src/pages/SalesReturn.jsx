@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import './online-orders.css';
+import './inventory-pages-custom.css';
 import AddSalesReturnModal  from '../components/AddSalesReturnModal';
 import EditSalesReturnModal from '../components/EditSalesReturnModal';
 import ViewSalesModal       from '../components/ViewSalesModal';
@@ -151,50 +152,49 @@ export default function SalesReturn() {
         <div className="online-orders-container">
 
             {/* Header */}
-            <div className="oo-page-header">
-                <div className="oo-title-area">
-                    <h5>Sales Return</h5>
-                    <p className="oo-subtitle">Manage your sales returns</p>
+            <div className="ss-header-row">
+                <div className="ss-page-title-area">
+                    <h2 className="ss-page-title">Sales Return</h2>
+                    <p className="ss-page-subtitle">Manage your sales returns</p>
                 </div>
-                <div className="oo-header-actions">
-                    <button className="oo-icon-btn pdf"   title="Print"     onClick={() => window.print()}><FileText size={15} /></button>
-                    <button className="oo-icon-btn excel" title="Export CSV" onClick={exportCSV}><Download size={15} /></button>
-                    <button className="oo-icon-btn"       title="Refresh"   onClick={fetchReturns}><RotateCcw size={15} /></button>
-                    <button className="oo-icon-btn"       title="Collapse"><ChevronUp size={15} /></button>
-                    <button className="oo-btn-add" onClick={() => setAddOpen(true)}>
-                        <Plus size={15} /> Add Sales Return
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="Print" onClick={() => window.print()}><FileText size={16} /></button>
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Export CSV" onClick={exportCSV}><Download size={16} /></button>
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchReturns}><RotateCcw size={16} /></button>
+                    <button className="ss-btn-orange" onClick={() => setAddOpen(true)}>
+                        <Plus size={16} /> Add Sales Return
                     </button>
                 </div>
             </div>
 
             {/* Card */}
-            <div className="oo-card">
+            <div className="ss-main-panel">
 
                 {/* Filter bar */}
-                <div className="oo-filter-bar">
-                    <div className="oo-search-wrap">
-                        <Search className="oo-search-icon" size={14} />
+                <div className="ss-table-controls">
+                    <div className="ss-search-wrap">
+                        <Search size={16} />
                         <input
                             type="text"
-                            className="oo-search-input"
+                            className="ss-search-input"
                             placeholder="Search customer, ref, status…"
                             value={searchTerm}
                             onChange={e => { setSearchTerm(e.target.value); resetPage(); }}
                         />
                     </div>
 
-                    <div className="oo-filter-controls">
-                        <select className="oo-select" value={filterCustomer} onChange={e => { setFilterCustomer(e.target.value); resetPage(); }}>
+                    <div className="ss-filters-wrap">
+                        <select className="ss-filter-select" value={filterCustomer} onChange={e => { setFilterCustomer(e.target.value); resetPage(); }}>
                             <option value="">All Customers</option>
                             {customers.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
 
-                        <select className="oo-select" value={filterStatus} onChange={e => { setFilterStatus(e.target.value); resetPage(); }}>
+                        <select className="ss-filter-select" value={filterStatus} onChange={e => { setFilterStatus(e.target.value); resetPage(); }}>
                             <option value="">All Statuses</option>
                             {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
 
-                        <select className="oo-select" value={filterPayment} onChange={e => { setFilterPayment(e.target.value); resetPage(); }}>
+                        <select className="ss-filter-select" value={filterPayment} onChange={e => { setFilterPayment(e.target.value); resetPage(); }}>
                             <option value="">All Payments</option>
                             {PAYMENTS.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
@@ -220,17 +220,18 @@ export default function SalesReturn() {
 
                 {/* Table */}
                 {!loading && !fetchError && (
-                    <div className="oo-table-wrap">
-                        <table className="oo-table">
+                    <div className="ss-table-wrapper">
+                        <table className="ss-table">
                             <thead>
                                 <tr>
-                                    <th className="oo-cb-col">
+                                    <th className="ss-cb-col" style={{ width: '40px' }}>
                                         <input type="checkbox"
+                                            className="ss-checkbox"
                                             checked={rows.length > 0 && selectedRows.length === rows.length}
                                             onChange={toggleAll}
                                         />
                                     </th>
-                                    <th>Product</th>
+                                    <th>Reference</th>
                                     <th>Date</th>
                                     <th>Customer</th>
                                     <th>Status</th>
@@ -243,60 +244,52 @@ export default function SalesReturn() {
                             </thead>
                             <tbody>
                                 {rows.length > 0 ? rows.map(item => (
-                                    <tr key={item.id} className={selectedRows.includes(item.id) ? 'oo-row-selected' : ''}>
+                                    <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
 
                                         <td>
                                             <input type="checkbox"
+                                                className="ss-checkbox"
                                                 checked={selectedRows.includes(item.id)}
                                                 onChange={() => toggleRow(item.id)}
                                             />
                                         </td>
 
-                                        <td>
-                                            <div className="oo-customer-cell">
-                                                <img className="oo-avatar" src={avatarSrc(item.customerName)} alt="" />
-                                                <div>
-                                                    <div className="oo-customer-name">{item.customerName || '—'}</div>
-                                                    <span className="oo-ref-badge">{item.referenceNo}</span>
-                                                </div>
-                                            </div>
-                                        </td>
+                                        <td className="ss-item-name">{item.referenceNo}</td>
 
                                         <td>{item.formattedDate || item.date || '—'}</td>
 
                                         <td>
-                                            <div className="oo-customer-cell">
-                                                <img className="oo-avatar" src={avatarSrc(item.customerName)} alt="" />
-                                                <span className="oo-customer-name">{item.customerName || '—'}</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <img src={avatarSrc(item.customerName)} alt="" style={{ width: '28px', height: '28px', borderRadius: '50%' }} />
+                                                <span className="ss-item-name">{item.customerName || '—'}</span>
                                             </div>
                                         </td>
 
                                         <td>
-                                            <span className={`oo-badge ${statusClass(item.status)}`}>
+                                            <span className={`ss-status-badge ${item.status === 'Received' ? 'ss-status-active' : item.status === 'Cancelled' ? 'ss-status-inactive' : 'ss-status-pending'}`}>
                                                 {item.status}
                                             </span>
                                         </td>
 
-                                        <td className="oo-money">{money(item.grandTotal)}</td>
+                                        <td style={{ fontWeight: '600' }}>{money(item.grandTotal)}</td>
                                         <td>{money(item.paidAmount)}</td>
 
-                                        <td className={parseFloat(item.dueAmount) > 0 ? 'oo-money-due-pos' : 'oo-money-due-zero'}>
+                                        <td style={{ color: parseFloat(item.dueAmount) > 0 ? '#ea5455' : '#28c76f', fontWeight: '500' }}>
                                             {money(item.dueAmount)}
                                         </td>
 
                                         <td>
-                                            <span className={`oo-pay-badge ${paymentClass(item.paymentStatus)}`}>
-                                                <span className="oo-dot" />
+                                            <span className={`ss-status-badge ${item.paymentStatus === 'Paid' ? 'ss-status-active' : item.paymentStatus === 'Overdue' ? 'ss-status-inactive' : 'ss-status-pending'}`}>
                                                 {item.paymentStatus}
                                             </span>
                                         </td>
 
                                         <td>
-                                            <div className="oo-action-btns">
-                                                <button className="oo-action-btn view"    title="View"    onClick={() => openView(item)}><Eye    size={14} /></button>
-                                                <button className="oo-action-btn invoice" title="Invoice" onClick={() => openInvoice(item)}><FileText size={14} /></button>
-                                                <button className="oo-action-btn edit"    title="Edit"    onClick={() => openEdit(item)}><Edit   size={14} /></button>
-                                                <button className="oo-action-btn delete"  title="Delete"  onClick={() => openDelete(item)}><Trash2 size={14} /></button>
+                                            <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                                <button className="ss-action-btn view"    title="View"    onClick={() => openView(item)}><Eye    size={14} /></button>
+                                                <button className="ss-action-btn edit"    style={{ background: '#f8f9fa', color: '#5b6670' }} title="Invoice" onClick={() => openInvoice(item)}><FileText size={14} /></button>
+                                                <button className="ss-action-btn edit"    title="Edit"    onClick={() => openEdit(item)}><Edit   size={14} /></button>
+                                                <button className="ss-action-btn delete"  title="Delete"  onClick={() => openDelete(item)}><Trash2 size={14} /></button>
                                             </div>
                                         </td>
 
@@ -322,34 +315,32 @@ export default function SalesReturn() {
 
                 {/* Pagination */}
                 {!loading && !fetchError && filtered.length > 0 && (
-                    <div className="oo-pagination-wrap">
-                        <div className="oo-entries-info">
+                    <div className="ss-pagination-row">
+                        <div className="ss-page-size">
                             <span>Rows per page</span>
                             <select
-                                className="oo-select"
-                                style={{ minWidth: '64px', height: '30px', fontSize: '12px' }}
                                 value={rowsPerPage}
                                 onChange={e => { setRowsPerPage(Number(e.target.value)); resetPage(); }}
                             >
                                 {ROWS_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
                             </select>
-                            <span>
+                            <span style={{ fontSize: '13px', color: '#5b6670', marginLeft: '10px' }}>
                                 {Math.min((page - 1) * rowsPerPage + 1, filtered.length)}–{Math.min(page * rowsPerPage, filtered.length)} of {filtered.length}
                             </span>
                         </div>
 
-                        <div className="oo-page-nav">
-                            <button className="oo-page-btn" disabled={page === 1} onClick={() => setCurrentPage(p => p - 1)}>
-                                <ChevronLeft size={14} />
+                        <div className="ss-page-controls">
+                            <button className="ss-page-btn" disabled={page === 1} onClick={() => setCurrentPage(p => p - 1)}>
+                                <ChevronLeft size={16} />
                             </button>
                             {pageList.map((p, i) =>
                                 p === '…'
-                                    ? <span key={`e${i}`} className="oo-page-btn" style={{ cursor: 'default' }}>…</span>
-                                    : <button key={p} className={`oo-page-btn ${p === page ? 'oo-page-btn-active' : ''}`}
+                                    ? <span key={`e${i}`} className="ss-page-btn" style={{ cursor: 'default' }}>…</span>
+                                    : <button key={p} className={`ss-page-btn ${p === page ? 'active' : ''}`}
                                               onClick={() => setCurrentPage(p)}>{p}</button>
                             )}
-                            <button className="oo-page-btn" disabled={page === totalPages} onClick={() => setCurrentPage(p => p + 1)}>
-                                <ChevronRight size={14} />
+                            <button className="ss-page-btn" disabled={page === totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+                                <ChevronRight size={16} />
                             </button>
                         </div>
                     </div>
