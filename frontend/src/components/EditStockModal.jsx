@@ -76,7 +76,7 @@ const EditStockModal = ({ isOpen, onClose, stock, onSuccess }) => {
             id: product.id,
             productName: product.name,
             productSku: product.sku,
-            productCategory: product.categoryName || 'General',
+            productCategory: product.category || 'General',
             productImg: product.images ? product.images.split(',')[0].trim() : 'https://api.dicebear.com/7.x/shapes/svg?seed=' + product.name
         });
         setSearchQuery('');

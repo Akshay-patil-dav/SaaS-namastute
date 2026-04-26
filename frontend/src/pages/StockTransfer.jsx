@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import './stock-transfer.css';
+import './inventory-pages-custom.css';
 import AddTransferModal from '../components/AddTransferModal';
 import ImportTransferModal from '../components/ImportTransferModal';
 import EditTransferModal from '../components/EditTransferModal';
@@ -193,50 +194,43 @@ export default function StockTransfer() {
     };
 
     const getStatusClass = (status) => {
-        if (!status) return 'status-badge status-pending';
+        if (!status) return 'ss-status-badge ss-status-pending';
         switch (status.toLowerCase()) {
-            case 'completed': return 'status-badge status-completed';
-            case 'pending': return 'status-badge status-pending';
-            case 'cancelled': return 'status-badge status-cancelled';
-            default: return 'status-badge status-pending';
+            case 'completed': return 'ss-status-badge ss-status-completed';
+            case 'pending': return 'ss-status-badge ss-status-pending';
+            case 'cancelled': return 'ss-status-badge ss-status-cancelled';
+            default: return 'ss-status-badge ss-status-pending';
         }
     };
 
     return (
         <div className="stock-transfer-container">
             {/* Page Header */}
-            <div className="page-header-flex">
-                <div className="page-title-area">
-                    <h5>Stock Transfer</h5>
-                    <p className="page-subtitle">Manage your stock transfers</p>
+            <div className="ss-header-row">
+                <div className="ss-page-title-area">
+                    <h2 className="ss-page-title">Stock Transfer</h2>
+                    <p className="ss-page-subtitle">Manage your stock transfers</p>
                 </div>
-                <div className="header-action-buttons">
-                    <button className="action-icon-btn btn-pdf" title="Export PDF" onClick={() => window.print()}>
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="Export PDF" onClick={() => window.print()}>
                         <FileText size={16} />
                     </button>
-                    <button className="action-icon-btn btn-excel" title="Export CSV" onClick={exportCSV}>
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Export CSV" onClick={exportCSV}>
                         <Download size={16} />
                     </button>
                     <button
-                        className={`action-icon-btn${isRefreshing ? ' spin' : ''}`}
+                        className={`ss-btn-icon-square${isRefreshing ? ' spin' : ''}`}
                         title="Refresh"
                         onClick={fetchTransfers}
                         disabled={isRefreshing}
                     >
                         <RotateCcw size={16} />
                     </button>
-                    <button
-                        className="action-icon-btn"
-                        title={isCollapsed ? 'Expand' : 'Collapse'}
-                        onClick={() => setIsCollapsed(c => !c)}
-                    >
-                        {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                    </button>
-                    <button className="btn-add-new" onClick={() => setIsAddModalOpen(true)}>
+                    <button className="ss-btn-orange" onClick={() => setIsAddModalOpen(true)}>
                         <Plus size={16} />
                         Add New
                     </button>
-                    <button className="btn-import" onClick={() => setIsImportModalOpen(true)}>
+                    <button className="ss-btn-orange" style={{ background: '#1b2850', boxShadow: 'none' }} onClick={() => setIsImportModalOpen(true)}>
                         <Upload size={16} />
                         Import Transfer
                     </button>
@@ -245,22 +239,22 @@ export default function StockTransfer() {
 
             {/* Main Content Area */}
             {!isCollapsed && (
-                <div className="transfer-card">
+                <div className="ss-main-panel">
                     {/* Filters */}
-                    <div className="filter-bar">
-                        <div className="search-wrapper">
-                            <Search className="search-icon" size={16} />
+                    <div className="ss-table-controls">
+                        <div className="ss-search-wrap">
+                            <Search size={16} />
                             <input 
                                 type="text" 
-                                className="search-input" 
+                                className="ss-search-input" 
                                 placeholder="Search by warehouse, ref no…" 
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <div className="filter-dropdowns">
+                        <div className="ss-filters-wrap">
                             <select
-                                className="filter-select"
+                                className="ss-filter-select"
                                 value={filterFrom}
                                 onChange={(e) => setFilterFrom(e.target.value)}
                             >
@@ -270,7 +264,7 @@ export default function StockTransfer() {
                                 ))}
                             </select>
                             <select
-                                className="filter-select"
+                                className="ss-filter-select"
                                 value={filterTo}
                                 onChange={(e) => setFilterTo(e.target.value)}
                             >
@@ -280,8 +274,7 @@ export default function StockTransfer() {
                                 ))}
                             </select>
                             <select
-                                className="filter-select"
-                                style={{ minWidth: '160px' }}
+                                className="ss-filter-select"
                                 value={sortDays}
                                 onChange={(e) => setSortDays(e.target.value)}
                             >
@@ -294,13 +287,14 @@ export default function StockTransfer() {
                     </div>
 
                     {/* Table Section */}
-                    <div className="transfer-table-wrapper">
-                        <table className="transfer-table">
+                    <div className="ss-table-wrapper">
+                        <table className="ss-table">
                             <thead>
                                 <tr>
-                                    <th className="checkbox-col">
+                                    <th className="checkbox-col" style={{ width: '40px' }}>
                                         <input 
                                             type="checkbox" 
+                                            className="ss-checkbox"
                                             checked={allPageSelected}
                                             onChange={toggleAll}
                                         />
@@ -312,7 +306,7 @@ export default function StockTransfer() {
                                     <th>Ref Number</th>
                                     <th>Status</th>
                                     <th>Date</th>
-                                    <th>Action</th>
+                                    <th style={{ textAlign: 'center' }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -322,15 +316,16 @@ export default function StockTransfer() {
                                             <td>
                                                 <input 
                                                     type="checkbox" 
+                                                    className="ss-checkbox"
                                                     checked={selectedRows.includes(item.id)}
                                                     onChange={() => toggleRow(item.id)}
                                                 />
                                             </td>
-                                            <td>{item.fromWarehouse || '—'}</td>
+                                            <td className="ss-item-name">{item.fromWarehouse || '—'}</td>
                                             <td>{item.toWarehouse || '—'}</td>
                                             <td>{item.noOfProducts ?? 0}</td>
                                             <td>{item.quantityTransferred ?? 0}</td>
-                                            <td><span className="ref-badge">{item.referenceNo || '—'}</span></td>
+                                            <td><span className="ss-code-badge">{item.referenceNo || '—'}</span></td>
                                             <td>
                                                 <span className={getStatusClass(item.status)}>
                                                     {item.status || 'Pending'}
@@ -338,23 +333,23 @@ export default function StockTransfer() {
                                             </td>
                                             <td>{item.formattedDate || item.date || '—'}</td>
                                             <td>
-                                                <div className="action-btns">
+                                                <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
                                                     <button
-                                                        className="action-btn btn-view"
+                                                        className="ss-action-btn view"
                                                         title="View"
                                                         onClick={() => handleEdit(item, true)}
                                                     >
                                                         <Eye size={14} />
                                                     </button>
                                                     <button
-                                                        className="action-btn btn-edit"
+                                                        className="ss-action-btn edit"
                                                         title="Edit"
                                                         onClick={() => handleEdit(item, false)}
                                                     >
                                                         <Edit size={14} />
                                                     </button>
                                                     <button
-                                                        className="action-btn btn-delete"
+                                                        className="ss-action-btn delete"
                                                         title="Delete"
                                                         onClick={() => openDeleteModal(item.id)}
                                                     >
@@ -376,12 +371,10 @@ export default function StockTransfer() {
                     </div>
 
                     {/* Pagination */}
-                    <div className="pagination-wrap">
-                        <div className="entries-info">
+                    <div className="ss-pagination-row">
+                        <div className="ss-page-size">
                             <span>Row Per Page</span>
                             <select
-                                className="filter-select"
-                                style={{ minWidth: '70px', padding: '5px 25px 5px 10px' }}
                                 value={rowsPerPage}
                                 onChange={(e) => setRowsPerPage(Number(e.target.value))}
                             >
@@ -390,12 +383,12 @@ export default function StockTransfer() {
                                 ))}
                             </select>
                             <span>
-                                {filteredData.length === 0 ? '0' : `${(safePage - 1) * rowsPerPage + 1}–${Math.min(safePage * rowsPerPage, filteredData.length)}`} of {filteredData.length} entries
+                                Entries
                             </span>
                         </div>
-                        <div className="pagination-nav">
+                        <div className="ss-page-controls">
                             <button
-                                className="page-btn"
+                                className="ss-page-btn"
                                 disabled={safePage <= 1}
                                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                             >
@@ -412,11 +405,11 @@ export default function StockTransfer() {
                                 }, [])
                                 .map((p, idx) =>
                                     p === '...' ? (
-                                        <span key={`ellipsis-${idx}`} className="page-btn" style={{ border: 'none', cursor: 'default' }}>…</span>
+                                        <span key={`ellipsis-${idx}`} className="ss-page-btn" style={{ border: 'none', cursor: 'default' }}>…</span>
                                     ) : (
                                         <button
                                             key={p}
-                                            className={`page-btn${safePage === p ? ' active' : ''}`}
+                                            className={`ss-page-btn${safePage === p ? ' active' : ''}`}
                                             onClick={() => setCurrentPage(p)}
                                         >
                                             {p}
@@ -425,7 +418,7 @@ export default function StockTransfer() {
                                 )
                             }
                             <button
-                                className="page-btn"
+                                className="ss-page-btn"
                                 disabled={safePage >= totalPages}
                                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                             >

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './Products.css';
+import './inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { 
@@ -148,31 +149,28 @@ const ExpiredProducts = () => {
             )}
 
             {/* Header Section */}
-            <div className="product-page-header">
-                <div className="product-page-title">
-                    <h4>Expired Products</h4>
-                    <p>
+            <div className="ss-header-row">
+                <div className="ss-page-title-area">
+                    <h2 className="ss-page-title">Expired Products</h2>
+                    <p className="ss-page-subtitle">
                         {loading ? 'Loading…' : (
                             apiOnline ? `${dbProducts.length} expired items found` : 'Backend API is offline'
                         )}
                     </p>
                 </div>
                 
-                <div className="page-actions">
-                    <button className="btn-icon-action" title="PDF">
-                        <FileText size={18} className="icon-red" />
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF">
+                        <FileText size={16} />
                     </button>
-                    <button className="btn-icon-action" title="Excel">
-                        <FileSpreadsheet size={18} className="icon-green" />
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel">
+                        <FileSpreadsheet size={16} />
                     </button>
-                    <button className="btn-icon-action" title="Refresh" onClick={fetchExpiredProducts}>
-                        <RefreshCw size={18} className={loading ? 'spin' : ''} />
-                    </button>
-                    <button className="btn-icon-action" title="Collapse">
-                        <ChevronUp size={18} />
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchExpiredProducts}>
+                        <RefreshCw size={16} className={loading ? 'spin' : ''} />
                     </button>
                     {selectedIds.length > 0 && (
-                        <button className="btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ea5455', color: '#ea5455', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s', textDecoration: 'none' }}>
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
@@ -188,145 +186,145 @@ const ExpiredProducts = () => {
             )}
 
             {/* Table Card Area */}
-            <div className="product-table-card">
+            <div className="ss-main-panel">
                 
                 {/* Filter Row */}
-                <div className="table-filter-row">
-                    <div className="search-box">
+                <div className="ss-table-controls">
+                    <div className="ss-search-wrap">
                         <Search size={18} />
                         <input 
                             type="text" 
+                            className="ss-search-input"
                             placeholder="Search by name or SKU…" 
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                         />
-                        {searchTerm && (
-                            <button className="search-clear" onClick={() => setSearchTerm('')}><X size={14} /></button>
-                        )}
                     </div>
-                    <div className="filter-dropdowns">
-                        <div className="filter-select">
-                            Product <ChevronDown size={16} />
-                        </div>
-                        <div className="filter-select">
-                            Sort By : Expired Date <ChevronDown size={16} />
-                        </div>
+                    <div className="ss-filters-wrap">
+                        <select className="ss-filter-select">
+                            <option>Product</option>
+                        </select>
+                        <select className="ss-filter-select">
+                            <option>Sort By : Expired Date</option>
+                        </select>
                     </div>
                 </div>
 
                 {/* Data Table */}
-                <table className="custom-table" style={{ minWidth: '800px' }}>
-                    <thead>
-                        <tr>
-                            <th style={{ width: '40px' }}>
-                                <input 
-                                    type="checkbox" 
-                                    className="custom-checkbox" 
-                                    checked={paginated.length > 0 && selectedIds.length === paginated.length}
-                                    onChange={(e) => handleSelectAll(e.target.checked)}
-                                />
-                            </th>
-                            <th>SKU</th>
-                            <th>Product</th>
-                            <th>Manufactured Date</th>
-                            <th className="text-danger">Expired Date</th>
-                            <th style={{ textAlign: 'center' }}>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading && Array.from({ length: 5 }).map((_, i) => (
-                            <tr key={`skel-${i}`} className="skeleton-row">
-                                <td><div className="skel skel-sm" /></td>
-                                <td><div className="skel skel-md" /></td>
-                                <td>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                        <div className="skel skel-circle" />
-                                        <div className="skel skel-lg" />
-                                    </div>
-                                </td>
-                                <td><div className="skel skel-md" /></td>
-                                <td><div className="skel skel-md" /></td>
-                                <td><div className="skel skel-md" /></td>
-                            </tr>
-                        ))}
-
-                        {!loading && paginated.length > 0 && paginated.map((item) => (
-                            <tr key={item.id}>
-                                <td>
+                <div className="ss-table-wrapper">
+                    <table className="ss-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '40px' }}>
                                     <input 
                                         type="checkbox" 
-                                        className="custom-checkbox" 
-                                        checked={selectedIds.includes(item.id)}
-                                        onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                        className="ss-checkbox" 
+                                        checked={paginated.length > 0 && selectedIds.length === paginated.length}
+                                        onChange={(e) => handleSelectAll(e.target.checked)}
                                     />
-                                </td>
-                                <td>
-                                    <span className="sku-chip">{item.sku || '—'}</span>
-                                </td>
-                                <td>
-                                    <div className="product-name-cell">
-                                        {item.images && item.images.split(',')[0]?.trim() ? (
-                                            <img
-                                                src={item.images.split(',')[0].trim()}
-                                                alt={item.name}
-                                                className="product-thumb"
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-                                                }}
-                                            />
-                                        ) : null}
-                                        <div
-                                            className="product-avatar"
-                                            style={{
-                                                background: getAvatarColor(item.name),
-                                                display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex'
-                                            }}
-                                        >
-                                            {getInitials(item.name)}
+                                </th>
+                                <th>SKU</th>
+                                <th>Product</th>
+                                <th>Manufactured Date</th>
+                                <th className="text-danger">Expired Date</th>
+                                <th style={{ textAlign: 'center' }}>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading && Array.from({ length: 5 }).map((_, i) => (
+                                <tr key={`skel-${i}`} className="skeleton-row">
+                                    <td><div className="skel skel-sm" /></td>
+                                    <td><div className="skel skel-md" /></td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <div className="skel skel-circle" />
+                                            <div className="skel skel-lg" />
                                         </div>
-                                        <span className="product-name-text">{item.name}</span>
-                                    </div>
-                                </td>
-                                <td className="date-cell">{formatDate(item.manufacturedDate)}</td>
-                                <td className="date-cell text-danger fw-bold">{formatDate(item.expiryDate)}</td>
-                                <td>
-                                    <div className="action-buttons justify-content-center">
-                                        <Link to={`/edit-product/${item.id}`} className="action-btn edit-btn" title="Edit">
-                                            <Pencil size={15} />
-                                        </Link>
-                                        <button 
-                                            className="action-btn delete-btn" 
-                                            title="Delete"
-                                            onClick={() => handleDelete(item.id)}
-                                        >
-                                            <Trash2 size={15} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                    </td>
+                                    <td><div className="skel skel-md" /></td>
+                                    <td><div className="skel skel-md" /></td>
+                                    <td><div className="skel skel-md" /></td>
+                                </tr>
+                            ))}
 
-                        {!loading && paginated.length === 0 && (
-                            <tr>
-                                <td colSpan="6">
-                                    <div className="empty-state">
-                                        <Package size={48} strokeWidth={1} />
-                                        <p>{searchTerm ? 'No expired products match your search.' : 'No expired products found.'}</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            {!loading && paginated.length > 0 && paginated.map((item) => (
+                                <tr key={item.id}>
+                                    <td>
+                                        <input 
+                                            type="checkbox" 
+                                            className="ss-checkbox" 
+                                            checked={selectedIds.includes(item.id)}
+                                            onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <span className="ss-code-badge">{item.sku || '—'}</span>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            {item.images && item.images.split(',')[0]?.trim() ? (
+                                                <img
+                                                    src={item.images.split(',')[0].trim()}
+                                                    alt={item.name}
+                                                    style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div
+                                                style={{
+                                                    width: '28px', height: '28px', borderRadius: '4px',
+                                                    background: getAvatarColor(item.name),
+                                                    display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex',
+                                                    alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px', fontWeight: '600'
+                                                }}
+                                            >
+                                                {getInitials(item.name)}
+                                            </div>
+                                            <span className="ss-item-name">{item.name}</span>
+                                        </div>
+                                    </td>
+                                    <td style={{ color: '#5b6670', fontSize: '13px' }}>{formatDate(item.manufacturedDate)}</td>
+                                    <td style={{ color: '#ea5455', fontWeight: '600', fontSize: '13px' }}>{formatDate(item.expiryDate)}</td>
+                                    <td>
+                                        <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                            <Link to={`/edit-product/${item.id}`} className="ss-action-btn edit" title="Edit">
+                                                <Pencil size={15} />
+                                            </Link>
+                                            <button 
+                                                className="ss-action-btn delete" 
+                                                title="Delete"
+                                                onClick={() => handleDelete(item.id)}
+                                            >
+                                                <Trash2 size={15} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+
+                            {!loading && paginated.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
+                                        <div className="empty-state">
+                                            <Package size={48} strokeWidth={1} style={{ opacity: 0.3, marginBottom: '10px' }} />
+                                            <p style={{ color: '#94a3b8' }}>{searchTerm ? 'No expired products match your search.' : 'No expired products found.'}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
                 {/* Pagination */}
                 {!loading && filtered.length > 0 && (
-                    <div className="pagination-row">
-                        <div className="rows-per-page">
+                    <div className="ss-pagination-row">
+                        <div className="ss-page-size">
                             Row Per Page&nbsp;
                             <select 
-                                className="entries-select" 
                                 value={rowsPerPage}
                                 onChange={(e) => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1); }}
                             >
@@ -334,8 +332,8 @@ const ExpiredProducts = () => {
                             </select> 
                             &nbsp;| Showing {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, filtered.length)} of {filtered.length}
                         </div>
-                        <div className="pagination-controls">
-                            <button className="page-btn bg-light" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
+                        <div className="ss-page-controls">
+                            <button className="ss-page-btn" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
                             {Array.from({ length: totalPages }, (_, i) => i + 1)
                                 .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
                                 .reduce((acc, p, i, arr) => {
@@ -345,11 +343,11 @@ const ExpiredProducts = () => {
                                 }, [])
                                 .map((p, i) => 
                                     p === '...' 
-                                        ? <span key={`ellipsis-${i}`} className="page-ellipsis">…</span>
-                                        : <button key={p} className={`page-btn ${p === currentPage ? 'active' : 'bg-light'}`} onClick={() => goToPage(p)}>{p}</button>
+                                        ? <span key={`ellipsis-${i}`} style={{ color: '#adb5bd', margin: '0 5px' }}>…</span>
+                                        : <button key={p} className={`ss-page-btn ${p === currentPage ? 'active' : ''}`} onClick={() => goToPage(p)}>{p}</button>
                                 )
                             }
-                            <button className="page-btn bg-light" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>&gt;</button>
+                            <button className="ss-page-btn" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>&gt;</button>
                         </div>
                     </div>
                 )}

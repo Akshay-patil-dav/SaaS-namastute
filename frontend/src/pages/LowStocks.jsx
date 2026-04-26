@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './Products.css';
+import './inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { 
@@ -140,31 +141,28 @@ const LowStocks = () => {
     return (
         <div className="product-page-container">
             {/* Header Section */}
-            <div className="product-page-header mb-3">
-                <div className="product-page-title">
-                    <h4>Low Stocks</h4>
-                    <p>Manage your stocks below alert levels</p>
+            <div className="ss-header-row">
+                <div className="ss-page-title-area">
+                    <h2 className="ss-page-title">Low Stocks</h2>
+                    <p className="ss-page-subtitle">Manage your stocks below alert levels</p>
                 </div>
                 
-                <div className="page-actions">
-                    <button className="btn-icon-action" title="PDF">
-                        <FileText size={18} className="icon-red" />
+                <div className="ss-header-actions">
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF">
+                        <FileText size={16} />
                     </button>
-                    <button className="btn-icon-action" title="Excel">
-                        <FileSpreadsheet size={18} className="icon-green" />
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel">
+                        <FileSpreadsheet size={16} />
                     </button>
-                    <button className="btn-icon-action" title="Refresh" onClick={fetchProducts}>
-                        <RefreshCw size={18} className={loading ? 'spin' : ''} />
-                    </button>
-                    <button className="btn-icon-action" title="Collapse">
-                        <ChevronUp size={18} />
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchProducts}>
+                        <RefreshCw size={16} className={loading ? 'spin' : ''} />
                     </button>
                     {selectedIds.length > 0 && (
-                        <button className="btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '6px', border: '1px solid #ea5455', color: '#ea5455', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s', textDecoration: 'none' }}>
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <button className="btn-dark-blue">
+                    <button className="ss-btn-orange" style={{ background: '#5b6670', borderColor: '#5b6670' }}>
                         <Mail size={16} /> Send Email
                     </button>
                 </div>
@@ -208,14 +206,15 @@ const LowStocks = () => {
             </div>
 
             {/* Table Card Area */}
-            <div className="product-table-card">
+            <div className="ss-main-panel">
                 
                 {/* Filter Row */}
-                <div className="table-filter-row">
-                    <div className="search-box">
+                <div className="ss-table-controls">
+                    <div className="ss-search-wrap">
                         <Search size={18} />
                         <input 
                             type="text" 
+                            className="ss-search-input"
                             placeholder="Search by name, SKU, brand…" 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -224,27 +223,28 @@ const LowStocks = () => {
                 </div>
 
                 {/* Data Table */}
-                <table className="custom-table" style={{ minWidth: '950px' }}>
-                    <thead>
-                        <tr>
-                            <th style={{ width: '40px' }}>
-                                <input 
-                                    type="checkbox" 
-                                    className="custom-checkbox" 
-                                    checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
-                                    onChange={(e) => handleSelectAll(e.target.checked)}
-                                />
-                            </th>
-                            <th>Warehouse</th>
-                            <th>Store</th>
-                            <th>Product Name</th>
-                            <th>Category</th>
-                            <th>SKU</th>
-                            <th>Qty</th>
-                            <th>Qty Alert</th>
-                            <th style={{ textAlign: 'center' }}>Action</th>
-                        </tr>
-                    </thead>
+                <div className="ss-table-wrapper">
+                    <table className="ss-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '40px' }}>
+                                    <input 
+                                        type="checkbox" 
+                                        className="ss-checkbox" 
+                                        checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
+                                        onChange={(e) => handleSelectAll(e.target.checked)}
+                                    />
+                                </th>
+                                <th>Warehouse</th>
+                                <th>Store</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>SKU</th>
+                                <th>Qty</th>
+                                <th>Qty Alert</th>
+                                <th style={{ textAlign: 'center' }}>Action</th>
+                            </tr>
+                        </thead>
                     <tbody>
                         {loading ? (
                             Array.from({ length: 4 }).map((_, i) => (
@@ -258,7 +258,7 @@ const LowStocks = () => {
                                     <td>
                                         <input 
                                             type="checkbox" 
-                                            className="custom-checkbox" 
+                                            className="ss-checkbox" 
                                             checked={selectedIds.includes(item.id)}
                                             onChange={(e) => handleSelectItem(item.id, e.target.checked)}
                                         />
@@ -266,45 +266,48 @@ const LowStocks = () => {
                                     <td>{item.warehouse || 'Primary'}</td>
                                     <td>{item.store || 'Main Store'}</td>
                                     <td>
-                                        <div className="product-name-cell">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             {item.images && item.images.split(',')[0]?.trim() ? (
                                                 <img 
                                                     src={item.images.split(',')[0].trim()} 
                                                     alt={item.name} 
-                                                    className="product-thumb" 
+                                                    style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
                                                 />
                                             ) : (
                                                 <div 
-                                                    className="product-avatar"
-                                                    style={{ background: getAvatarColor(item.name) }}
+                                                    style={{
+                                                        width: '28px', height: '28px', borderRadius: '4px',
+                                                        background: getAvatarColor(item.name),
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px', fontWeight: '600'
+                                                    }}
                                                 >
                                                     {getInitials(item.name)}
                                                 </div>
                                             )}
-                                            <span className="product-name-text ms-2">{item.name}</span>
+                                            <span className="ss-item-name ms-2">{item.name}</span>
                                         </div>
                                     </td>
                                     <td>
                                         <span 
-                                            className="category-badge"
-                                            style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category) }}
+                                            className="ss-status-badge ss-status-active"
+                                            style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category), borderColor: 'transparent' }}
                                         >
                                             {item.category || '—'}
                                         </span>
                                     </td>
-                                    <td><span className="sku-chip">{item.sku || '—'}</span></td>
+                                    <td><span className="ss-code-badge">{item.sku || '—'}</span></td>
                                     <td>
-                                        <span className={`qty-badge ${item.quantity <= 0 ? 'badge-danger' : 'badge-warning'}`}>
+                                        <span className={`ss-status-badge ${item.quantity <= 0 ? 'ss-status-inactive' : 'ss-status-pending'}`}>
                                             {item.quantity ?? 0}
                                         </span>
                                     </td>
-                                    <td><span className="text-secondary fw-bold">{item.quantityAlert || 0}</span></td>
+                                    <td style={{ color: '#5b6670', fontWeight: '600' }}>{item.quantityAlert || 0}</td>
                                     <td>
-                                        <div className="action-buttons justify-content-center">
-                                            <Link to={`/edit-product/${item.id}`} className="action-btn edit-btn" title="Edit">
+                                        <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                            <Link to={`/edit-product/${item.id}`} className="ss-action-btn edit" title="Edit">
                                                 <Pencil size={15} />
                                             </Link>
-                                            <button className="action-btn delete-btn" title="Delete" onClick={() => handleDelete(item.id)}>
+                                            <button className="ss-action-btn delete" title="Delete" onClick={() => handleDelete(item.id)}>
                                                 <Trash2 size={15} />
                                             </button>
                                         </div>
@@ -313,22 +316,23 @@ const LowStocks = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="9">
-                                    <div className="empty-state py-5">
-                                        <Package size={48} strokeWidth={1} className="text-muted mb-3" />
-                                        <p className="text-muted">No products found matching your inventory concerns.</p>
+                                <td colSpan="9" style={{ textAlign: 'center', padding: '40px' }}>
+                                    <div className="empty-state">
+                                        <Package size={48} strokeWidth={1} style={{ opacity: 0.3, marginBottom: '10px' }} />
+                                        <p style={{ color: '#94a3b8' }}>No products found matching your inventory concerns.</p>
                                     </div>
                                 </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
+            </div>
 
-                {/* Pagination (Static for now as filtering happens in-memory) */}
-                <div className="pagination-row">
-                    <div>
+                {/* Pagination */}
+                <div className="ss-pagination-row">
+                    <div className="ss-page-size">
                         Row Per Page 
-                        <select className="entries-select" defaultValue="10">
+                        <select defaultValue="10">
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>

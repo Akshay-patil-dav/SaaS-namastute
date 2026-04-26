@@ -170,7 +170,7 @@ const SubCategory = () => {
                         <ChevronUp size={18} />
                     </button>
                     {selectedIds.length > 0 && (
-                        <button className="ss-btn-red-outline" onClick={handleBulkDelete} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 15px', height: '40px', borderRadius: '8px', border: '1px solid #ef4444', color: '#ef4444', background: '#fff', fontWeight: '600', fontSize: '13px', transition: 'all 0.2s' }}>
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
@@ -341,8 +341,8 @@ const SubCategory = () => {
                                         </span>
                                     </td>
                                     <td>
-                                        <div className="ss-actions-group justify-content-center">
-                                            <button className="ss-action-btn" title="Edit" onClick={() => handleEdit(item)}>
+                                        <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                            <button className="ss-action-btn edit" title="Edit" onClick={() => handleEdit(item)}>
                                                 <Pencil size={14} />
                                             </button>
                                             <button className="ss-action-btn delete" title="Delete" onClick={() => handleDelete(item.id)}>

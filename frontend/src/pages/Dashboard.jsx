@@ -464,7 +464,7 @@ export default function Dashboard() {
                         <div className="col-12 col-lg-6">
                              <div className="dash-card mb-0 h-100">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 className="dash-title mb-0"><TrendingUp size={20} className="text-orange" color="#ea580c"/> Sales Statics</h5>
+                                    <h5 className="dash-title mb-0"><TrendingUp size={20} className="text-orange" color="#ea580c"/> Sales Statistics</h5>
                                     <select className="dash-select"><option>2023</option></select>
                                 </div>
                                 <div className="d-flex gap-4 border-bottom pb-3 mb-3">
