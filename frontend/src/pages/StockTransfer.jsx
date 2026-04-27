@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
     Search, 
     FileText, 
@@ -12,7 +12,9 @@ import {
     ChevronLeft, 
     ChevronRight,
     Upload,
-    Eye
+    Eye,
+    Package,
+    AlertCircle
 } from 'lucide-react';
 import axios from 'axios';
 import './stock-transfer.css';
@@ -24,8 +26,10 @@ import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
 
-export default function StockTransfer() {
+const StockTransfer = () => {
     const [transfers, setTransfers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRows, setSelectedRows] = useState([]);
     const [filterFrom, setFilterFrom] = useState('');
@@ -34,7 +38,6 @@ export default function StockTransfer() {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [isRefreshing, setIsRefreshing] = useState(false);
 
     // Modals state
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -48,59 +51,25 @@ export default function StockTransfer() {
     const [editModalData, setEditModalData] = useState(null);
     const [isViewMode, setIsViewMode] = useState(false);
 
-    const fetchTransfers = async () => {
+    const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/transfers`;
+
+    const fetchTransfers = useCallback(async () => {
         setIsRefreshing(true);
+        if (loading) setLoading(true);
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/transfers`);
-            setTransfers(response.data);
+            const response = await axios.get(API_BASE);
+            setTransfers(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching transfers:', error);
         } finally {
             setIsRefreshing(false);
+            setLoading(false);
         }
-    };
+    }, [loading]);
 
     useEffect(() => {
         fetchTransfers();
-    }, []);
-
-    // Reset page when filters/search change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, filterFrom, filterTo, sortDays, rowsPerPage]);
-
-    const openDeleteModal = (id) => {
-        setTransferToDelete(id);
-        setIsDeleteModalOpen(true);
-    };
-
-    const confirmDelete = async () => {
-        if (!transferToDelete) return;
-        setIsDeleting(true);
-        try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/transfers/${transferToDelete}`);
-            fetchTransfers();
-            setIsDeleteModalOpen(false);
-            setTransferToDelete(null);
-        } catch (error) {
-            console.error('Error deleting transfer:', error);
-            alert('Failed to delete transfer. Please try again.');
-        } finally {
-            setIsDeleting(false);
-        }
-    };
-
-    const handleEdit = (transfer, viewMode = false) => {
-        setEditModalData(transfer);
-        setIsViewMode(viewMode);
-        setIsEditModalOpen(true);
-    };
-
-    const toggleRow = (id) => {
-        setSelectedRows(prev => 
-            prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
-        );
-    };
+    }, [fetchTransfers]);
 
     // Derive unique warehouse names for filter dropdowns
     const uniqueFromWarehouses = useMemo(() => {
@@ -113,34 +82,23 @@ export default function StockTransfer() {
         return [...new Set(names)].sort();
     }, [transfers]);
 
-    // Filter + search + sort
+    // Filtering & Pagination
     const filteredData = useMemo(() => {
         let data = [...transfers];
 
-        // Search
-        const st = searchTerm.toLowerCase();
-        if (st) {
-            data = data.filter(item => {
-                return (
-                    (item.fromWarehouse || '').toLowerCase().includes(st) ||
-                    (item.toWarehouse || '').toLowerCase().includes(st) ||
-                    (item.referenceNo || '').toLowerCase().includes(st) ||
-                    (item.notes || '').toLowerCase().includes(st)
-                );
-            });
+        if (searchTerm) {
+            const st = searchTerm.toLowerCase();
+            data = data.filter(item => 
+                (item.fromWarehouse || '').toLowerCase().includes(st) ||
+                (item.toWarehouse || '').toLowerCase().includes(st) ||
+                (item.referenceNo || '').toLowerCase().includes(st) ||
+                (item.notes || '').toLowerCase().includes(st)
+            );
         }
 
-        // From warehouse filter
-        if (filterFrom) {
-            data = data.filter(item => item.fromWarehouse === filterFrom);
-        }
+        if (filterFrom) data = data.filter(item => item.fromWarehouse === filterFrom);
+        if (filterTo)   data = data.filter(item => item.toWarehouse === filterTo);
 
-        // To warehouse filter
-        if (filterTo) {
-            data = data.filter(item => item.toWarehouse === filterTo);
-        }
-
-        // Sort by date
         if (sortDays) {
             const days = parseInt(sortDays, 10);
             const cutoff = new Date();
@@ -150,14 +108,49 @@ export default function StockTransfer() {
                 return d && d >= cutoff;
             });
         }
-
         return data;
     }, [transfers, searchTerm, filterFrom, filterTo, sortDays]);
 
-    // Pagination
     const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
     const safePage = Math.min(currentPage, totalPages);
     const pagedData = filteredData.slice((safePage - 1) * rowsPerPage, safePage * rowsPerPage);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filterFrom, filterTo, sortDays, rowsPerPage]);
+
+    // Handlers
+    const handleEdit = (transfer, viewMode = false) => {
+        setEditModalData(transfer);
+        setIsViewMode(viewMode);
+        setIsEditModalOpen(true);
+    };
+
+    const openDeleteModal = (id) => {
+        setTransferToDelete(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!transferToDelete) return;
+        setIsDeleting(true);
+        try {
+            await axios.delete(`${API_BASE}/${transferToDelete}`);
+            fetchTransfers();
+            setIsDeleteModalOpen(false);
+            setTransferToDelete(null);
+        } catch (error) {
+            console.error('Error deleting transfer:', error);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const toggleRow = (id) => {
+        setSelectedRows(prev => 
+            prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
+        );
+    };
 
     const toggleAll = () => {
         const pageIds = pagedData.map(d => d.id);
@@ -196,274 +189,207 @@ export default function StockTransfer() {
     const getStatusClass = (status) => {
         if (!status) return 'ss-status-badge ss-status-pending';
         switch (status.toLowerCase()) {
-            case 'completed': return 'ss-status-badge ss-status-completed';
+            case 'completed': return 'ss-status-badge ss-status-active'; // Updated for ss- design system
             case 'pending': return 'ss-status-badge ss-status-pending';
-            case 'cancelled': return 'ss-status-badge ss-status-cancelled';
+            case 'cancelled': return 'ss-status-badge ss-status-inactive'; // Updated for ss- design system
             default: return 'ss-status-badge ss-status-pending';
         }
     };
 
     return (
-        <div className="stock-transfer-container">
-            {/* Page Header */}
+        <div className="product-page-container">
+            {/* Header Section */}
             <div className="ss-header-row">
                 <div className="ss-page-title-area">
                     <h2 className="ss-page-title">Stock Transfer</h2>
-                    <p className="ss-page-subtitle">Manage your stock transfers</p>
+                    <p className="ss-page-subtitle">Manage your warehouse stock transfers</p>
                 </div>
+                
                 <div className="ss-header-actions">
-                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="Export PDF" onClick={() => window.print()}>
+                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF" onClick={() => window.print()}>
                         <FileText size={16} />
                     </button>
-                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Export CSV" onClick={exportCSV}>
+                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel" onClick={exportCSV}>
                         <Download size={16} />
                     </button>
-                    <button
-                        className={`ss-btn-icon-square${isRefreshing ? ' spin' : ''}`}
-                        title="Refresh"
-                        onClick={fetchTransfers}
-                        disabled={isRefreshing}
-                    >
-                        <RotateCcw size={16} />
+                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchTransfers}>
+                        <RotateCcw size={16} className={isRefreshing ? 'spin' : ''} />
+                    </button>
+                    <button className="ss-btn-icon-square" title={isCollapsed ? "Expand" : "Collapse"} onClick={() => setIsCollapsed(!isCollapsed)}>
+                        {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                     </button>
                     <button className="ss-btn-orange" onClick={() => setIsAddModalOpen(true)}>
-                        <Plus size={16} />
-                        Add New
+                        <Plus size={16} /> Add New
                     </button>
-                    <button className="ss-btn-orange" style={{ background: '#1b2850', boxShadow: 'none' }} onClick={() => setIsImportModalOpen(true)}>
-                        <Upload size={16} />
-                        Import Transfer
+                    <button className="ss-btn-orange" style={{ background: '#1b2850', borderColor: '#1b2850' }} onClick={() => setIsImportModalOpen(true)}>
+                        <Upload size={16} /> Import
                     </button>
                 </div>
             </div>
 
-            {/* Main Content Area */}
-            {!isCollapsed && (
-                <div className="ss-main-panel">
-                    {/* Filters */}
-                    <div className="ss-table-controls">
-                        <div className="ss-search-wrap">
-                            <Search size={16} />
-                            <input 
-                                type="text" 
-                                className="ss-search-input" 
-                                placeholder="Search by warehouse, ref no…" 
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+            {/* Main Panel */}
+            <div className={`ss-main-panel ${isCollapsed ? 'ss-collapsed' : ''}`}>
+                {!isCollapsed && (
+                    <>
+                        {/* Table Controls */}
+                        <div className="ss-table-controls">
+                            <div className="ss-search-wrap">
+                                <Search size={18} />
+                                <input 
+                                    type="text" 
+                                    className="ss-search-input"
+                                    placeholder="Search warehouse, ref no…" 
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <div className="ss-filters-wrap">
+                                <select className="ss-filter-select" value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)}>
+                                    <option value="">From Warehouse</option>
+                                    {uniqueFromWarehouses.map(w => <option key={w} value={w}>{w}</option>)}
+                                </select>
+                                <select className="ss-filter-select" value={filterTo} onChange={(e) => setFilterTo(e.target.value)}>
+                                    <option value="">To Warehouse</option>
+                                    {uniqueToWarehouses.map(w => <option key={w} value={w}>{w}</option>)}
+                                </select>
+                                <select className="ss-filter-select" value={sortDays} onChange={(e) => setSortDays(e.target.value)}>
+                                    <option value="">All Time</option>
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30">Last 30 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                </select>
+                            </div>
                         </div>
-                        <div className="ss-filters-wrap">
-                            <select
-                                className="ss-filter-select"
-                                value={filterFrom}
-                                onChange={(e) => setFilterFrom(e.target.value)}
-                            >
-                                <option value="">From Warehouse</option>
-                                {uniqueFromWarehouses.map(w => (
-                                    <option key={w} value={w}>{w}</option>
-                                ))}
-                            </select>
-                            <select
-                                className="ss-filter-select"
-                                value={filterTo}
-                                onChange={(e) => setFilterTo(e.target.value)}
-                            >
-                                <option value="">To Warehouse</option>
-                                {uniqueToWarehouses.map(w => (
-                                    <option key={w} value={w}>{w}</option>
-                                ))}
-                            </select>
-                            <select
-                                className="ss-filter-select"
-                                value={sortDays}
-                                onChange={(e) => setSortDays(e.target.value)}
-                            >
-                                <option value="">All Time</option>
-                                <option value="7">Last 7 Days</option>
-                                <option value="30">Last 30 Days</option>
-                                <option value="90">Last 90 Days</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    {/* Table Section */}
-                    <div className="ss-table-wrapper">
-                        <table className="ss-table">
-                            <thead>
-                                <tr>
-                                    <th className="checkbox-col" style={{ width: '40px' }}>
-                                        <input 
-                                            type="checkbox" 
-                                            className="ss-checkbox"
-                                            checked={allPageSelected}
-                                            onChange={toggleAll}
-                                        />
-                                    </th>
-                                    <th>From Warehouse</th>
-                                    <th>To Warehouse</th>
-                                    <th>No of Products</th>
-                                    <th>Qty Transferred</th>
-                                    <th>Ref Number</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th style={{ textAlign: 'center' }}>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {pagedData.length > 0 ? (
-                                    pagedData.map((item) => (
-                                        <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
-                                            <td>
-                                                <input 
-                                                    type="checkbox" 
-                                                    className="ss-checkbox"
-                                                    checked={selectedRows.includes(item.id)}
-                                                    onChange={() => toggleRow(item.id)}
-                                                />
-                                            </td>
-                                            <td className="ss-item-name">{item.fromWarehouse || '—'}</td>
-                                            <td>{item.toWarehouse || '—'}</td>
-                                            <td>{item.noOfProducts ?? 0}</td>
-                                            <td>{item.quantityTransferred ?? 0}</td>
-                                            <td><span className="ss-code-badge">{item.referenceNo || '—'}</span></td>
-                                            <td>
-                                                <span className={getStatusClass(item.status)}>
-                                                    {item.status || 'Pending'}
-                                                </span>
-                                            </td>
-                                            <td>{item.formattedDate || item.date || '—'}</td>
-                                            <td>
-                                                <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
-                                                    <button
-                                                        className="ss-action-btn view"
-                                                        title="View"
-                                                        onClick={() => handleEdit(item, true)}
-                                                    >
-                                                        <Eye size={14} />
-                                                    </button>
-                                                    <button
-                                                        className="ss-action-btn edit"
-                                                        title="Edit"
-                                                        onClick={() => handleEdit(item, false)}
-                                                    >
-                                                        <Edit size={14} />
-                                                    </button>
-                                                    <button
-                                                        className="ss-action-btn delete"
-                                                        title="Delete"
-                                                        onClick={() => openDeleteModal(item.id)}
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
+                        {/* Table Area */}
+                        <div className="ss-table-wrapper">
+                            <table className="ss-table">
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: '40px' }}>
+                                            <input 
+                                                type="checkbox" 
+                                                className="ss-checkbox" 
+                                                checked={allPageSelected}
+                                                onChange={toggleAll}
+                                            />
+                                        </th>
+                                        <th>From Warehouse</th>
+                                        <th>To Warehouse</th>
+                                        <th>Products</th>
+                                        <th>Qty</th>
+                                        <th>Ref Number</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th style={{ textAlign: 'center' }}>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loading ? (
+                                        Array.from({ length: 5 }).map((_, i) => (
+                                            <tr key={`skel-${i}`} className="skeleton-row">
+                                                <td colSpan="9"><div className="skel skel-lg" /></td>
+                                            </tr>
+                                        ))
+                                    ) : pagedData.length > 0 ? (
+                                        pagedData.map((item) => (
+                                            <tr key={item.id} className={selectedRows.includes(item.id) ? 'row-selected' : ''}>
+                                                <td>
+                                                    <input 
+                                                        type="checkbox" 
+                                                        className="ss-checkbox" 
+                                                        checked={selectedRows.includes(item.id)}
+                                                        onChange={() => toggleRow(item.id)}
+                                                    />
+                                                </td>
+                                                <td className="ss-item-name">{item.fromWarehouse || '—'}</td>
+                                                <td>{item.toWarehouse || '—'}</td>
+                                                <td>{item.noOfProducts ?? 0}</td>
+                                                <td>{item.quantityTransferred ?? 0}</td>
+                                                <td><span className="ss-code-badge">{item.referenceNo || '—'}</span></td>
+                                                <td>
+                                                    <span className={getStatusClass(item.status)}>
+                                                        {item.status || 'Pending'}
+                                                    </span>
+                                                </td>
+                                                <td>{item.formattedDate || item.date || '—'}</td>
+                                                <td>
+                                                    <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                                        <button className="ss-action-btn view" title="View" onClick={() => handleEdit(item, true)}>
+                                                            <Eye size={15} />
+                                                        </button>
+                                                        <button className="ss-action-btn edit" title="Edit" onClick={() => handleEdit(item, false)}>
+                                                            <Edit size={15} />
+                                                        </button>
+                                                        <button className="ss-action-btn delete" title="Delete" onClick={() => openDeleteModal(item.id)}>
+                                                            <Trash2 size={15} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="9" style={{ textAlign: 'center', padding: '60px 20px' }}>
+                                                <div className="empty-state">
+                                                    <Package size={48} strokeWidth={1} style={{ opacity: 0.3, marginBottom: '10px' }} />
+                                                    <p style={{ color: '#94a3b8' }}>No stock transfers found.</p>
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="9" style={{ textAlign: 'center', padding: '40px 20px', color: '#5b6670' }}>
-                                            {isRefreshing ? 'Loading…' : 'No matching records found.'}
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
 
-                    {/* Pagination */}
-                    <div className="ss-pagination-row">
-                        <div className="ss-page-size">
-                            <span>Row Per Page</span>
-                            <select
-                                value={rowsPerPage}
-                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                            >
-                                {ROWS_PER_PAGE_OPTIONS.map(n => (
-                                    <option key={n} value={n}>{n}</option>
-                                ))}
-                            </select>
-                            <span>
-                                Entries
-                            </span>
+                        {/* Pagination Row */}
+                        <div className="ss-pagination-row">
+                            <div className="ss-page-size">
+                                Row Per Page&nbsp;
+                                <select value={rowsPerPage} onChange={(e) => setRowsPerPage(Number(e.target.value))}>
+                                    {ROWS_PER_PAGE_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
+                                </select> 
+                                &nbsp;| Showing {(safePage - 1) * rowsPerPage + 1}–{Math.min(safePage * rowsPerPage, filteredData.length)} of {filteredData.length}
+                            </div>
+                            <div className="ss-page-controls">
+                                <button className="ss-page-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={safePage === 1}>
+                                    <ChevronLeft size={16} />
+                                </button>
+                                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                    .filter(p => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+                                    .reduce((acc, p, i, arr) => {
+                                        if (i > 0 && p - arr[i-1] > 1) acc.push('...');
+                                        acc.push(p);
+                                        return acc;
+                                    }, [])
+                                    .map((p, i) => (
+                                        p === '...' 
+                                        ? <span key={`ellipsis-${i}`} className="ss-page-btn" style={{ border: 'none', cursor: 'default' }}>…</span>
+                                        : <button key={p} className={`ss-page-btn ${p === safePage ? 'active' : ''}`} onClick={() => setCurrentPage(p)}>{p}</button>
+                                    ))
+                                }
+                                <button className="ss-page-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={safePage === totalPages}>
+                                    <ChevronRight size={16} />
+                                </button>
+                            </div>
                         </div>
-                        <div className="ss-page-controls">
-                            <button
-                                className="ss-page-btn"
-                                disabled={safePage <= 1}
-                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                            >
-                                <ChevronLeft size={16} />
-                            </button>
-                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                .filter(p => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
-                                .reduce((acc, p, idx, arr) => {
-                                    if (idx > 0 && p - arr[idx - 1] > 1) {
-                                        acc.push('...');
-                                    }
-                                    acc.push(p);
-                                    return acc;
-                                }, [])
-                                .map((p, idx) =>
-                                    p === '...' ? (
-                                        <span key={`ellipsis-${idx}`} className="ss-page-btn" style={{ border: 'none', cursor: 'default' }}>…</span>
-                                    ) : (
-                                        <button
-                                            key={p}
-                                            className={`ss-page-btn${safePage === p ? ' active' : ''}`}
-                                            onClick={() => setCurrentPage(p)}
-                                        >
-                                            {p}
-                                        </button>
-                                    )
-                                )
-                            }
-                            <button
-                                className="ss-page-btn"
-                                disabled={safePage >= totalPages}
-                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                            >
-                                <ChevronRight size={16} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                    </>
+                )}
+            </div>
 
             {/* Footer */}
             <footer className="manage-stock-footer">
-                <div className="footer-copyright">
-                    2014 - 2026 © DreamsPOS. All Right Reserved
-                </div>
-                <div className="footer-designer">
-                    Designed &amp; Developed by <span>Dreams</span>
-                </div>
+                <div className="footer-copyright">2014 - 2026 © DreamsPOS. All Right Reserved</div>
+                <div className="footer-designer">Designed & Developed by <span>Dreams</span></div>
             </footer>
 
-            <AddTransferModal 
-                isOpen={isAddModalOpen} 
-                onClose={() => setIsAddModalOpen(false)} 
-                onSuccess={fetchTransfers}
-            />
-            <ImportTransferModal 
-                isOpen={isImportModalOpen} 
-                onClose={() => setIsImportModalOpen(false)} 
-                onSuccess={fetchTransfers}
-            />
-            <EditTransferModal 
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                onSuccess={fetchTransfers}
-                initialData={editModalData}
-                isView={isViewMode}
-            />
-            <DeleteConfirmModal 
-                isOpen={isDeleteModalOpen}
-                onClose={() => { setIsDeleteModalOpen(false); setTransferToDelete(null); }}
-                onConfirm={confirmDelete}
-                title="Delete Transfer"
-                message="Are you sure you want to delete this transfer? This action cannot be undone."
-                isDeleting={isDeleting}
-            />
+            {/* Modals */}
+            <AddTransferModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onSuccess={fetchTransfers} />
+            <ImportTransferModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={fetchTransfers} />
+            <EditTransferModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} onSuccess={fetchTransfers} initialData={editModalData} isView={isViewMode} />
+            <DeleteConfirmModal isOpen={isDeleteModalOpen} onClose={() => { setIsDeleteModalOpen(false); setTransferToDelete(null); }} onConfirm={confirmDelete} title="Delete Transfer" message="Are you sure you want to delete this transfer? This action cannot be undone." isDeleting={isDeleting} />
         </div>
     );
-}
+};
+
+export default StockTransfer;

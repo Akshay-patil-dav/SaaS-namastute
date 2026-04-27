@@ -3,6 +3,16 @@ import { X, UploadCloud } from 'lucide-react';
 import axios from 'axios';
 import './import-transfer-modal.css';
 
+// Combined list of all possible warehouses
+const ALL_WAREHOUSES = [
+    'Lobar Handy',
+    'Lavish Warehouse',
+    'Quaint Warehouse',
+    'Selosy',
+    'North Zone Warehouse',
+    'Nova Storage Hub',
+];
+
 const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         from: '',
@@ -101,8 +111,9 @@ const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
                                 onChange={(e) => setFormData({...formData, from: e.target.value})}
                             >
                                 <option value="" disabled hidden>select</option>
-                                <option>Lobar Handy</option>
-                                <option>Lavish Warehouse</option>
+                                {ALL_WAREHOUSES.map(w => (
+                                    <option key={w} value={w}>{w}</option>
+                                ))}
                             </select>
                         </div>
                         <div className="import-form-group">
@@ -113,8 +124,9 @@ const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
                                 onChange={(e) => setFormData({...formData, to: e.target.value})}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                <option>Selosy</option>
-                                <option>North Zone Warehouse</option>
+                                {ALL_WAREHOUSES.map(w => (
+                                    <option key={w} value={w}>{w}</option>
+                                ))}
                             </select>
                         </div>
                         <div className="import-form-group">

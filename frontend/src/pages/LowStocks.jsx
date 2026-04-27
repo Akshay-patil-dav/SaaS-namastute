@@ -10,6 +10,8 @@ import {
     ChevronUp,
     Search,
     ChevronDown,
+    ChevronLeft,
+    ChevronRight,
     Pencil,
     Trash2,
     Mail,
@@ -41,6 +43,8 @@ const LowStocks = () => {
     const [activeTab, setActiveTab]     = useState('low'); // 'low' or 'out'
     const [notify, setNotify]           = useState(true);
     const [selectedIds, setSelectedIds] = useState([]);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
     const { confirm } = useConfirm();
 
     // ── Fetch products from backend ──────────────────────────────────────
@@ -48,7 +52,7 @@ const LowStocks = () => {
         setLoading(true);
         try {
             const res = await axios.get(API_BASE);
-            setDbProducts(res.data || []);
+            setDbProducts(Array.isArray(res.data) ? res.data : []);
             setApiOnline(true);
         } catch {
             setApiOnline(false);
@@ -59,54 +63,6 @@ const LowStocks = () => {
     }, []);
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
-
-    const handleBulkDelete = async () => {
-        if (!selectedIds.length) return;
-        const isConfirmed = await confirm({
-            title: 'Delete Products',
-            message: `Are you sure you want to delete ${selectedIds.length} products?`
-        });
-        if (!isConfirmed) return;
-
-        try {
-            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
-            // Local notification or toast logic could go here if toast state is added
-            setSelectedIds([]);
-            fetchProducts();
-        } catch (err) {
-            console.error('Failed to delete products', err);
-        }
-    };
-
-    const handleDelete = async (id) => {
-        const isConfirmed = await confirm({
-            title: 'Delete Product',
-            message: 'Are you sure you want to delete this product?'
-        });
-        if (!isConfirmed) return;
-        try {
-            await axios.delete(`${API_BASE}/${id}`);
-            fetchProducts();
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleSelectAll = (isChecked) => {
-        if (isChecked) {
-            setSelectedIds(filteredData.map(item => item.id));
-        } else {
-            setSelectedIds([]);
-        }
-    };
-
-    const handleSelectItem = (id, isChecked) => {
-        if (isChecked) {
-            setSelectedIds(prev => [...prev, id]);
-        } else {
-            setSelectedIds(prev => prev.filter(item => item !== id));
-        }
-    };
 
     // ── Filtering Logic ──────────────────────────────────────────────────
     const getFilteredData = () => {
@@ -137,6 +93,61 @@ const LowStocks = () => {
     };
 
     const filteredData = getFilteredData();
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+    const safePage = Math.min(currentPage, totalPages);
+    const pagedData = filteredData.slice((safePage - 1) * rowsPerPage, safePage * rowsPerPage);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, activeTab, rowsPerPage]);
+
+    // ── Handlers ────────────────────────────────────────────────────────
+    const handleBulkDelete = async () => {
+        if (!selectedIds.length) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Products',
+            message: `Are you sure you want to delete ${selectedIds.length} products?`
+        });
+        if (!isConfirmed) return;
+
+        try {
+            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            setSelectedIds([]);
+            fetchProducts();
+        } catch (err) {
+            console.error('Failed to delete products', err);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        const isConfirmed = await confirm({
+            title: 'Delete Product',
+            message: 'Are you sure you want to delete this product?'
+        });
+        if (!isConfirmed) return;
+        try {
+            await axios.delete(`${API_BASE}/${id}`);
+            fetchProducts();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleSelectAll = (isChecked) => {
+        if (isChecked) {
+            setSelectedIds(pagedData.map(item => item.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelectItem = (id, isChecked) => {
+        if (isChecked) {
+            setSelectedIds(prev => [...prev, id]);
+        } else {
+            setSelectedIds(prev => prev.filter(item => item !== id));
+        }
+    };
 
     return (
         <div className="product-page-container">
@@ -231,7 +242,7 @@ const LowStocks = () => {
                                     <input 
                                         type="checkbox" 
                                         className="ss-checkbox" 
-                                        checked={filteredData.length > 0 && selectedIds.length === filteredData.length}
+                                        checked={pagedData.length > 0 && selectedIds.length === pagedData.length}
                                         onChange={(e) => handleSelectAll(e.target.checked)}
                                     />
                                 </th>
@@ -245,102 +256,131 @@ const LowStocks = () => {
                                 <th style={{ textAlign: 'center' }}>Action</th>
                             </tr>
                         </thead>
-                    <tbody>
-                        {loading ? (
-                            Array.from({ length: 4 }).map((_, i) => (
-                                <tr key={`skel-${i}`} className="skeleton-row">
-                                    <td colSpan="9"><div className="skel skel-lg" /></td>
-                                </tr>
-                            ))
-                        ) : filteredData.length > 0 ? (
-                            filteredData.map((item) => (
-                                <tr key={item.id}>
-                                    <td>
-                                        <input 
-                                            type="checkbox" 
-                                            className="ss-checkbox" 
-                                            checked={selectedIds.includes(item.id)}
-                                            onChange={(e) => handleSelectItem(item.id, e.target.checked)}
-                                        />
-                                    </td>
-                                    <td>{item.warehouse || 'Primary'}</td>
-                                    <td>{item.store || 'Main Store'}</td>
-                                    <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            {item.images && item.images.split(',')[0]?.trim() ? (
-                                                <img 
-                                                    src={item.images.split(',')[0].trim()} 
-                                                    alt={item.name} 
-                                                    style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
-                                                />
-                                            ) : (
-                                                <div 
-                                                    style={{
-                                                        width: '28px', height: '28px', borderRadius: '4px',
-                                                        background: getAvatarColor(item.name),
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px', fontWeight: '600'
-                                                    }}
-                                                >
-                                                    {getInitials(item.name)}
-                                                </div>
-                                            )}
-                                            <span className="ss-item-name ms-2">{item.name}</span>
+                        <tbody>
+                            {loading ? (
+                                Array.from({ length: 4 }).map((_, i) => (
+                                    <tr key={`skel-${i}`} className="skeleton-row">
+                                        <td colSpan="9"><div className="skel skel-lg" /></td>
+                                    </tr>
+                                ))
+                            ) : pagedData.length > 0 ? (
+                                pagedData.map((item) => (
+                                    <tr key={item.id} className={selectedIds.includes(item.id) ? 'row-selected' : ''}>
+                                        <td>
+                                            <input 
+                                                type="checkbox" 
+                                                className="ss-checkbox" 
+                                                checked={selectedIds.includes(item.id)}
+                                                onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                            />
+                                        </td>
+                                        <td>{item.warehouse || 'Primary'}</td>
+                                        <td>{item.store || 'Main Store'}</td>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                {item.images && item.images.split(',')[0]?.trim() ? (
+                                                    <img 
+                                                        src={item.images.split(',')[0].trim()} 
+                                                        alt={item.name} 
+                                                        style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
+                                                    />
+                                                ) : (
+                                                    <div 
+                                                        style={{
+                                                            width: '28px', height: '28px', borderRadius: '4px',
+                                                            background: getAvatarColor(item.name),
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px', fontWeight: '600'
+                                                        }}
+                                                    >
+                                                        {getInitials(item.name)}
+                                                    </div>
+                                                )}
+                                                <span className="ss-item-name ms-2">{item.name}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span 
+                                                className="ss-status-badge ss-status-active"
+                                                style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category), borderColor: 'transparent' }}
+                                            >
+                                                {item.category || '—'}
+                                            </span>
+                                        </td>
+                                        <td><span className="ss-code-badge">{item.sku || '—'}</span></td>
+                                        <td>
+                                            <span className={`ss-status-badge ${item.quantity <= 0 ? 'ss-status-inactive' : 'ss-status-pending'}`}>
+                                                {item.quantity ?? 0}
+                                            </span>
+                                        </td>
+                                        <td style={{ color: '#5b6670', fontWeight: '600' }}>{item.quantityAlert || 0}</td>
+                                        <td>
+                                            <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                                <Link to={`/edit-product/${item.id}`} className="ss-action-btn edit" title="Edit">
+                                                    <Pencil size={15} />
+                                                </Link>
+                                                <button className="ss-action-btn delete" title="Delete" onClick={() => handleDelete(item.id)}>
+                                                    <Trash2 size={15} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="9" style={{ textAlign: 'center', padding: '40px' }}>
+                                        <div className="empty-state">
+                                            <Package size={48} strokeWidth={1} style={{ opacity: 0.3, marginBottom: '10px' }} />
+                                            <p style={{ color: '#94a3b8' }}>No products found matching your inventory concerns.</p>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span 
-                                            className="ss-status-badge ss-status-active"
-                                            style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category), borderColor: 'transparent' }}
-                                        >
-                                            {item.category || '—'}
-                                        </span>
-                                    </td>
-                                    <td><span className="ss-code-badge">{item.sku || '—'}</span></td>
-                                    <td>
-                                        <span className={`ss-status-badge ${item.quantity <= 0 ? 'ss-status-inactive' : 'ss-status-pending'}`}>
-                                            {item.quantity ?? 0}
-                                        </span>
-                                    </td>
-                                    <td style={{ color: '#5b6670', fontWeight: '600' }}>{item.quantityAlert || 0}</td>
-                                    <td>
-                                        <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
-                                            <Link to={`/edit-product/${item.id}`} className="ss-action-btn edit" title="Edit">
-                                                <Pencil size={15} />
-                                            </Link>
-                                            <button className="ss-action-btn delete" title="Delete" onClick={() => handleDelete(item.id)}>
-                                                <Trash2 size={15} />
-                                            </button>
-                                        </div>
-                                    </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="9" style={{ textAlign: 'center', padding: '40px' }}>
-                                    <div className="empty-state">
-                                        <Package size={48} strokeWidth={1} style={{ opacity: 0.3, marginBottom: '10px' }} />
-                                        <p style={{ color: '#94a3b8' }}>No products found matching your inventory concerns.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
                 {/* Pagination */}
                 <div className="ss-pagination-row">
                     <div className="ss-page-size">
-                        Row Per Page 
-                        <select defaultValue="10">
+                        Row Per Page&nbsp;
+                        <select 
+                            value={rowsPerPage}
+                            onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                        >
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
                         </select> 
-                        Entries
+                        &nbsp;| Showing {(safePage - 1) * rowsPerPage + 1}–{Math.min(safePage * rowsPerPage, filteredData.length)} of {filteredData.length}
+                    </div>
+                    <div className="ss-page-controls">
+                        <button className="ss-page-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={safePage === 1}>
+                            <ChevronLeft size={16} />
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                            .filter(p => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+                            .reduce((acc, p, i, arr) => {
+                                if (i > 0 && p - arr[i-1] > 1) acc.push('...');
+                                acc.push(p);
+                                return acc;
+                            }, [])
+                            .map((p, i) => (
+                                p === '...' 
+                                ? <span key={`ellipsis-${i}`} className="ss-page-btn" style={{ border: 'none', cursor: 'default' }}>…</span>
+                                : <button 
+                                    key={p} 
+                                    className={`ss-page-btn ${p === safePage ? 'active' : ''}`}
+                                    onClick={() => setCurrentPage(p)}
+                                  >
+                                    {p}
+                                  </button>
+                            ))
+                        }
+                        <button className="ss-page-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={safePage === totalPages}>
+                            <ChevronRight size={16} />
+                        </button>
                     </div>
                 </div>
-
             </div>
         </div>
     );
