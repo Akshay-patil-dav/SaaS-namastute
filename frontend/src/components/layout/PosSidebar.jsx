@@ -250,14 +250,6 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     </ul>
                                 </li>
                                 <li className="pos-menu-item">
-                                    <a className="pos-menu-link">
-                                        <div className="pos-menu-link-content">
-                                            <FileText className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Invoices</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li className="pos-menu-item">
                                     <NavLink to="/dashboard/sales-return" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                         <div className="pos-menu-link-content">
                                             <RotateCcw className="pos-menu-icon" strokeWidth={1.5} />
