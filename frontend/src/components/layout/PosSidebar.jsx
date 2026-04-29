@@ -29,7 +29,8 @@ import {
     FileText,
     RotateCcw,
     Copy,
-    Monitor
+    Monitor,
+    FileUp
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -273,6 +274,36 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                         <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
                                     </a>
+                                </li>
+                            </ul>
+
+                            {/* Purchases Section */}
+                            <div className="pos-menu-divider"></div>
+                            <div className="pos-menu-section">Purchases</div>
+                            <ul className="pos-menu-list pb-4">
+                                <li className="pos-menu-item">
+                                    <NavLink to="/purchases" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <ShoppingBag className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Purchases</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
+                                    <NavLink to="/purchase-order" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <FileText className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Purchase Order</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
+                                    <NavLink to="/purchase-return" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <FileUp className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Purchase Return</span>
+                                        </div>
+                                    </NavLink>
                                 </li>
                             </ul>
                         </>
