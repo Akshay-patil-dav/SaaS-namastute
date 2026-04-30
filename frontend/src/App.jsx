@@ -43,19 +43,8 @@ import AddPurchase from './pages/AddPurchase.jsx';
 
 
 
-// ── Admin Pages ─────────────────────────────────────────────────────────────
-import AdminDashboard from './pages/admin/AdminDashboard.jsx';
-import UserManagement from './pages/admin/UserManagement';
-import AdminSettings from './pages/admin/AdminSettings';
-import AdminAnalytics from './pages/admin/AdminAnalytics';
-import AdminContent from './pages/admin/AdminContent';
-import AdminRoles from './pages/admin/AdminRoles';
-import AdminBlog from './pages/admin/AdminBlog';
-import AdminNotifications from './pages/admin/AdminNotifications';
-
 // ── Layouts ─────────────────────────────────────────────────────────────────
 import PosLayout from './components/layout/PosLayout';
-import AdminLayout from './components/admin/AdminLayout';
 
 // ── Role constants ───────────────────────────────────────────────────────────
 const ALL_ROLES          = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
@@ -66,12 +55,6 @@ const SUPER_ADMIN_ROLES  = ['SUPER_ADMIN'];
 const PosPage = ({ roles, children }) => (
     <ProtectedRoute allowedRoles={roles}>
         <PosLayout>{children}</PosLayout>
-    </ProtectedRoute>
-);
-
-const AdminPage = ({ children }) => (
-    <ProtectedRoute allowedRoles={ADMIN_ROLES}>
-        <AdminLayout>{children}</AdminLayout>
     </ProtectedRoute>
 );
 
@@ -212,18 +195,6 @@ function AppRoutes() {
                 path="/dashboard/super-packages"
                 element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperPackages /></PosPage>}
             />
-
-            {/* ── Admin Layout (ADMIN + SUPER ADMIN) ─────────────────── */}
-            <Route path="/admin"                  element={<AdminPage><AdminDashboard /></AdminPage>} />
-            <Route path="/admin/users"            element={<AdminPage><UserManagement /></AdminPage>} />
-            <Route path="/admin/analytics"        element={<AdminPage><AdminAnalytics /></AdminPage>} />
-            <Route path="/admin/content"          element={<AdminPage><AdminContent /></AdminPage>} />
-            <Route path="/admin/roles"            element={<AdminPage><AdminRoles /></AdminPage>} />
-            <Route path="/admin/notifications"    element={<AdminPage><AdminNotifications /></AdminPage>} />
-            <Route path="/admin/category"         element={<AdminPage><Category /></AdminPage>} />
-            <Route path="/admin/sub-category"     element={<AdminPage><SubCategory /></AdminPage>} />
-            <Route path="/admin/settings"         element={<AdminPage><AdminSettings /></AdminPage>} />
-            <Route path="/admin/blog"             element={<AdminPage><AdminBlog /></AdminPage>} />
 
             {/* Catch-all → login */}
             <Route path="*" element={<Navigate to="/login" replace />} />
