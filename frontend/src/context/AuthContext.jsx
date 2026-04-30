@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { API } from '../api/config';
 
 const AuthContext = createContext(null);
 
-const AUTH_API = `${import.meta.env.VITE_API_BASE_URL}/auth`;
+// AUTH_API is read from frontend/.env → VITE_API_BASE_URL (via api/config.js)
+const AUTH_API = API.AUTH;
 const STORAGE_KEY = 'namastute_auth';
 
 /**

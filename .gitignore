@@ -1,0 +1,38 @@
+# =============================================================================
+#  Namastute POS — Root .gitignore
+# =============================================================================
+
+# ── Environment files (NEVER commit real secrets) ────────────────────────────
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+# Allow example templates (safe to commit)
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# ── Build outputs ────────────────────────────────────────────────────────────
+frontend/dist/
+backend/target/
+
+# ── Dependencies ─────────────────────────────────────────────────────────────
+frontend/node_modules/
+
+# ── OS / Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── ngrok binary ─────────────────────────────────────────────────────────────
+ngrok.exe

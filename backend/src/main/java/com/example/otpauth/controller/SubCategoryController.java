@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/subcategories")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
+// CORS is handled globally in SecurityConfig.java — reads FRONTEND_URL from backend/.env
 public class SubCategoryController {
 
     private final SubCategoryService subCategoryService;

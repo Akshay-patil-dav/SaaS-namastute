@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ── Environment files (keep .env.example, ignore real secrets) ───────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Allow example template (no real secrets)
+!.env.example
