@@ -113,13 +113,13 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             <ul className={`pos-submenu ${openMenus.dashboard ? 'show' : ''}`}>
                                 <li>
                                     <NavLink to="/dashboard" end className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                        Admin Dashboard
+                                        Dashboard
                                     </NavLink>
                                 </li>
                                 {isAdminOrAbove && (
                                     <li>
                                         <NavLink to="/dashboard/admin2" className={({isActive}) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                            Admin Dashboard 2
+                                            Dashboard 2
                                         </NavLink>
                                     </li>
                                 )}
