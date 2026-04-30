@@ -285,7 +285,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     <NavLink to="/purchases" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                         <div className="pos-menu-link-content">
                                             <ShoppingBag className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Purchases</span>
+                                            <span>Purchase</span>
                                         </div>
                                     </NavLink>
                                 </li>

@@ -1,0 +1,200 @@
+.ap-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+.bg-soft-orange {
+    background-color: #fff7ed;
+    border: 1px solid #ffedd5;
+}
+
+.text-orange {
+    color: #f97316;
+}
+
+.vr {
+    width: 1px;
+    height: 1.5rem;
+    background-color: #e2e8f0;
+    opacity: 0.5;
+}
+
+.grand-total-display {
+    padding: 12px 24px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+/* Search Suggestions Dropdown */
+.search-suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    z-index: 1100;
+    list-style: none;
+    padding: 4px 0;
+    margin-top: 6px;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.search-suggestions-dropdown li {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.search-suggestions-dropdown li:last-child {
+    border-bottom: none;
+}
+
+.search-suggestions-dropdown li:hover {
+    background-color: #fff7ed; /* Light orange on hover */
+}
+
+.suggestion-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.suggestion-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.suggestion-barcode {
+    font-size: 11px;
+    color: #64748b;
+    letter-spacing: 0.5px;
+}
+
+.suggestion-price {
+    font-weight: 700;
+    color: #f97316;
+    background: #fff7ed;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.ap-table-product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ap-table-product-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    background-color: #f1f5f9;
+}
+
+.ap-qty-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    width: 100%;
+}
+
+.ap-qty-selector span {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.ap-qty-selector button {
+    background: none;
+    border: none;
+    color: #1b2850;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    transition: all 0.2s;
+}
+
+.ap-qty-selector button:hover {
+    color: #f97316;
+    transform: scale(1.1);
+}
+
+/* Toast Styles */
+.cp-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    font-weight: 600;
+    z-index: 9999;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease-out;
+}
+
+.cp-toast-success {
+    background-color: #10b981;
+}
+
+.cp-toast-error {
+    background-color: #ef4444;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.btn-orange:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Override standard table styles for more compact view in Add Purchase */
+.ap-table-wrapper {
+    overflow: visible; /* Ensure dropdown doesn't get cut off */
+    height: auto;
+    min-height: 100px;
+}
+.ss-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
+}
+
+.ss-table th {
+    padding: 12px 16px;
+}
+
+@media (max-width: 768px) {
+    .grand-total-display {
+        width: 100%;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+    }
+}

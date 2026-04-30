@@ -38,6 +38,10 @@ import Units from './pages/Units.jsx';
 import Warranties from './pages/Warranties.jsx';
 import PrintBarcode from './pages/PrintBarcode.jsx';
 import PrintQRCode from './pages/PrintQRCode.jsx';
+import Purchases from './pages/Purchases.jsx';
+import AddPurchase from './pages/AddPurchase.jsx';
+
+
 
 // ── Admin Pages ─────────────────────────────────────────────────────────────
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
@@ -180,6 +184,16 @@ function AppRoutes() {
                 path="/print-qrcode"
                 element={<PosPage roles={ADMIN_ROLES}><PrintQRCode /></PosPage>}
             />
+            <Route
+                path="/purchases"
+                element={<PosPage roles={ADMIN_ROLES}><Purchases /></PosPage>}
+            />
+            <Route
+                path="/add-purchase"
+                element={<PosPage roles={ADMIN_ROLES}><AddPurchase /></PosPage>}
+            />
+
+
 
             {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
             <Route
