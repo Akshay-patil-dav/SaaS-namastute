@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stocks")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:3000", "http://localhost:8080"})
+// CORS is handled globally in SecurityConfig.java — reads FRONTEND_URL from backend/.env
 public class StockController {
 
     private final StockService stockService;

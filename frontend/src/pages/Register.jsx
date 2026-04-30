@@ -5,6 +5,7 @@ import {
     User, Mail, Lock, EyeOff, Eye,
     Facebook, Apple, Sparkles, ShieldCheck, Zap,
 } from 'lucide-react';
+import { API } from '../api/config';
 import './Login.css';
 import './LoginNew.css';
 
@@ -227,7 +228,7 @@ export default function Register() {
                         <button
                             id="register-btn-facebook"
                             className="btn-social btn-social-fb"
-                            onClick={() => window.location.href = `${import.meta.env.VITE_BACKEND_BASE_URL}/oauth2/authorization/facebook`}
+                            onClick={() => window.location.href = API.OAUTH_FACEBOOK}
                             type="button"
                         >
                             <Facebook size={18} fill="currentColor" />
@@ -235,7 +236,7 @@ export default function Register() {
                         <button
                             id="register-btn-google"
                             className="btn-social btn-social-google"
-                            onClick={() => window.location.href = `${import.meta.env.VITE_BACKEND_BASE_URL}/oauth2/authorization/google`}
+                            onClick={() => window.location.href = API.OAUTH_GOOGLE}
                             type="button"
                         >
                             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '18px', height: '18px' }} />

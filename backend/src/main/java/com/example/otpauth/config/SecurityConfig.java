@@ -30,8 +30,16 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler successHandler;
 
+    // ─── Read from backend/.env → FRONTEND_URL ────────────────────────────────
+    // This is the primary allowed CORS origin (your frontend URL)
     @Value("${app.frontend-url}")
     private String frontendUrl;
+
+    // ─── Read from backend/.env → CORS_EXTRA_ORIGINS ──────────────────────────
+    // Optional: comma-separated extra origins (e.g. for dev ports, staging, etc.)
+    // Example: CORS_EXTRA_ORIGINS=http://localhost:5174,http://localhost:3000
+    @Value("${app.cors-extra-origins:}")
+    private String corsExtraOrigins;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
                           CustomOAuth2UserService customOAuth2UserService,
@@ -77,13 +85,23 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-            frontendUrl,
-            "http://localhost:5173", 
-            "http://localhost:5174", 
-            "http://localhost:3000", 
-            "http://localhost:8080"
-        ));
+        // ── CORS Allowed Origins ───────────────────────────────────────────────────
+        // ALL origins come from backend/.env via application.yml — zero hardcoding here.
+        //
+        //  backend/.env:
+        //    FRONTEND_URL=http://localhost:5173        ← your main allowed origin
+        //    CORS_EXTRA_ORIGINS=http://localhost:5174,http://localhost:3000
+        //
+        // Parse comma-separated extra origins from env
+        List<String> origins = new java.util.ArrayList<>();
+        origins.add(frontendUrl);                      // FRONTEND_URL from backend/.env
+        if (corsExtraOrigins != null && !corsExtraOrigins.isBlank()) {
+            for (String o : corsExtraOrigins.split(",")) {
+                String trimmed = o.trim();
+                if (!trimmed.isEmpty()) origins.add(trimmed);
+            }
+        }
+        configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
