@@ -40,7 +40,7 @@ import PrintBarcode from './pages/PrintBarcode.jsx';
 import PrintQRCode from './pages/PrintQRCode.jsx';
 import Purchases from './pages/Purchases.jsx';
 import AddPurchase from './pages/AddPurchase.jsx';
-
+import EditPurchase from './pages/EditPurchase.jsx';
 
 
 // ── Layouts ─────────────────────────────────────────────────────────────────
@@ -174,6 +174,10 @@ function AppRoutes() {
             <Route
                 path="/add-purchase"
                 element={<PosPage roles={ADMIN_ROLES}><AddPurchase /></PosPage>}
+            />
+            <Route
+                path="/edit-purchase/:id"
+                element={<PosPage roles={ADMIN_ROLES}><EditPurchase /></PosPage>}
             />
 
 

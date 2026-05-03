@@ -116,25 +116,48 @@ const AddPurchase = () => {
         setShowSuggestions(false);
     };
 
+    const calculateItem = (item) => {
+        const safeQty = item.qty === '' ? 0 : parseInt(item.qty) || 0;
+        const baseTotal = item.price * safeQty;
+        const totalDiscount = item.discount * safeQty;
+        const discountedTotal = baseTotal - totalDiscount;
+        const taxAmount = (discountedTotal * item.taxRate) / 100;
+        
+        return {
+            ...item,
+            taxAmount,
+            unitCost: (item.price - item.discount) + ((item.price - item.discount) * item.taxRate / 100),
+            totalCost: discountedTotal + taxAmount
+        };
+    };
+
+    const updateItemField = (id, field, value) => {
+        setItems(prev => prev.map(item => {
+            if (item.id === id) {
+                let val = parseFloat(value);
+                if (isNaN(val)) val = 0;
+                return calculateItem({ ...item, [field]: val });
+            }
+            return item;
+        }));
+    };
+
     const addItem = (product) => {
         setItems(prev => {
             const existing = prev.find(item => item.id === product.id);
             if (existing) {
                 return prev.map(item => 
                     item.id === product.id 
-                    ? { ...item, qty: item.qty + 1 } 
+                    ? calculateItem({ ...item, qty: item.qty + 1 })
                     : item
                 );
             }
-            return [...prev, {
+            return [...prev, calculateItem({
                 ...product,
                 qty: 1,
                 discount: 0,
-                taxRate: product.tax,
-                taxAmount: (product.price * product.tax) / 100,
-                unitCost: product.price + (product.price * product.tax) / 100,
-                totalCost: product.price + (product.price * product.tax) / 100
-            }];
+                taxRate: product.taxRate || 0
+            })];
         });
     };
 
@@ -143,17 +166,15 @@ const AddPurchase = () => {
     };
 
     const updateQty = (id, newQty) => {
+        let qty = newQty;
+        if (qty !== '') {
+            qty = parseInt(qty);
+            if (isNaN(qty) || qty < 1) qty = 1;
+        }
+
         setItems(prev => prev.map(item => {
             if (item.id === id) {
-                const qty = Math.max(1, parseInt(newQty) || 1);
-                const baseTotal = item.price * qty;
-                const taxAmount = (baseTotal * item.taxRate) / 100;
-                return { 
-                    ...item, 
-                    qty, 
-                    taxAmount, 
-                    totalCost: baseTotal + taxAmount - (item.discount * qty)
-                };
+                return calculateItem({ ...item, qty });
             }
             return item;
         }));
@@ -180,32 +201,35 @@ const AddPurchase = () => {
 
         setIsSubmitting(true);
         
-        // Mocking the save process
-        setTimeout(() => {
-            const newPurchase = {
-                id: Date.now(),
-                supplier,
-                reference,
-                date: new Date(date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-                status,
-                total: calculateGrandTotal(),
-                paid: calculateGrandTotal(), // Assuming full payment for now
-                due: 0,
-                paymentStatus: 'Paid'
-            };
+        const newPurchase = {
+            supplier,
+            reference,
+            date: date, // Keep original YYYY-MM-DD
+            status,
+            total: calculateGrandTotal(),
+            paid: calculateGrandTotal(), // Assuming full payment for now
+            due: 0,
+            paymentStatus: 'Paid',
+            orderTax,
+            discount: orderDiscount,
+            shipping,
+            productsJson: JSON.stringify(items),
+            notes: description
+        };
 
-            // Save to localStorage
-            const existing = JSON.parse(localStorage.getItem('purchases') || '[]');
-            localStorage.setItem('purchases', JSON.stringify([newPurchase, ...existing]));
-
-            setToast({ type: 'success', message: 'Purchase saved successfully!' });
-            setIsSubmitting(false);
-
-            // Redirect after delay
-            setTimeout(() => {
-                navigate('/purchases');
-            }, 1500);
-        }, 1000);
+        axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchases`, newPurchase)
+            .then(res => {
+                setToast({ type: 'success', message: 'Purchase saved successfully!' });
+                setIsSubmitting(false);
+                setTimeout(() => {
+                    navigate('/purchases');
+                }, 1500);
+            })
+            .catch(err => {
+                console.error("Error saving purchase", err);
+                setToast({ type: 'error', message: 'Failed to save purchase.' });
+                setIsSubmitting(false);
+            });
     };
 
     return (
@@ -348,18 +372,30 @@ const AddPurchase = () => {
                                                         <button type="button" onClick={() => updateQty(item.id, item.qty + 1)}>
                                                             <PlusCircle size={18} />
                                                         </button>
-                                                        <span>{item.qty}</span>
+                                                        <input 
+                                                            type="number" 
+                                                            className="cp-input text-center mx-1" 
+                                                            value={item.qty} 
+                                                            onChange={(e) => updateQty(item.id, e.target.value)}
+                                                            style={{ width: '50px', padding: '2px 4px', height: '30px' }}
+                                                        />
                                                         <button type="button" onClick={() => updateQty(item.id, item.qty - 1)}>
                                                             <MinusCircle size={18} />
                                                         </button>
                                                     </div>
                                                 </td>
-                                                <td>{item.price}</td>
-                                                <td>0</td>
-                                                <td>{item.taxRate}</td>
+                                                <td>
+                                                    <input type="number" className="cp-input" value={item.price} onChange={(e) => updateItemField(item.id, 'price', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
+                                                </td>
+                                                <td>
+                                                    <input type="number" className="cp-input" value={item.discount} onChange={(e) => updateItemField(item.id, 'discount', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
+                                                </td>
+                                                <td>
+                                                    <input type="number" className="cp-input" value={item.taxRate} onChange={(e) => updateItemField(item.id, 'taxRate', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
+                                                </td>
                                                 <td>{item.taxAmount.toFixed(2)}</td>
-                                                <td>{item.price.toFixed(0)}</td>
-                                                <td className="fw-bold text-dark">{(item.totalCost).toFixed(0)}</td>
+                                                <td>{item.unitCost.toFixed(2)}</td>
+                                                <td className="fw-bold text-dark">{(item.totalCost).toFixed(2)}</td>
 
                                                 <td style={{ textAlign: 'center' }}>
                                                     <button type="button" className="ss-action-btn delete" onClick={() => removeItem(item.id)}>

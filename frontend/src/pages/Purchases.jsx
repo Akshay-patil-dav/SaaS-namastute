@@ -17,6 +17,10 @@ import {
     Upload,
     MoreVertical
 } from 'lucide-react';
+import axios from 'axios';
+import ViewPurchaseModal from '../components/ViewPurchaseModal';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import ImportPurchaseModal from '../components/ImportPurchaseModal';
 
 const mockPurchasesData = [
     { id: 1, supplier: 'Electro Mart', reference: 'PT001', date: '24 Dec 2024', status: 'Received', total: 1000, paid: 1000, due: 0, paymentStatus: 'Paid' },
@@ -33,28 +37,63 @@ const mockPurchasesData = [
 
 const Purchases = () => {
     const navigate = useNavigate();
-    const [purchases, setPurchases] = useState(mockPurchasesData);
+    const [purchases, setPurchases] = useState([]);
+    const [loading, setLoading] = useState(false);
+    
+    // Modal state
+    const [viewModalOpen, setViewModalOpen] = useState(false);
+    const [selectedPurchase, setSelectedPurchase] = useState(null);
+    
+    // Delete state
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    // Import state
+    const [importModalOpen, setImportModalOpen] = useState(false);
+
+    const fetchPurchases = async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchases`);
+            // Format dates
+            const formatted = res.data.map(p => ({
+                ...p,
+                date: p.formattedDate || new Date(p.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            }));
+            setPurchases(formatted);
+        } catch (error) {
+            console.error('Error fetching purchases:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        // Load locally saved purchases (to bridge between Add Purchase and this list)
-        const savedPurchases = JSON.parse(localStorage.getItem('purchases') || '[]');
-        if (savedPurchases.length > 0) {
-            setPurchases(prev => {
-                // Filter out any duplicates if they exist, then prepend new ones
-                const combined = [...savedPurchases, ...mockPurchasesData];
-                // Unique by reference or id
-                const unique = Array.from(new Map(combined.map(item => [item.reference, item])).values());
-                return unique;
-            });
-        }
+        fetchPurchases();
     }, []);
+
+    const handleDeleteConfirm = async () => {
+        if (!itemToDelete) return;
+        setIsDeleting(true);
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/purchases/${itemToDelete}`);
+            setDeleteModalOpen(false);
+            setItemToDelete(null);
+            fetchPurchases();
+        } catch (error) {
+            console.error('Error deleting purchase:', error);
+            // Optionally add a toast error here
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     const [searchTerm, setSearchTerm] = useState('');
     const [paymentStatusFilter, setPaymentStatusFilter] = useState('All');
     const [selectedIds, setSelectedIds] = useState([]);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    const [loading, setLoading] = useState(false);
 
     // Filtering logic
     const filteredData = purchases.filter(item => {
@@ -103,8 +142,7 @@ const Purchases = () => {
     };
 
     const handleRefresh = () => {
-        setLoading(true);
-        setTimeout(() => setLoading(false), 800);
+        fetchPurchases();
     };
 
     return (
@@ -149,11 +187,35 @@ const Purchases = () => {
                     <button className="ss-btn-orange" onClick={() => navigate('/add-purchase')}>
                         <Plus size={16} /> Add Purchase
                     </button>
-                    <button className="ss-btn-orange" style={{ background: '#1b2850', borderColor: '#1b2850' }}>
+                    <button className="ss-btn-orange" style={{ background: '#1b2850', borderColor: '#1b2850' }} onClick={() => setImportModalOpen(true)}>
                         <Upload size={16} /> Import Purchase
                     </button>
                 </div>
             </div>
+
+            {/* View Modal */}
+            <ViewPurchaseModal 
+                isOpen={viewModalOpen} 
+                purchase={selectedPurchase} 
+                onClose={() => setViewModalOpen(false)} 
+            />
+
+            {/* Delete Modal */}
+            <DeleteConfirmModal
+                isOpen={deleteModalOpen}
+                onClose={() => { setDeleteModalOpen(false); setItemToDelete(null); }}
+                onConfirm={handleDeleteConfirm}
+                title="Delete Purchase"
+                message="Are you sure you want to delete this purchase? This action cannot be undone."
+                isDeleting={isDeleting}
+            />
+
+            {/* Import Modal */}
+            <ImportPurchaseModal 
+                isOpen={importModalOpen}
+                onClose={() => setImportModalOpen(false)}
+                onSuccess={fetchPurchases}
+            />
 
             {/* Main Panel */}
             <div className="ss-main-panel">
@@ -244,13 +306,13 @@ const Purchases = () => {
                                         </td>
                                         <td>
                                             <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
-                                                <button className="ss-action-btn view" title="View">
+                                                <button className="ss-action-btn view" title="View" onClick={() => { setSelectedPurchase(item); setViewModalOpen(true); }}>
                                                     <Eye size={15} />
                                                 </button>
-                                                <button className="ss-action-btn edit" title="Edit">
+                                                <button className="ss-action-btn edit" title="Edit" onClick={() => navigate(`/edit-purchase/${item.id}`)}>
                                                     <Pencil size={15} />
                                                 </button>
-                                                <button className="ss-action-btn delete" title="Delete">
+                                                <button className="ss-action-btn delete" title="Delete" onClick={() => { setItemToDelete(item.id); setDeleteModalOpen(true); }}>
                                                     <Trash2 size={15} />
                                                 </button>
                                             </div>
