@@ -101,7 +101,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <span className="pos-badge">1</span>
                 </button>
 
-                <button className="pos-icon-btn hide-on-mobile">
+                <button className="pos-icon-btn hide-on-mobile" onClick={() => navigate('/settings')}>
                     <Settings size={18} />
                 </button>
 
@@ -177,7 +177,10 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                     style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#374151', textAlign: 'left', transition: 'background 0.15s' }}
                                     onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
                                     onMouseOut={(e) => e.currentTarget.style.background = 'white'}
-                                    onClick={() => setProfileOpen(false)}
+                                    onClick={() => {
+                                        setProfileOpen(false);
+                                        navigate('/settings');
+                                    }}
                                 >
                                     <User size={15} color="#888" /> My Profile
                                 </button>

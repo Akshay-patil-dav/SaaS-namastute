@@ -41,7 +41,10 @@ import PrintQRCode from './pages/PrintQRCode.jsx';
 import Purchases from './pages/Purchases.jsx';
 import AddPurchase from './pages/AddPurchase.jsx';
 import EditPurchase from './pages/EditPurchase.jsx';
-
+import PurchaseReturn from './pages/PurchaseReturn.jsx';
+import AddPurchaseReturn from './pages/AddPurchaseReturn.jsx';
+import EditPurchaseReturn from './pages/EditPurchaseReturn.jsx';
+import Settings from './pages/Settings.jsx';
 
 // ── Layouts ─────────────────────────────────────────────────────────────────
 import PosLayout from './components/layout/PosLayout';
@@ -179,7 +182,22 @@ function AppRoutes() {
                 path="/edit-purchase/:id"
                 element={<PosPage roles={ADMIN_ROLES}><EditPurchase /></PosPage>}
             />
-
+            <Route
+                path="/purchase-return"
+                element={<PosPage roles={ADMIN_ROLES}><PurchaseReturn /></PosPage>}
+            />
+            <Route
+                path="/add-purchase-return"
+                element={<PosPage roles={ADMIN_ROLES}><AddPurchaseReturn /></PosPage>}
+            />
+            <Route
+                path="/edit-purchase-return/:id"
+                element={<PosPage roles={ADMIN_ROLES}><EditPurchaseReturn /></PosPage>}
+            />
+            <Route
+                path="/settings"
+                element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
+            />
 
 
             {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
