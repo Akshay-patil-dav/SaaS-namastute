@@ -80,11 +80,10 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, unitData }) => {
                         )}
                         
                         <div className="form-group mb-3">
-                            <label>Unit Name <span className="required">*</span></label>
+                            <label>Unit <span className="required" style={{color: 'red'}}>*</span></label>
                             <input 
                                 type="text" 
                                 className="form-input" 
-                                placeholder="Enter unit name"
                                 value={unitName}
                                 onChange={(e) => setUnitName(e.target.value)}
                                 required
@@ -92,11 +91,10 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, unitData }) => {
                         </div>
 
                         <div className="form-group mb-3">
-                            <label>Short Name <span className="required">*</span></label>
+                            <label>Short Name <span className="required" style={{color: 'red'}}>*</span></label>
                             <input 
                                 type="text" 
                                 className="form-input" 
-                                placeholder="Enter short name"
                                 value={shortName}
                                 onChange={(e) => setShortName(e.target.value)}
                                 required
@@ -104,7 +102,7 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, unitData }) => {
                         </div>
 
                         <div className="status-toggle-container">
-                            <label>Status <span className="required">*</span></label>
+                            <label>Status</label>
                             <label className="switch">
                                 <input 
                                     type="checkbox" 

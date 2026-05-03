@@ -77,12 +77,12 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <ChevronDown size={14} color="#888" />
                 </div>
 
-                <a href="#" className="pos-btn-orange">
+                {/* <a href="#" className="pos-btn-orange">
                     <PlusCircle size={16} />
                     <span>Add New</span>
-                </a>
+                </a> */}
 
-                <a href="#" className="pos-btn-dark">
+                <a href="#"className="pos-btn-orange">
                     <MonitorDot size={16} />
                     <span>POS</span>
                 </a>
