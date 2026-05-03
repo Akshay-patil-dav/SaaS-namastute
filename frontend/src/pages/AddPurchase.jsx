@@ -48,6 +48,7 @@ const AddPurchase = () => {
     const [orderDiscount, setOrderDiscount] = useState(0);
     const [shipping, setShipping] = useState(0);
     const [status, setStatus] = useState('Pending');
+    const [paymentStatus, setPaymentStatus] = useState('Paid');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toast, setToast] = useState(null); // { type: 'success', message: '' }
 
@@ -207,9 +208,9 @@ const AddPurchase = () => {
             date: date, // Keep original YYYY-MM-DD
             status,
             total: calculateGrandTotal(),
-            paid: calculateGrandTotal(), // Assuming full payment for now
-            due: 0,
-            paymentStatus: 'Paid',
+            paid: paymentStatus === 'Paid' ? calculateGrandTotal() : 0,
+            due: paymentStatus === 'Paid' ? 0 : calculateGrandTotal(),
+            paymentStatus: paymentStatus,
             orderTax,
             discount: orderDiscount,
             shipping,
@@ -446,6 +447,14 @@ const AddPurchase = () => {
                                     <option>Received</option>
                                     <option>Pending</option>
                                     <option>Ordered</option>
+                                </select>
+                            </div>
+                            <div className="col-md-3 cp-form-group">
+                                <label className="cp-label">Payment Status <span className="required">*</span></label>
+                                <select className="cp-input" value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value)} required>
+                                    <option>Paid</option>
+                                    <option>Unpaid</option>
+                                    <option>Overdue</option>
                                 </select>
                             </div>
                             <div className="col-12 cp-form-group mt-2">

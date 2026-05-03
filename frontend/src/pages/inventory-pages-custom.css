@@ -462,6 +462,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .ss-page-btn {
@@ -597,6 +599,10 @@
     align-items: flex-start;
     gap: 15px;
   }
+  .ss-header-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
   .ss-table-controls {
     flex-direction: column;
     align-items: flex-start;
@@ -605,7 +611,15 @@
   .ss-search-wrap, .ss-filters-wrap {
     width: 100%;
   }
+  .ss-filter-select {
+    width: 100%;
+  }
   .ss-stat-card {
     padding: 15px;
+  }
+  .ss-pagination-row {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
   }
 }

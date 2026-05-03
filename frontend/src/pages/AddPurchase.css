@@ -174,7 +174,7 @@
 
 /* Override standard table styles for more compact view in Add Purchase */
 .ap-table-wrapper {
-    overflow: visible; /* Ensure dropdown doesn't get cut off */
+    overflow-x: auto; /* Allow horizontal scroll for responsive table */
     height: auto;
     min-height: 100px;
 }

@@ -28,12 +28,12 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const EditPurchase = () => {
+const EditPurchaseReturn = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [supplier, setSupplier] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [reference, setReference] = useState('REF-' + Math.floor(Math.random() * 10000));
+    const [reference, setReference] = useState('');
     const [description, setDescription] = useState('');
     const [productSearch, setProductSearch] = useState('');
     const [items, setItems] = useState([]);
@@ -48,7 +48,7 @@ const EditPurchase = () => {
     const [orderTax, setOrderTax] = useState(0);
     const [orderDiscount, setOrderDiscount] = useState(0);
     const [shipping, setShipping] = useState(0);
-    const [status, setStatus] = useState('Pending');
+    const [status, setStatus] = useState('Returned');
     const [paymentStatus, setPaymentStatus] = useState('Paid');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toast, setToast] = useState(null); // { type: 'success', message: '' }
@@ -78,17 +78,17 @@ const EditPurchase = () => {
         fetchProducts();
     }, []);
 
-    // ── Fetch Purchase Details ───────────────────────────────────────────────
+    // ── Fetch Purchase Return Details ────────────────────────────────────────
     useEffect(() => {
         if (!id) return;
-        const fetchPurchase = async () => {
+        const fetchPurchaseReturn = async () => {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchases/${id}`);
+                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns/${id}`);
                 const data = res.data;
                 setSupplier(data.supplier || '');
                 setDate(data.date || new Date().toISOString().split('T')[0]);
                 setReference(data.reference || '');
-                setStatus(data.status || 'Pending');
+                setStatus(data.status || 'Returned');
                 setPaymentStatus(data.paymentStatus || 'Paid');
                 setOrderTax(data.orderTax || 0);
                 setOrderDiscount(data.discount || 0);
@@ -102,11 +102,11 @@ const EditPurchase = () => {
                     setItems([]);
                 }
             } catch (err) {
-                console.error('Failed to fetch purchase', err);
-                setToast({ type: 'error', message: 'Failed to load purchase details.' });
+                console.error('Failed to fetch purchase return', err);
+                setToast({ type: 'error', message: 'Failed to load purchase return details.' });
             }
         };
-        fetchPurchase();
+        fetchPurchaseReturn();
     }, [id]);
 
     // ── Search & Auto-add Logic ──────────────────────────────────────────────
@@ -234,10 +234,10 @@ const EditPurchase = () => {
 
         setIsSubmitting(true);
         
-        const newPurchase = {
+        const updatePayload = {
             supplier,
             reference,
-            date: date, // Keep original YYYY-MM-DD
+            date: date,
             status,
             total: calculateGrandTotal(),
             paid: paymentStatus === 'Paid' ? calculateGrandTotal() : 0,
@@ -250,17 +250,17 @@ const EditPurchase = () => {
             notes: description
         };
 
-        axios.put(`${import.meta.env.VITE_API_BASE_URL}/purchases/${id}`, newPurchase)
+        axios.put(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns/${id}`, updatePayload)
             .then(res => {
-                setToast({ type: 'success', message: 'Purchase saved successfully!' });
+                setToast({ type: 'success', message: 'Purchase return updated successfully!' });
                 setIsSubmitting(false);
                 setTimeout(() => {
-                    navigate('/purchases');
+                    navigate('/purchase-return');
                 }, 1500);
             })
             .catch(err => {
-                console.error("Error saving purchase", err);
-                setToast({ type: 'error', message: 'Failed to save purchase.' });
+                console.error("Error updating purchase return", err);
+                setToast({ type: 'error', message: 'Failed to update purchase return.' });
                 setIsSubmitting(false);
             });
     };
@@ -277,8 +277,8 @@ const EditPurchase = () => {
             {/* Header */}
             <div className="cp-header mb-4">
                 <div className="cp-title">
-                    <h4>Edit Purchase</h4>
-                    <p>Modify an existing purchase order in your inventory</p>
+                    <h4>Edit Purchase Return</h4>
+                    <p>Modify an existing purchase return in your inventory</p>
                 </div>
                 <div className="cp-actions">
                     <button className="btn-icon-action" title="Reset form" onClick={() => setItems([])}>
@@ -287,8 +287,8 @@ const EditPurchase = () => {
                     <button className="btn-icon-action" title="Collapse">
                         <ChevronUp size={18} />
                     </button>
-                    <button onClick={() => navigate('/purchases')} className="btn-dark-blue text-decoration-none d-flex align-items-center gap-2">
-                        <ArrowLeft size={18} /> Back to Purchase
+                    <button onClick={() => navigate('/purchase-return')} className="btn-dark-blue text-decoration-none d-flex align-items-center gap-2">
+                        <ArrowLeft size={18} /> Back to Purchase Returns
                     </button>
                 </div>
             </div>
@@ -380,7 +380,7 @@ const EditPurchase = () => {
                                     <tr>
                                         <th style={{ background: '#f8fafc' }}>Product Name</th>
                                         <th style={{ background: '#f8fafc', textAlign: 'center' }}>QTY</th>
-                                        <th style={{ background: '#f8fafc' }}>Purchase Price($)</th>
+                                        <th style={{ background: '#f8fafc' }}>Return Price($)</th>
                                         <th style={{ background: '#f8fafc' }}>Discount($)</th>
                                         <th style={{ background: '#f8fafc' }}>Tax %</th>
                                         <th style={{ background: '#f8fafc' }}>Tax Amount($)</th>
@@ -476,9 +476,9 @@ const EditPurchase = () => {
                             <div className="col-md-3 cp-form-group">
                                 <label className="cp-label">Status <span className="required">*</span></label>
                                 <select className="cp-input" value={status} onChange={(e) => setStatus(e.target.value)} required>
-                                    <option>Received</option>
+                                    <option>Returned</option>
                                     <option>Pending</option>
-                                    <option>Ordered</option>
+                                    <option>Cancelled</option>
                                 </select>
                             </div>
                             <div className="col-md-3 cp-form-group">
@@ -521,14 +521,14 @@ const EditPurchase = () => {
                         <span className="ms-2 fw-bold text-dark h4 mb-0">${calculateGrandTotal().toFixed(2)}</span>
                     </div>
                     <div className="cp-footer mb-0">
-                        <button type="button" className="btn-dark-blue px-4 py-2" onClick={() => navigate('/purchases')}>Cancel</button>
+                        <button type="button" className="btn-dark-blue px-4 py-2" onClick={() => navigate('/purchase-return')}>Cancel</button>
                         <button type="submit" className="btn-orange px-4 py-2" disabled={isSubmitting}>
                             {isSubmitting ? (
                                 <>
                                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                     Saving...
                                 </>
-                            ) : 'Update Purchase'}
+                            ) : 'Update Return'}
                         </button>
                     </div>
                 </div>
@@ -537,4 +537,4 @@ const EditPurchase = () => {
     );
 };
 
-export default EditPurchase;
+export default EditPurchaseReturn;

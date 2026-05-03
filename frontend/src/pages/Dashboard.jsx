@@ -75,13 +75,13 @@ export default function Dashboard() {
             </div>
 
             {/* Warning Banner */}
-            <div className="warning-header mb-4">
+            {/* <div className="warning-header mb-4">
                 <div className="d-flex align-items-center gap-2">
                     <Info size={18} />
                     <span>Your Product Aviva - 3D icon is out of stock. <a href="#" className="text-decoration-underline text-orange-600">Buy now.</a></span>
                 </div>
                 <button className="btn-close" style={{fontSize: '0.75rem'}}></button>
-            </div>
+            </div> */}
 
             {/* Top Cards Row 1 */}
             <div className="row g-3 mb-3">
