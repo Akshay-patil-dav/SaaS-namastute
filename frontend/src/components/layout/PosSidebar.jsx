@@ -258,14 +258,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     </NavLink>
                                 </li>
-                                <li className="pos-menu-item">
+                                {/* <li className="pos-menu-item">
                                     <a className="pos-menu-link">
                                         <div className="pos-menu-link-content">
                                             <Copy className="pos-menu-icon" strokeWidth={1.5} />
                                             <span>Quotation</span>
                                         </div>
                                     </a>
-                                </li>
+                                </li> */}
                                 <li className="pos-menu-item">
                                     <a className="pos-menu-link">
                                         <div className="pos-menu-link-content">
