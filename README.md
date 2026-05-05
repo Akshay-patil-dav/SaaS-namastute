@@ -19,7 +19,8 @@ https://saa-s-namastute.vercel.app/login
 
 ## 🏗️ System Architecture
 
-![System Architecture](./images/system_architecture.png)
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/2f65c3fa-e097-4bfa-900d-9796c3c5aefb" />
+
 
 | Layer | Technology | Port |
 |-------|-----------|------|
