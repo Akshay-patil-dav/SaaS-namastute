@@ -33,6 +33,7 @@ https://saa-s-namastute.vercel.app/login
 ---
 
 ## 🔐 Authentication & RBAC
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/b94a969d-6b61-4ba3-befa-aa716caef9dd" />
 
 ![RBAC Flow](./images/rbac_flow.png)
 
