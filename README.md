@@ -1,5 +1,11 @@
+## **Live : ** https://saa-s-namastute.vercel.app/login
 
-https://saa-s-namastute.vercel.app/login
+<img width="3020" height="1722" alt="localhost_5173_login" src="https://github.com/user-attachments/assets/8ffa6d20-3b5a-495f-b164-6baab14dae79" />
+<img width="3020" height="13240" alt="localhost_5173_" src="https://github.com/user-attachments/assets/3c25d413-6456-4179-bd14-d1ccba31e8a3" />
+<img width="3200" height="6054" alt="localhost_5173_ (1)" src="https://github.com/user-attachments/assets/6ba7a6d2-5f5e-4816-84e5-3c79fc50ac18" />
+<img width="3200" height="3206" alt="localhost_5173_ (2)" src="https://github.com/user-attachments/assets/0641a377-f89c-46d5-86ed-ed513189d71f" />
+
+
 
 
 # 📦 Namastute — SaaS Inventory & POS Platform
@@ -10,10 +16,13 @@ https://saa-s-namastute.vercel.app/login
 ## 📸 UI Preview
 
 ### Admin Dashboard
-![Dashboard 1](./screenshots/dashboard1.png)
+<img width="3020" height="1722" alt="localhost_5173_login" src="https://github.com/user-attachments/assets/dc4ccee2-66e0-4c90-8078-838dfd89f9f0" />
+<img width="3200" height="1830" alt="localhost_5173_login (1)" src="https://github.com/user-attachments/assets/c2c4a60e-335d-43c6-9694-9c4ee1e22ad0" />
 
-### Dashboard 2 — Analytics
-![Dashboard 2](./screenshots/dashboard2.png)
+
+### Dashboard 2 — Add Product Page 
+<img width="3200" height="1830" alt="localhost_5173_login (2)" src="https://github.com/user-attachments/assets/7a58f6b3-310b-490b-812b-eeaa975c841b" />
+
 
 ---
 
