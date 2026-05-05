@@ -1,8 +1,8 @@
 ## **Live : ** https://saa-s-namastute.vercel.app/login
 
 <img width="5020" height="13240" alt="localhost_5173_" src="https://github.com/user-attachments/assets/3c25d413-6456-4179-bd14-d1ccba31e8a3" />
-<img width="3200" height="6054" alt="localhost_5173_ (1)" src="https://github.com/user-attachments/assets/6ba7a6d2-5f5e-4816-84e5-3c79fc50ac18" />
-<img width="3200" height="3206" alt="localhost_5173_ (2)" src="https://github.com/user-attachments/assets/0641a377-f89c-46d5-86ed-ed513189d71f" />
+<!-- <img width="3200" height="6054" alt="localhost_5173_ (1)" src="https://github.com/user-attachments/assets/6ba7a6d2-5f5e-4816-84e5-3c79fc50ac18" />
+<img width="3200" height="3206" alt="localhost_5173_ (2)" src="https://github.com/user-attachments/assets/0641a377-f89c-46d5-86ed-ed513189d71f" /> -->
 
 
 
