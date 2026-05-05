@@ -30,9 +30,6 @@ https://saa-s-namastute.vercel.app/login
 | Tunnel (Dev) | ngrok | Dynamic |
 
 
-<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/d89f5935-28e1-489c-8763-07780f67c977" />
-
-
 ---
 
 ## 🔐 Authentication & RBAC
