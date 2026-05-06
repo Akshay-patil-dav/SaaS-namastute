@@ -195,7 +195,7 @@ function AppRoutes() {
                 element={<PosPage roles={ADMIN_ROLES}><EditPurchaseReturn /></PosPage>}
             />
             <Route
-                path="/settings"
+                path="/settings/*"
                 element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
             />
 
