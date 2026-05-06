@@ -10,7 +10,16 @@ import {
     ChevronDown, 
     User, 
     MapPin,
-    Plus
+    Plus,
+    EyeOff,
+    Shield,
+    Phone,
+    Mail,
+    Key,
+    Activity,
+    Ban,
+    Trash2,
+    CheckCircle2
 } from 'lucide-react';
 import './settings.css';
 
@@ -228,7 +237,144 @@ export default function Settings() {
                         </>
                     )}
                     
-                    {activeTab !== 'profile' && (
+                    {activeTab === 'security' && (
+                        <>
+                            <div className="settings-content-header">
+                                <h3>Security</h3>
+                            </div>
+                            <div className="settings-content-body" style={{ padding: '24px' }}>
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <EyeOff size={18} />
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Password</h4>
+                                        <p>Last Changed 22 Dec 2024, 10:30 AM</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <button className="btn-action orange">Change Password</button>
+                                    </div>
+                                </div>
+
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <Shield size={18} />
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Two Factor Authentication</h4>
+                                        <p>Receive codes via SMS or email every time you login</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <label className="toggle-switch">
+                                            <input type="checkbox" defaultChecked />
+                                            <span className="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <span style={{ fontSize: '14px', fontWeight: 'bold' }}>G</span>
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Google Authentication</h4>
+                                        <p>Connect to Google</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <span className="status-text">Connected</span>
+                                        <label className="toggle-switch">
+                                            <input type="checkbox" defaultChecked />
+                                            <span className="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <Phone size={18} />
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Phone Number Verification</h4>
+                                        <p>Verified Mobile Number : +81699799974</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <CheckCircle2 size={18} className="verified-icon" />
+                                        <button className="btn-action orange">Change</button>
+                                        <button className="btn-action dark">Remove</button>
+                                    </div>
+                                </div>
+
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <Mail size={18} />
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Email Verification</h4>
+                                        <p>Verified Email : info@example.com</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <CheckCircle2 size={18} className="verified-icon" />
+                                        <button className="btn-action orange">Change</button>
+                                        <button className="btn-action dark">Remove</button>
+                                    </div>
+                                </div>
+
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <Key size={18} />
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Device Management</h4>
+                                        <p>Manage devices associated with the account</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <button className="btn-action orange">Manage</button>
+                                    </div>
+                                </div>
+
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <Activity size={18} />
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Account Activity</h4>
+                                        <p>Manage activities associated with the account</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <button className="btn-action orange">View</button>
+                                    </div>
+                                </div>
+
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <Ban size={18} />
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Deactivate Account</h4>
+                                        <p>This will shutdown your account. Your account will be reactive when you sign in again</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <button className="btn-action orange">Deactivate</button>
+                                    </div>
+                                </div>
+
+                                <div className="security-item">
+                                    <div className="security-item-icon">
+                                        <Trash2 size={18} />
+                                    </div>
+                                    <div className="security-item-content">
+                                        <h4>Delete Account</h4>
+                                        <p>Your account will be permanently deleted</p>
+                                    </div>
+                                    <div className="security-item-action">
+                                        <button className="btn-action red">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                    
+                    {activeTab !== 'profile' && activeTab !== 'security' && (
                         <div className="settings-content-body d-flex justify-content-center align-items-center" style={{ minHeight: '300px', color: '#64748b' }}>
                             <p>Coming Soon</p>
                         </div>
