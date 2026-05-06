@@ -221,19 +221,33 @@
 }
 
 .settings-form-group input,
-.settings-form-group select {
+.settings-form-group select,
+.settings-form-group textarea {
+    width: 100%;
     padding: 10px 12px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     font-size: 0.875rem;
     color: #1e293b;
+    background-color: #fff;
     outline: none;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    font-family: inherit;
+    resize: vertical;
 }
 
 .settings-form-group input:focus,
-.settings-form-group select:focus {
-    border-color: #94a3b8;
+.settings-form-group select:focus,
+.settings-form-group textarea:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.settings-form-group input[type="color"] {
+    padding: 2px 4px;
+    height: 42px;
+    cursor: pointer;
 }
 
 .settings-divider {
@@ -431,6 +445,38 @@ input:checked + .toggle-slider:before {
 
 .verified-icon {
     color: #10b981;
+}
+
+/* Settings Tables */
+.settings-content-body .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.settings-content-body .table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.875rem;
+}
+
+.settings-content-body .table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #1e293b;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.settings-content-body .table tr:last-child td {
+    border-bottom: none;
 }
 
 /* Responsive */
