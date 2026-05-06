@@ -22,9 +22,20 @@ import {
     CheckCircle2
 } from 'lucide-react';
 import './settings.css';
+import { Notifications, ConnectedApps } from '../components/settings/GeneralSettings';
+import { SystemSettings, CompanySettings, Localization, Prefixes, Preference, Appearance, SocialAuthentication, Language } from '../components/settings/WebsiteSettings';
+import { InvoiceSettings, InvoiceTemplate, Printer, PosSettings, CustomFields } from '../components/settings/AppSettings';
+import { EmailSettings, EmailTemplate, SmsSettings, SmsTemplate, OtpSettings, GdprCookies } from '../components/settings/SystemSettings';
+import { PaymentGateway, BankAccounts, TaxRates, Currencies } from '../components/settings/FinancialSettings';
+import { Storage, BanIp } from '../components/settings/OtherSettings';
 
 export default function Settings() {
     const [generalOpen, setGeneralOpen] = useState(true);
+    const [websiteOpen, setWebsiteOpen] = useState(false);
+    const [appOpen, setAppOpen] = useState(false);
+    const [systemOpen, setSystemOpen] = useState(false);
+    const [financialOpen, setFinancialOpen] = useState(false);
+    const [otherOpen, setOtherOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('profile');
 
     return (
@@ -83,57 +94,117 @@ export default function Settings() {
 
                     {/* Website Settings */}
                     <div className="settings-sidebar-section">
-                        <div className="settings-sidebar-section-title">
+                        <div 
+                            className={`settings-sidebar-section-title ${websiteOpen ? 'active' : ''}`}
+                            onClick={() => setWebsiteOpen(!websiteOpen)}
+                        >
                             <div className="settings-sidebar-section-icon">
                                 <Globe size={18} />
                                 <span>Website Settings</span>
                             </div>
-                            <ChevronDown size={16} />
+                            {websiteOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
+                        {websiteOpen && (
+                            <ul className="settings-sidebar-list">
+                                <li className={`settings-sidebar-item ${activeTab === 'system_settings' ? 'active' : ''}`} onClick={() => setActiveTab('system_settings')}>System Settings</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'company_settings' ? 'active' : ''}`} onClick={() => setActiveTab('company_settings')}>Company Settings</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'localization' ? 'active' : ''}`} onClick={() => setActiveTab('localization')}>Localization</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'prefixes' ? 'active' : ''}`} onClick={() => setActiveTab('prefixes')}>Prefixes</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'preference' ? 'active' : ''}`} onClick={() => setActiveTab('preference')}>Preference</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'appearance' ? 'active' : ''}`} onClick={() => setActiveTab('appearance')}>Appearance</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'social_authentication' ? 'active' : ''}`} onClick={() => setActiveTab('social_authentication')}>Social Authentication</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'language' ? 'active' : ''}`} onClick={() => setActiveTab('language')}>Language</li>
+                            </ul>
+                        )}
                     </div>
 
                     {/* App Settings */}
                     <div className="settings-sidebar-section">
-                        <div className="settings-sidebar-section-title">
+                        <div 
+                            className={`settings-sidebar-section-title ${appOpen ? 'active' : ''}`}
+                            onClick={() => setAppOpen(!appOpen)}
+                        >
                             <div className="settings-sidebar-section-icon">
                                 <Smartphone size={18} />
                                 <span>App Settings</span>
                             </div>
-                            <ChevronDown size={16} />
+                            {appOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
+                        {appOpen && (
+                            <ul className="settings-sidebar-list">
+                                <li className={`settings-sidebar-item ${activeTab === 'invoice_settings' ? 'active' : ''}`} onClick={() => setActiveTab('invoice_settings')}>Invoice Settings</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'invoice_template' ? 'active' : ''}`} onClick={() => setActiveTab('invoice_template')}>Invoice Template</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'printer' ? 'active' : ''}`} onClick={() => setActiveTab('printer')}>Printer</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'pos_settings' ? 'active' : ''}`} onClick={() => setActiveTab('pos_settings')}>POS Settings</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'custom_fields' ? 'active' : ''}`} onClick={() => setActiveTab('custom_fields')}>Custom Fields</li>
+                            </ul>
+                        )}
                     </div>
 
                     {/* System Settings */}
                     <div className="settings-sidebar-section">
-                        <div className="settings-sidebar-section-title">
+                        <div 
+                            className={`settings-sidebar-section-title ${systemOpen ? 'active' : ''}`}
+                            onClick={() => setSystemOpen(!systemOpen)}
+                        >
                             <div className="settings-sidebar-section-icon">
                                 <Monitor size={18} />
                                 <span>System Settings</span>
                             </div>
-                            <ChevronDown size={16} />
+                            {systemOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
+                        {systemOpen && (
+                            <ul className="settings-sidebar-list">
+                                <li className={`settings-sidebar-item ${activeTab === 'email_settings' ? 'active' : ''}`} onClick={() => setActiveTab('email_settings')}>Email Settings</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'email_template' ? 'active' : ''}`} onClick={() => setActiveTab('email_template')}>Email Template</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'sms_settings' ? 'active' : ''}`} onClick={() => setActiveTab('sms_settings')}>SMS Settings</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'sms_template' ? 'active' : ''}`} onClick={() => setActiveTab('sms_template')}>SMS Template</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'otp' ? 'active' : ''}`} onClick={() => setActiveTab('otp')}>OTP Settings</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'gdpr_cookies' ? 'active' : ''}`} onClick={() => setActiveTab('gdpr_cookies')}>GDPR Cookies</li>
+                            </ul>
+                        )}
                     </div>
 
                     {/* Financial Settings */}
                     <div className="settings-sidebar-section">
-                        <div className="settings-sidebar-section-title">
+                        <div 
+                            className={`settings-sidebar-section-title ${financialOpen ? 'active' : ''}`}
+                            onClick={() => setFinancialOpen(!financialOpen)}
+                        >
                             <div className="settings-sidebar-section-icon">
                                 <DollarSign size={18} />
                                 <span>Financial Settings</span>
                             </div>
-                            <ChevronDown size={16} />
+                            {financialOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
+                        {financialOpen && (
+                            <ul className="settings-sidebar-list">
+                                <li className={`settings-sidebar-item ${activeTab === 'payment_gateway' ? 'active' : ''}`} onClick={() => setActiveTab('payment_gateway')}>Payment Gateway</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'bank_accounts' ? 'active' : ''}`} onClick={() => setActiveTab('bank_accounts')}>Bank Accounts</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'tax_rates' ? 'active' : ''}`} onClick={() => setActiveTab('tax_rates')}>Tax Rates</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'currencies' ? 'active' : ''}`} onClick={() => setActiveTab('currencies')}>Currencies</li>
+                            </ul>
+                        )}
                     </div>
 
                     {/* Other Settings */}
                     <div className="settings-sidebar-section">
-                        <div className="settings-sidebar-section-title">
+                        <div 
+                            className={`settings-sidebar-section-title ${otherOpen ? 'active' : ''}`}
+                            onClick={() => setOtherOpen(!otherOpen)}
+                        >
                             <div className="settings-sidebar-section-icon">
                                 <MoreHorizontal size={18} />
                                 <span>Other Settings</span>
                             </div>
-                            <ChevronDown size={16} />
+                            {otherOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
+                        {otherOpen && (
+                            <ul className="settings-sidebar-list">
+                                <li className={`settings-sidebar-item ${activeTab === 'storage' ? 'active' : ''}`} onClick={() => setActiveTab('storage')}>Storage</li>
+                                <li className={`settings-sidebar-item ${activeTab === 'ban_ip' ? 'active' : ''}`} onClick={() => setActiveTab('ban_ip')}>Ban IP Address</li>
+                            </ul>
+                        )}
                     </div>
                 </div>
 
@@ -374,11 +445,38 @@ export default function Settings() {
                         </>
                     )}
                     
-                    {activeTab !== 'profile' && activeTab !== 'security' && (
-                        <div className="settings-content-body d-flex justify-content-center align-items-center" style={{ minHeight: '300px', color: '#64748b' }}>
-                            <p>Coming Soon</p>
-                        </div>
-                    )}
+                    {activeTab === 'notifications' && <Notifications />}
+                    {activeTab === 'connected_apps' && <ConnectedApps />}
+                    
+                    {activeTab === 'system_settings' && <SystemSettings />}
+                    {activeTab === 'company_settings' && <CompanySettings />}
+                    {activeTab === 'localization' && <Localization />}
+                    {activeTab === 'prefixes' && <Prefixes />}
+                    {activeTab === 'preference' && <Preference />}
+                    {activeTab === 'appearance' && <Appearance />}
+                    {activeTab === 'social_authentication' && <SocialAuthentication />}
+                    {activeTab === 'language' && <Language />}
+                    
+                    {activeTab === 'invoice_settings' && <InvoiceSettings />}
+                    {activeTab === 'invoice_template' && <InvoiceTemplate />}
+                    {activeTab === 'printer' && <Printer />}
+                    {activeTab === 'pos_settings' && <PosSettings />}
+                    {activeTab === 'custom_fields' && <CustomFields />}
+                    
+                    {activeTab === 'email_settings' && <EmailSettings />}
+                    {activeTab === 'email_template' && <EmailTemplate />}
+                    {activeTab === 'sms_settings' && <SmsSettings />}
+                    {activeTab === 'sms_template' && <SmsTemplate />}
+                    {activeTab === 'otp' && <OtpSettings />}
+                    {activeTab === 'gdpr_cookies' && <GdprCookies />}
+                    
+                    {activeTab === 'payment_gateway' && <PaymentGateway />}
+                    {activeTab === 'bank_accounts' && <BankAccounts />}
+                    {activeTab === 'tax_rates' && <TaxRates />}
+                    {activeTab === 'currencies' && <Currencies />}
+                    
+                    {activeTab === 'storage' && <Storage />}
+                    {activeTab === 'ban_ip' && <BanIp />}
                 </div>
             </div>
         </div>
