@@ -30,10 +30,11 @@
 .settings-sidebar {
     width: 250px;
     background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    padding: 16px 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.02);
+    padding: 20px 0;
     flex-shrink: 0;
+    border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .settings-sidebar-section {
@@ -106,8 +107,16 @@
 .settings-content {
     flex: 1;
     background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.02);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .settings-content-header {
@@ -224,14 +233,14 @@
 .settings-form-group select,
 .settings-form-group textarea {
     width: 100%;
-    padding: 10px 12px;
+    padding: 10px 14px;
     border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 0.875rem;
     color: #1e293b;
-    background-color: #fff;
+    background-color: #f8fafc;
     outline: none;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     box-sizing: border-box;
     font-family: inherit;
     resize: vertical;
@@ -240,8 +249,9 @@
 .settings-form-group input:focus,
 .settings-form-group select:focus,
 .settings-form-group textarea:focus {
+    background-color: #fff;
     border-color: #f97316;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
 }
 
 .settings-form-group input[type="color"] {
@@ -280,19 +290,21 @@
 }
 
 .btn-save {
-    padding: 10px 20px;
-    background-color: #f97316;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
 }
 
 .btn-save:hover {
-    background-color: #ea580c;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.3);
 }
 
 /* Security Tab Styles */
@@ -373,11 +385,14 @@
 }
 
 .btn-action.orange {
-    background-color: #fba049;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     color: white;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
+    transition: all 0.2s;
 }
 .btn-action.orange:hover {
-    background-color: #e8991d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }
 
 .btn-action.dark {
