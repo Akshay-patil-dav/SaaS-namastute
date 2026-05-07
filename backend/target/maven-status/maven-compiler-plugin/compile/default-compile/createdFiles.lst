@@ -36,6 +36,7 @@ com\example\otpauth\controller\SubCategoryController.class
 com\example\otpauth\model\PosOrder.class
 com\example\otpauth\service\SalesReturnService.class
 com\example\otpauth\service\WarrantyService.class
+com\example\otpauth\controller\PurchaseReturnController.class
 com\example\otpauth\dto\BuilderDto$UpdateIconRequest.class
 com\example\otpauth\repository\PurchaseRepository.class
 com\example\otpauth\model\PageBlock.class
@@ -48,6 +49,7 @@ com\example\otpauth\repository\UnitRepository.class
 com\example\otpauth\service\PurchaseService.class
 com\example\otpauth\model\SubCategory.class
 com\example\otpauth\service\SubCategoryService.class
+com\example\otpauth\model\PurchaseReturn.class
 com\example\otpauth\repository\ProductRepository.class
 com\example\otpauth\controller\PosOrderController.class
 com\example\otpauth\config\OAuth2AuthenticationSuccessHandler.class
@@ -63,8 +65,10 @@ com\example\otpauth\service\AuthService.class
 com\example\otpauth\dto\TransferRequest$TransferProduct.class
 com\example\otpauth\model\Role.class
 com\example\otpauth\repository\PageBlockRepository.class
+com\example\otpauth\repository\PurchaseReturnRepository.class
 com\example\otpauth\service\SmsService.class
 com\example\otpauth\dto\BuilderDto$PageBlockDto.class
+com\example\otpauth\service\PurchaseReturnService.class
 com\example\otpauth\controller\ProductController.class
 com\example\otpauth\dto\PosOrderRequest.class
 com\example\otpauth\model\RoleName.class
@@ -85,6 +89,7 @@ com\example\otpauth\repository\PosOrderRepository.class
 com\example\otpauth\dto\SaleOrderRequest.class
 com\example\otpauth\repository\FolderInvitationRepository.class
 com\example\otpauth\controller\WarrantyController.class
+com\example\otpauth\dto\PurchaseReturnRequest.class
 com\example\otpauth\controller\StockController.class
 com\example\otpauth\controller\BuilderController.class
 com\example\otpauth\config\DataSeeder.class
