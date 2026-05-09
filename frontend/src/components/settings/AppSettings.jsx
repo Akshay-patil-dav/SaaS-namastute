@@ -1,126 +1,230 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { useSettings } from '../../hooks/useSettings';
 
-export const InvoiceSettings = () => (
-    <>
-        <div className="settings-content-header">
-            <h3>Invoice Settings</h3>
-        </div>
-        <div className="settings-content-body">
-            <div className="profile-upload-section">
-                <div className="profile-upload-box">
-                    <span>Add Invoice Logo</span>
-                </div>
-                <div className="profile-upload-actions">
-                    <button className="btn-upload">Upload Logo</button>
-                    <p>Recommended size: 150x50px</p>
-                </div>
-            </div>
-            <div className="settings-form-row">
-                <div className="settings-form-group">
-                    <label>Invoice Prefix</label>
-                    <input type="text" defaultValue="INV-" />
-                </div>
-                <div className="settings-form-group">
-                    <label>Invoice Due</label>
-                    <select><option>Due on Receipt</option><option>15 Days</option><option>30 Days</option></select>
-                </div>
-            </div>
-            <div className="settings-form-group">
-                <label>Invoice Notes</label>
-                <textarea rows="3" defaultValue="Thank you for your business."></textarea>
-            </div>
-            <div className="settings-actions">
-                <button className="btn-save">Save Changes</button>
-            </div>
-        </div>
-    </>
-);
+export const InvoiceSettings = () => {
+    const { settings, loading, saving, handleChange, saveSettings } = useSettings();
 
-export const InvoiceTemplate = () => (
-    <>
-        <div className="settings-content-header">
-            <h3>Invoice Template</h3>
-        </div>
-        <div className="settings-content-body">
-            <div className="settings-form-group">
-                <label>Select Template</label>
-                <select><option>Classic</option><option>Modern</option><option>Professional</option></select>
-            </div>
-            <div className="settings-actions">
-                <button className="btn-save">Save Changes</button>
-            </div>
-        </div>
-    </>
-);
+    if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
 
-export const Printer = () => (
-    <>
-        <div className="settings-content-header">
-            <h3>Printer Settings</h3>
-        </div>
-        <div className="settings-content-body">
-            <div className="settings-form-row">
-                <div className="settings-form-group">
-                    <label>Printer Name <span className="required">*</span></label>
-                    <input type="text" defaultValue="Receipt Printer 1" />
+    return (
+        <>
+            <div className="settings-content-header">
+                <h3>Invoice Settings</h3>
+            </div>
+            <div className="settings-content-body">
+                <div className="profile-upload-section">
+                    <div className="profile-upload-box">
+                        <span>Add Invoice Logo</span>
+                    </div>
+                    <div className="profile-upload-actions">
+                        <button className="btn-upload">Upload Logo</button>
+                        <p>Recommended size: 150x50px</p>
+                    </div>
+                </div>
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>Invoice Prefix</label>
+                        <input 
+                            type="text" 
+                            value={settings.invoicePrefix || 'INV-'}
+                            onChange={(e) => handleChange('invoicePrefix', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Invoice Due</label>
+                        <select
+                            value={settings.invoiceDue || 'Due on Receipt'}
+                            onChange={(e) => handleChange('invoiceDue', e.target.value)}
+                        >
+                            <option value="Due on Receipt">Due on Receipt</option>
+                            <option value="15 Days">15 Days</option>
+                            <option value="30 Days">30 Days</option>
+                        </select>
+                    </div>
                 </div>
                 <div className="settings-form-group">
-                    <label>Connection Type <span className="required">*</span></label>
-                    <select><option>Network</option><option>USB</option><option>Bluetooth</option></select>
+                    <label>Invoice Notes</label>
+                    <textarea 
+                        rows="3" 
+                        value={settings.invoiceNotes || 'Thank you for your business.'}
+                        onChange={(e) => handleChange('invoiceNotes', e.target.value)}
+                    ></textarea>
+                </div>
+                <div className="settings-actions">
+                    <button 
+                        className="btn-save"
+                        onClick={() => saveSettings(['invoicePrefix', 'invoiceDue', 'invoiceNotes'])}
+                        disabled={saving}
+                    >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
                 </div>
             </div>
-            <div className="settings-form-row">
-                <div className="settings-form-group">
-                    <label>IP Address</label>
-                    <input type="text" defaultValue="192.168.1.100" />
-                </div>
-                <div className="settings-form-group">
-                    <label>Port</label>
-                    <input type="text" defaultValue="9100" />
-                </div>
-            </div>
-            <div className="settings-actions">
-                <button className="btn-save">Save Changes</button>
-            </div>
-        </div>
-    </>
-);
+        </>
+    );
+};
 
-export const PosSettings = () => (
-    <>
-        <div className="settings-content-header">
-            <h3>POS Settings</h3>
-        </div>
-        <div className="settings-content-body">
-            <div className="settings-form-row">
+export const InvoiceTemplate = () => {
+    const { settings, loading, saving, handleChange, saveSettings } = useSettings();
+
+    if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
+
+    return (
+        <>
+            <div className="settings-content-header">
+                <h3>Invoice Template</h3>
+            </div>
+            <div className="settings-content-body">
                 <div className="settings-form-group">
-                    <label>Default Customer</label>
-                    <select><option>Walk-in Customer</option></select>
+                    <label>Select Template</label>
+                    <select
+                        value={settings.invoiceTemplate || 'Classic'}
+                        onChange={(e) => handleChange('invoiceTemplate', e.target.value)}
+                    >
+                        <option value="Classic">Classic</option>
+                        <option value="Modern">Modern</option>
+                        <option value="Professional">Professional</option>
+                    </select>
                 </div>
-                <div className="settings-form-group">
-                    <label>Default Biller</label>
-                    <select><option>Admin</option></select>
+                <div className="settings-actions">
+                    <button 
+                        className="btn-save"
+                        onClick={() => saveSettings(['invoiceTemplate'])}
+                        disabled={saving}
+                    >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
                 </div>
             </div>
-            <div className="security-item">
-                <div className="security-item-content">
-                    <h4>Display Keyboard</h4>
-                    <p>Show virtual keyboard in POS screen</p>
+        </>
+    );
+};
+
+export const Printer = () => {
+    const { settings, loading, saving, handleChange, saveSettings } = useSettings();
+
+    if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
+
+    return (
+        <>
+            <div className="settings-content-header">
+                <h3>Printer Settings</h3>
+            </div>
+            <div className="settings-content-body">
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>Printer Name <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            value={settings.printerName || 'Receipt Printer 1'}
+                            onChange={(e) => handleChange('printerName', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Connection Type <span className="required">*</span></label>
+                        <select
+                            value={settings.printerConnectionType || 'Network'}
+                            onChange={(e) => handleChange('printerConnectionType', e.target.value)}
+                        >
+                            <option value="Network">Network</option>
+                            <option value="USB">USB</option>
+                            <option value="Bluetooth">Bluetooth</option>
+                        </select>
+                    </div>
                 </div>
-                <div className="security-item-action">
-                    <label className="toggle-switch">
-                        <input type="checkbox" defaultChecked />
-                        <span className="toggle-slider"></span>
-                    </label>
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>IP Address</label>
+                        <input 
+                            type="text" 
+                            value={settings.printerIpAddress || '192.168.1.100'}
+                            onChange={(e) => handleChange('printerIpAddress', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Port</label>
+                        <input 
+                            type="text" 
+                            value={settings.printerPort || '9100'}
+                            onChange={(e) => handleChange('printerPort', e.target.value)}
+                        />
+                    </div>
+                </div>
+                <div className="settings-actions">
+                    <button 
+                        className="btn-save"
+                        onClick={() => saveSettings(['printerName', 'printerConnectionType', 'printerIpAddress', 'printerPort'])}
+                        disabled={saving}
+                    >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
                 </div>
             </div>
-            <div className="settings-actions">
-                <button className="btn-save">Save Changes</button>
+        </>
+    );
+};
+
+export const PosSettings = () => {
+    const { settings, loading, saving, handleChange, saveSettings } = useSettings();
+
+    if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
+
+    return (
+        <>
+            <div className="settings-content-header">
+                <h3>POS Settings</h3>
             </div>
-        </div>
-    </>
-);
+            <div className="settings-content-body">
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>Default Customer</label>
+                        <select
+                            value={settings.posDefaultCustomer || 'Walk-in Customer'}
+                            onChange={(e) => handleChange('posDefaultCustomer', e.target.value)}
+                        >
+                            <option value="Walk-in Customer">Walk-in Customer</option>
+                        </select>
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Default Biller</label>
+                        <select
+                            value={settings.posDefaultBiller || 'Admin'}
+                            onChange={(e) => handleChange('posDefaultBiller', e.target.value)}
+                        >
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="security-item">
+                    <div className="security-item-content">
+                        <h4>Display Keyboard</h4>
+                        <p>Show virtual keyboard in POS screen</p>
+                    </div>
+                    <div className="security-item-action">
+                        <label className="toggle-switch">
+                            <input 
+                                type="checkbox" 
+                                checked={settings.posDisplayKeyboard !== 'false'}
+                                onChange={(e) => handleChange('posDisplayKeyboard', e.target.checked ? 'true' : 'false')}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div className="settings-actions">
+                    <button 
+                        className="btn-save"
+                        onClick={() => saveSettings(['posDefaultCustomer', 'posDefaultBiller', 'posDisplayKeyboard'])}
+                        disabled={saving}
+                    >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                </div>
+            </div>
+        </>
+    );
+};
 
 export const CustomFields = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

@@ -59,6 +59,7 @@ export const API = {
 
   // Page Builder
   BUILDER:       `${ENV.API_BASE_URL}/builder`,
+  SETTINGS:      `${ENV.API_BASE_URL}/settings`,
 
   // OAuth2 redirect URLs (uses backend root, not /api prefix)
   OAUTH_GOOGLE:  `${ENV.BACKEND_BASE_URL}/oauth2/authorization/google`,
