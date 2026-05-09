@@ -13,13 +13,37 @@ import {
     X,
     Eye,
     Edit,
-    Trash2
+    Trash2,
+    Upload
 } from 'lucide-react';
 
 export const SystemSettings = () => {
     const { settings, loading, saving, handleChange, saveSettings } = useSettings();
 
     if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
+
+    const handleImageUpload = async (e, field) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.url) {
+                const absoluteUrl = `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${data.url}`;
+                handleChange(field, absoluteUrl);
+            }
+        } catch (error) {
+            console.error('Upload failed:', error);
+            alert('Failed to upload image. Please try again.');
+        }
+    };
 
     const systemFields = ['websiteName', 'websiteLogo', 'websiteFavicon'];
 
@@ -42,54 +66,110 @@ export const SystemSettings = () => {
                 </div>
 
                 <div className="settings-form-row">
+                    {/* Logo Upload */}
                     <div className="settings-form-group">
-                        <label><ImageIcon size={14} style={{ marginRight: '6px' }} /> Website Logo URL</label>
-                        <input 
-                            type="text" 
-                            value={settings.websiteLogo || ''}
-                            placeholder="https://example.com/logo.png"
-                            onChange={(e) => handleChange('websiteLogo', e.target.value)}
-                        />
+                        <label><ImageIcon size={14} className="me-2" /> Website Logo</label>
+                        <div 
+                            className="image-upload-wrapper" 
+                            style={{ 
+                                border: '2px dashed #e2e8f0', 
+                                borderRadius: '12px', 
+                                padding: '20px', 
+                                textAlign: 'center', 
+                                background: '#f8fafc',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                marginBottom: '20px'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.borderColor = '#ff6b35'}
+                            onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                            onClick={() => document.getElementById('website-logo-upload').click()}
+                        >
+                            <input 
+                                id="website-logo-upload"
+                                type="file" 
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={(e) => handleImageUpload(e, 'websiteLogo')}
+                            />
+                            
+                            {settings.websiteLogo ? (
+                                <div style={{ position: 'relative' }}>
+                                    <img 
+                                        src={settings.websiteLogo} 
+                                        alt="Logo Preview" 
+                                        style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }} 
+                                    />
+                                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleChange('websiteLogo', ''); }}>
+                                        <X size={14} />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-muted">
+                                    <Upload size={24} className="mb-2 opacity-40" />
+                                    <p style={{ margin: 0, fontSize: '13px', fontWeight: '500' }}>Click to upload Website Logo</p>
+                                    <p style={{ margin: 0, fontSize: '11px', opacity: 0.6 }}>Recommended size: 150x50px</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-                
-                <div className="profile-upload-section">
-                    <div className="profile-upload-box">
-                        {settings.websiteLogo ? (
-                            <img src={settings.websiteLogo} alt="Logo" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                        ) : (
-                            <span>No Logo</span>
-                        )}
-                    </div>
-                    <div className="profile-upload-actions">
-                        <p>Logo Preview</p>
-                        <p className="text-muted small">Recommended size: 150x50px</p>
-                    </div>
-                </div>
 
-                <div className="settings-form-row">
+                    {/* Favicon Upload */}
                     <div className="settings-form-group">
-                        <label><ImageIcon size={14} style={{ marginRight: '6px' }} /> Website Favicon URL</label>
-                        <input 
-                            type="text" 
-                            value={settings.websiteFavicon || ''}
-                            placeholder="https://example.com/favicon.ico"
-                            onChange={(e) => handleChange('websiteFavicon', e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                <div className="profile-upload-section">
-                    <div className="profile-upload-box" style={{ width: '64px', height: '64px' }}>
-                        {settings.websiteFavicon ? (
-                            <img src={settings.websiteFavicon} alt="Favicon" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                        ) : (
-                            <span>No Icon</span>
-                        )}
-                    </div>
-                    <div className="profile-upload-actions">
-                        <p>Favicon Preview</p>
-                        <p className="text-muted small">Recommended: 32x32px</p>
+                        <label><ImageIcon size={14} className="me-2" /> Website Favicon</label>
+                        <div 
+                            className="image-upload-wrapper" 
+                            style={{ 
+                                border: '2px dashed #e2e8f0', 
+                                borderRadius: '12px', 
+                                padding: '20px', 
+                                textAlign: 'center', 
+                                background: '#f8fafc',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                minHeight: '144px'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.borderColor = '#ff6b35'}
+                            onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                            onClick={() => document.getElementById('website-favicon-upload').click()}
+                        >
+                            <input 
+                                id="website-favicon-upload"
+                                type="file" 
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={(e) => handleImageUpload(e, 'websiteFavicon')}
+                            />
+                            
+                            {settings.websiteFavicon ? (
+                                <div style={{ position: 'relative' }}>
+                                    <div style={{ width: '64px', height: '64px', background: '#fff', borderRadius: '12px', padding: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9' }}>
+                                        <img 
+                                            src={settings.websiteFavicon} 
+                                            alt="Favicon Preview" 
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                        />
+                                    </div>
+                                    <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleChange('websiteFavicon', ''); }}>
+                                        <X size={12} />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-muted">
+                                    <Upload size={24} className="mb-2 opacity-40" />
+                                    <p style={{ margin: 0, fontSize: '13px', fontWeight: '500' }}>Upload Favicon</p>
+                                    <p style={{ margin: 0, fontSize: '11px', opacity: 0.6 }}>Best size: 32x32px</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -196,6 +276,31 @@ export const CompanySettings = () => {
 
     const handleFormChange = (field, value) => {
         setCurrentCompany(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleImageUpload = async (e, field) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.url) {
+                // Ensure the URL is absolute for the frontend to display it correctly
+                // The backend returns /uploads/..., we prepend the base URL
+                const absoluteUrl = `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${data.url}`;
+                handleFormChange(field, absoluteUrl);
+            }
+        } catch (error) {
+            console.error('Upload failed:', error);
+            alert('Failed to upload image. Please try again.');
+        }
     };
 
     const persistCompanies = (updatedCompanies) => {
@@ -746,42 +851,107 @@ export const CompanySettings = () => {
                             </div>
 
                             <div className="settings-form-row">
+                                {/* Logo Upload */}
                                 <div className="settings-form-group">
-                                    <label><ImageIcon size={14} className="me-2" /> Company Logo URL</label>
-                                    <input 
-                                        type="text" 
-                                        value={currentCompany.companyLogo || ''}
-                                        placeholder="https://example.com/logo.png"
-                                        onChange={(e) => handleFormChange('companyLogo', e.target.value)}
-                                    />
-                                </div>
-                                <div className="settings-form-group">
-                                    <label><ImageIcon size={14} className="me-2" /> Company Favicon URL</label>
-                                    <input 
-                                        type="text" 
-                                        value={currentCompany.companyFavicon || ''}
-                                        placeholder="https://example.com/favicon.ico"
-                                        onChange={(e) => handleFormChange('companyFavicon', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="settings-form-row mt-3">
-                                <div className="settings-form-group">
-                                    <div className="profile-upload-box" style={{ width: '150px', height: '50px', background: '#f8fafc' }}>
+                                    <label><ImageIcon size={14} className="me-2" /> Company Logo</label>
+                                    <div 
+                                        className="image-upload-wrapper" 
+                                        style={{ 
+                                            border: '2px dashed #e2e8f0', 
+                                            borderRadius: '12px', 
+                                            padding: '20px', 
+                                            textAlign: 'center', 
+                                            background: '#f8fafc',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            position: 'relative',
+                                            overflow: 'hidden'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.borderColor = '#ff6b35'}
+                                        onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                                        onClick={() => document.getElementById('logo-upload-input').click()}
+                                    >
+                                        <input 
+                                            id="logo-upload-input"
+                                            type="file" 
+                                            accept="image/*"
+                                            style={{ display: 'none' }}
+                                            onChange={(e) => handleImageUpload(e, 'companyLogo')}
+                                        />
+                                        
                                         {currentCompany.companyLogo ? (
-                                            <img src={currentCompany.companyLogo} alt="Company Logo" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                            <div style={{ position: 'relative' }}>
+                                                <img 
+                                                    src={currentCompany.companyLogo} 
+                                                    alt="Logo Preview" 
+                                                    style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }} 
+                                                />
+                                                <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleFormChange('companyLogo', ''); }}>
+                                                    <X size={14} />
+                                                </div>
+                                            </div>
                                         ) : (
-                                            <span className="text-muted small">No Logo</span>
+                                            <div className="text-muted">
+                                                <Upload size={24} className="mb-2 opacity-40" />
+                                                <p style={{ margin: 0, fontSize: '12px', fontWeight: '500' }}>Click to upload Logo</p>
+                                                <p style={{ margin: 0, fontSize: '10px', opacity: 0.6 }}>PNG, JPG or SVG (Max 2MB)</p>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
+
+                                {/* Favicon Upload */}
                                 <div className="settings-form-group">
-                                    <div className="profile-upload-box" style={{ width: '50px', height: '50px', background: '#f8fafc' }}>
+                                    <label><ImageIcon size={14} className="me-2" /> Company Favicon</label>
+                                    <div 
+                                        className="image-upload-wrapper" 
+                                        style={{ 
+                                            border: '2px dashed #e2e8f0', 
+                                            borderRadius: '12px', 
+                                            padding: '20px', 
+                                            textAlign: 'center', 
+                                            background: '#f8fafc',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            minHeight: '144px'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.borderColor = '#ff6b35'}
+                                        onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                                        onClick={() => document.getElementById('favicon-upload-input').click()}
+                                    >
+                                        <input 
+                                            id="favicon-upload-input"
+                                            type="file" 
+                                            accept="image/*"
+                                            style={{ display: 'none' }}
+                                            onChange={(e) => handleImageUpload(e, 'companyFavicon')}
+                                        />
+                                        
                                         {currentCompany.companyFavicon ? (
-                                            <img src={currentCompany.companyFavicon} alt="Favicon" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                            <div style={{ position: 'relative' }}>
+                                                <div style={{ width: '64px', height: '64px', background: '#fff', borderRadius: '12px', padding: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9' }}>
+                                                    <img 
+                                                        src={currentCompany.companyFavicon} 
+                                                        alt="Favicon Preview" 
+                                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                                    />
+                                                </div>
+                                                <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleFormChange('companyFavicon', ''); }}>
+                                                    <X size={12} />
+                                                </div>
+                                            </div>
                                         ) : (
-                                            <span className="text-muted small">No Icon</span>
+                                            <div className="text-muted">
+                                                <Upload size={24} className="mb-2 opacity-40" />
+                                                <p style={{ margin: 0, fontSize: '12px', fontWeight: '500' }}>Upload Favicon</p>
+                                                <p style={{ margin: 0, fontSize: '10px', opacity: 0.6 }}>Best size: 32x32</p>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
