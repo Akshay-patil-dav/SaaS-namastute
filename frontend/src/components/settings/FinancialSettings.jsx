@@ -1,53 +1,82 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { useSettings } from '../../hooks/useSettings';
 
-export const PaymentGateway = () => (
-    <>
-        <div className="settings-content-header">
-            <h3>Payment Gateway</h3>
-        </div>
-        <div className="settings-content-body">
-            <div className="security-item">
-                <div className="security-item-content">
-                    <h4>Stripe Integration</h4>
-                    <p>Accept credit card payments via Stripe</p>
+export const PaymentGateway = () => {
+    const { settings, loading, saving, handleChange, saveSettings } = useSettings();
+
+    if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
+
+    return (
+        <>
+            <div className="settings-content-header">
+                <h3>Payment Gateway</h3>
+            </div>
+            <div className="settings-content-body">
+                <div className="security-item">
+                    <div className="security-item-content">
+                        <h4>Stripe Integration</h4>
+                        <p>Accept credit card payments via Stripe</p>
+                    </div>
+                    <div className="security-item-action">
+                        <label className="toggle-switch">
+                            <input 
+                                type="checkbox" 
+                                checked={settings.enableStripe !== 'false'}
+                                onChange={(e) => handleChange('enableStripe', e.target.checked ? 'true' : 'false')}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div className="security-item-action">
-                    <label className="toggle-switch">
-                        <input type="checkbox" defaultChecked />
-                        <span className="toggle-slider"></span>
-                    </label>
+                <div className="settings-form-row mt-3">
+                    <div className="settings-form-group">
+                        <label>Stripe Public Key</label>
+                        <input 
+                            type="text" 
+                            value={settings.stripePublicKey || ''}
+                            onChange={(e) => handleChange('stripePublicKey', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Stripe Secret Key</label>
+                        <input 
+                            type="password" 
+                            value={settings.stripeSecretKey || ''}
+                            onChange={(e) => handleChange('stripeSecretKey', e.target.value)}
+                        />
+                    </div>
+                </div>
+                
+                <div className="security-item mt-4">
+                    <div className="security-item-content">
+                        <h4>PayPal Integration</h4>
+                        <p>Accept payments via PayPal</p>
+                    </div>
+                    <div className="security-item-action">
+                        <label className="toggle-switch">
+                            <input 
+                                type="checkbox" 
+                                checked={settings.enablePayPal === 'true'}
+                                onChange={(e) => handleChange('enablePayPal', e.target.checked ? 'true' : 'false')}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div className="settings-actions">
+                    <button 
+                        className="btn-save"
+                        onClick={() => saveSettings(['enableStripe', 'stripePublicKey', 'stripeSecretKey', 'enablePayPal'])}
+                        disabled={saving}
+                    >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
                 </div>
             </div>
-            <div className="settings-form-row mt-3">
-                <div className="settings-form-group">
-                    <label>Stripe Public Key</label>
-                    <input type="text" />
-                </div>
-                <div className="settings-form-group">
-                    <label>Stripe Secret Key</label>
-                    <input type="password" />
-                </div>
-            </div>
-            
-            <div className="security-item mt-4">
-                <div className="security-item-content">
-                    <h4>PayPal Integration</h4>
-                    <p>Accept payments via PayPal</p>
-                </div>
-                <div className="security-item-action">
-                    <label className="toggle-switch">
-                        <input type="checkbox" />
-                        <span className="toggle-slider"></span>
-                    </label>
-                </div>
-            </div>
-            <div className="settings-actions">
-                <button className="btn-save">Save Changes</button>
-            </div>
-        </div>
-    </>
-);
+        </>
+    );
+};
 
 export const BankAccounts = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

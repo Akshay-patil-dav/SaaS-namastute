@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Settings as SettingsIcon, 
     Globe, 
@@ -30,10 +30,32 @@ import { EmailSettings, EmailTemplate, SmsSettings, SmsTemplate, OtpSettings, Gd
 import { PaymentGateway, BankAccounts, TaxRates, Currencies } from '../components/settings/FinancialSettings';
 import { Storage, BanIp } from '../components/settings/OtherSettings';
 
+const sectionMapping = {
+    profile: 'general', security: 'general', notifications: 'general', connected_apps: 'general',
+    system_settings: 'website', company_settings: 'website', localization: 'website', prefixes: 'website', preference: 'website', appearance: 'website', social_authentication: 'website', language: 'website',
+    invoice_settings: 'app', invoice_template: 'app', printer: 'app', pos_settings: 'app', custom_fields: 'app',
+    email_settings: 'system', email_template: 'system', sms_settings: 'system', sms_template: 'system', otp: 'system', gdpr_cookies: 'system',
+    payment_gateway: 'financial', bank_accounts: 'financial', tax_rates: 'financial', currencies: 'financial',
+    storage: 'other', ban_ip: 'other'
+};
+
 export default function Settings() {
-    const [openSection, setOpenSection] = useState('general');
     const navigate = useNavigate();
     const location = useLocation();
+    
+    const getInitialSection = () => {
+        const path = location.pathname.split('/').pop();
+        return sectionMapping[path] || 'general';
+    };
+
+    const [openSection, setOpenSection] = useState(getInitialSection());
+
+    useEffect(() => {
+        const path = location.pathname.split('/').pop();
+        if (sectionMapping[path]) {
+            setOpenSection(sectionMapping[path]);
+        }
+    }, [location.pathname]);
     
     // Helper to check if a tab is active
     const isActive = (path) => location.pathname.includes(`/settings/${path}`);

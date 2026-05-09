@@ -1,42 +1,77 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { useSettings } from '../../hooks/useSettings';
 
-export const Storage = () => (
-    <>
-        <div className="settings-content-header">
-            <h3>Storage Settings</h3>
-        </div>
-        <div className="settings-content-body">
-            <div className="settings-form-group">
-                <label>Default Storage Provider</label>
-                <select><option>Local Storage</option><option>AWS S3</option></select>
+export const Storage = () => {
+    const { settings, loading, saving, handleChange, saveSettings } = useSettings();
+
+    if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
+
+    return (
+        <>
+            <div className="settings-content-header">
+                <h3>Storage Settings</h3>
             </div>
-            <div className="settings-form-row">
+            <div className="settings-content-body">
                 <div className="settings-form-group">
-                    <label>AWS Access Key</label>
-                    <input type="text" />
+                    <label>Default Storage Provider</label>
+                    <select
+                        value={settings.storageProvider || 'Local Storage'}
+                        onChange={(e) => handleChange('storageProvider', e.target.value)}
+                    >
+                        <option value="Local Storage">Local Storage</option>
+                        <option value="AWS S3">AWS S3</option>
+                    </select>
                 </div>
-                <div className="settings-form-group">
-                    <label>AWS Secret Key</label>
-                    <input type="password" />
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>AWS Access Key</label>
+                        <input 
+                            type="text" 
+                            value={settings.awsAccessKey || ''}
+                            onChange={(e) => handleChange('awsAccessKey', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>AWS Secret Key</label>
+                        <input 
+                            type="password" 
+                            value={settings.awsSecretKey || ''}
+                            onChange={(e) => handleChange('awsSecretKey', e.target.value)}
+                        />
+                    </div>
+                </div>
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>AWS Region</label>
+                        <input 
+                            type="text" 
+                            value={settings.awsRegion || 'us-east-1'}
+                            onChange={(e) => handleChange('awsRegion', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>AWS Bucket Name</label>
+                        <input 
+                            type="text" 
+                            value={settings.awsBucketName || ''}
+                            onChange={(e) => handleChange('awsBucketName', e.target.value)}
+                        />
+                    </div>
+                </div>
+                <div className="settings-actions">
+                    <button 
+                        className="btn-save"
+                        onClick={() => saveSettings(['storageProvider', 'awsAccessKey', 'awsSecretKey', 'awsRegion', 'awsBucketName'])}
+                        disabled={saving}
+                    >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
                 </div>
             </div>
-            <div className="settings-form-row">
-                <div className="settings-form-group">
-                    <label>AWS Region</label>
-                    <input type="text" defaultValue="us-east-1" />
-                </div>
-                <div className="settings-form-group">
-                    <label>AWS Bucket Name</label>
-                    <input type="text" />
-                </div>
-            </div>
-            <div className="settings-actions">
-                <button className="btn-save">Save Changes</button>
-            </div>
-        </div>
-    </>
-);
+        </>
+    );
+};
 
 export const BanIp = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Moon, Bell, Grid, Maximize, Settings, ChevronDown, Menu, Check, X, Folder, Clock, Users, User, LogOut, Zap } from 'lucide-react';
+import { Search, Moon, Bell, Grid, Maximize, Settings, ChevronDown, Menu, Check, X, Folder, Clock, Users, User, LogOut, Zap, Building } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useNavigate } from 'react-router-dom';
@@ -327,11 +327,19 @@ export default function Header({ onMenuClick }) {
                             </div>
 
                             <button
-                                onClick={() => { navigate('/profile'); setProfileOpen(false); }}
+                                onClick={() => { navigate('/settings/profile'); setProfileOpen(false); }}
                                 className="w-[92%] mx-auto flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-indigo-50/60 hover:text-indigo-600 hover:translate-x-1 rounded-xl transition-all duration-200 group/item"
                             >
                                 <User size={18} className="text-gray-400 group-hover/item:text-indigo-500 transition-colors" />
                                 <span className="font-medium">Profile</span>
+                            </button>
+
+                            <button
+                                onClick={() => { navigate('/settings/company_settings'); setProfileOpen(false); }}
+                                className="w-[92%] mx-auto flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-indigo-50/60 hover:text-indigo-600 hover:translate-x-1 rounded-xl transition-all duration-200 group/item"
+                            >
+                                <Building size={18} className="text-gray-400 group-hover/item:text-indigo-500 transition-colors" />
+                                <span className="font-medium">Company Settings</span>
                             </button>
 
                             <button

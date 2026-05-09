@@ -14,7 +14,8 @@ import {
     ChevronDown,
     PlusCircle,
     User,
-    LogOut
+    LogOut,
+    Building
 } from 'lucide-react';
 
 export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
@@ -179,10 +180,22 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                     onMouseOut={(e) => e.currentTarget.style.background = 'white'}
                                     onClick={() => {
                                         setProfileOpen(false);
-                                        navigate('/settings');
+                                        navigate('/settings/profile');
                                     }}
                                 >
                                     <User size={15} color="#888" /> My Profile
+                                </button>
+
+                                <button
+                                    style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#374151', textAlign: 'left', transition: 'background 0.15s' }}
+                                    onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
+                                    onMouseOut={(e) => e.currentTarget.style.background = 'white'}
+                                    onClick={() => {
+                                        setProfileOpen(false);
+                                        navigate('/settings/company_settings');
+                                    }}
+                                >
+                                    <Building size={15} color="#888" /> Company Settings
                                 </button>
 
                                 <button
