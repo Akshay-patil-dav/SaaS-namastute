@@ -1,6 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './BlogPage.css';
+import WebsiteNavbar from '../components/common/WebsiteNavbar';
+import WebsiteFooter from '../components/common/WebsiteFooter';
+
+/* ── Category Badge ──────────────────────────────────────────────────────── */
+const CATEGORIES = ['All', 'Software', 'Development', 'Business', 'Updates', 'Tutorial'];
+const CATEGORY_COLORS = {
+    Software:    { bg: 'rgba(99,102,241,0.1)',  color: '#6366f1' },
+    Development: { bg: 'rgba(16,185,129,0.10)', color: '#059669' },
+    Business:    { bg: 'rgba(245,158,11,0.10)', color: '#d97706' },
+    Updates:     { bg: 'rgba(255,144,47,0.10)', color: '#ff6b1a' },
+    Tutorial:    { bg: 'rgba(236,72,153,0.10)', color: '#db2777' },
+    All:         { bg: 'rgba(100,116,139,0.10)',color: '#475569' },
+};
 
 /* ── Scroll-reveal hook ─────────────────────────────────────────────────── */
 function useReveal() {
@@ -19,29 +32,6 @@ function useReveal() {
     }, []);
     return ref;
 }
-
-/* ── Nav Logo (shared) ──────────────────────────────────────────────────── */
-function NavLogo() {
-    return (
-        <Link to="/" className="lp-nav-logo">
-            <div className="lp-nav-logo-icon">
-                {[...Array(6)].map((_, i) => <div key={i} className="lp-nav-logo-dot" />)}
-            </div>
-            <span className="lp-nav-logo-text">Namas<span>tute</span></span>
-        </Link>
-    );
-}
-
-/* ── Category Badge ──────────────────────────────────────────────────────── */
-const CATEGORIES = ['All', 'Software', 'Development', 'Business', 'Updates', 'Tutorial'];
-const CATEGORY_COLORS = {
-    Software:    { bg: 'rgba(99,102,241,0.1)',  color: '#6366f1' },
-    Development: { bg: 'rgba(16,185,129,0.10)', color: '#059669' },
-    Business:    { bg: 'rgba(245,158,11,0.10)', color: '#d97706' },
-    Updates:     { bg: 'rgba(255,144,47,0.10)', color: '#ff6b1a' },
-    Tutorial:    { bg: 'rgba(236,72,153,0.10)', color: '#db2777' },
-    All:         { bg: 'rgba(100,116,139,0.10)',color: '#475569' },
-};
 
 /* ── Default sample blogs (shown when no saved blogs exist) ─────────────── */
 const DEFAULT_BLOGS = [
@@ -223,8 +213,6 @@ function FeaturedCard({ blog, onClick }) {
 /* ── Main Blog Page ──────────────────────────────────────────────────────── */
 export default function BlogPage() {
     const navigate = useNavigate();
-    const [scrolled, setScrolled] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(1);
@@ -241,18 +229,7 @@ export default function BlogPage() {
         } catch { return DEFAULT_BLOGS; }
     });
 
-    useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', onScroll);
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
-
     useEffect(() => { window.scrollTo(0, 0); }, []);
-
-    const scrollTo = (id) => {
-        setMenuOpen(false);
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    };
 
     const openBlog = (blog) => navigate(`/blog/${blog.slug}`, { state: { blog } });
 
@@ -276,32 +253,7 @@ export default function BlogPage() {
 
     return (
         <div className="lp-root blog-root">
-            {/* ── Navbar ─────────────────────── */}
-            <nav className={`lp-nav ${scrolled ? 'scrolled' : ''}`}>
-                <NavLogo />
-                <ul className="lp-nav-links">
-                    <li><a href="/#features"     onClick={() => { navigate('/'); setTimeout(() => scrollTo('features'), 100); }}>Features</a></li>
-                    <li><a href="/#pricing"       onClick={() => { navigate('/'); setTimeout(() => scrollTo('pricing'), 100); }}>Pricing</a></li>
-                    <li><Link to="/blog" className="blog-nav-active">Blog</Link></li>
-                </ul>
-                <div className="lp-nav-cta">
-                    <button className="lp-btn-ghost" onClick={() => navigate('/login')}>Log In</button>
-                    <button className="lp-btn-primary" onClick={() => navigate('/register')}>Get Started Free</button>
-                </div>
-                <button className={`lp-hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
-                    <span /><span /><span />
-                </button>
-            </nav>
-
-            {/* ── Mobile Menu ─────────────────── */}
-            <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`}>
-                <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
-                <Link to="/blog" onClick={() => setMenuOpen(false)}>Blog</Link>
-                <div className="lp-mobile-menu-cta">
-                    <a href="#" className="lp-btn-ghost" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Log In</a>
-                    <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/register'); }}>Get Started Free</a>
-                </div>
-            </div>
+            <WebsiteNavbar />
 
             {/* ── Hero Banner ──────────────────── */}
             <section className="blog-hero">
@@ -412,31 +364,7 @@ export default function BlogPage() {
                 </div>
             </section>
 
-            {/* ── Footer ──────────────────────── */}
-            <footer className="lp-footer">
-                <div className="lp-footer-top">
-                    <div className="lp-footer-brand">
-                        <NavLogo />
-                        <p className="lp-footer-desc">India's leading retail SaaS platform helping businesses manage inventory, orders, and analytics from one powerful dashboard.</p>
-                    </div>
-                    <div>
-                        <div className="lp-footer-col-title">Quick Links</div>
-                        <ul className="lp-footer-links">
-                            <li><Link to="/">Home</Link></li>
-                            <li><Link to="/blog">Blog</Link></li>
-                            <li><Link to="/register">Get Started</Link></li>
-                            <li><Link to="/login">Log In</Link></li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="lp-footer-bottom">
-                    <div className="lp-footer-copy">© 2026 Namastute POS. All rights reserved.</div>
-                    <div className="lp-footer-legal">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Service</a>
-                    </div>
-                </div>
-            </footer>
+            <WebsiteFooter />
         </div>
     );
 }
