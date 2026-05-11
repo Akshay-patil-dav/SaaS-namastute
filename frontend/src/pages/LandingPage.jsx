@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './LandingPage.css';
+import WebsiteNavbar from '../components/common/WebsiteNavbar';
+import WebsiteFooter from '../components/common/WebsiteFooter';
 
 /* ── Scroll-reveal hook ─────────────────────────────────────────────────── */
 function useReveal() {
@@ -21,22 +23,6 @@ function useReveal() {
         return () => observer.disconnect();
     }, []);
     return ref;
-}
-
-/* ── Nav Logo ───────────────────────────────────────────────────────────── */
-function NavLogo() {
-    return (
-        <Link to="/" className="lp-nav-logo">
-            <div className="lp-nav-logo-icon">
-                {[...Array(6)].map((_, i) => (
-                    <div key={i} className="lp-nav-logo-dot" />
-                ))}
-            </div>
-            <span className="lp-nav-logo-text">
-                Namas<span>tute</span>
-            </span>
-        </Link>
-    );
 }
 
 /* ── Feature Card ───────────────────────────────────────────────────────── */
@@ -130,8 +116,6 @@ function DashboardShowcase() {
 /* ── Main Landing Page ──────────────────────────────────────────────────── */
 export default function LandingPage() {
     const navigate = useNavigate();
-    const [scrolled, setScrolled] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
 
     // hero refs
     const featuresRef   = useReveal();
@@ -142,13 +126,10 @@ export default function LandingPage() {
     const blogRef       = useReveal();
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', onScroll);
-        return () => window.removeEventListener('scroll', onScroll);
+        window.scrollTo(0, 0);
     }, []);
 
     const scrollTo = (id) => {
-        setMenuOpen(false);
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     };
 
@@ -265,44 +246,7 @@ export default function LandingPage() {
 
     return (
         <div className="lp-root">
-            {/* ── Navbar ─────────────────────── */}
-            <nav className={`lp-nav ${scrolled ? 'scrolled' : ''}`}>
-                <NavLogo />
-
-                <ul className="lp-nav-links">
-                    <li><a href="#features"      onClick={() => scrollTo('features')}>Features</a></li>
-                    <li><a href="#how-it-works"  onClick={() => scrollTo('how-it-works')}>How It Works</a></li>
-                    <li><a href="#pricing"       onClick={() => scrollTo('pricing')}>Pricing</a></li>
-                    <li><a href="#testimonials"  onClick={() => scrollTo('testimonials')}>Reviews</a></li>
-                    <li><Link to="/blog" style={{ color: 'var(--primary)', fontWeight: 700 }}>Blog</Link></li>
-                </ul>
-
-                <div className="lp-nav-cta">
-                    <button className="lp-btn-ghost" onClick={() => navigate('/login')}>Log In</button>
-                    <button className="lp-btn-primary" onClick={() => navigate('/register')}>Get Started Free</button>
-                </div>
-
-                <button
-                    className={`lp-hamburger ${menuOpen ? 'open' : ''}`}
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    aria-label="Toggle menu"
-                >
-                    <span /><span /><span />
-                </button>
-            </nav>
-
-            {/* ── Mobile Menu ─────────────────── */}
-            <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`}>
-                <a href="#features"     onClick={() => scrollTo('features')}>Features</a>
-                <a href="#how-it-works" onClick={() => scrollTo('how-it-works')}>How It Works</a>
-                <a href="#pricing"      onClick={() => scrollTo('pricing')}>Pricing</a>
-                <a href="#testimonials" onClick={() => scrollTo('testimonials')}>Reviews</a>
-                <Link to="/blog" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'block', fontSize: 15 }}>Blog</Link>
-                <div className="lp-mobile-menu-cta">
-                    <a href="#" className="lp-btn-ghost" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Log In</a>
-                    <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/register'); }}>Get Started Free</a>
-                </div>
-            </div>
+            <WebsiteNavbar />
 
             {/* ── Hero ────────────────────────── */}
             <section className="lp-hero">
@@ -514,7 +458,7 @@ export default function LandingPage() {
             </section>
 
             {/* ── CTA ─────────────────────────── */}
-            <section className="lp-cta">
+            <section className="lp-section lp-cta">
                 <div ref={ctaRef} className="lp-cta-inner lp-reveal">
                     <h2 className="lp-cta-title">Ready to Transform<br />Your Business?</h2>
                     <p className="lp-cta-sub">Start your free trial today. No credit card required.</p>
@@ -536,55 +480,7 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ── Footer ──────────────────────── */}
-            <footer className="lp-footer">
-                <div className="lp-footer-top">
-                    <div className="lp-footer-brand">
-                        <NavLogo />
-                        <p className="lp-footer-desc">
-                            India's leading retail SaaS platform helping businesses manage
-                            inventory, orders, and analytics from one powerful dashboard.
-                        </p>
-                    </div>
-                    <div>
-                        <div className="lp-footer-col-title">Product</div>
-                        <ul className="lp-footer-links">
-                            <li><a href="#features"     onClick={() => scrollTo('features')}>Features</a></li>
-                            <li><a href="#pricing"      onClick={() => scrollTo('pricing')}>Pricing</a></li>
-                            <li><a href="#how-it-works" onClick={() => scrollTo('how-it-works')}>How It Works</a></li>
-                            <li><a href="#testimonials" onClick={() => scrollTo('testimonials')}>Reviews</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <div className="lp-footer-col-title">Company</div>
-                        <ul className="lp-footer-links">
-                            <li><a href="#">About Us</a></li>
-                            <li><Link to="/blog" style={{ color: 'inherit', textDecoration: 'none' }}>Blog</Link></li>
-                            <li><a href="#">Careers</a></li>
-                            <li><a href="#">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <div className="lp-footer-col-title">Support</div>
-                        <ul className="lp-footer-links">
-                            <li><a href="#">Help Center</a></li>
-                            <li><a href="#">Documentation</a></li>
-                            <li><a href="#">API Reference</a></li>
-                            <li><a href="#">Status</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="lp-footer-bottom">
-                    <div className="lp-footer-copy">
-                        © 2026 Namastute POS. All rights reserved.
-                    </div>
-                    <div className="lp-footer-legal">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Cookie Policy</a>
-                    </div>
-                </div>
-            </footer>
+            <WebsiteFooter />
         </div>
     );
 }

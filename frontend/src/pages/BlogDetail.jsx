@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import './BlogPage.css';
 import './LandingPage.css';
+import WebsiteNavbar from '../components/common/WebsiteNavbar';
+import WebsiteFooter from '../components/common/WebsiteFooter';
 
 /* ── Simple Markdown Renderer ────────────────────────────────────────────── */
 function renderMarkdown(text) {
@@ -21,28 +23,6 @@ function renderMarkdown(text) {
         .replace(/(<\/[hul][^>]*>)<\/p>/g, '$1');
 }
 
-/* ── Nav Logo ────────────────────────────────────────────────────────────── */
-function NavLogo() {
-    return (
-        <Link to="/" className="lp-nav-logo">
-            <div className="lp-nav-logo-icon">
-                {[...Array(6)].map((_, i) => <div key={i} className="lp-nav-logo-dot" />)}
-            </div>
-            <span className="lp-nav-logo-text">Namas<span>tute</span></span>
-        </Link>
-    );
-}
-
-/* ── Get all blogs ───────────────────────────────────────────────────────── */
-function getAllBlogs() {
-    try {
-        const saved = JSON.parse(localStorage.getItem('namastute_blogs') || '[]');
-        const DEFAULT_IDS = ['b1','b2','b3','b4','b5','b6'];
-        // Import defaults inline to avoid circular deps
-        return saved;
-    } catch { return []; }
-}
-
 const CATEGORY_COLORS = {
     Software:    { bg: 'rgba(99,102,241,0.1)',  color: '#6366f1' },
     Development: { bg: 'rgba(16,185,129,0.10)', color: '#059669' },
@@ -56,13 +36,13 @@ export default function BlogDetail() {
     const navigate = useNavigate();
     const location = useLocation();
     const { slug } = useParams();
-    const [scrolled, setScrolled] = useState(false);
 
     // Blog passed via state OR found by slug in localStorage
     const [blog, setBlog] = useState(() => {
         if (location.state?.blog) return location.state.blog;
         try {
             const saved = JSON.parse(localStorage.getItem('namastute_blogs') || '[]');
+            // Also check default blogs if not found in saved
             return saved.find(b => b.slug === slug) || null;
         } catch { return null; }
     });
@@ -77,49 +57,28 @@ export default function BlogDetail() {
         } catch { setRelated([]); }
     }, [blog]);
 
-    useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', onScroll);
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
-
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
     if (!blog) {
         return (
             <div className="lp-root blog-detail-root">
-                <nav className={`lp-nav ${scrolled ? 'scrolled' : ''}`}>
-                    <NavLogo />
-                    <div className="lp-nav-cta">
-                        <button className="lp-btn-ghost" onClick={() => navigate('/blog')}>← Back to Blog</button>
-                    </div>
-                </nav>
+                <WebsiteNavbar />
                 <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
                     <div style={{ fontSize: 64 }}>📭</div>
                     <h2 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 26, fontWeight: 800, color: 'var(--text)' }}>Article Not Found</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>This article may have been removed or moved.</p>
                     <button className="lp-btn-primary" onClick={() => navigate('/blog')}>Browse All Articles</button>
                 </div>
+                <WebsiteFooter />
             </div>
         );
     }
 
-    const cat = CATEGORY_COLORS[blog.category] || CATEGORY_COLORS.All;
     const htmlContent = renderMarkdown(blog.content || '');
 
     return (
         <div className="lp-root blog-detail-root">
-            {/* ── Navbar ─────────────────────────────── */}
-            <nav className={`lp-nav ${scrolled ? 'scrolled' : ''}`}>
-                <NavLogo />
-                <ul className="lp-nav-links">
-                    <li><Link to="/blog" className="blog-nav-active">Blog</Link></li>
-                </ul>
-                <div className="lp-nav-cta">
-                    <button className="lp-btn-ghost" onClick={() => navigate('/login')}>Log In</button>
-                    <button className="lp-btn-primary" onClick={() => navigate('/register')}>Get Started Free</button>
-                </div>
-            </nav>
+            <WebsiteNavbar />
 
             {/* ── Cover ──────────────────────────────── */}
             <div className="blog-detail-cover" style={{ background: blog.coverColor }}>
@@ -236,6 +195,7 @@ export default function BlogDetail() {
                     </div>
                 </aside>
             </div>
+            <WebsiteFooter />
         </div>
     );
 }
