@@ -9,6 +9,7 @@ import { ConfirmProvider } from './context/ConfirmContext';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import LandingPage from './pages/LandingPage.jsx';
+import ITPortfolio from './pages/ITPortfolio.jsx';
 import BlogPage from './pages/BlogPage.jsx';
 import BlogDetail from './pages/BlogDetail.jsx';
 import Unauthorized from './pages/Unauthorized.jsx';
@@ -70,8 +71,9 @@ function AppRoutes() {
             <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
             <Route path="/unauthorized" element={<Unauthorized />} />
 
-            {/* Root → landing page */}
-            <Route path="/" element={<LandingPage />} />
+            {/* Root → IT Portfolio Landing Page */}
+            <Route path="/" element={<ITPortfolio />} />
+            <Route path="/retail-saas-platform" element={<LandingPage />} />
 
             {/* Blog routes – public */}
             <Route path="/blog" element={<BlogPage />} />
