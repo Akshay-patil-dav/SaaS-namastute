@@ -73,26 +73,25 @@
   gap: 10px;
   text-decoration: none;
 }
-.lp-nav-logo-icon {
-  width: 36px; height: 36px;
-  background: var(--gradient);
-  border-radius: 10px;
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 3px;
-  padding: 8px;
-  box-shadow: 0 4px 12px rgba(255,144,47,0.35);
+.lp-nav-logo-img {
+  width: 42px;
+  /* width: 10%; */
+  height: 42px;
+  object-fit: contain;
+  border-radius: 12px;
+  /* box-shadow: 0 4px 12px rgba(255,144,47,0.25); */
+  transition: transform 0.3s ease;
 }
-.lp-nav-logo-dot {
-  background: white;
-  border-radius: 50%;
+.lp-nav-logo:hover .lp-nav-logo-img {
+  transform: scale(1.05) rotate(-2deg);
 }
-.lp-nav-logo-dot:nth-child(even) { opacity: 0.55; }
 .lp-nav-logo-text {
   font-size: 20px;
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.5px;
+      POSITION: relative;
+    right: 13px;
 }
 .lp-nav-logo-text span { color: var(--primary); }
 
