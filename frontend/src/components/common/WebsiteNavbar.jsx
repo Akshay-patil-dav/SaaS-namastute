@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import logo from '../../assets/logo.svg';
 
 const productsDropdown = {
   columns: [
@@ -65,10 +66,8 @@ const dropdownMap = {
 
 export const NavLogo = () => (
     <Link to="/" className="lp-nav-logo">
-        <div className="lp-nav-logo-icon">
-            {[...Array(6)].map((_, i) => <div key={i} className="lp-nav-logo-dot" />)}
-        </div>
-        <span className="lp-nav-logo-text">Namas<span>tute</span></span>
+        <img src={logo} alt="Namastute Logo" className="lp-nav-logo-img" />
+        <span className="lp-nav-logo-text">amas<span>tute</span></span>
     </Link>
 );
 
