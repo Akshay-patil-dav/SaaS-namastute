@@ -127,6 +127,7 @@ export default function LandingPage() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        document.title = "Retail SaaS Platform";
     }, []);
 
     const scrollTo = (id) => {

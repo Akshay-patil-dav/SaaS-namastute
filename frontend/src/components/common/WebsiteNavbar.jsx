@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-/* ─── Dropdown Data ─── */
 const productsDropdown = {
   columns: [
     {
       heading: 'Products',
       items: [
-        { icon: '🖼️', title: 'List of Products', desc: 'Browse products with banner images', color: '#2563EB' },
+        { icon: '🛒', title: 'Retail SaaS Platform', desc: 'Complete POS & Inventory Management System', color: '#ff902f', link: '/retail-saas-platform' },
+        { icon: '🖼️', title: 'List of Products', desc: 'Browse products with banner images', color: '#2563EB', link: '#' },
       ],
     },
   ],
@@ -116,8 +116,8 @@ const WebsiteNavbar = () => {
 
     const scrollTo = (id) => {
         setMenuOpen(false);
-        if (window.location.pathname !== '/') {
-            navigate('/');
+        if (window.location.pathname !== '/retail-saas-platform') {
+            navigate('/retail-saas-platform');
             setTimeout(() => {
                 document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
             }, 300);
@@ -146,7 +146,7 @@ const WebsiteNavbar = () => {
                             <div key={ci} className="lp-mobile-accordion-group">
                                 <span className="lp-mobile-accordion-heading">{col.heading}</span>
                                 {col.items.map((item, ii) => (
-                                    <a href="#" className="lp-mobile-accordion-item" key={ii} onClick={() => setMenuOpen(false)}>
+                                    <Link to={item.link || '#'} className="lp-mobile-accordion-item" key={ii} onClick={() => setMenuOpen(false)}>
                                         <span className="lp-mobile-accordion-icon" style={{ background: `${item.color}12`, color: item.color }}>
                                             {item.icon}
                                         </span>
@@ -154,7 +154,7 @@ const WebsiteNavbar = () => {
                                             <span className="lp-mobile-accordion-title">{item.title}</span>
                                             <span className="lp-mobile-accordion-desc">{item.desc}</span>
                                         </div>
-                                    </a>
+                                    </Link>
                                 ))}
                             </div>
                         ))}
@@ -249,7 +249,7 @@ const WebsiteNavbar = () => {
                                         <div className="lp-dropdown-column" key={ci}>
                                             <span className="lp-dropdown-heading">{col.heading}</span>
                                             {col.items.map((item, ii) => (
-                                                <a href="#" className="lp-dropdown-item" key={ii}>
+                                                <Link to={item.link || '#'} className="lp-dropdown-item" key={ii} onClick={() => setMenuOpen(false)}>
                                                     <span className="lp-dropdown-icon" style={{ background: `${item.color}12`, color: item.color }}>
                                                         {item.icon}
                                                     </span>
@@ -257,7 +257,7 @@ const WebsiteNavbar = () => {
                                                         <span className="lp-dropdown-title">{item.title}</span>
                                                         <span className="lp-dropdown-desc">{item.desc}</span>
                                                     </div>
-                                                </a>
+                                                </Link>
                                             ))}
                                         </div>
                                     ))}
