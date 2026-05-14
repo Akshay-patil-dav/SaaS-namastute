@@ -4,6 +4,8 @@ import './LandingPage.css';
 import './ITPortfolio.css';
 import WebsiteNavbar from '../components/common/WebsiteNavbar';
 import WebsiteFooter from '../components/common/WebsiteFooter';
+import NodeFeatures from '../components/common/NodeFeatures';
+import TeamSection from '../components/common/TeamSection';
 
 function useReveal() {
     const ref = useRef(null);
@@ -28,7 +30,6 @@ function useReveal() {
 export default function ITPortfolio() {
     const navigate = useNavigate();
     const heroRef = useReveal();
-    const servicesRef = useReveal();
     const portfolioRef = useReveal();
     const whyRef = useReveal();
     const ctaRef = useReveal();
@@ -69,8 +70,93 @@ export default function ITPortfolio() {
             category: 'Web Development',
             img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
             color: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+        },
+        {
+            title: 'Mobile Banking App',
+            category: 'Fintech Solution',
+            img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800',
+            color: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)'
+        },
+        {
+            title: 'AI Chatbot Integration',
+            category: 'Machine Learning',
+            img: 'https://images.unsplash.com/photo-1531746790731-6c087fecd05a?auto=format&fit=crop&q=80&w=800',
+            color: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)'
+        },
+        {
+            title: 'E-commerce Fashion Store',
+            category: 'Online Retail',
+            img: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800',
+            color: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)'
         }
     ];
+
+    const [activePortfolioTab, setActivePortfolioTab] = useState('App Development');
+    const portfolioTabsData = [
+        { id: 'Data Analysis', icon: '📊' },
+        { id: 'UI/UX Designing', icon: '🎨' },
+        { id: 'App Development', icon: '📱' },
+        { id: 'Wp Development', icon: '⚙️' },
+        { id: '3D Design Solution', icon: '🧊' }
+    ];
+    const portfolioContentData = {
+        'App Development': {
+            mainImg: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
+            title: 'Detailing Of Our Project',
+            desc: 'There are many variations passages of Lorem Ipsum available but the majority have suffered alteration in some form by injected humour,',
+            features: [
+                { icon: '💻', title: 'Responsive\nWebsite' },
+                { icon: '⭐', title: '100% Customers\nSatisfaction' },
+                { icon: '☁️', title: 'Big Data &\nAnalytics' }
+            ],
+            innerImg: '/dashboard1.png'
+        },
+        'Data Analysis': {
+            mainImg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
+            title: 'Data Insights & Analytics',
+            desc: 'Unlock the power of your data with our advanced analytics solutions, providing actionable insights for business growth.',
+            features: [
+                { icon: '📈', title: 'Real-time\nMetrics' },
+                { icon: '🎯', title: 'Predictive\nModeling' },
+                { icon: '🔒', title: 'Secure Data\nPipelines' }
+            ],
+            innerImg: '/dashboard2.png'
+        },
+        'UI/UX Designing': {
+            mainImg: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800',
+            title: 'User-Centric Design',
+            desc: 'We craft intuitive and engaging user experiences that delight your customers and drive conversions.',
+            features: [
+                { icon: '✨', title: 'Pixel-Perfect\nUI' },
+                { icon: '🔍', title: 'User\nResearch' },
+                { icon: '📱', title: 'Interactive\nPrototypes' }
+            ],
+            innerImg: '/dashboard1.png'
+        },
+        'Wp Development': {
+            mainImg: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800',
+            title: 'Custom WordPress Solutions',
+            desc: 'Scalable and secure WordPress websites tailored to your unique business needs, with easy content management.',
+            features: [
+                { icon: '⚡', title: 'Optimized\nPerformance' },
+                { icon: '🛡️', title: 'Enhanced\nSecurity' },
+                { icon: '🧩', title: 'Custom\nPlugins' }
+            ],
+            innerImg: '/dashboard2.png'
+        },
+        '3D Design Solution': {
+            mainImg: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800',
+            title: 'Immersive 3D Experiences',
+            desc: 'Bring your ideas to life with stunning 3D models and interactive environments for web and mobile.',
+            features: [
+                { icon: '🧊', title: 'High-Fidelity\nModeling' },
+                { icon: '🎮', title: 'Interactive\nWebGL' },
+                { icon: '👁️', title: 'AR/VR\nReady' }
+            ],
+            innerImg: '/dashboard1.png'
+        }
+    };
+    const activeContent = portfolioContentData[activePortfolioTab];
 
     return (
         <div className="portfolio-root">
@@ -121,51 +207,128 @@ export default function ITPortfolio() {
                 </div>
             </section>
 
-            {/* ── Services Section ──────────────────────── */}
-            <section className="portfolio-section" id="services">
-                <div className="portfolio-section-header reveal" ref={servicesRef}>
-                    <div className="portfolio-section-label">Our Expertise</div>
-                    <h2 className="portfolio-section-title">End-to-End IT Services</h2>
-                    <p className="portfolio-section-subtitle">Comprehensive solutions tailored to accelerate your digital growth and streamline operations.</p>
-                </div>
-                <div className="portfolio-services-grid">
-                    {services.map((s, i) => (
-                        <div key={i} className="portfolio-service-card reveal" style={{ transitionDelay: `${i * 100}ms` }}>
-                            <div className="portfolio-service-icon">{s.icon}</div>
-                            <h3 className="portfolio-service-title">{s.title}</h3>
-                            <p className="portfolio-service-desc">{s.desc}</p>
-                        </div>
+            {/* ── Node Features (Replaces Our Expertise) ──────────────── */}
+            <section id="services">
+                <NodeFeatures 
+                    badgeTitle="Expertise"
+                    title={<>End-to-End IT Services</>}
+                    subtitle="Comprehensive solutions tailored to accelerate your digital growth and streamline operations."
+                    features={services}
+                    centerNode={{
+                        title: "Namastute",
+                        icon: <svg viewBox="0 0 24 24" width="48" height="48" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                    }}
+                />
+            </section>
+
+            {/* ── Latest Portfolios Section (Our Experience) ──────────────────────── */}
+            <section className="portfolio-latest-section" id="experience">
+                <div className="portfolio-section-label">SELECTED WORKS</div>
+                <h2 className="portfolio-latest-title">Check Our Latest Portfolios</h2>
+                
+                <div className="portfolio-tabs-container">
+                    {portfolioTabsData.map(tab => (
+                        <button 
+                            key={tab.id}
+                            className={`portfolio-tab-btn ${activePortfolioTab === tab.id ? 'active' : ''}`}
+                            onClick={() => setActivePortfolioTab(tab.id)}
+                        >
+                            <div className="portfolio-tab-icon-wrapper">
+                                <span className="icon">{tab.icon}</span>
+                            </div>
+                            <span className="text">{tab.id}</span>
+                        </button>
                     ))}
+                </div>
+
+                <div className="portfolio-tab-content" key={activePortfolioTab}>
+                    <div className="portfolio-tab-left-img">
+                        <img src={activeContent.mainImg} alt={activeContent.title} />
+                    </div>
+                    <div className="portfolio-tab-right-card">
+                        <div className="portfolio-tab-card-info">
+                            <h3>{activeContent.title}</h3>
+                            <p>{activeContent.desc}</p>
+                            
+                            <div className="portfolio-tab-features">
+                                {activeContent.features.map((feature, idx) => (
+                                    <div key={idx} className="portfolio-tab-feature">
+                                        <div className="icon">{feature.icon}</div>
+                                        <div className="text">{feature.title}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <div className="portfolio-explore-badge">
+                                <div className="portfolio-explore-badge-inner">
+                                    <svg viewBox="0 0 100 100" width="80" height="80">
+                                        <defs>
+                                            <path id="circlePath" d="M 50, 50 m -30, 0 a 30,30 0 1,1 60,0 a 30,30 0 1,1 -60,0" fill="none" />
+                                        </defs>
+                                        <text className="portfolio-explore-svg-text" fontSize="11" fontWeight="bold" letterSpacing="1">
+                                            <textPath href="#circlePath" startOffset="0%">
+                                                EXPLORE MORE • EXPLORE MORE •
+                                            </textPath>
+                                        </text>
+                                    </svg>
+                                </div>
+                                <span className="portfolio-explore-arrow">↘</span>
+                            </div>
+                        </div>
+                        <div className="portfolio-tab-card-mockup">
+                            <img src={activeContent.innerImg} alt="App mockup" />
+                        </div>
+                    </div>
                 </div>
             </section>
 
             {/* ── Portfolio Section ──────────────────────── */}
-            <section className="portfolio-section portfolio-section-alt" id="portfolio">
+            {/* ── Showcase of Brilliance (Dynamic Carousel) ──────────────────────── */}
+            <section className="portfolio-showcase-section" id="portfolio">
                 <div className="portfolio-section-header reveal" ref={portfolioRef}>
                     <div className="portfolio-section-label">Selected Works</div>
                     <h2 className="portfolio-section-title">Showcase of Brilliance</h2>
                     <p className="portfolio-section-subtitle">Explore some of our recent flagship projects and enterprise solutions.</p>
                 </div>
-                <div className="portfolio-projects-grid">
-                    {projects.map((p, i) => (
-                        <div key={i} className="portfolio-project-card reveal" style={{ transitionDelay: `${i * 150}ms` }}>
-                            <div className="portfolio-project-img-wrapper" style={{ background: p.color }}>
-                                <img src={p.img} alt={p.title} className="portfolio-project-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
+
+                <div className="portfolio-showcase-carousel">
+                    <div className="portfolio-showcase-row row-left">
+                        {[...projects, ...projects, ...projects].map((p, i) => (
+                            <div key={`left-${i}`} className="portfolio-showcase-card">
+                                <div className="portfolio-showcase-img-wrapper" style={{ background: p.color }}>
+                                    <img src={p.img} alt={p.title} className="portfolio-showcase-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
+                                    <div className="portfolio-showcase-overlay">
+                                        <span className="portfolio-showcase-category">{p.category}</span>
+                                        <h3 className="portfolio-showcase-card-title">{p.title}</h3>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="portfolio-project-info">
-                                <div className="portfolio-project-category">{p.category}</div>
-                                <h3 className="portfolio-project-title">{p.title}</h3>
-                                <div className="portfolio-project-link">View Case Study →</div>
+                        ))}
+                    </div>
+                    <div className="portfolio-showcase-row row-right">
+                        {[...projects, ...projects, ...projects].reverse().map((p, i) => (
+                            <div key={`right-${i}`} className="portfolio-showcase-card">
+                                <div className="portfolio-showcase-img-wrapper" style={{ background: p.color }}>
+                                    <img src={p.img} alt={p.title} className="portfolio-showcase-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
+                                    <div className="portfolio-showcase-overlay">
+                                        <span className="portfolio-showcase-category">{p.category}</span>
+                                        <h3 className="portfolio-showcase-card-title">{p.title}</h3>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-                <div className="portfolio-btn-wrapper">
+
+                <div className="portfolio-btn-wrapper" style={{ marginTop: '60px' }}>
                     <button className="portfolio-btn-outline" onClick={() => navigate('/retail-saas-platform')}>
                         Explore Retail SaaS Demo →
                     </button>
                 </div>
             </section>
+
+            {/* ── Team Section ──────────────────────── */}
+            <TeamSection />
 
             {/* ── Why Choose Us ──────────────────────── */}
             <section className="portfolio-section" id="why-us">

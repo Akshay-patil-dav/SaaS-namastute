@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import './LandingPage.css';
 import WebsiteNavbar from '../components/common/WebsiteNavbar';
 import WebsiteFooter from '../components/common/WebsiteFooter';
+import NodeFeatures from '../components/common/NodeFeatures';
 
 /* ── Scroll-reveal hook ─────────────────────────────────────────────────── */
 function useReveal() {
@@ -321,21 +322,17 @@ export default function LandingPage() {
             </section>
 
             {/* ── Features ────────────────────── */}
-            <section className="lp-section" id="features">
-                <div ref={featuresRef} className="lp-reveal">
-                    <div className="lp-section-label">Features</div>
-                    <h2 className="lp-section-title">
-                        Everything You Need<br />to Run Your Business
-                    </h2>
-                    <p className="lp-section-sub">
-                        From inventory to billing to analytics — Namastute is the only tool your team will ever need.
-                    </p>
-                </div>
-                <div className="lp-features-grid">
-                    {features.map((f, i) => (
-                        <FeatureCard key={i} {...f} delay={i * 80} />
-                    ))}
-                </div>
+            <section id="features">
+                <NodeFeatures 
+                    badgeTitle="Features"
+                    title={<>All Features in One</>}
+                    subtitle="From inventory to billing to analytics — Namastute is the only tool your team will ever need."
+                    features={features}
+                    centerNode={{
+                        title: "Namastute",
+                        icon: <svg viewBox="0 0 24 24" width="48" height="48" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                    }}
+                />
             </section>
 
             {/* ── How It Works ────────────────── */}
