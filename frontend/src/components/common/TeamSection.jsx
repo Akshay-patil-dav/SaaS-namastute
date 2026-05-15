@@ -3,13 +3,13 @@ import './TeamSection.css';
 
 const teamMembers = [
     { name: 'Wade Warren', role: 'Medical Assistant', image: '/team/wade.png' },
-    { name: 'Masirul Islam', role: 'Manager Assistant', image: '/team/masirul.png' },
-    { name: 'Jenny Wilson', role: 'Web Designer', image: '/team/jenny.png' },
-    { name: 'Floyd Miles', role: 'Head Assistant', image: '/team/floyd.png' },
-    { name: 'Cody Fisher', role: 'UI Designer', image: '/team/cody.png' },
-    { name: 'Arlene McCoy', role: 'Developer', image: '/team/arlene.png' },
-    { name: 'Robert Fox', role: 'Marketing Specialist', image: '/team/robert.png' },
-    { name: 'Esther Howard', role: 'Support Lead', image: '/team/esther.png' },
+    { name: 'Masirul Islam', role: 'Manager Assistant', image: '/team/wade.png' },
+    { name: 'Jenny Wilson', role: 'Web Designer', image: '/team/wade.png' },
+    { name: 'Floyd Miles', role: 'Head Assistant', image: '/team/wade.png' },
+    { name: 'Cody Fisher', role: 'UI Designer', image: '/team/wade.png' },
+    { name: 'Arlene McCoy', role: 'Developer', image: '/team/wade.png' },
+    { name: 'Robert Fox', role: 'Marketing Specialist', image: '/team/wade.png' },
+    { name: 'Esther Howard', role: 'Support Lead', image: '/team/wade.png' },
 ];
 
 const TeamSection = () => {
