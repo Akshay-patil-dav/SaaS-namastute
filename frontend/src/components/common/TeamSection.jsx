@@ -1,60 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './TeamSection.css';
 
 const teamMembers = [
-    {
-        name: 'Arjun Patil',
-        role: 'Founder & CEO',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400',
-        description: 'Visionary leader with 10+ years of experience in SaaS and enterprise solutions.'
-    },
-    {
-        name: 'Sarah Chen',
-        role: 'Head of Design',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400',
-        description: 'Award-winning UI/UX designer focused on creating intuitive and beautiful digital experiences.'
-    },
-    {
-        name: 'David Miller',
-        role: 'Technical Lead',
-        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400',
-        description: 'Full-stack expert specializing in scalable cloud architectures and multi-tenant systems.'
-    },
-    {
-        name: 'Elena Rodriguez',
-        role: 'E-commerce Specialist',
-        image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400',
-        description: 'Dedicated to building high-converting Shopify and custom e-commerce platforms.'
-    }
+    { name: 'Wade Warren', role: 'Medical Assistant', image: '/team/wade.png' },
+    { name: 'Masirul Islam', role: 'Manager Assistant', image: '/team/masirul.png' },
+    { name: 'Jenny Wilson', role: 'Web Designer', image: '/team/jenny.png' },
+    { name: 'Floyd Miles', role: 'Head Assistant', image: '/team/floyd.png' },
+    { name: 'Cody Fisher', role: 'UI Designer', image: '/team/cody.png' },
+    { name: 'Arlene McCoy', role: 'Developer', image: '/team/arlene.png' },
+    { name: 'Robert Fox', role: 'Marketing Specialist', image: '/team/robert.png' },
+    { name: 'Esther Howard', role: 'Support Lead', image: '/team/esther.png' },
 ];
 
 const TeamSection = () => {
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [isFlipping, setIsFlipping] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+    const displayCount = 4;
+
+    useEffect(() => {
+        if (isPaused) return;
+
+        const interval = setInterval(() => {
+            setIsFlipping(true);
+            setTimeout(() => {
+                setActiveIndex((prev) => (prev + displayCount) % teamMembers.length);
+                setIsFlipping(false);
+            }, 600); 
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [activeIndex, isPaused]);
+
+    const visibleMembers = teamMembers.slice(activeIndex, activeIndex + displayCount);
+    if (visibleMembers.length < displayCount) {
+        visibleMembers.push(...teamMembers.slice(0, displayCount - visibleMembers.length));
+    }
+
     return (
         <section className="team-section" id="team">
             <div className="team-container">
                 <div className="team-header">
-                    <div className="team-badge">OUR EXPERTS</div>
-                    <h2 className="team-title">The Brilliant Minds Behind <span className="gradient-text">Namastute</span></h2>
-                    <p className="team-subtitle">
-                        Meet our dedicated team of designers, developers, and strategists working together to build your digital future.
-                    </p>
+                    <div className="team-badge-wrapper">
+                        <span className="arrow">←</span>
+                        <span className="team-badge-text">OUR EXPERT</span>
+                        <span className="arrow">→</span>
+                    </div>
+                    <h2 className="team-title">See Our Skilled Expert Team</h2>
                 </div>
 
-                <div className="team-grid">
-                    {teamMembers.map((member, index) => (
-                        <div key={index} className="team-card">
-                            <div className="team-image-wrapper">
-                                <img src={member.image} alt={member.name} className="team-image" />
-                                <div className="team-socials">
-                                    <span className="social-icon">𝕏</span>
-                                    <span className="social-icon">in</span>
-                                    <span className="social-icon">🌐</span>
+                <div 
+                    className="team-flip-grid"
+                    onMouseEnter={() => setIsPaused(true)}
+                    onMouseLeave={() => setIsPaused(false)}
+                >
+                    {visibleMembers.map((member, index) => (
+                        <div key={`${activeIndex}-${index}`} className={`team-flip-wrapper ${isFlipping ? 'flipping' : ''}`}>
+                            <div className="team-card">
+                                <div className="card-decoration"></div>
+                                <div className="team-image-container">
+                                    <img src={member.image} alt={member.name} className="team-image" />
                                 </div>
-                            </div>
-                            <div className="team-info">
-                                <h3 className="member-name">{member.name}</h3>
-                                <div className="member-role">{member.role}</div>
-                                <p className="member-desc">{member.description}</p>
+                                <div className="team-info-label">
+                                    <h3 className="member-name">{member.name}</h3>
+                                    <div className="member-role">{member.role}</div>
+                                </div>
                             </div>
                         </div>
                     ))}
