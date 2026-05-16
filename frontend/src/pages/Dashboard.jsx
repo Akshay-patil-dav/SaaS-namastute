@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import apiClient, { API } from '../api/config';
 import { 
     Wallet, ShoppingCart, ShoppingBag, ArrowUpRight, ArrowDownRight, 
     MoreVertical, Info, Package, Users, Activity,
@@ -60,17 +61,72 @@ export default function Dashboard() {
     const { user } = useAuth();
     const name = user?.identifier?.split('@')[0] || 'Admin';
 
+    // { onlineCount, posCount, total } — fetched from /api/sales/today/summary
+    const [todaySummary, setTodaySummary] = useState(null);
+    const [loadingCount, setLoadingCount] = useState(true);
+
+    useEffect(() => {
+        let cancelled = false;
+        const fetchTodaySummary = async () => {
+            try {
+                const res = await apiClient.get(`${API.SALES}/today/summary`);
+                if (!cancelled) setTodaySummary(res.data);
+            } catch (err) {
+                console.error('Failed to fetch today\'s sales summary:', err);
+                if (!cancelled) setTodaySummary({ onlineCount: 0, posCount: 0, total: 0 });
+            } finally {
+                if (!cancelled) setLoadingCount(false);
+            }
+        };
+        fetchTodaySummary();
+        // Poll every 60 s so numbers stay fresh without a manual reload
+        const interval = setInterval(fetchTodaySummary, 60_000);
+        return () => { cancelled = true; clearInterval(interval); };
+    }, []);
+
+    const totalCount   = todaySummary?.totalCount   ?? 0;
+    const onlineCount  = todaySummary?.onlineCount  ?? 0;
+    const posCount     = todaySummary?.posCount     ?? 0;
+    const totalAmount  = todaySummary?.totalAmount  ?? 0;
+    const onlineAmount = todaySummary?.onlineAmount ?? 0;
+    const posAmount    = todaySummary?.posAmount    ?? 0;
+    const onlinePct    = totalCount > 0 ? Math.round((onlineCount / totalCount) * 100) : 0;
+    const posPct       = totalCount > 0 ? Math.round((posCount    / totalCount) * 100) : 0;
+
+    const fmt = (n) => {
+        const num = Number(n);
+        if (isNaN(num)) return '₹0.00';
+        return '₹' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
     return (
         <div className="dashboard-wrapper">
             {/* Header Area */}
             <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
                     <h2 className="fw-bold mb-1" style={{color: '#1e293b'}}>Welcome, {name}</h2>
-                    <p className="text-muted small mb-0">You have <span className="text-warning fw-bold">295+</span> Orders, Today</p>
+                    <p className="text-muted small mb-0">
+                        You have{' '}
+                        <span className="text-warning fw-bold">
+                            {loadingCount
+                                ? <span className="spinner-border spinner-border-sm text-warning" role="status" style={{width:'14px',height:'14px'}} />
+                                : totalCount}
+                        </span>{' '}
+                        sale{totalCount !== 1 ? 's' : ''} today
+                        {!loadingCount && totalCount > 0 && (
+                            <span className="text-muted ms-1">(
+                                <span className="text-primary fw-semibold">{onlineCount} online</span>
+                                {' + '}
+                                <span className="text-success fw-semibold">{posCount} POS</span>
+                            )</span>
+                        )}
+                    </p>
                 </div>
                 <div className="d-flex gap-2 align-items-center bg-white border px-3 py-2 rounded-2 shadow-sm">
                     <Calendar size={16} className="text-muted" />
-                    <span className="small fw-semibold text-secondary">23 October 2024 - 24 October 2024</span>
+                    <span className="small fw-semibold text-secondary">
+                        {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}
+                    </span>
                 </div>
             </div>
 
@@ -87,17 +143,32 @@ export default function Dashboard() {
             <div className="row g-3 mb-3">
                 <div className="col-12 col-md-6 col-xl-3">
                     <div className="dash-card top-card-orange">
-                        <div className="d-flex justify-content-between align-items-start mb-4">
+                        <div className="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <p className="mb-1 fw-medium text-white-50 small">Total Sales</p>
-                                <h3 className="mb-0 fw-bold">$48,988,078</h3>
+                                <p className="mb-1 fw-medium text-white-50 small">Today's Total Sales</p>
+                                <h3 className="mb-0 fw-bold">
+                                        {fmt(totalAmount)}
+                                </h3>
+                                <h6 className="text-white-50"><b>Total Sales : </b>{totalCount}</h6>
                             </div>
                             <div className="icon-rounded-sm bg-white text-orange">
                                 <Wallet size={18} color="#ea580c" />
                             </div>
                         </div>
+                        {/* Mini breakdown inside the card */}
+                        <div className="d-flex gap-3 mb-3" style={{fontSize:'12px'}}>
+                            <div className="d-flex align-items-center gap-1 text-white-50">
+                                <span style={{width:8,height:8,borderRadius:'50%',background:'rgba(255,255,255,0.9)',display:'inline-block'}}></span>
+                                Online: <span className="text-white fw-bold ms-1">{loadingCount ? '…' : onlineCount}</span>
+                            </div>
+                            <div className="d-flex align-items-center gap-1 text-white-50">
+                                <span style={{width:8,height:8,borderRadius:'50%',background:'rgba(255,255,255,0.5)',display:'inline-block'}}></span>
+                                POS: <span className="text-white fw-bold ms-1">{loadingCount ? '…' : posCount}</span>
+                            </div>
+                        </div>
                         <div className="d-flex align-items-center gap-2">
-                            <span className="pill-badge bg-white text-orange small"><ArrowUpRight size={12}/> +22%</span>
+                            <span className="pill-badge bg-white text-orange small"><ArrowUpRight size={12}/> Live</span>
+                            <span className="text-white-50" style={{fontSize:'11px'}}>Auto-refresh 60s</span>
                         </div>
                     </div>
                 </div>
@@ -219,6 +290,131 @@ export default function Dashboard() {
                             <small className="text-danger fw-semibold">-20% vs Last Month</small>
                             <a href="#" className="small fw-semibold text-primary text-decoration-none">View All</a>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Today's Sales Breakdown ─────────────────────────────────────── */}
+            <div className="row g-3 mb-4">
+                <div className="col-12">
+                    <div className="dash-card">
+                        {/* Header */}
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <h5 className="dash-title mb-0">
+                                <ShoppingCart size={20} color="#f97316" className="me-2" />
+                                Today's Sales Breakdown
+                                <span className="ms-2" style={{
+                                    fontSize: '11px', background: '#fef3c7', color: '#d97706',
+                                    padding: '2px 9px', borderRadius: '20px', fontWeight: 600
+                                }}>● LIVE</span>
+                            </h5>
+                            <span className="small text-muted">
+                                {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}
+                            </span>
+                        </div>
+
+                        {loadingCount ? (
+                            <div className="text-center py-4">
+                                <div className="spinner-border text-warning" role="status" style={{width:32,height:32}} />
+                                <p className="text-muted small mt-2 mb-0">Fetching today's data…</p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Column headers */}
+                                <div className="d-flex justify-content-between align-items-center px-2 mb-2">
+                                    <span className="small text-muted fw-semibold" style={{flex:1}}>Source</span>
+                                    <span className="small text-muted fw-semibold text-end" style={{minWidth:80}}>Orders</span>
+                                    <span className="small text-muted fw-semibold text-end" style={{minWidth:130}}>Amount</span>
+                                </div>
+
+                                {/* ── Online Sales row ── */}
+                                <div className="dash-list-item">
+                                    <div className="item-flex" style={{flex:1}}>
+                                        <div className="item-img" style={{background:'#eff6ff',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                                            <ShoppingCart size={18} color="#2563eb" />
+                                        </div>
+                                        <div>
+                                            <p className="item-title">Online Sales</p>
+                                            <p className="item-desc">Sale Orders (web)</p>
+                                        </div>
+                                    </div>
+                                    <span className="fw-bold fs-5 text-end" style={{minWidth:80,color:'#2563eb'}}>
+                                        {onlineCount}
+                                    </span>
+                                    <span className="fw-bold small text-end" style={{minWidth:130,color:'#2563eb'}}>
+                                        {fmt(onlineAmount)}
+                                    </span>
+                                </div>
+
+                                {/* ── POS Sales row ── */}
+                                <div className="dash-list-item">
+                                    <div className="item-flex" style={{flex:1}}>
+                                        <div className="item-img" style={{background:'#f0fdf4',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                                            <DollarSign size={18} color="#16a34a" />
+                                        </div>
+                                        <div>
+                                            <p className="item-title">POS Sales</p>
+                                            <p className="item-desc">Point-of-Sale terminal</p>
+                                        </div>
+                                    </div>
+                                    <span className="fw-bold fs-5 text-end" style={{minWidth:80,color:'#16a34a'}}>
+                                        {posCount}
+                                    </span>
+                                    <span className="fw-bold small text-end" style={{minWidth:130,color:'#16a34a'}}>
+                                        {fmt(posAmount)}
+                                    </span>
+                                </div>
+
+                                {/* ── Total row ── */}
+                                <div className="dash-list-item" style={{background:'#fff7ed',borderRadius:10,marginTop:6}}>
+                                    <div className="item-flex" style={{flex:1}}>
+                                        <div className="item-img" style={{background:'#ea580c',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                                            <TrendingUp size={18} color="#fff" />
+                                        </div>
+                                        <div>
+                                            <p className="item-title fw-bold" style={{color:'#ea580c'}}>Total Today</p>
+                                            <p className="item-desc">Online + POS combined</p>
+                                        </div>
+                                    </div>
+                                    <span className="fw-bold fs-4 text-end" style={{minWidth:80,color:'#ea580c'}}>
+                                        {totalCount}
+                                    </span>
+                                    <span className="fw-bold text-end" style={{minWidth:130,color:'#ea580c',fontSize:'1rem'}}>
+                                        {fmt(totalAmount)}
+                                    </span>
+                                </div>
+
+                                {/* ── Stacked progress bar (count distribution) ── */}
+                                {totalCount > 0 && (
+                                    <div className="mt-4">
+                                        <div className="d-flex justify-content-between mb-1">
+                                            <small className="text-muted fw-semibold">Order distribution</small>
+                                            <small className="text-muted">{onlinePct}% Online · {posPct}% POS</small>
+                                        </div>
+                                        <div className="w-100 rounded-pill overflow-hidden" style={{height:10,background:'#f1f5f9'}}>
+                                            <div className="d-flex h-100">
+                                                <div style={{
+                                                    width:`${onlinePct}%`,
+                                                    background:'linear-gradient(90deg,#60a5fa,#2563eb)',
+                                                    transition:'width 0.6s ease',
+                                                    borderRadius: onlinePct === 100 ? '9999px' : '9999px 0 0 9999px'
+                                                }} />
+                                                <div style={{
+                                                    width:`${posPct}%`,
+                                                    background:'linear-gradient(90deg,#4ade80,#16a34a)',
+                                                    transition:'width 0.6s ease',
+                                                    borderRadius: posPct === 100 ? '9999px' : '0 9999px 9999px 0'
+                                                }} />
+                                            </div>
+                                        </div>
+                                        <div className="d-flex gap-3 mt-2">
+                                            <span className="small text-muted"><span style={{color:'#2563eb'}}>■</span> Online ({onlineCount} orders)</span>
+                                            <span className="small text-muted"><span style={{color:'#16a34a'}}>■</span> POS ({posCount} orders)</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

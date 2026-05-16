@@ -37,6 +37,17 @@ public class SaleOrderService {
         return repository.searchOrders(q);
     }
 
+    /** Returns the number of sale orders placed today (based on the `date` field). */
+    public long countTodaySales() {
+        return repository.countByDate(LocalDate.now());
+    }
+
+    /** Returns the sum of grandTotal for all sale orders placed today. */
+    public BigDecimal sumTodayRevenue() {
+        BigDecimal result = repository.sumGrandTotalByDate(LocalDate.now());
+        return result != null ? result : BigDecimal.ZERO;
+    }
+
     public SaleOrder createOrder(SaleOrderRequest request) throws JsonProcessingException {
         SaleOrder order = new SaleOrder();
         mapRequestToEntity(request, order);

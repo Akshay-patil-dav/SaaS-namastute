@@ -37,6 +37,17 @@ public class PosOrderService {
         return repository.searchOrders(q);
     }
 
+    /** Returns the number of POS orders placed today (based on the `date` field). */
+    public long countTodaySales() {
+        return repository.countByDate(LocalDate.now());
+    }
+
+    /** Returns the sum of grandTotal for all POS orders placed today. */
+    public BigDecimal sumTodayRevenue() {
+        BigDecimal result = repository.sumGrandTotalByDate(LocalDate.now());
+        return result != null ? result : BigDecimal.ZERO;
+    }
+
     public PosOrder createOrder(PosOrderRequest request) throws JsonProcessingException {
         PosOrder order = new PosOrder();
         mapRequestToEntity(request, order);
