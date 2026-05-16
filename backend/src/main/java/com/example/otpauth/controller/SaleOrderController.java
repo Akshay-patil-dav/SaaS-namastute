@@ -2,11 +2,14 @@ package com.example.otpauth.controller;
 
 import com.example.otpauth.dto.SaleOrderRequest;
 import com.example.otpauth.model.SaleOrder;
+import com.example.otpauth.service.PosOrderService;
 import com.example.otpauth.service.SaleOrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +19,12 @@ import java.util.Map;
 public class SaleOrderController {
 
     private final SaleOrderService saleOrderService;
+    private final PosOrderService  posOrderService;
 
-    public SaleOrderController(SaleOrderService saleOrderService) {
+    public SaleOrderController(SaleOrderService saleOrderService,
+                               PosOrderService  posOrderService) {
         this.saleOrderService = saleOrderService;
+        this.posOrderService  = posOrderService;
     }
 
     /** GET /api/sales — list all orders (optionally search by ?q=...) */
@@ -29,6 +35,39 @@ public class SaleOrderController {
             return ResponseEntity.ok(saleOrderService.searchOrders(q));
         }
         return ResponseEntity.ok(saleOrderService.getAllOrders());
+    }
+
+    /**
+     * GET /api/sales/today/summary
+     * Returns counts AND revenue (grandTotal sum) for Online Sales, POS Sales, and combined.
+     * Response shape:
+     *  {
+     *    onlineCount, posCount, totalCount,
+     *    onlineAmount, posAmount, totalAmount
+     *  }
+     */
+    @GetMapping("/today/summary")
+    public ResponseEntity<Map<String, Object>> getTodaySummary() {
+        long       onlineCount  = saleOrderService.countTodaySales();
+        long       posCount     = posOrderService.countTodaySales();
+        BigDecimal onlineAmount = saleOrderService.sumTodayRevenue();
+        BigDecimal posAmount    = posOrderService.sumTodayRevenue();
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("onlineCount",  onlineCount);
+        body.put("posCount",     posCount);
+        body.put("totalCount",   onlineCount + posCount);
+        body.put("onlineAmount", onlineAmount);
+        body.put("posAmount",    posAmount);
+        body.put("totalAmount",  onlineAmount.add(posAmount));
+        return ResponseEntity.ok(body);
+    }
+
+    /** GET /api/sales/today/count — legacy alias, returns { "count": total } */
+    @GetMapping("/today/count")
+    public ResponseEntity<Map<String, Long>> getTodayCount() {
+        long total = saleOrderService.countTodaySales() + posOrderService.countTodaySales();
+        return ResponseEntity.ok(Map.of("count", total));
     }
 
     /** GET /api/sales/{id} */

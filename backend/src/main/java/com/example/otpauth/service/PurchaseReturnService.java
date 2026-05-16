@@ -12,9 +12,15 @@ import java.util.Optional;
 public class PurchaseReturnService {
 
     private final PurchaseReturnRepository purchaseReturnRepository;
+    private final com.example.otpauth.repository.ProductRepository productRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
-    public PurchaseReturnService(PurchaseReturnRepository purchaseReturnRepository) {
+    public PurchaseReturnService(PurchaseReturnRepository purchaseReturnRepository,
+                                 com.example.otpauth.repository.ProductRepository productRepository,
+                                 com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
         this.purchaseReturnRepository = purchaseReturnRepository;
+        this.productRepository = productRepository;
+        this.objectMapper = objectMapper;
     }
 
     public List<PurchaseReturn> getAllPurchaseReturns() {
@@ -32,6 +38,30 @@ public class PurchaseReturnService {
     public PurchaseReturn createPurchaseReturn(PurchaseReturnRequest request) {
         PurchaseReturn p = new PurchaseReturn();
         mapRequestToEntity(request, p);
+
+        // Decrease product quantity since it is returned to supplier
+        if (request.getProductsJson() != null && !request.getProductsJson().isBlank()) {
+            try {
+                java.util.List<java.util.Map<String, Object>> items = objectMapper.readValue(
+                    request.getProductsJson(), 
+                    new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {}
+                );
+                for (java.util.Map<String, Object> item : items) {
+                    if (item.get("id") != null && item.get("qty") != null) {
+                        Long productId = Long.valueOf(item.get("id").toString());
+                        Integer qty = Integer.valueOf(item.get("qty").toString());
+                        productRepository.findById(productId).ifPresent(product -> {
+                            int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
+                            product.setQuantity(currentQty - qty);
+                            productRepository.save(product);
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         return purchaseReturnRepository.save(p);
     }
 

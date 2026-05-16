@@ -30,6 +30,13 @@ spring:
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET:YOUR_FACEBOOK_CLIENT_SECRET}
             scope: email, public_profile
 
+  # ── File Upload Size Limits ──────────────────────────────────────────────────
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB      # max size per individual file
+      max-request-size: 50MB   # max total size for all files in one request
+
 server:
   port: 3000
 

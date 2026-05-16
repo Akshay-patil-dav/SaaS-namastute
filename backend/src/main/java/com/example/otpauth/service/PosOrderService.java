@@ -19,10 +19,12 @@ public class PosOrderService {
 
     private final PosOrderRepository repository;
     private final ObjectMapper objectMapper;
+    private final com.example.otpauth.repository.ProductRepository productRepository;
 
-    public PosOrderService(PosOrderRepository repository, ObjectMapper objectMapper) {
+    public PosOrderService(PosOrderRepository repository, ObjectMapper objectMapper, com.example.otpauth.repository.ProductRepository productRepository) {
         this.repository = repository;
         this.objectMapper = objectMapper;
+        this.productRepository = productRepository;
     }
 
     public List<PosOrder> getAllOrders() {
@@ -37,11 +39,36 @@ public class PosOrderService {
         return repository.searchOrders(q);
     }
 
+    /** Returns the number of POS orders placed today (based on the `date` field). */
+    public long countTodaySales() {
+        return repository.countByDate(LocalDate.now());
+    }
+
+    /** Returns the sum of grandTotal for all POS orders placed today. */
+    public BigDecimal sumTodayRevenue() {
+        BigDecimal result = repository.sumGrandTotalByDate(LocalDate.now());
+        return result != null ? result : BigDecimal.ZERO;
+    }
+
     public PosOrder createOrder(PosOrderRequest request) throws JsonProcessingException {
         PosOrder order = new PosOrder();
         mapRequestToEntity(request, order);
         order.setReferenceNo("PO" + String.format("%06d", (long)(Math.random() * 1000000)));
         order.setBiller(request.getBiller() != null ? request.getBiller() : "Admin");
+
+        // Decrease product quantity
+        if (request.getProducts() != null) {
+            for (PosOrderRequest.OrderProduct op : request.getProducts()) {
+                if (op.getProductId() != null && op.getQuantity() != null && op.getQuantity() > 0) {
+                    productRepository.findById(op.getProductId()).ifPresent(product -> {
+                        int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
+                        product.setQuantity(currentQty - op.getQuantity());
+                        productRepository.save(product);
+                    });
+                }
+            }
+        }
+
         return repository.save(order);
     }
 

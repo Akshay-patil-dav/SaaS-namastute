@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -19,4 +21,11 @@ public interface SaleOrderRepository extends JpaRepository<SaleOrder, Long> {
            "LOWER(s.status) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
            "LOWER(s.paymentStatus) LIKE LOWER(CONCAT('%', :q, '%'))")
     List<SaleOrder> searchOrders(@Param("q") String q);
+
+    /** Count all sale orders whose date equals the given date (today). */
+    long countByDate(LocalDate date);
+
+    /** Sum grandTotal for all sale orders on a given date (returns null if none). */
+    @Query("SELECT COALESCE(SUM(s.grandTotal), 0) FROM SaleOrder s WHERE s.date = :date")
+    BigDecimal sumGrandTotalByDate(@Param("date") LocalDate date);
 }
