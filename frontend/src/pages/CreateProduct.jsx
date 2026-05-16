@@ -60,8 +60,9 @@ const initialForm = {
 const CreateProduct = () => {
     const navigate = useNavigate();
     const [form, setForm] = useState(initialForm);
-    const [images, setImages] = useState([]);
+    const [images, setImages] = useState([]);           // { url: string, name: string }[]
     const [submitting, setSubmitting] = useState(false);
+    const [uploadingImages, setUploadingImages] = useState(false);
     const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
     const [generatingSku, setGeneratingSku] = useState(false);
     const [generatingBarcode, setGeneratingBarcode] = useState(false);
@@ -154,16 +155,36 @@ const CreateProduct = () => {
         }
     };
 
-    // ── Image upload ──────────────────────────────────────────────────────────
-    const handleImageUpload = (e) => {
+    // ── Image upload — POST to /api/upload and store server file path ────────
+    const handleImageUpload = async (e) => {
         const files = Array.from(e.target.files);
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                setImages(prev => [...prev, { url: ev.target.result, name: file.name }]);
-            };
-            reader.readAsDataURL(file);
-        });
+        if (files.length === 0) return;
+
+        setUploadingImages(true);
+        try {
+            const uploadPromises = files.map(async (file) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                const res = await axios.post(
+                    `${import.meta.env.VITE_API_BASE_URL}/upload`,
+                    formData,
+                    { headers: { 'Content-Type': 'multipart/form-data' } }
+                );
+                // Backend returns { url: '/uploads/uuid.ext' }
+                return {
+                    url: `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${res.data.url}`,
+                    name: file.name,
+                };
+            });
+            const uploaded = await Promise.all(uploadPromises);
+            setImages(prev => [...prev, ...uploaded]);
+        } catch (err) {
+            showToast('error', 'Image upload failed: ' + (err.response?.data?.error || err.message));
+        } finally {
+            setUploadingImages(false);
+            // Reset input so same file can be re-selected if needed
+            e.target.value = '';
+        }
     };
 
     const removeImage = (index) => {
@@ -188,11 +209,11 @@ const CreateProduct = () => {
             showToast('error', 'Price is required.');
             return;
         }
-        if (!form.quantity) {
-            showToast('error', 'Quantity is required.');
+
+        if (uploadingImages) {
+            showToast('error', 'Please wait for images to finish uploading.');
             return;
         }
-
         setSubmitting(true);
         try {
             const payload = {
@@ -209,7 +230,7 @@ const CreateProduct = () => {
                 unit:             form.unit,
                 barcodeSymbology: form.barcodeSymbology,
                 itemBarcode:      form.itemBarcode,
-                quantity:         parseInt(form.quantity) || 0,
+                quantity:         0,
                 price:            parseFloat(form.price) || 0,
                 productType:      form.productType,
                 taxType:          form.taxType,
@@ -492,19 +513,7 @@ const CreateProduct = () => {
                                     </label>
                                 </div>
                             </div>
-                            <div className="col-md-4 cp-form-group">
-                                <label className="cp-label">Quantity <span className="required">*</span></label>
-                                <input
-                                    type="number"
-                                    name="quantity"
-                                    className="cp-input"
-                                    placeholder="0"
-                                    min="0"
-                                    value={form.quantity}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
+
                             <div className="col-md-4 cp-form-group">
                                 <label className="cp-label">Price <span className="required">*</span></label>
                                 <input
@@ -581,16 +590,19 @@ const CreateProduct = () => {
                     </div>
                     <div className="cp-card-body">
                         <div className="images-container">
-                            <label className="add-image-box" style={{ cursor: 'pointer' }}>
+                            <label className="add-image-box" style={{ cursor: uploadingImages ? 'not-allowed' : 'pointer', opacity: uploadingImages ? 0.6 : 1 }}>
                                 <input
                                     type="file"
                                     multiple
                                     accept="image/*"
                                     style={{ display: 'none' }}
                                     onChange={handleImageUpload}
+                                    disabled={uploadingImages}
                                 />
-                                <Plus size={20} className="text-muted" />
-                                <span>Add Images</span>
+                                {uploadingImages
+                                    ? <><Loader size={20} className="spin text-muted" /><span>Uploading...</span></>
+                                    : <><Plus size={20} className="text-muted" /><span>Add Images</span></>
+                                }
                             </label>
                             {images.map((img, idx) => (
                                 <div className="preview-image-box" key={idx}>
