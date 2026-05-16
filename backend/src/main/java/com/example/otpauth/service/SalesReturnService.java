@@ -19,10 +19,12 @@ public class SalesReturnService {
 
     private final SalesReturnRepository repository;
     private final ObjectMapper objectMapper;
+    private final com.example.otpauth.repository.ProductRepository productRepository;
 
-    public SalesReturnService(SalesReturnRepository repository, ObjectMapper objectMapper) {
+    public SalesReturnService(SalesReturnRepository repository, ObjectMapper objectMapper, com.example.otpauth.repository.ProductRepository productRepository) {
         this.repository = repository;
         this.objectMapper = objectMapper;
+        this.productRepository = productRepository;
     }
 
     public List<SalesReturn> getAllReturns() {
@@ -42,6 +44,20 @@ public class SalesReturnService {
         mapRequestToEntity(request, salesReturn);
         salesReturn.setReferenceNo("SR" + String.format("%06d", (long)(Math.random() * 1000000)));
         salesReturn.setBiller(request.getBiller() != null ? request.getBiller() : "Admin");
+
+        // Increase product quantity since customer returned the item
+        if (request.getProducts() != null) {
+            for (SalesReturnRequest.ReturnProduct rp : request.getProducts()) {
+                if (rp.getProductId() != null && rp.getQuantity() != null && rp.getQuantity() > 0) {
+                    productRepository.findById(rp.getProductId()).ifPresent(product -> {
+                        int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
+                        product.setQuantity(currentQty + rp.getQuantity());
+                        productRepository.save(product);
+                    });
+                }
+            }
+        }
+
         return repository.save(salesReturn);
     }
 

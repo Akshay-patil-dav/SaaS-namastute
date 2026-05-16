@@ -19,10 +19,12 @@ public class SaleOrderService {
 
     private final SaleOrderRepository repository;
     private final ObjectMapper objectMapper;
+    private final com.example.otpauth.repository.ProductRepository productRepository;
 
-    public SaleOrderService(SaleOrderRepository repository, ObjectMapper objectMapper) {
+    public SaleOrderService(SaleOrderRepository repository, ObjectMapper objectMapper, com.example.otpauth.repository.ProductRepository productRepository) {
         this.repository = repository;
         this.objectMapper = objectMapper;
+        this.productRepository = productRepository;
     }
 
     public List<SaleOrder> getAllOrders() {
@@ -53,6 +55,20 @@ public class SaleOrderService {
         mapRequestToEntity(request, order);
         order.setReferenceNo("SL" + String.format("%06d", (long)(Math.random() * 1000000)));
         order.setBiller(request.getBiller() != null ? request.getBiller() : "Admin");
+
+        // Decrease product quantity
+        if (request.getProducts() != null) {
+            for (SaleOrderRequest.OrderProduct op : request.getProducts()) {
+                if (op.getProductId() != null && op.getQuantity() != null && op.getQuantity() > 0) {
+                    productRepository.findById(op.getProductId()).ifPresent(product -> {
+                        int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
+                        product.setQuantity(currentQty - op.getQuantity());
+                        productRepository.save(product);
+                    });
+                }
+            }
+        }
+
         return repository.save(order);
     }
 
