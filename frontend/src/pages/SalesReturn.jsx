@@ -3,6 +3,7 @@ import {
     Search, FileText, Download, RotateCcw,
     ChevronUp, Plus, ChevronLeft, ChevronRight,
     Eye, Edit, Trash2, AlertCircle,
+    TrendingDown, DollarSign, CheckCircle, Clock,
 } from 'lucide-react';
 import axios from 'axios';
 import './online-orders.css';
@@ -91,6 +92,12 @@ export default function SalesReturn() {
     /* ── unique filter options ───────────────────────────── */
     const customers = [...new Set(returns.map(o => o.customerName).filter(Boolean))];
 
+    /* ── totals (computed from all returns, not just current page) ── */
+    const totalReturns   = filtered.length;
+    const totalAmount    = filtered.reduce((s, o) => s + (parseFloat(o.grandTotal)  || 0), 0);
+    const totalPaid      = filtered.reduce((s, o) => s + (parseFloat(o.paidAmount)  || 0), 0);
+    const totalDue       = filtered.reduce((s, o) => s + (parseFloat(o.dueAmount)   || 0), 0);
+
     /* ── modal helpers ───────────────────────────────────── */
     const openView    = o => { setActiveReturn(o); setViewOpen(true);    };
     const openEdit    = o => { setActiveReturn(o); setEditOpen(true);    };
@@ -165,6 +172,79 @@ export default function SalesReturn() {
                         <Plus size={16} /> Add Sales Return
                     </button>
                 </div>
+            </div>
+
+            {/* ── Summary Stats ─────────────────────────────────── */}
+            <div className="ss-stats-container">
+
+                {/* Total Returns */}
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Total Sales Returns</h4>
+                            <p>{totalReturns}</p>
+                        </div>
+                        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,#7367f0,#9e95f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                            <TrendingDown size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom" style={{ color: '#7367f0' }}>
+                        <ChevronUp size={14} />
+                        <span>All time returns</span>
+                    </div>
+                </div>
+
+                {/* Grand Total */}
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Total Return Amount</h4>
+                            <p>{money(totalAmount)}</p>
+                        </div>
+                        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,#ff9b29,#ffbe76)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                            <DollarSign size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom" style={{ color: '#ff9b29' }}>
+                        <ChevronUp size={14} />
+                        <span>Grand total of all returns</span>
+                    </div>
+                </div>
+
+                {/* Total Paid */}
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Total Paid</h4>
+                            <p>{money(totalPaid)}</p>
+                        </div>
+                        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,#28c76f,#48da89)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                            <CheckCircle size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom" style={{ color: '#28c76f' }}>
+                        <ChevronUp size={14} />
+                        <span>Amount already refunded</span>
+                    </div>
+                </div>
+
+                {/* Total Due */}
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Total Due</h4>
+                            <p style={{ color: totalDue > 0 ? '#ea5455' : '#1a1a1a' }}>{money(totalDue)}</p>
+                        </div>
+                        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,#ea5455,#f08182)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                            <Clock size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom" style={{ color: totalDue > 0 ? '#ea5455' : '#28c76f' }}>
+                        <ChevronUp size={14} />
+                        <span>{totalDue > 0 ? 'Outstanding balance' : 'All settled'}</span>
+                    </div>
+                </div>
+
             </div>
 
             {/* Card */}
