@@ -11,4 +11,7 @@ public interface PurchaseReturnRepository extends JpaRepository<PurchaseReturn, 
 
     @Query("SELECT p FROM PurchaseReturn p WHERE LOWER(p.supplier) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.reference) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<PurchaseReturn> searchPurchaseReturns(@Param("query") String query);
+
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM PurchaseReturn p")
+    Double sumTotalPurchaseReturn();
 }

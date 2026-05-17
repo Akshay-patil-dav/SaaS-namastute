@@ -11,4 +11,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
     @Query("SELECT p FROM Purchase p WHERE LOWER(p.supplier) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.reference) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<Purchase> searchPurchases(@Param("query") String query);
+
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p")
+    Double sumTotalPurchase();
 }

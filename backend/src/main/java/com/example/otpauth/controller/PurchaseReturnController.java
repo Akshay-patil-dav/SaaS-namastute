@@ -36,6 +36,14 @@ public class PurchaseReturnController {
                         .body(Map.of("error", "PurchaseReturn not found")));
     }
 
+    @GetMapping("/summary")
+    public ResponseEntity<?> getPurchaseReturnSummary() {
+        return ResponseEntity.ok(Map.of(
+            "totalAmount", purchaseReturnService.getPurchaseReturnSummary(),
+            "totalCount", purchaseReturnService.getPurchaseReturnCount()
+        ));
+    }
+
     @PostMapping
     public ResponseEntity<?> createPurchaseReturn(@RequestBody PurchaseReturnRequest request) {
         try {
