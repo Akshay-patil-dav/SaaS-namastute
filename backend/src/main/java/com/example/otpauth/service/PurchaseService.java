@@ -35,6 +35,14 @@ public class PurchaseService {
         return purchaseRepository.findById(id);
     }
 
+    public Double getPurchaseSummary() {
+        return purchaseRepository.sumTotalPurchase();
+    }
+
+    public Long getPurchaseCount() {
+        return purchaseRepository.count();
+    }
+
     public Purchase createPurchase(PurchaseRequest request) {
         Purchase p = new Purchase();
         mapRequestToEntity(request, p);

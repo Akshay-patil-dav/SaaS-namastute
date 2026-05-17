@@ -106,6 +106,50 @@ export default function Dashboard() {
         return () => { cancelled = true; clearInterval(interval); };
     }, []);
 
+    // Purchase summary
+    const [purchaseSummary, setPurchaseSummary] = useState(null);
+    const [loadingPurchase, setLoadingPurchase] = useState(true);
+
+    // Purchase Return summary
+    const [purchaseReturnSummary, setPurchaseReturnSummary] = useState(null);
+    const [loadingPurchaseReturn, setLoadingPurchaseReturn] = useState(true);
+
+    useEffect(() => {
+        let cancelled = false;
+        const fetchPurchaseSummary = async () => {
+            try {
+                const res = await apiClient.get('/purchases/summary');
+                if (!cancelled) setPurchaseSummary(res.data);
+            } catch (err) {
+                console.error('Failed to fetch purchase summary:', err);
+                if (!cancelled) setPurchaseSummary({ totalAmount: 0 });
+            } finally {
+                if (!cancelled) setLoadingPurchase(false);
+            }
+        };
+        fetchPurchaseSummary();
+        const interval = setInterval(fetchPurchaseSummary, 60_000);
+        return () => { cancelled = true; clearInterval(interval); };
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+        const fetchPurchaseReturnSummary = async () => {
+            try {
+                const res = await apiClient.get('/purchase-returns/summary');
+                if (!cancelled) setPurchaseReturnSummary(res.data);
+            } catch (err) {
+                console.error('Failed to fetch purchase return summary:', err);
+                if (!cancelled) setPurchaseReturnSummary({ totalAmount: 0 });
+            } finally {
+                if (!cancelled) setLoadingPurchaseReturn(false);
+            }
+        };
+        fetchPurchaseReturnSummary();
+        const interval = setInterval(fetchPurchaseReturnSummary, 60_000);
+        return () => { cancelled = true; clearInterval(interval); };
+    }, []);
+
     const totalCount   = todaySummary?.totalCount   ?? 0;
     const onlineCount  = todaySummary?.onlineCount  ?? 0;
     const posCount     = todaySummary?.posCount     ?? 0;
@@ -229,33 +273,52 @@ export default function Dashboard() {
                 </div>
                 <div className="col-12 col-md-6 col-xl-3">
                     <div className="dash-card top-card-teal">
-                        <div className="d-flex justify-content-between align-items-start mb-4">
+                        <div className="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <p className="mb-1 fw-medium text-white-50 small">Total Purchase</p>
-                                <h3 className="mb-0 fw-bold">$24,145,789</h3>
+                                <p className="mb-1 fw-medium text-white-50 small">Total Purchase (Net)</p>
+                                <h3 className="mb-0 fw-bold">
+                                    {loadingPurchase || loadingPurchaseReturn
+                                        ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
+                                        : fmt((purchaseSummary?.totalAmount ?? 0) - (purchaseReturnSummary?.totalAmount ?? 0))}
+                                </h3>
+                                <h6 className="text-white-50" style={{marginTop: '4px'}}>
+                                    <b>Total Purchases : </b>{loadingPurchase ? '…' : (purchaseSummary?.totalCount ?? 0)}
+                                </h6>
+                                <h6 className="text-white-50" style={{fontSize: '11px', marginTop: '2px'}}>
+                                    Gross: {loadingPurchase ? '…' : fmt(purchaseSummary?.totalAmount ?? 0)}
+                                </h6>
                             </div>
                             <div className="icon-rounded-sm bg-white text-teal">
                                 <ShoppingBag size={18} color="#0d9488" />
                             </div>
                         </div>
                         <div className="d-flex align-items-center gap-2">
-                            <span className="pill-badge bg-white text-teal small"><ArrowUpRight size={12}/> +12%</span>
+                            <span className="pill-badge bg-white text-dark small"><ArrowUpRight size={12}/> Live</span>
+                            <span className="text-white-50" style={{fontSize:'11px'}}>Auto-refresh 60s</span>
                         </div>
                     </div>
                 </div>
                 <div className="col-12 col-md-6 col-xl-3">
                     <div className="dash-card top-card-blue">
-                        <div className="d-flex justify-content-between align-items-start mb-4">
+                        <div className="d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <p className="mb-1 fw-medium text-white-50 small">Total Purchase Return</p>
-                                <h3 className="mb-0 fw-bold">$18,458,747</h3>
+                                <h3 className="mb-0 fw-bold">
+                                    {loadingPurchaseReturn
+                                        ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
+                                        : fmt(purchaseReturnSummary?.totalAmount ?? 0)}
+                                </h3>
+                                <h6 className="text-white-50" style={{marginTop: '4px'}}>
+                                    <b>Total Returns : </b>{loadingPurchaseReturn ? '…' : (purchaseReturnSummary?.totalCount ?? 0)}
+                                </h6>
                             </div>
                             <div className="icon-rounded-sm bg-white text-blue">
                                 <Box size={18} color="#2563eb" />
                             </div>
                         </div>
                         <div className="d-flex align-items-center gap-2">
-                            <span className="pill-badge bg-white text-blue small"><ArrowUpRight size={12}/> +10%</span>
+                            <span className="pill-badge bg-white text-dark small"><ArrowUpRight size={12}/> Live</span>
+                            <span className="text-white-50" style={{fontSize:'11px'}}>Auto-refresh 60s</span>
                         </div>
                     </div>
                 </div>

@@ -35,6 +35,14 @@ public class PurchaseReturnService {
         return purchaseReturnRepository.findById(id);
     }
 
+    public Double getPurchaseReturnSummary() {
+        return purchaseReturnRepository.sumTotalPurchaseReturn();
+    }
+
+    public Long getPurchaseReturnCount() {
+        return purchaseReturnRepository.count();
+    }
+
     public PurchaseReturn createPurchaseReturn(PurchaseReturnRequest request) {
         PurchaseReturn p = new PurchaseReturn();
         mapRequestToEntity(request, p);

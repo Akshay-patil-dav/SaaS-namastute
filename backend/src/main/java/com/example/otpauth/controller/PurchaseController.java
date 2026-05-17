@@ -36,6 +36,14 @@ public class PurchaseController {
                         .body(Map.of("error", "Purchase not found")));
     }
 
+    @GetMapping("/summary")
+    public ResponseEntity<?> getPurchaseSummary() {
+        return ResponseEntity.ok(Map.of(
+            "totalAmount", purchaseService.getPurchaseSummary(),
+            "totalCount", purchaseService.getPurchaseCount()
+        ));
+    }
+
     @PostMapping
     public ResponseEntity<?> createPurchase(@RequestBody PurchaseRequest request) {
         try {
