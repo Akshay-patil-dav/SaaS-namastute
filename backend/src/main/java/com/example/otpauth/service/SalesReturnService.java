@@ -11,7 +11,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -25,6 +27,21 @@ public class SalesReturnService {
         this.repository = repository;
         this.objectMapper = objectMapper;
         this.productRepository = productRepository;
+    }
+
+    /** Dashboard summary: total count, totalAmount, totalPaid, totalDue */
+    public Map<String, Object> getSalesReturnSummary() {
+        long totalCount       = repository.count();
+        BigDecimal totalAmount = repository.sumAllGrandTotal();
+        BigDecimal totalPaid   = repository.sumAllPaidAmount();
+        BigDecimal totalDue    = repository.sumAllDueAmount();
+
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("totalCount",  totalCount);
+        summary.put("totalAmount", totalAmount);
+        summary.put("totalPaid",   totalPaid);
+        summary.put("totalDue",    totalDue);
+        return summary;
     }
 
     public List<SalesReturn> getAllReturns() {

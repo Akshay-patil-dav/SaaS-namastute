@@ -21,6 +21,12 @@ public class SalesReturnController {
         this.salesReturnService = salesReturnService;
     }
 
+    /** GET /api/sales-returns/summary — Dashboard aggregate */
+    @GetMapping("/summary")
+    public ResponseEntity<Map<String, Object>> getSummary() {
+        return ResponseEntity.ok(salesReturnService.getSalesReturnSummary());
+    }
+
     /** GET /api/sales-returns */
     @GetMapping
     public ResponseEntity<List<SalesReturn>> getAllReturns(

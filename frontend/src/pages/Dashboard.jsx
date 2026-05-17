@@ -65,6 +65,10 @@ export default function Dashboard() {
     const [todaySummary, setTodaySummary] = useState(null);
     const [loadingCount, setLoadingCount] = useState(true);
 
+    // Sales Return summary — fetched from /api/sales-returns/summary
+    const [returnSummary, setReturnSummary] = useState(null);
+    const [loadingReturn, setLoadingReturn] = useState(true);
+
     useEffect(() => {
         let cancelled = false;
         const fetchTodaySummary = async () => {
@@ -81,6 +85,24 @@ export default function Dashboard() {
         fetchTodaySummary();
         // Poll every 60 s so numbers stay fresh without a manual reload
         const interval = setInterval(fetchTodaySummary, 60_000);
+        return () => { cancelled = true; clearInterval(interval); };
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+        const fetchReturnSummary = async () => {
+            try {
+                const res = await apiClient.get(`${API.SALES_RETURNS}/summary`);
+                if (!cancelled) setReturnSummary(res.data);
+            } catch (err) {
+                console.error('Failed to fetch sales return summary:', err);
+                if (!cancelled) setReturnSummary({ totalCount: 0, totalAmount: 0, totalPaid: 0, totalDue: 0 });
+            } finally {
+                if (!cancelled) setLoadingReturn(false);
+            }
+        };
+        fetchReturnSummary();
+        const interval = setInterval(fetchReturnSummary, 60_000);
         return () => { cancelled = true; clearInterval(interval); };
     }, []);
 
@@ -174,17 +196,34 @@ export default function Dashboard() {
                 </div>
                 <div className="col-12 col-md-6 col-xl-3">
                     <div className="dash-card top-card-navy">
-                        <div className="d-flex justify-content-between align-items-start mb-4">
+                        <div className="d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <p className="mb-1 fw-medium text-white-50 small">Total Sales Return</p>
-                                <h3 className="mb-0 fw-bold">$18,478,145</h3>
+                                <h3 className="mb-0 fw-bold">
+                                    {loadingReturn
+                                        ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
+                                        : fmt(returnSummary?.totalAmount ?? 0)}
+                                </h3>
+                                <h6 className="text-white-50"><b>Total Returns : </b>{loadingReturn ? '…' : (returnSummary?.totalCount ?? 0)}</h6>
                             </div>
                             <div className="icon-rounded-sm bg-white text-navy">
                                 <RefreshCcw size={18} color="#0f172a" />
                             </div>
                         </div>
+                        {/* Mini breakdown: Paid vs Due */}
+                        <div className="d-flex gap-3 mb-3" style={{fontSize:'12px'}}>
+                            <div className="d-flex align-items-center gap-1 text-white-50">
+                                <span style={{width:8,height:8,borderRadius:'50%',background:'#4ade80',display:'inline-block'}}></span>
+                                Paid: <span className="text-white fw-bold ms-1">{loadingReturn ? '…' : fmt(returnSummary?.totalPaid ?? 0)}</span>
+                            </div>
+                            <div className="d-flex align-items-center gap-1 text-white-50">
+                                <span style={{width:8,height:8,borderRadius:'50%',background:'#f87171',display:'inline-block'}}></span>
+                                Due: <span className="text-white fw-bold ms-1">{loadingReturn ? '…' : fmt(returnSummary?.totalDue ?? 0)}</span>
+                            </div>
+                        </div>
                         <div className="d-flex align-items-center gap-2">
-                            <span className="pill-badge bg-danger text-white small"><ArrowDownRight size={12}/> -15%</span>
+                            <span className="pill-badge bg-white text-dark small"><ArrowUpRight size={12}/> Live</span>
+                            <span className="text-white-50" style={{fontSize:'11px'}}>Auto-refresh 60s</span>
                         </div>
                     </div>
                 </div>
