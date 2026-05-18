@@ -11,5 +11,3 @@ public class OtpAuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(OtpAuthApplication.class, args);
     }
-
-}

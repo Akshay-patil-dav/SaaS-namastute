@@ -52,7 +52,8 @@ import PosLayout from './components/layout/PosLayout';
 
 // ── Role constants ───────────────────────────────────────────────────────────
 const ALL_ROLES          = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
-const ADMIN_ROLES        = ['SUPER_ADMIN', 'ADMIN'];
+const CLIENT_ADMIN_ROLES = ['ADMIN', 'CLIENT'];
+const ADMIN_ROLES        = ['ADMIN', 'CLIENT'];
 const SUPER_ADMIN_ROLES  = ['SUPER_ADMIN'];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -79,10 +80,10 @@ function AppRoutes() {
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogDetail />} />
 
-            {/* ── CLIENT + ADMIN + SUPER ADMIN ───────────────────────── */}
+            {/* ── CLIENT + ADMIN ───────────────────────── */}
             <Route
                 path="/dashboard"
-                element={<PosPage roles={ALL_ROLES}><Dashboard /></PosPage>}
+                element={<PosPage roles={CLIENT_ADMIN_ROLES}><Dashboard /></PosPage>}
             />
 
             {/* ── ADMIN + SUPER ADMIN ─────────────────────────────────── */}

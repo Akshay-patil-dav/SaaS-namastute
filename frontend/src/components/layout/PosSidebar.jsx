@@ -37,7 +37,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
     const { user } = useAuth();
     const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-    const isAdminOrAbove = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+    const isClientOrAdmin = user?.role === 'ADMIN' || user?.role === 'CLIENT';
 
     const isDashboardActive = location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/dashboard/admin2' || location.pathname === '/dashboard/sales';
     const isSuperAdminActive = location.pathname.startsWith('/dashboard/super-');
@@ -95,81 +95,85 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                 </div>
 
                 <div className="pos-sidebar-content">
-                    {/* Main Section */}
-                    <div className="pos-menu-divider" style={{ marginTop: '0' }}></div>
-                    <div className="pos-menu-section">Main</div>
-                    <ul className="pos-menu-list">
-                        <li className="pos-menu-item">
-                            <a
-                                className={`pos-menu-link ${isDashboardActive ? 'active' : ''} ${openMenus.dashboard ? 'open' : ''}`}
-                                onClick={() => toggleMenu('dashboard')}
-                            >
-                                <div className="pos-menu-link-content">
-                                    <LayoutDashboard className="pos-menu-icon" strokeWidth={1.5} />
-                                    <span>Dashboard</span>
-                                </div>
-                                <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
-                            </a>
-                            <ul className={`pos-submenu ${openMenus.dashboard ? 'show' : ''}`}>
-                                <li>
-                                    <NavLink to="/dashboard" end className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                        Dashboard
-                                    </NavLink>
+                    {/* Main Section — CLIENT + ADMIN only */}
+                    {!isSuperAdmin && (
+                        <>
+                            <div className="pos-menu-divider" style={{ marginTop: '0' }}></div>
+                            <div className="pos-menu-section">Main</div>
+                            <ul className="pos-menu-list">
+                                <li className="pos-menu-item">
+                                    <a
+                                        className={`pos-menu-link ${isDashboardActive ? 'active' : ''} ${openMenus.dashboard ? 'open' : ''}`}
+                                        onClick={() => toggleMenu('dashboard')}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <LayoutDashboard className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Dashboard</span>
+                                        </div>
+                                        <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                    </a>
+                                    <ul className={`pos-submenu ${openMenus.dashboard ? 'show' : ''}`}>
+                                        <li>
+                                            <NavLink to="/dashboard" end className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Dashboard
+                                            </NavLink>
+                                        </li>
+                                        {isClientOrAdmin && (
+                                            <li>
+                                                <NavLink to="/dashboard/sales" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                    <BarChart2 size={16} className="me-2" /> Sales Dashboard
+                                                </NavLink>
+                                            </li>
+                                        )}
+                                    </ul>
                                 </li>
-                                {/* {isAdminOrAbove && (
-                                    <li>
-                                        <NavLink to="/dashboard/admin2" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                            Dashboard 2
-                                        </NavLink>
-                                    </li>
-                                )} */}
-                                {isAdminOrAbove && (
-                                    <li>
-                                        <NavLink to="/dashboard/sales" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                            <BarChart2 size={16} className="me-2" /> Sales Dashboard
-                                        </NavLink>
-                                    </li>
-                                )}
                             </ul>
-                        </li>
-                        {/* Super Admin menu — SUPER_ADMIN only */}
-                        {isSuperAdmin && (
-                            <li className="pos-menu-item">
-                                <a className={`pos-menu-link ${isSuperAdminActive ? 'active' : ''} ${openMenus.superAdmin ? 'open' : ''}`} onClick={() => toggleMenu('superAdmin')}>
-                                    <div className="pos-menu-link-content">
-                                        <UserCog className="pos-menu-icon" strokeWidth={1.5} />
-                                        <span>Super Admin</span>
-                                    </div>
-                                    <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
-                                </a>
-                                <ul className={`pos-submenu ${openMenus.superAdmin ? 'show' : ''}`}>
-                                    <li>
-                                        <NavLink to="/dashboard/super-dashboard" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                            Dashboard
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink to="/dashboard/super-companies" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                            Companies
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink to="/dashboard/super-subscriptions" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                            Subscriptions
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink to="/dashboard/super-packages" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                            Packages
-                                        </NavLink>
-                                    </li>
-                                </ul>
-                            </li>
-                        )}
-                    </ul>
+                        </>
+                    )}
 
-                    {/* Inventory Section — ADMIN + SUPER_ADMIN only */}
-                    {isAdminOrAbove && (
+                    {/* Super Admin menu — SUPER_ADMIN only */}
+                    {isSuperAdmin && (
+                        <>
+                            <div className="pos-menu-divider" style={{ marginTop: '0' }}></div>
+                            <div className="pos-menu-section">Super Admin</div>
+                            <ul className="pos-menu-list">
+                                <li className="pos-menu-item">
+                                    <a className={`pos-menu-link ${isSuperAdminActive ? 'active' : ''} ${openMenus.superAdmin ? 'open' : ''}`} onClick={() => toggleMenu('superAdmin')}>
+                                        <div className="pos-menu-link-content">
+                                            <UserCog className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Super Admin</span>
+                                        </div>
+                                        <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                    </a>
+                                    <ul className={`pos-submenu ${openMenus.superAdmin ? 'show' : ''}`}>
+                                        <li>
+                                            <NavLink to="/dashboard/super-dashboard" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Dashboard
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/dashboard/super-companies" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Companies
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/dashboard/super-subscriptions" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Subscriptions
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/dashboard/super-packages" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Packages
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </>
+                    )}
+
+                    {/* Inventory Section — CLIENT + ADMIN only */}
+                    {isClientOrAdmin && (
                         <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Inventory</div>
@@ -190,8 +194,8 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                         </>
                     )}
 
-                    {/* Stock Section — ADMIN + SUPER_ADMIN only */}
-                    {isAdminOrAbove && (
+                    {/* Stock Section — CLIENT + ADMIN only */}
+                    {isClientOrAdmin && (
                         <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Stock</div>
