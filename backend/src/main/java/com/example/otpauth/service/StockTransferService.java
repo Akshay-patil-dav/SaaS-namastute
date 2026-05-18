@@ -104,6 +104,10 @@ public class StockTransferService {
         return false;
     }
 
+    public void bulkDeleteTransfers(List<Long> ids) {
+        repository.deleteAllById(ids);
+    }
+
     private void mapRequestToEntity(TransferRequest request, StockTransfer transfer) throws JsonProcessingException {
         transfer.setFromWarehouse(request.getResolvedFrom());
         transfer.setToWarehouse(request.getResolvedTo());

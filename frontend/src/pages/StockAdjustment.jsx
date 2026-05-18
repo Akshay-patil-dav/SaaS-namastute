@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useConfirm } from '../context/ConfirmContext';
 import { 
     Search, 
     FileText, 
@@ -34,6 +35,7 @@ import ViewAdjustmentModal from '../components/ViewAdjustmentModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 export default function StockAdjustment() {
+    const { confirm } = useConfirm();
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRows, setSelectedRows] = useState([]);
@@ -84,6 +86,24 @@ export default function StockAdjustment() {
         setSelectedRows(prev => 
             prev.length === data.length ? [] : data.map(d => d.id)
         );
+    };
+
+    const handleBulkDelete = async () => {
+        if (!selectedRows.length) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Adjustments',
+            message: `Are you sure you want to delete ${selectedRows.length} stock adjustment entries? This will revert their quantities.`
+        });
+        if (!isConfirmed) return;
+        
+        try {
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/stocks/delete-bulk`, { ids: selectedRows });
+            setSelectedRows([]);
+            fetchStocks();
+        } catch (err) {
+            console.error('Failed to delete adjustments:', err);
+            alert('Failed to delete adjustments.');
+        }
     };
 
     const filteredData = data.filter(item => 
@@ -177,6 +197,11 @@ export default function StockAdjustment() {
                     <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="Export PDF"><FileText size={16} /></button>
                     <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Export Excel"><Download size={16} /></button>
                     <button className="ss-btn-icon-square" title="Refresh" onClick={fetchStocks}><RotateCcw size={16} /></button>
+                    {selectedRows.length > 0 && (
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
+                            <Trash2 size={16} /> Delete Selected ({selectedRows.length})
+                        </button>
+                    )}
                     <button className="ss-btn-orange" onClick={handleOpenAddModal}>
                         <Plus size={16} />
                         Add Adjustment

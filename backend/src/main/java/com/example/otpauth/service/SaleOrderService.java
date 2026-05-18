@@ -56,15 +56,19 @@ public class SaleOrderService {
         order.setReferenceNo("SL" + String.format("%06d", (long)(Math.random() * 1000000)));
         order.setBiller(request.getBiller() != null ? request.getBiller() : "Admin");
 
-        // Decrease product quantity
+        // Decrease product quantity with live stock checks
         if (request.getProducts() != null) {
             for (SaleOrderRequest.OrderProduct op : request.getProducts()) {
                 if (op.getProductId() != null && op.getQuantity() != null && op.getQuantity() > 0) {
-                    productRepository.findById(op.getProductId()).ifPresent(product -> {
-                        int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
-                        product.setQuantity(currentQty - op.getQuantity());
-                        productRepository.save(product);
-                    });
+                    com.example.otpauth.model.Product product = productRepository.findById(op.getProductId())
+                            .orElseThrow(() -> new RuntimeException("Product not found with id: " + op.getProductId()));
+                    int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
+                    if (op.getQuantity() > currentQty) {
+                        throw new RuntimeException("Insufficient stock for product: " + product.getName() 
+                                + " (Requested: " + op.getQuantity() + ", Available: " + currentQty + ")");
+                    }
+                    product.setQuantity(currentQty - op.getQuantity());
+                    productRepository.save(product);
                 }
             }
         }
@@ -86,6 +90,10 @@ public class SaleOrderService {
             return true;
         }
         return false;
+    }
+
+    public void bulkDeleteOrders(List<Long> ids) {
+        repository.deleteAllById(ids);
     }
 
     // ── Internal mapping ─────────────────────────────────────────────────────

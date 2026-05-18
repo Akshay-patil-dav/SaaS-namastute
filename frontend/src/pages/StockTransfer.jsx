@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useConfirm } from '../context/ConfirmContext';
 import { 
     Search, 
     FileText, 
@@ -27,6 +28,7 @@ import DeleteConfirmModal from '../components/DeleteConfirmModal';
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
 
 const StockTransfer = () => {
+    const { confirm } = useConfirm();
     const [transfers, setTransfers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -162,6 +164,24 @@ const StockTransfer = () => {
         }
     };
 
+    const handleBulkDelete = async () => {
+        if (!selectedRows.length) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Transfers',
+            message: `Are you sure you want to delete ${selectedRows.length} stock transfer records?`
+        });
+        if (!isConfirmed) return;
+        
+        try {
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/transfers/delete-bulk`, { ids: selectedRows });
+            setSelectedRows([]);
+            fetchTransfers();
+        } catch (err) {
+            console.error('Failed to delete transfers:', err);
+            alert('Failed to delete transfers.');
+        }
+    };
+
     const allPageSelected = pagedData.length > 0 && pagedData.every(d => selectedRows.includes(d.id));
 
     const exportCSV = () => {
@@ -215,6 +235,11 @@ const StockTransfer = () => {
                     <button className="ss-btn-icon-square" title="Refresh" onClick={fetchTransfers}>
                         <RotateCcw size={16} className={isRefreshing ? 'spin' : ''} />
                     </button>
+                    {selectedRows.length > 0 && (
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
+                            <Trash2 size={16} /> Delete Selected ({selectedRows.length})
+                        </button>
+                    )}
                     <button className="ss-btn-icon-square" title={isCollapsed ? "Expand" : "Collapse"} onClick={() => setIsCollapsed(!isCollapsed)}>
                         {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                     </button>

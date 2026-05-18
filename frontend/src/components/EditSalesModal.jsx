@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Search, Trash2 } from 'lucide-react';
+import { X, Search, Trash2, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
 import './add-sales-modal.css';
 
@@ -14,6 +14,8 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
     const [activeIdx, setActiveIdx] = useState(-1);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError]         = useState('');
+    const [warningModalOpen, setWarningModalOpen] = useState(false);
+    const [warningProducts, setWarningProducts] = useState([]);
     const searchRef = useRef(null);
 
     useEffect(() => {
@@ -35,7 +37,7 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
                 quantity: p.quantity||1, unitPrice: parseFloat(p.unitPrice)||0,
                 discount: parseFloat(p.discount)||0, taxPercent: parseFloat(p.taxPercent)||0,
             }))); } catch { setProducts([]); }
-            setSearchQ(''); setError('');
+            setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]);
         }
     }, [isOpen, order]);
 
@@ -88,6 +90,30 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
         if (!products.length) return setError('Add at least one product.');
         setError(''); setSubmitting(true);
         try {
+            // Validate product stocks before placing order
+            const { data: dbProducts } = await axios.get(`${BASE_URL}/products`);
+            const stockMap = {};
+            if (Array.isArray(dbProducts)) {
+                dbProducts.forEach(p => {
+                    stockMap[p.id] = p.quantity ?? 0;
+                });
+            }
+
+            const errorProds = products.filter(p => {
+                const stock = stockMap[p.productId] ?? 0;
+                return stock <= 0 || p.quantity > stock;
+            }).map(p => ({
+                ...p,
+                availableStock: stockMap[p.productId] ?? 0
+            }));
+
+            if (errorProds.length > 0) {
+                setWarningProducts(errorProds);
+                setWarningModalOpen(true);
+                setSubmitting(false);
+                return;
+            }
+
             await axios.put(`${BASE_URL}/sales/${order.id}`, { ...form, orderTax:+form.orderTax, discount:+form.discount, shipping:+form.shipping, paidAmount:+form.paidAmount, products });
             onSuccess?.(); onClose();
         } catch (err) { setError(err.response?.data?.error || 'Failed to update sale.'); }
@@ -97,124 +123,243 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="sm-overlay" onClick={e => e.target===e.currentTarget && onClose()}>
-            <div className="sm-modal">
-                <div className="sm-header">
-                    <div>
-                        <h4>Edit Sale</h4>
-                        {order?.referenceNo && <span className="sm-ref-tag">{order.referenceNo}</span>}
-                    </div>
-                    <button className="sm-close-btn" onClick={onClose}><X size={16}/></button>
-                </div>
-                <div className="sm-body">
-                    {products.length > 0 && (
-                        <div className="sm-prod-header">
-                            <span>Product</span><span>Qty</span><span>Unit Price ($)</span>
-                            <span>Discount ($)</span><span>Tax (%)</span><span>Total ($)</span><span></span>
+        <>
+            <div className="sm-overlay" onClick={e => e.target===e.currentTarget && onClose()}>
+                <div className="sm-modal">
+                    <div className="sm-header">
+                        <div>
+                            <h4>Edit Sale</h4>
+                            {order?.referenceNo && <span className="sm-ref-tag">{order.referenceNo}</span>}
                         </div>
-                    )}
-                    {products.length > 0 && (
-                        <div className="sm-prod-rows">
-                            {products.map((p,idx) => (
-                                <div className="sm-prod-row" key={idx}>
-                                    <div className="sm-prod-info">
-                                        {p.img ? <img src={p.img} alt="" className="sm-prod-img"/> : <div className="sm-prod-placeholder">{(p.name||'?').charAt(0)}</div>}
-                                        <div><div className="sm-prod-name-text">{p.name}</div><div className="sm-prod-sku">SKU: {p.sku}</div></div>
+                        <button className="sm-close-btn" onClick={onClose}><X size={16}/></button>
+                    </div>
+                    <div className="sm-body">
+                        {products.length > 0 && (
+                            <div className="sm-prod-header">
+                                <span>Product</span><span>Qty</span><span>Unit Price ($)</span>
+                                <span>Discount ($)</span><span>Tax (%)</span><span>Total ($)</span><span></span>
+                            </div>
+                        )}
+                        {products.length > 0 && (
+                            <div className="sm-prod-rows">
+                                {products.map((p,idx) => (
+                                    <div className="sm-prod-row" key={idx}>
+                                        <div className="sm-prod-info">
+                                            {p.img ? <img src={p.img} alt="" className="sm-prod-img"/> : <div className="sm-prod-placeholder">{(p.name||'?').charAt(0)}</div>}
+                                            <div><div className="sm-prod-name-text">{p.name}</div><div className="sm-prod-sku">SKU: {p.sku}</div></div>
+                                        </div>
+                                        <input className="sm-prod-input" type="number" min="1" value={p.quantity} onChange={e=>updateField(idx,'quantity',e.target.value)}/>
+                                        <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.unitPrice} onChange={e=>updateField(idx,'unitPrice',e.target.value)}/>
+                                        <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.discount} onChange={e=>updateField(idx,'discount',e.target.value)}/>
+                                        <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.taxPercent} onChange={e=>updateField(idx,'taxPercent',e.target.value)}/>
+                                        <div className="sm-prod-total">${lineTotal(p).toFixed(2)}</div>
+                                        <button className="sm-prod-remove" onClick={()=>setProducts(prev=>prev.filter((_,i)=>i!==idx))}><Trash2 size={13}/></button>
                                     </div>
-                                    <input className="sm-prod-input" type="number" min="1" value={p.quantity} onChange={e=>updateField(idx,'quantity',e.target.value)}/>
-                                    <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.unitPrice} onChange={e=>updateField(idx,'unitPrice',e.target.value)}/>
-                                    <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.discount} onChange={e=>updateField(idx,'discount',e.target.value)}/>
-                                    <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.taxPercent} onChange={e=>updateField(idx,'taxPercent',e.target.value)}/>
-                                    <div className="sm-prod-total">${lineTotal(p).toFixed(2)}</div>
-                                    <button className="sm-prod-remove" onClick={()=>setProducts(prev=>prev.filter((_,i)=>i!==idx))}><Trash2 size={13}/></button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
 
-                    <div className="sm-form-grid-3">
-                        <div className="sm-form-group"><label>Customer Name <span className="sm-required">*</span></label>
-                            <input className="sm-input" type="text" value={form.customerName||''} onChange={e=>setForm(f=>({...f,customerName:e.target.value}))}/>
+                        <div className="sm-form-grid-3">
+                            <div className="sm-form-group"><label>Customer Name <span className="sm-required">*</span></label>
+                                <input className="sm-input" type="text" value={form.customerName||''} onChange={e=>setForm(f=>({...f,customerName:e.target.value}))}/>
+                            </div>
+                            <div className="sm-form-group"><label>Date</label>
+                                <input className="sm-input" type="date" value={form.date||''} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/>
+                            </div>
+                            <div className="sm-form-group"><label>Biller</label>
+                                <input className="sm-input" type="text" value={form.biller||''} onChange={e=>setForm(f=>({...f,biller:e.target.value}))}/>
+                            </div>
                         </div>
-                        <div className="sm-form-group"><label>Date</label>
-                            <input className="sm-input" type="date" value={form.date||''} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/>
+
+                        <div className="sm-form-group" ref={searchRef}>
+                            <label>Add Product</label>
+                            <div className="sm-search-wrap">
+                                <Search className="sm-search-icon" size={14}/>
+                                <input className="sm-input" style={{paddingLeft:'32px'}} type="text" placeholder="Search by name or SKU…"
+                                    value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowDrop(true);}}
+                                    onKeyDown={onKey} onFocus={()=>setShowDrop(true)}/>
+                                {showDrop && (
+                                    <div className="sm-suggestions">
+                                        {results.length > 0 ? (
+                                            <ul className="sm-suggestion-list">
+                                                {results.map((r,i) => (
+                                                    <li key={r.id} className={`sm-suggestion-item ${i===activeIdx?'active':''}`} onClick={()=>selectProduct(r)}>
+                                                        <div className="sm-sug-img-wrap">
+                                                            {r.images&&r.images.split(',')[0]?.trim() ? <img src={r.images.split(',')[0].trim()} alt=""/> : <div className="sm-sug-placeholder">{r.name.charAt(0)}</div>}
+                                                        </div>
+                                                        <div><div className="sm-sug-name">{r.name}</div><div className="sm-sug-meta">SKU: {r.sku} · ${r.price}</div></div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : <div className="sm-suggestions-empty">No products found</div>}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <div className="sm-form-group"><label>Biller</label>
-                            <input className="sm-input" type="text" value={form.biller||''} onChange={e=>setForm(f=>({...f,biller:e.target.value}))}/>
+
+                        <div className="sm-summary-row">
+                            <div className="sm-summary-box">
+                                <table className="sm-summary-table"><tbody>
+                                    <tr><td>Sub Total</td><td>${subtotal.toFixed(2)}</td></tr>
+                                    <tr><td>Order Tax</td><td>${(+form.orderTax).toFixed(2)}</td></tr>
+                                    <tr><td>Discount</td><td>${(+form.discount).toFixed(2)}</td></tr>
+                                    <tr><td>Shipping</td><td>${(+form.shipping).toFixed(2)}</td></tr>
+                                    <tr className="sm-summary-grand"><td>Grand Total</td><td>${grandTotal.toFixed(2)}</td></tr>
+                                    <tr><td>Paid</td><td>${(+form.paidAmount).toFixed(2)}</td></tr>
+                                    <tr className={due>0?'sm-summary-due-pos':'sm-summary-due-zero'}><td>Due</td><td>${due.toFixed(2)}</td></tr>
+                                </tbody></table>
+                            </div>
                         </div>
+
+                        <div className="sm-form-grid-4">
+                            <div className="sm-form-group"><label>Order Tax ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.orderTax||0} onChange={e=>setForm(f=>({...f,orderTax:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Discount ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.discount||0} onChange={e=>setForm(f=>({...f,discount:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Shipping ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.shipping||0} onChange={e=>setForm(f=>({...f,shipping:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Paid Amount ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.paidAmount||0} onChange={e=>setForm(f=>({...f,paidAmount:e.target.value}))}/></div>
+                        </div>
+
+                        <div className="sm-form-grid-3">
+                            <div className="sm-form-group"><label>Order Status</label>
+                                <select className="sm-select" value={form.status||'Pending'} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>
+                                    <option value="Pending">Pending</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div className="sm-form-group"><label>Payment Status</label>
+                                <select className="sm-select" value={form.paymentStatus||'Unpaid'} onChange={e=>setForm(f=>({...f,paymentStatus:e.target.value}))}>
+                                    <option value="Unpaid">Unpaid</option><option value="Paid">Paid</option><option value="Overdue">Overdue</option>
+                                </select>
+                            </div>
+                            <div className="sm-form-group"><label>Notes</label>
+                                <input className="sm-input" type="text" placeholder="Optional…" value={form.notes||''} onChange={e=>setForm(f=>({...f,notes:e.target.value}))}/>
+                            </div>
+                        </div>
+
+                        {error && <div className="sm-error">{error}</div>}
                     </div>
-
-                    <div className="sm-form-group" ref={searchRef}>
-                        <label>Add Product</label>
-                        <div className="sm-search-wrap">
-                            <Search className="sm-search-icon" size={14}/>
-                            <input className="sm-input" style={{paddingLeft:'32px'}} type="text" placeholder="Search by name or SKU…"
-                                value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowDrop(true);}}
-                                onKeyDown={onKey} onFocus={()=>setShowDrop(true)}/>
-                            {showDrop && (
-                                <div className="sm-suggestions">
-                                    {results.length > 0 ? (
-                                        <ul className="sm-suggestion-list">
-                                            {results.map((r,i) => (
-                                                <li key={r.id} className={`sm-suggestion-item ${i===activeIdx?'active':''}`} onClick={()=>selectProduct(r)}>
-                                                    <div className="sm-sug-img-wrap">
-                                                        {r.images&&r.images.split(',')[0]?.trim() ? <img src={r.images.split(',')[0].trim()} alt=""/> : <div className="sm-sug-placeholder">{r.name.charAt(0)}</div>}
-                                                    </div>
-                                                    <div><div className="sm-sug-name">{r.name}</div><div className="sm-sug-meta">SKU: {r.sku} · ${r.price}</div></div>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : <div className="sm-suggestions-empty">No products found</div>}
-                                </div>
-                            )}
-                        </div>
+                    <div className="sm-footer">
+                        <button className="sm-btn-cancel" onClick={onClose} disabled={submitting}>Cancel</button>
+                        <button className="sm-btn-submit" onClick={submit} disabled={submitting}>{submitting?'Saving…':'Save Changes'}</button>
                     </div>
-
-                    <div className="sm-summary-row">
-                        <div className="sm-summary-box">
-                            <table className="sm-summary-table"><tbody>
-                                <tr><td>Sub Total</td><td>${subtotal.toFixed(2)}</td></tr>
-                                <tr><td>Order Tax</td><td>${(+form.orderTax).toFixed(2)}</td></tr>
-                                <tr><td>Discount</td><td>${(+form.discount).toFixed(2)}</td></tr>
-                                <tr><td>Shipping</td><td>${(+form.shipping).toFixed(2)}</td></tr>
-                                <tr className="sm-summary-grand"><td>Grand Total</td><td>${grandTotal.toFixed(2)}</td></tr>
-                                <tr><td>Paid</td><td>${(+form.paidAmount).toFixed(2)}</td></tr>
-                                <tr className={due>0?'sm-summary-due-pos':'sm-summary-due-zero'}><td>Due</td><td>${due.toFixed(2)}</td></tr>
-                            </tbody></table>
-                        </div>
-                    </div>
-
-                    <div className="sm-form-grid-4">
-                        <div className="sm-form-group"><label>Order Tax ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.orderTax||0} onChange={e=>setForm(f=>({...f,orderTax:e.target.value}))}/></div>
-                        <div className="sm-form-group"><label>Discount ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.discount||0} onChange={e=>setForm(f=>({...f,discount:e.target.value}))}/></div>
-                        <div className="sm-form-group"><label>Shipping ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.shipping||0} onChange={e=>setForm(f=>({...f,shipping:e.target.value}))}/></div>
-                        <div className="sm-form-group"><label>Paid Amount ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.paidAmount||0} onChange={e=>setForm(f=>({...f,paidAmount:e.target.value}))}/></div>
-                    </div>
-
-                    <div className="sm-form-grid-3">
-                        <div className="sm-form-group"><label>Order Status</label>
-                            <select className="sm-select" value={form.status||'Pending'} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>
-                                <option value="Pending">Pending</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                        <div className="sm-form-group"><label>Payment Status</label>
-                            <select className="sm-select" value={form.paymentStatus||'Unpaid'} onChange={e=>setForm(f=>({...f,paymentStatus:e.target.value}))}>
-                                <option value="Unpaid">Unpaid</option><option value="Paid">Paid</option><option value="Overdue">Overdue</option>
-                            </select>
-                        </div>
-                        <div className="sm-form-group"><label>Notes</label>
-                            <input className="sm-input" type="text" placeholder="Optional…" value={form.notes||''} onChange={e=>setForm(f=>({...f,notes:e.target.value}))}/>
-                        </div>
-                    </div>
-
-                    {error && <div className="sm-error">{error}</div>}
-                </div>
-                <div className="sm-footer">
-                    <button className="sm-btn-cancel" onClick={onClose} disabled={submitting}>Cancel</button>
-                    <button className="sm-btn-submit" onClick={submit} disabled={submitting}>{submitting?'Saving…':'Save Changes'}</button>
                 </div>
             </div>
-        </div>
+
+            {warningModalOpen && (
+                <div className="sm-warning-overlay" style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+                    backdropFilter: 'blur(8px)',
+                    zIndex: 2000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '1.5rem'
+                }}>
+                    <div className="sm-warning-card" style={{
+                        background: '#ffffff',
+                        borderRadius: '16px',
+                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                        width: '100%',
+                        maxWidth: '500px',
+                        overflow: 'hidden',
+                        border: '1px solid #fecaca',
+                        animation: 'sm-pop-in 0.25s ease-out'
+                    }}>
+                        <div style={{
+                            padding: '1.5rem 1.5rem 1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            borderBottom: '1px solid #fee2e2',
+                            background: '#fef2f2'
+                        }}>
+                            <div style={{
+                                backgroundColor: '#fee2e2',
+                                borderRadius: '50%',
+                                padding: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                <AlertTriangle size={24} color="#dc2626" />
+                            </div>
+                            <div>
+                                <h4 style={{ margin: 0, fontWeight: 700, color: '#991b1b', fontSize: '1.15rem' }}>
+                                    Inventory Stock Warning
+                                </h4>
+                                <p style={{ margin: '2px 0 0', fontSize: '0.85rem', color: '#b91c1c' }}>
+                                    There are {warningProducts.length} product(s) with quantity errors
+                                </p>
+                            </div>
+                        </div>
+                        <div style={{ padding: '1.5rem', maxHeight: '280px', overflowY: 'auto' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {warningProducts.map((p, i) => (
+                                    <div key={i} style={{
+                                        background: '#fffbeb',
+                                        border: '1px solid #fef3c7',
+                                        borderRadius: '8px',
+                                        padding: '12px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '4px'
+                                    }}>
+                                        <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.95rem' }}>
+                                            {p.name}
+                                        </div>
+                                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                                            SKU: {p.sku || 'N/A'}
+                                        </div>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            fontSize: '0.85rem',
+                                            marginTop: '6px',
+                                            background: '#fee2e2',
+                                            padding: '6px 10px',
+                                            borderRadius: '6px',
+                                            color: '#b91c1c',
+                                            fontWeight: 500
+                                        }}>
+                                            <span style={{flex: 1}}>Requested Qty: <b>{p.quantity}</b></span>
+                                            <span>Available Stock: <b>{p.availableStock}</b></span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div style={{
+                            padding: '1rem 1.5rem 1.5rem',
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            background: '#f8fafc',
+                            borderTop: '1px solid #e2e8f0',
+                            gap: '12px'
+                        }}>
+                            <button 
+                                onClick={() => setWarningModalOpen(false)}
+                                style={{
+                                    backgroundColor: '#dc2626',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '8px 16px',
+                                    fontWeight: 600,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.2s'
+                                }}
+                                onMouseOver={(e) => e.target.style.backgroundColor = '#b91c1c'}
+                                onMouseOut={(e) => e.target.style.backgroundColor = '#dc2626'}
+                            >
+                                Close & Correct
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 

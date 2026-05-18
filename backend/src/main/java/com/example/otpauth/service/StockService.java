@@ -128,4 +128,11 @@ public class StockService {
             return true;
         }).orElse(false);
     }
+
+    @Transactional
+    public void bulkDeleteStocks(List<Long> ids) {
+        for (Long id : ids) {
+            deleteStock(id);
+        }
+    }
 }

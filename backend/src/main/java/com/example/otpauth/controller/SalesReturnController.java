@@ -86,4 +86,19 @@ public class SalesReturnController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/delete-bulk")
+    public ResponseEntity<?> bulkDeleteReturns(@RequestBody Map<String, List<Long>> payload) {
+        try {
+            List<Long> ids = payload.get("ids");
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No IDs provided"));
+            }
+            salesReturnService.bulkDeleteReturns(ids);
+            return ResponseEntity.ok(Map.of("message", "Sales returns deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 }

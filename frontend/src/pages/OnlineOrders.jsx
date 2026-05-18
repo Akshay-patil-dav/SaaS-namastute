@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useConfirm } from '../context/ConfirmContext';
 import {
     Search, FileText, Download, RotateCcw,
     ChevronUp, Plus, ChevronLeft, ChevronRight,
@@ -19,6 +20,7 @@ const STATUSES    = ['Completed', 'Pending', 'Cancelled'];
 const PAYMENTS    = ['Paid', 'Unpaid', 'Overdue'];
 
 export default function OnlineOrders() {
+    const { confirm } = useConfirm();
 
     /* ── data ────────────────────────────────────────────── */
     const [orders,     setOrders]     = useState([]);
@@ -88,6 +90,24 @@ export default function OnlineOrders() {
         setSelectedRows(p => p.includes(id) ? p.filter(r => r !== id) : [...p, id]);
     const toggleAll = () =>
         setSelectedRows(p => p.length === rows.length ? [] : rows.map(r => r.id));
+
+    const handleBulkDelete = async () => {
+        if (!selectedRows.length) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Sales Orders',
+            message: `Are you sure you want to delete ${selectedRows.length} sales orders?`
+        });
+        if (!isConfirmed) return;
+        
+        try {
+            await axios.post(`${BASE_URL}/sales/delete-bulk`, { ids: selectedRows });
+            setSelectedRows([]);
+            fetchOrders();
+        } catch (err) {
+            console.error('Failed to delete sales orders:', err);
+            alert('Failed to delete sales orders.');
+        }
+    };
 
     /* ── unique dropdown options ─────────────────────────── */
     const customers = [...new Set(orders.map(o => o.customerName).filter(Boolean))];
@@ -162,6 +182,11 @@ export default function OnlineOrders() {
                     <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="Print" onClick={() => window.print()}><FileText size={16} /></button>
                     <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Export CSV" onClick={exportCSV}><Download size={16} /></button>
                     <button className="ss-btn-icon-square" title="Refresh" onClick={fetchOrders}><RotateCcw size={16} /></button>
+                    {selectedRows.length > 0 && (
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
+                            <Trash2 size={16} /> Delete Selected ({selectedRows.length})
+                        </button>
+                    )}
                     <button className="ss-btn-orange" onClick={() => setAddOpen(true)}>
                         <Plus size={16} /> Add Sales
                     </button>

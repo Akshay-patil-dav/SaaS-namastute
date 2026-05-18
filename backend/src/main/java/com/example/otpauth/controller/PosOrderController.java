@@ -80,4 +80,19 @@ public class PosOrderController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/delete-bulk")
+    public ResponseEntity<?> bulkDeleteOrders(@RequestBody Map<String, List<Long>> payload) {
+        try {
+            List<Long> ids = payload.get("ids");
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No IDs provided"));
+            }
+            posOrderService.bulkDeleteOrders(ids);
+            return ResponseEntity.ok(Map.of("message", "POS orders deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 }

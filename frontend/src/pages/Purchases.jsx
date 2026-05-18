@@ -21,6 +21,7 @@ import axios from 'axios';
 import ViewPurchaseModal from '../components/ViewPurchaseModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import ImportPurchaseModal from '../components/ImportPurchaseModal';
+import { useConfirm } from '../context/ConfirmContext';
 
 const mockPurchasesData = [
     { id: 1, supplier: 'Electro Mart', reference: 'PT001', date: '24 Dec 2024', status: 'Received', total: 1000, paid: 1000, due: 0, paymentStatus: 'Paid' },
@@ -39,6 +40,7 @@ const Purchases = () => {
     const navigate = useNavigate();
     const [purchases, setPurchases] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { confirm } = useConfirm();
     
     // Modal state
     const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -86,6 +88,24 @@ const Purchases = () => {
             // Optionally add a toast error here
         } finally {
             setIsDeleting(false);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!selectedIds.length) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Purchases',
+            message: `Are you sure you want to delete ${selectedIds.length} purchases?`
+        });
+        if (!isConfirmed) return;
+        
+        try {
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchases/delete-bulk`, { ids: selectedIds });
+            setSelectedIds([]);
+            fetchPurchases();
+        } catch (err) {
+            console.error('Failed to delete purchases:', err);
+            alert('Failed to delete purchases.');
         }
     };
 
@@ -181,6 +201,11 @@ const Purchases = () => {
                     <button className="ss-btn-icon-square" title="Refresh" onClick={handleRefresh}>
                         <RefreshCw size={16} className={loading ? 'spin' : ''} />
                     </button>
+                    {selectedIds.length > 0 && (
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
+                            <Trash2 size={16} /> Delete Selected ({selectedIds.length})
+                        </button>
+                    )}
                     <button className="ss-btn-icon-square" title="Collapse">
                         <ChevronUp size={16} />
                     </button>
