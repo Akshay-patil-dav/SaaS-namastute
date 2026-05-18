@@ -117,6 +117,7 @@ const Purchases = () => {
 
     // Filtering logic
     const filteredData = purchases.filter(item => {
+        if (item.status === 'Return' || item.status === 'Returned') return false;
         const matchesSearch = 
             item.supplier.toLowerCase().includes(searchTerm.toLowerCase()) ||
             item.reference.toLowerCase().includes(searchTerm.toLowerCase());

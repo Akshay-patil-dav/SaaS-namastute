@@ -14,4 +14,16 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
     @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p")
     Double sumTotalPurchase();
+
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p WHERE p.status IS NULL OR LOWER(p.status) NOT IN ('return', 'returned')")
+    Double sumTotalActivePurchase();
+
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p WHERE p.status IS NOT NULL AND LOWER(p.status) IN ('return', 'returned')")
+    Double sumTotalPurchaseReturns();
+
+    @Query("SELECT COUNT(p) FROM Purchase p WHERE p.status IS NULL OR LOWER(p.status) NOT IN ('return', 'returned')")
+    Long countActivePurchases();
+
+    @Query("SELECT COUNT(p) FROM Purchase p WHERE p.status IS NOT NULL AND LOWER(p.status) IN ('return', 'returned')")
+    Long countPurchaseReturns();
 }

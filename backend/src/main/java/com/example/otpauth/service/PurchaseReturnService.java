@@ -14,13 +14,16 @@ public class PurchaseReturnService {
     private final PurchaseReturnRepository purchaseReturnRepository;
     private final com.example.otpauth.repository.ProductRepository productRepository;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    private final com.example.otpauth.repository.PurchaseRepository purchaseRepository;
 
     public PurchaseReturnService(PurchaseReturnRepository purchaseReturnRepository,
                                  com.example.otpauth.repository.ProductRepository productRepository,
-                                 com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
+                                 com.fasterxml.jackson.databind.ObjectMapper objectMapper,
+                                 com.example.otpauth.repository.PurchaseRepository purchaseRepository) {
         this.purchaseReturnRepository = purchaseReturnRepository;
         this.productRepository = productRepository;
         this.objectMapper = objectMapper;
+        this.purchaseRepository = purchaseRepository;
     }
 
     public List<PurchaseReturn> getAllPurchaseReturns() {
@@ -36,11 +39,13 @@ public class PurchaseReturnService {
     }
 
     public Double getPurchaseReturnSummary() {
-        return purchaseReturnRepository.sumTotalPurchaseReturn();
+        Double returnsSum = purchaseReturnRepository.sumTotalPurchaseReturn();
+        Double purchaseReturnsSum = purchaseRepository.sumTotalPurchaseReturns();
+        return (returnsSum != null ? returnsSum : 0.0) + (purchaseReturnsSum != null ? purchaseReturnsSum : 0.0);
     }
 
     public Long getPurchaseReturnCount() {
-        return purchaseReturnRepository.count();
+        return purchaseReturnRepository.count() + purchaseRepository.countPurchaseReturns();
     }
 
     public PurchaseReturn createPurchaseReturn(PurchaseReturnRequest request) {

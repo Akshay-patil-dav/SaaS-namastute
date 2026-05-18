@@ -223,7 +223,11 @@ const AddPurchase = () => {
                 setToast({ type: 'success', message: 'Purchase saved successfully!' });
                 setIsSubmitting(false);
                 setTimeout(() => {
-                    navigate('/purchases');
+                    if (status === 'Return') {
+                        navigate('/purchase-return');
+                    } else {
+                        navigate('/purchases');
+                    }
                 }, 1500);
             })
             .catch(err => {
@@ -447,6 +451,7 @@ const AddPurchase = () => {
                                     <option>Received</option>
                                     <option>Pending</option>
                                     <option>Ordered</option>
+                                    <option>Return</option>
                                 </select>
                             </div>
                             <div className="col-md-3 cp-form-group">

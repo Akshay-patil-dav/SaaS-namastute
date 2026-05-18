@@ -41,19 +41,33 @@ const PurchaseReturn = () => {
     // Import state
     const [importModalOpen, setImportModalOpen] = useState(false);
 
+    const getUniqueId = (item) => item.isFromPurchases ? `P-${item.id}` : `PR-${item.id}`;
+
     const fetchPurchaseReturns = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns`);
+            const [returnsRes, purchasesRes] = await Promise.all([
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns`),
+                axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchases`)
+            ]);
+            
+            const returnPurchases = purchasesRes.data
+                .filter(p => p.status === 'Return' || p.status === 'Returned')
+                .map(p => ({
+                    ...p,
+                    isFromPurchases: true
+                }));
+                
+            const allReturns = [...returnsRes.data, ...returnPurchases];
+            
             // Format dates
-            const formatted = res.data.map(p => ({
+            const formatted = allReturns.map(p => ({
                 ...p,
                 date: p.formattedDate || new Date(p.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
             }));
             setPurchaseReturns(formatted);
         } catch (error) {
             console.error('Error fetching purchase returns:', error);
-            // Fallback empty if endpoint doesn't exist yet
             setPurchaseReturns([]);
         } finally {
             setLoading(false);
@@ -68,14 +82,15 @@ const PurchaseReturn = () => {
         if (!itemToDelete) return;
         setIsDeleting(true);
         try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns/${itemToDelete}`);
+            const url = itemToDelete.isFromPurchases 
+                ? `${import.meta.env.VITE_API_BASE_URL}/purchases/${itemToDelete.id}`
+                : `${import.meta.env.VITE_API_BASE_URL}/purchase-returns/${itemToDelete.id}`;
+            await axios.delete(url);
             setDeleteModalOpen(false);
             setItemToDelete(null);
             fetchPurchaseReturns();
         } catch (error) {
             console.error('Error deleting purchase return:', error);
-            // Optionally add a toast error here
-            // fallback behavior for demo
             setDeleteModalOpen(false);
             setItemToDelete(null);
         } finally {
@@ -92,7 +107,27 @@ const PurchaseReturn = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns/delete-bulk`, { ids: selectedIds });
+            const purchaseIds = [];
+            const returnIds = [];
+            selectedIds.forEach(uid => {
+                const parts = uid.split('-');
+                const id = Number(parts[1]);
+                if (parts[0] === 'P') {
+                    purchaseIds.push(id);
+                } else {
+                    returnIds.push(id);
+                }
+            });
+            
+            const promises = [];
+            if (purchaseIds.length > 0) {
+                promises.push(axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchases/delete-bulk`, { ids: purchaseIds }));
+            }
+            if (returnIds.length > 0) {
+                promises.push(axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns/delete-bulk`, { ids: returnIds }));
+            }
+            
+            await Promise.all(promises);
             setSelectedIds([]);
             fetchPurchaseReturns();
         } catch (err) {
@@ -121,17 +156,18 @@ const PurchaseReturn = () => {
 
     const handleSelectAll = (isChecked) => {
         if (isChecked) {
-            setSelectedIds(pagedData.map(item => item.id));
+            setSelectedIds(pagedData.map(item => getUniqueId(item)));
         } else {
             setSelectedIds([]);
         }
     };
 
-    const handleSelectItem = (id, isChecked) => {
+    const handleSelectItem = (item, isChecked) => {
+        const uid = getUniqueId(item);
         if (isChecked) {
-            setSelectedIds(prev => [...prev, id]);
+            setSelectedIds(prev => [...prev, uid]);
         } else {
-            setSelectedIds(prev => prev.filter(item => item !== id));
+            setSelectedIds(prev => prev.filter(x => x !== uid));
         }
     };
 
@@ -272,7 +308,7 @@ const PurchaseReturn = () => {
                                     <input 
                                         type="checkbox" 
                                         className="ss-checkbox" 
-                                        checked={pagedData.length > 0 && selectedIds.length === pagedData.length}
+                                        checked={pagedData.length > 0 && pagedData.every(item => selectedIds.includes(getUniqueId(item)))}
                                         onChange={(e) => handleSelectAll(e.target.checked)}
                                     />
                                 </th>
@@ -296,13 +332,13 @@ const PurchaseReturn = () => {
                                 ))
                             ) : pagedData.length > 0 ? (
                                 pagedData.map((item) => (
-                                    <tr key={item.id} className={selectedIds.includes(item.id) ? 'row-selected' : ''}>
+                                    <tr key={getUniqueId(item)} className={selectedIds.includes(getUniqueId(item)) ? 'row-selected' : ''}>
                                         <td>
                                             <input 
                                                 type="checkbox" 
                                                 className="ss-checkbox" 
-                                                checked={selectedIds.includes(item.id)}
-                                                onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                                checked={selectedIds.includes(getUniqueId(item))}
+                                                onChange={(e) => handleSelectItem(item, e.target.checked)}
                                             />
                                         </td>
                                         <td className="ss-item-name">{item.supplier}</td>
@@ -327,10 +363,10 @@ const PurchaseReturn = () => {
                                                 <button className="ss-action-btn view" title="View" onClick={() => { setSelectedPurchaseReturn(item); setViewModalOpen(true); }}>
                                                     <Eye size={15} />
                                                 </button>
-                                                <button className="ss-action-btn edit" title="Edit" onClick={() => navigate(`/edit-purchase-return/${item.id}`)}>
+                                                <button className="ss-action-btn edit" title="Edit" onClick={() => navigate(item.isFromPurchases ? `/edit-purchase/${item.id}` : `/edit-purchase-return/${item.id}`)}>
                                                     <Pencil size={15} />
                                                 </button>
-                                                <button className="ss-action-btn delete" title="Delete" onClick={() => { setItemToDelete(item.id); setDeleteModalOpen(true); }}>
+                                                <button className="ss-action-btn delete" title="Delete" onClick={() => { setItemToDelete(item); setDeleteModalOpen(true); }}>
                                                     <Trash2 size={15} />
                                                 </button>
                                             </div>

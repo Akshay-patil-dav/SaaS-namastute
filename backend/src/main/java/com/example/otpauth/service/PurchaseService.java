@@ -36,31 +36,37 @@ public class PurchaseService {
     }
 
     public Double getPurchaseSummary() {
-        return purchaseRepository.sumTotalPurchase();
+        return purchaseRepository.sumTotalActivePurchase();
     }
 
     public Long getPurchaseCount() {
-        return purchaseRepository.count();
+        return purchaseRepository.countActivePurchases();
     }
 
     public Purchase createPurchase(PurchaseRequest request) {
         Purchase p = new Purchase();
         mapRequestToEntity(request, p);
         
-        // Increase product quantity
+        // Adjust product quantity
         if (request.getProductsJson() != null && !request.getProductsJson().isBlank()) {
             try {
                 java.util.List<java.util.Map<String, Object>> items = objectMapper.readValue(
                     request.getProductsJson(), 
                     new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {}
                 );
+                boolean isReturn = request.getStatus() != null && 
+                    ("Return".equalsIgnoreCase(request.getStatus()) || "Returned".equalsIgnoreCase(request.getStatus()));
                 for (java.util.Map<String, Object> item : items) {
                     if (item.get("id") != null && item.get("qty") != null) {
                         Long productId = Long.valueOf(item.get("id").toString());
                         Integer qty = Integer.valueOf(item.get("qty").toString());
                         productRepository.findById(productId).ifPresent(product -> {
                             int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
-                            product.setQuantity(currentQty + qty);
+                            if (isReturn) {
+                                product.setQuantity(currentQty - qty);
+                            } else {
+                                product.setQuantity(currentQty + qty);
+                            }
                             productRepository.save(product);
                         });
                     }
