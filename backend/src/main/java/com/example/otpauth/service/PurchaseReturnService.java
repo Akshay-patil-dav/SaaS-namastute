@@ -88,6 +88,10 @@ public class PurchaseReturnService {
         return false;
     }
 
+    public void bulkDeletePurchaseReturns(List<Long> ids) {
+        purchaseReturnRepository.deleteAllById(ids);
+    }
+
     private void mapRequestToEntity(PurchaseReturnRequest request, PurchaseReturn p) {
         if (request.getReference() != null) p.setReference(request.getReference());
         if (request.getSupplier() != null) p.setSupplier(request.getSupplier());

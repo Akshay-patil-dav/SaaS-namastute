@@ -21,11 +21,13 @@ import axios from 'axios';
 import ViewPurchaseModal from '../components/ViewPurchaseModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import ImportPurchaseModal from '../components/ImportPurchaseModal';
+import { useConfirm } from '../context/ConfirmContext';
 
 const PurchaseReturn = () => {
     const navigate = useNavigate();
     const [purchaseReturns, setPurchaseReturns] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { confirm } = useConfirm();
     
     // Modal state
     const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -78,6 +80,24 @@ const PurchaseReturn = () => {
             setItemToDelete(null);
         } finally {
             setIsDeleting(false);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!selectedIds.length) return;
+        const isConfirmed = await confirm({
+            title: 'Delete Purchase Returns',
+            message: `Are you sure you want to delete ${selectedIds.length} purchase returns?`
+        });
+        if (!isConfirmed) return;
+        
+        try {
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns/delete-bulk`, { ids: selectedIds });
+            setSelectedIds([]);
+            fetchPurchaseReturns();
+        } catch (err) {
+            console.error('Failed to delete purchase returns:', err);
+            alert('Failed to delete purchase returns.');
         }
     };
 
@@ -174,6 +194,11 @@ const PurchaseReturn = () => {
                     <button className="ss-btn-icon-square" title="Refresh" onClick={handleRefresh}>
                         <RefreshCw size={16} className={loading ? 'spin' : ''} />
                     </button>
+                    {selectedIds.length > 0 && (
+                        <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
+                            <Trash2 size={16} /> Delete Selected ({selectedIds.length})
+                        </button>
+                    )}
                     <button className="ss-btn-icon-square" title="Collapse">
                         <ChevronUp size={16} />
                     </button>

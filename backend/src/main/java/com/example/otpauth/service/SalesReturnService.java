@@ -94,6 +94,10 @@ public class SalesReturnService {
         return false;
     }
 
+    public void bulkDeleteReturns(List<Long> ids) {
+        repository.deleteAllById(ids);
+    }
+
     private void mapRequestToEntity(SalesReturnRequest req, SalesReturn salesReturn) throws JsonProcessingException {
         salesReturn.setCustomerName(req.getCustomerName());
         salesReturn.setStatus(req.getStatus() != null ? req.getStatus() : "Pending");
