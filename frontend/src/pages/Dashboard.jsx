@@ -1025,11 +1025,11 @@ export default function Dashboard() {
             </div>
 
             {/* Link to Admin Dashboard Requirement */}
-            <div className="text-center mt-5 mb-3">
+            {/* <div className="text-center mt-5 mb-3">
                 <Link to="/admin" className="btn btn-outline-primary shadow-sm rounded-pill px-4 py-2 fw-semibold">
                     <ShieldCheck size={18} className="me-2" /> Go to Full Admin Dashboard
                 </Link>
-            </div>
+            </div> */}
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
     ChevronsLeft, 
     Search, 
@@ -83,10 +83,10 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <span>Add New</span>
                 </a> */}
 
-                <a href="#"className="pos-btn-orange">
+                <Link to="/pos" className="pos-btn-orange" style={{ textDecoration: 'none' }}>
                     <MonitorDot size={16} />
                     <span>POS</span>
-                </a>
+                </Link>
 
                 {/* Icons */}
                 <button className="pos-icon-btn hide-on-mobile">

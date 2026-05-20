@@ -25,6 +25,7 @@ import StockAdjustment from './pages/StockAdjustment.jsx';
 import StockTransfer from './pages/StockTransfer.jsx';
 import OnlineOrders from './pages/OnlineOrders.jsx';
 import PosOrders from './pages/PosOrders.jsx';
+import POS from './pages/POS.jsx';
 import SalesReturn from './pages/SalesReturn.jsx';
 import Products from './pages/Products.jsx';
 import CreateProduct from './pages/CreateProduct.jsx';
@@ -46,6 +47,7 @@ import PurchaseReturn from './pages/PurchaseReturn.jsx';
 import AddPurchaseReturn from './pages/AddPurchaseReturn.jsx';
 import EditPurchaseReturn from './pages/EditPurchaseReturn.jsx';
 import Settings from './pages/Settings.jsx';
+import WebsiteBuilder from './pages/WebsiteBuilder.jsx';
 
 // ── Layouts ─────────────────────────────────────────────────────────────────
 import PosLayout from './components/layout/PosLayout';
@@ -114,6 +116,10 @@ function AppRoutes() {
             <Route
                 path="/dashboard/sales-pos"
                 element={<PosPage roles={ADMIN_ROLES}><PosOrders /></PosPage>}
+            />
+            <Route
+                path="/pos"
+                element={<ProtectedRoute allowedRoles={CLIENT_ADMIN_ROLES}><POS /></ProtectedRoute>}
             />
             <Route
                 path="/dashboard/sales-return"
@@ -200,6 +206,10 @@ function AppRoutes() {
             <Route
                 path="/settings/*"
                 element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
+            />
+            <Route
+                path="/website-builder"
+                element={<PosPage roles={CLIENT_ADMIN_ROLES}><WebsiteBuilder /></PosPage>}
             />
 
 
