@@ -30,7 +30,8 @@ import {
     RotateCcw,
     Copy,
     Monitor,
-    FileUp
+    FileUp,
+    Globe
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -270,15 +271,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     </a>
                                 </li> */}
-                                {/* <li className="pos-menu-item">
-                                    <a className="pos-menu-link">
-                                        <div className="pos-menu-link-content">
-                                            <Monitor className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>POS</span>
-                                        </div>
-                                        <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
-                                    </a>
-                                </li> */}
+                                 <li className="pos-menu-item">
+                                     <NavLink to="/pos" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                         <div className="pos-menu-link-content">
+                                             <Monitor className="pos-menu-icon" strokeWidth={1.5} />
+                                             <span>POS Terminal</span>
+                                         </div>
+                                     </NavLink>
+                                 </li>
                             </ul>
 
                             {/* Purchases Section */}
@@ -307,6 +307,39 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                             <FileUp className="pos-menu-icon" strokeWidth={1.5} />
                                             <span>Purchase Return</span>
                                         </div>
+                                    </NavLink>
+                                </li>
+                            </ul>
+                        </>
+                    )}
+
+                    {/* Website Builder Section — CLIENT + ADMIN only */}
+                    {isClientOrAdmin && (
+                        <>
+                            <div className="pos-menu-divider"></div>
+                            <div className="pos-menu-section">Website Builder</div>
+                            <ul className="pos-menu-list pb-4">
+                                <li className="pos-menu-item">
+                                    <NavLink
+                                        to="/website-builder"
+                                        className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}
+                                        style={({ isActive }) => isActive ? {} : {}}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <Globe className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Website Builder</span>
+                                        </div>
+                                        <span style={{
+                                            fontSize: '9px',
+                                            fontWeight: 800,
+                                            background: 'linear-gradient(135deg,#6366f1,#a855f7)',
+                                            color: '#fff',
+                                            borderRadius: '4px',
+                                            padding: '2px 6px',
+                                            letterSpacing: '0.04em',
+                                            textTransform: 'uppercase',
+                                            flexShrink: 0
+                                        }}>NEW</span>
                                     </NavLink>
                                 </li>
                             </ul>
