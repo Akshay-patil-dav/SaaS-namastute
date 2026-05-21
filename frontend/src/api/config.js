@@ -61,6 +61,9 @@ export const API = {
   BUILDER:       `${ENV.API_BASE_URL}/builder`,
   SETTINGS:      `${ENV.API_BASE_URL}/settings`,
 
+  // AI Helper (per-user, JWT-protected)
+  AI:            `${ENV.API_BASE_URL}/ai`,
+
   // OAuth2 redirect URLs (uses backend root, not /api prefix)
   OAUTH_GOOGLE:  `${ENV.BACKEND_BASE_URL}/oauth2/authorization/google`,
   OAUTH_FACEBOOK:`${ENV.BACKEND_BASE_URL}/oauth2/authorization/facebook`,
@@ -83,15 +86,23 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000, // 15 s
+  timeout: 45000, // 45 s — AI calls can take longer
 });
 
 // Attach JWT token from localStorage to every request
+// NOTE: Auth context stores the session at 'namastute_auth' as JSON {token, user}
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const stored = localStorage.getItem('namastute_auth');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.token) {
+          config.headers.Authorization = `Bearer ${parsed.token}`;
+        }
+      }
+    } catch {
+      // ignore malformed storage
     }
     return config;
   },
@@ -107,7 +118,7 @@ apiClient.interceptors.response.use(
       const publicPaths = ['/login', '/register', '/', '/blog'];
       const isPublic = publicPaths.some((p) => window.location.pathname.startsWith(p));
       if (!isPublic) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('namastute_auth');
         window.location.href = '/login';
       }
     }

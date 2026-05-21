@@ -19,7 +19,8 @@ import {
     Activity,
     Ban,
     Trash2,
-    CheckCircle2
+    CheckCircle2,
+    Bot
 } from 'lucide-react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './settings.css';
@@ -29,6 +30,7 @@ import { InvoiceSettings, InvoiceTemplate, Printer, PosSettings, CustomFields } 
 import { EmailSettings, EmailTemplate, SmsSettings, SmsTemplate, OtpSettings, GdprCookies } from '../components/settings/SystemSettings';
 import { PaymentGateway, BankAccounts, TaxRates, Currencies } from '../components/settings/FinancialSettings';
 import { Storage, BanIp } from '../components/settings/OtherSettings';
+import { AiHelperSettings } from '../components/settings/AiHelperSettings';
 
 const sectionMapping = {
     profile: 'general', security: 'general', notifications: 'general', connected_apps: 'general',
@@ -36,7 +38,8 @@ const sectionMapping = {
     invoice_settings: 'app', invoice_template: 'app', printer: 'app', pos_settings: 'app', custom_fields: 'app',
     email_settings: 'system', email_template: 'system', sms_settings: 'system', sms_template: 'system', otp: 'system', gdpr_cookies: 'system',
     payment_gateway: 'financial', bank_accounts: 'financial', tax_rates: 'financial', currencies: 'financial',
-    storage: 'other', ban_ip: 'other'
+    storage: 'other', ban_ip: 'other',
+    ai_helper: 'ai'
 };
 
 export default function Settings() {
@@ -208,6 +211,25 @@ export default function Settings() {
                             </ul>
                         )}
                     </div>
+
+                    {/* AI Settings */}
+                    <div className="settings-sidebar-section">
+                        <div 
+                            className={`settings-sidebar-section-title ${openSection === 'ai' ? 'active' : ''}`}
+                            onClick={() => setOpenSection(openSection === 'ai' ? null : 'ai')}
+                        >
+                            <div className="settings-sidebar-section-icon">
+                                <Bot size={18} />
+                                <span>AI Settings</span>
+                            </div>
+                            {openSection === 'ai' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </div>
+                        {openSection === 'ai' && (
+                            <ul className="settings-sidebar-list">
+                                <li className={`settings-sidebar-item ${isActive('ai_helper') ? 'active' : ''}`} onClick={() => navigate('/settings/ai_helper')}>AI Helper</li>
+                            </ul>
+                        )}
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -248,6 +270,9 @@ export default function Settings() {
                         
                         <Route path="storage" element={<Storage />} />
                         <Route path="ban_ip" element={<BanIp />} />
+
+                        {/* AI Settings */}
+                        <Route path="ai_helper" element={<AiHelperSettings />} />
                     </Routes>
                 </div>
             </div>

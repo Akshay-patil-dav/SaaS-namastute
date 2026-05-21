@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PosSidebar from './PosSidebar';
 import PosHeader from './PosHeader';
 import '../../assets/pos-layout.css'; // Import the custom POS layout styles
+import AIHelper from '../ai/AIHelper';
 
 export default function PosLayout({ children }) {
     // True means sidebar is expanded. We default to true on desktop.
@@ -30,6 +31,8 @@ export default function PosLayout({ children }) {
                     {children}
                 </main>
             </div>
+            {/* AI Helper — floats on all authenticated pages, per-user isolated */}
+            <AIHelper />
         </div>
     );
 }
