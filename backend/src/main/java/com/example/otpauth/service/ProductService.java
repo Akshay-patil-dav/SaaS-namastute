@@ -100,6 +100,112 @@ public class ProductService {
         return String.valueOf((long) (Math.random() * 9_000_000_000_000L) + 1_000_000_000_000L);
     }
 
+    /** Import products from a CSV file */
+    public List<Product> importProductsFromCsv(org.springframework.web.multipart.MultipartFile file) throws Exception {
+        List<Product> importedProducts = new java.util.ArrayList<>();
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(file.getInputStream()))) {
+            String headerLine = reader.readLine();
+            if (headerLine == null) {
+                throw new IllegalArgumentException("CSV file is empty");
+            }
+            
+            // Parse headers
+            String[] headers = headerLine.split(",");
+            for (int i = 0; i < headers.length; i++) {
+                headers[i] = headers[i].trim().toLowerCase().replaceAll("\"", "");
+            }
+            
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                
+                // Parse line (handling quotes optionally, split on commas not inside quotes)
+                String[] columns = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                ProductRequest req = new ProductRequest();
+                
+                for (int i = 0; i < Math.min(headers.length, columns.length); i++) {
+                    String val = columns[i].trim().replaceAll("^\"|\"$", "");
+                    if (val.isEmpty()) continue;
+                    
+                    String header = headers[i];
+                    if (header.equals("name") || header.equals("product name") || header.equals("product_name")) {
+                        req.setName(val);
+                    } else if (header.equals("sku")) {
+                        req.setSku(val);
+                    } else if (header.equals("slug")) {
+                        req.setSlug(val);
+                    } else if (header.equals("description")) {
+                        req.setDescription(val);
+                    } else if (header.equals("store")) {
+                        req.setStore(val);
+                    } else if (header.equals("warehouse")) {
+                        req.setWarehouse(val);
+                    } else if (header.equals("sellingtype") || header.equals("selling_type") || header.equals("selling type")) {
+                        req.setSellingType(val);
+                    } else if (header.equals("category")) {
+                        req.setCategory(val);
+                    } else if (header.equals("subcategory") || header.equals("sub_category") || header.equals("sub category")) {
+                        req.setSubCategory(val);
+                    } else if (header.equals("brand")) {
+                        req.setBrand(val);
+                    } else if (header.equals("unit")) {
+                        req.setUnit(val);
+                    } else if (header.equals("barcodesymbology") || header.equals("barcode_symbology") || header.equals("barcode symbology")) {
+                        req.setBarcodeSymbology(val);
+                    } else if (header.equals("itembarcode") || header.equals("item_barcode") || header.equals("item barcode") || header.equals("barcode")) {
+                        req.setItemBarcode(val);
+                    } else if (header.equals("quantity") || header.equals("qty") || header.equals("stock")) {
+                        try {
+                            req.setQuantity(Integer.parseInt(val));
+                        } catch (NumberFormatException ignored) {}
+                    } else if (header.equals("price") || header.equals("selling price") || header.equals("selling_price") || header.equals("rate")) {
+                        try {
+                            req.setPrice(new java.math.BigDecimal(val));
+                        } catch (NumberFormatException ignored) {}
+                    } else if (header.equals("producttype") || header.equals("product_type") || header.equals("product type")) {
+                        req.setProductType(val);
+                    } else if (header.equals("taxtype") || header.equals("tax_type") || header.equals("tax type")) {
+                        req.setTaxType(val);
+                    } else if (header.equals("tax")) {
+                        req.setTax(val);
+                    } else if (header.equals("discounttype") || header.equals("discount_type") || header.equals("discount type")) {
+                        req.setDiscountType(val);
+                    } else if (header.equals("discountvalue") || header.equals("discount_value") || header.equals("discount value")) {
+                        try {
+                            req.setDiscountValue(new java.math.BigDecimal(val));
+                        } catch (NumberFormatException ignored) {}
+                    } else if (header.equals("quantityalert") || header.equals("quantity_alert") || header.equals("quantity alert") || header.equals("alert quantity") || header.equals("alert_qty")) {
+                        try {
+                            req.setQuantityAlert(Integer.parseInt(val));
+                        } catch (NumberFormatException ignored) {}
+                    } else if (header.equals("warranty")) {
+                        req.setWarranty(val);
+                    } else if (header.equals("manufacturer")) {
+                        req.setManufacturer(val);
+                    } else if (header.equals("manufactureddate") || header.equals("manufactured_date") || header.equals("manufactured date")) {
+                        req.setManufacturedDate(val);
+                    } else if (header.equals("expirydate") || header.equals("expiry_date") || header.equals("expiry date")) {
+                        req.setExpiryDate(val);
+                    } else if (header.equals("images") || header.equals("image") || header.equals("image_url") || header.equals("image url")) {
+                        req.setImages(val);
+                    }
+                }
+                
+                if (req.getName() != null && !req.getName().isBlank()) {
+                    if (req.getPrice() == null) {
+                        req.setPrice(java.math.BigDecimal.ZERO);
+                    }
+                    if (req.getQuantity() == null) {
+                        req.setQuantity(0);
+                    }
+                    Product p = createProduct(req);
+                    importedProducts.add(p);
+                }
+            }
+        }
+        return importedProducts;
+    }
+
     // ── Private helper ────────────────────────────────────────────────────────
     private void mapRequestToProduct(ProductRequest req, Product p) {
         if (req.getName()             != null) p.setName(req.getName());

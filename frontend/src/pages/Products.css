@@ -1173,3 +1173,271 @@ input:checked + .ls-slider:before {
 .search-suggestions-container::-webkit-scrollbar-thumb:hover {
     background: #cbd5e1;
 }
+
+/* ── Import Products Modal ────────────────────────────────────────────── */
+.import-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.import-modal {
+    background: rgba(255, 255, 255, 0.98);
+    width: 100%;
+    max-width: 550px;
+    border-radius: 24px;
+    box-shadow: 0 25px 70px -12px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.import-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 30px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.import-modal-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.import-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.import-modal-close:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.import-modal-body {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.import-drag-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: #f8fafc;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.import-drag-zone:hover, .import-drag-zone.active {
+    border-color: #f97316;
+    background: #fff7ed;
+}
+
+.import-drag-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #fff;
+    color: #f97316;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
+}
+
+.import-drag-text {
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.import-drag-subtext {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.import-file-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.import-file-icon {
+    color: #0f172a;
+    display: flex;
+}
+
+.import-file-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.import-file-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.import-file-size {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.import-file-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    transition: all 0.2s;
+}
+
+.import-file-remove:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.import-instructions {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.import-instructions-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.import-instructions-list {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.8rem;
+    color: #1e40af;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.import-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 30px;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+}
+
+.import-btn-cancel {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.import-btn-cancel:hover {
+    background: #f8fafc;
+}
+
+.import-btn-submit {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: none;
+    background: #f97316;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.import-btn-submit:hover:not(:disabled) {
+    background: #ea580c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+}
+
+.import-btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.import-btn-sample {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    align-self: center;
+}
+
+.import-btn-sample:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
