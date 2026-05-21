@@ -18,7 +18,8 @@ import {
     Package,
     AlertCircle,
     CheckCircle,
-    X
+    X,
+    UploadCloud
 } from 'lucide-react';
 import { useConfirm } from '../context/ConfirmContext';
 
@@ -53,6 +54,12 @@ const Products = () => {
     const [viewProduct, setViewProduct]     = useState(null);   // product to view
     const [activeImgIndex, setActiveImgIndex] = useState(0);    // for gallery
     const [selectedIds, setSelectedIds]       = useState([]);
+
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [importFile, setImportFile]           = useState(null);
+    const [importing, setImporting]             = useState(false);
+    const [dragActive, setDragActive]           = useState(false);
+    const [importError, setImportError]         = useState('');
     
     const { confirm } = useConfirm();
 
@@ -72,6 +79,85 @@ const Products = () => {
     }, []);
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+    // ── CSV Import Handlers ──────────────────────────────────────────────────
+    const handleDrag = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === "dragenter" || e.type === "dragover") {
+            setDragActive(true);
+        } else if (e.type === "dragleave") {
+            setDragActive(false);
+        }
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const file = e.dataTransfer.files[0];
+            if (file.name.endsWith('.csv')) {
+                setImportFile(file);
+                setImportError('');
+            } else {
+                setImportError('Please upload a valid CSV file.');
+            }
+        }
+    };
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.name.endsWith('.csv')) {
+                setImportFile(file);
+                setImportError('');
+            } else {
+                setImportError('Please upload a valid CSV file.');
+            }
+        }
+    };
+
+    const handleImportSubmit = async (e) => {
+        e.preventDefault();
+        if (!importFile) return;
+        setImporting(true);
+        setImportError('');
+
+        const formData = new FormData();
+        formData.append('file', importFile);
+
+        try {
+            const res = await axios.post(`${API_BASE}/import`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            showToast('success', res.data.message || 'Products imported successfully.');
+            setShowImportModal(false);
+            setImportFile(null);
+            fetchProducts();
+        } catch (err) {
+            const errMsg = err.response?.data?.error || err.message || 'Failed to import products.';
+            setImportError(errMsg);
+            showToast('error', errMsg);
+        } finally {
+            setImporting(false);
+        }
+    };
+
+    const downloadSampleCsv = () => {
+        const headers = 'name,sku,category,brand,price,quantity,unit,barcode,description,store,warehouse,selling_type,sub_category,barcode_symbology,product_type,tax_type,tax,discount_type,discount_value,quantity_alert,warranty,manufacturer,manufactured_date,expiry_date,images\n';
+        const sampleData = '"Sample Laptop","SKU-LAP123","Electronics","Dell",1200.00,50,"Pc","8901234567890","Powerful developer laptop","Main Store","Primary","RETAIL","Computers","CODE128","SINGLE","Exclusive","18%","PERCENT",5.00,10,"1 Year Warranty","Dell Inc","2026-01-01","2028-01-01","https://images.unsplash.com/photo-1593642632823-8f785ba67e45"\n';
+        const blob = new Blob([headers + sampleData], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "products_import_sample.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     // ── Merge: DB products first, then mock (only if DB is empty/offline) ─
     const allProducts = dbProducts;
@@ -217,7 +303,11 @@ const Products = () => {
                     <Link to="/create-product" className="ss-btn-orange" style={{ textDecoration: 'none' }}>
                         <PlusCircle size={18} /> Add Product
                     </Link>
-                    <button className="ss-btn-orange" style={{ background: '#5b6670', borderColor: '#5b6670' }}>
+                    <button 
+                        className="ss-btn-orange" 
+                        style={{ background: '#5b6670', borderColor: '#5b6670' }}
+                        onClick={() => setShowImportModal(true)}
+                    >
                         <Download size={18} /> Import Product
                     </button>
                 </div>
@@ -596,6 +686,106 @@ const Products = () => {
                                     <button className="view-btn-close" onClick={() => setViewProduct(null)}>Close Details</button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* CSV Import Modal */}
+            {showImportModal && (
+                <div className="import-overlay" onClick={() => !importing && setShowImportModal(false)}>
+                    <div className="import-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="import-modal-header">
+                            <h3 className="import-modal-title">Import Products from CSV</h3>
+                            <button className="import-modal-close" onClick={() => !importing && setShowImportModal(false)} disabled={importing}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="import-modal-body">
+                            {importError && (
+                                <div className="prod-toast prod-toast-error" style={{ position: 'static', minWidth: 'auto', marginBottom: '10px', maxWidth: 'none' }}>
+                                    <AlertCircle size={17} />
+                                    <span>{importError}</span>
+                                </div>
+                            )}
+
+                            {/* Drag and Drop Zone */}
+                            {!importFile ? (
+                                <div 
+                                    className={`import-drag-zone ${dragActive ? 'active' : ''}`}
+                                    onDragEnter={handleDrag}
+                                    onDragOver={handleDrag}
+                                    onDragLeave={handleDrag}
+                                    onDrop={handleDrop}
+                                    onClick={() => document.getElementById('csv-file-input').click()}
+                                >
+                                    <input 
+                                        type="file" 
+                                        id="csv-file-input" 
+                                        accept=".csv" 
+                                        style={{ display: 'none' }} 
+                                        onChange={handleFileChange}
+                                    />
+                                    <div className="import-drag-icon">
+                                        <UploadCloud size={24} />
+                                    </div>
+                                    <p className="import-drag-text">Drag & drop your CSV file here or click to browse</p>
+                                    <p className="import-drag-subtext">Supported format: .csv up to 10MB</p>
+                                </div>
+                            ) : (
+                                <div className="import-file-info">
+                                    <div className="import-file-icon">
+                                        <FileSpreadsheet size={32} style={{ color: '#28c76f' }} />
+                                    </div>
+                                    <div className="import-file-details">
+                                        <span className="import-file-name">{importFile.name}</span>
+                                        <span className="import-file-size">{(importFile.size / 1024).toFixed(1)} KB</span>
+                                    </div>
+                                    <button 
+                                        className="import-file-remove" 
+                                        onClick={() => setImportFile(null)}
+                                        disabled={importing}
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Standard sample format helper button */}
+                            <button className="import-btn-sample" onClick={downloadSampleCsv}>
+                                <Download size={14} /> Download Sample CSV Template
+                            </button>
+
+                            {/* Instructions Box */}
+                            <div className="import-instructions">
+                                <h4 className="import-instructions-title">
+                                    <AlertCircle size={16} /> Column Requirements:
+                                </h4>
+                                <ul className="import-instructions-list">
+                                    <li><strong>Required headers:</strong> name, price.</li>
+                                    <li><strong>Optional headers:</strong> sku, category, brand, quantity, unit, barcode, description, store, warehouse, discount_type, discount_value, images, warranty, etc.</li>
+                                    <li>Make sure values for price and quantity are numerical.</li>
+                                    <li>Date fields should be formatted as YYYY-MM-DD.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className="import-modal-footer">
+                            <button 
+                                className="import-btn-cancel" 
+                                onClick={() => setShowImportModal(false)}
+                                disabled={importing}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className="import-btn-submit" 
+                                onClick={handleImportSubmit}
+                                disabled={!importFile || importing}
+                            >
+                                {importing ? 'Importing...' : 'Upload & Import'}
+                            </button>
                         </div>
                     </div>
                 </div>

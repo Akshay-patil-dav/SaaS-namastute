@@ -114,4 +114,22 @@ public class ProductController {
     public ResponseEntity<Map<String, String>> generateBarcode() {
         return ResponseEntity.ok(Map.of("barcode", productService.generateBarcode()));
     }
+
+    /** POST /api/products/import — import products from CSV */
+    @PostMapping("/import")
+    public ResponseEntity<?> importProducts(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Please upload a CSV file"));
+            }
+            List<Product> imported = productService.importProductsFromCsv(file);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message", "Successfully imported " + imported.size() + " products",
+                "count", imported.size()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to import products: " + e.getMessage()));
+        }
+    }
 }
