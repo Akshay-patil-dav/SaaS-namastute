@@ -7,6 +7,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import apiClient, { API } from '../../api/config';
 import { useAuth } from '../../context/AuthContext';
+import { useCompany } from '../../context/CompanyContext';
 import './AIHelper.css';
 
 // ── System prompt sent with every request ────────────────────────────────────
@@ -16,14 +17,14 @@ Keep responses clear, concise, and actionable. For code or configuration, use co
 
 // ── Quick action prompts ──────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { icon: '🔧', label: 'Fix Error',        prompt: 'I have an error in the system. Help me troubleshoot it: ' },
-  { icon: '📖', label: 'Explain Feature',  prompt: 'Please explain how this feature works in Namastute POS: ' },
+  { icon: '🔧', label: 'Fix Error', prompt: 'I have an error in the system. Help me troubleshoot it: ' },
+  { icon: '📖', label: 'Explain Feature', prompt: 'Please explain how this feature works in Namastute POS: ' },
   { icon: '✨', label: 'Improve Workflow', prompt: 'How can I improve my workflow for: ' },
-  { icon: '💡', label: 'Best Practice',   prompt: 'What are the best practices for: ' },
+  { icon: '💡', label: 'Best Practice', prompt: 'What are the best practices for: ' },
 ];
 
 const STORAGE_KEY_PREFIX = 'nms_ai_chat_';
-const MAX_CONTEXT_MSGS   = 10; // last N non-system messages sent as context
+const MAX_CONTEXT_MSGS = 10; // last N non-system messages sent as context
 
 function getStorageKey(email) {
   return `${STORAGE_KEY_PREFIX}${btoa(email || 'guest').replace(/=/g, '')}`;
@@ -78,27 +79,30 @@ function TypingIndicator() {
 
 // ── Main AIHelper component ───────────────────────────────────────────────────
 export default function AIHelper() {
-  const { user }   = useAuth();
-  const navigate   = useNavigate();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const [isOpen,           setIsOpen]           = useState(false);
-  const [isMaximized,      setIsMaximized]       = useState(false);
-  const [messages,         setMessages]          = useState([]);
-  const [input,            setInput]             = useState('');
-  const [isLoading,        setIsLoading]         = useState(false);
-  const [aiConfig,         setAiConfig]          = useState(null);   // { hasKey, provider, model }
-  const [showQuickActions, setShowQuickActions]   = useState(false);
-  const [unreadCount,      setUnreadCount]        = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [aiConfig, setAiConfig] = useState(null);   // { hasKey, provider, model }
+  const [showQuickActions, setShowQuickActions] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  const bottomRef      = useRef(null);
-  const inputRef       = useRef(null);
-  const msgsRef        = useRef([]);   // mirror of `messages` to avoid stale closure in sendMessage
+  // Company info comes from the shared CompanyContext — updates in real-time
+  const { companyInfo } = useCompany();
+
+  const bottomRef = useRef(null);
+  const inputRef = useRef(null);
+  const msgsRef = useRef([]);   // mirror of `messages` to avoid stale closure in sendMessage
 
   // ── Load chat history (per-user, localStorage) ────────────────────────────
   useEffect(() => {
     if (!user?.email) return;
 
-    const key    = getStorageKey(user.email);
+    const key = getStorageKey(user.email);
     const stored = localStorage.getItem(key);
     if (stored) {
       try {
@@ -113,9 +117,10 @@ export default function AIHelper() {
 
     // First time — show welcome
     const firstName = user?.name ? user.name.split(' ')[0] : 'there';
+    const bizName = companyInfo.name || 'Namastute POS';
     const welcome = [{
       role: 'assistant',
-      content: `👋 Hi ${firstName}! I'm your Namastute POS AI Helper.\n\nI can help you with inventory, sales, settings, product management, and more. Try the quick actions above, or just type your question!`,
+      content: `👋 Hi ${firstName}! I'm your ${bizName} AI Helper.\n\nI can help you with inventory, sales, settings, product management, and more. Try the quick actions above, or just type your question!`,
       ts: Date.now(),
     }];
     setMessages(welcome);
@@ -177,8 +182,8 @@ export default function AIHelper() {
     if (!text || isLoading) return;
 
     // Append user message immediately
-    const userMsg      = { role: 'user', content: text, ts: Date.now() };
-    const updatedMsgs  = [...msgsRef.current, userMsg];
+    const userMsg = { role: 'user', content: text, ts: Date.now() };
+    const updatedMsgs = [...msgsRef.current, userMsg];
     setMessages(updatedMsgs);
     setInput('');
     setIsLoading(true);
@@ -197,7 +202,7 @@ export default function AIHelper() {
     };
 
     try {
-      const res          = await apiClient.post(`${API.AI}/chat`, payload);
+      const res = await apiClient.post(`${API.AI}/chat`, payload);
       const assistantMsg = { role: 'assistant', content: res.data.reply, ts: Date.now() };
       setMessages(prev => [...prev, assistantMsg]);
       if (!isOpen) setUnreadCount(prev => prev + 1);
@@ -250,7 +255,7 @@ export default function AIHelper() {
 
   if (!user) return null;
 
-  const canChat    = aiConfig?.hasKey === true;
+  const canChat = aiConfig?.hasKey === true;
   const configReady = aiConfig !== null;
 
   return (
@@ -280,9 +285,13 @@ export default function AIHelper() {
           {/* Header */}
           <div className="ai-panel__header">
             <div className="ai-panel__header-left">
-              <div className="ai-panel__bot-icon"><Bot size={15} /></div>
+              <div className="ai-panel__bot-icon">
+                {companyInfo.logo
+                  ? <img src={companyInfo.logo} alt={companyInfo.name || 'Company'} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '4px' }} />
+                  : <Bot size={15} />}
+              </div>
               <div>
-                <div className="ai-panel__title">AI Helper</div>
+                <div className="ai-panel__title">{companyInfo.name || 'AI Helper'}</div>
                 <div className="ai-panel__subtitle">
                   {configReady ? (
                     <>
@@ -328,9 +337,11 @@ export default function AIHelper() {
               <span>No API key configured. </span>
               <button
                 onClick={goToSettings}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer', padding: 0,
                   color: '#f97316', fontWeight: 600, fontSize: '12px',
-                  display: 'inline-flex', alignItems: 'center', gap: '2px' }}
+                  display: 'inline-flex', alignItems: 'center', gap: '2px'
+                }}
               >
                 Add in Settings <ChevronRight size={10} />
               </button>

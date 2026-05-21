@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { CompanyProvider } from './context/CompanyContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import GuestRoute from './components/auth/GuestRoute';
 import { ConfirmProvider } from './context/ConfirmContext';
@@ -240,11 +241,13 @@ function AppRoutes() {
 export default function App() {
     return (
         <AuthProvider>
-            <ConfirmProvider>
-                <BrowserRouter>
-                    <AppRoutes />
-                </BrowserRouter>
-            </ConfirmProvider>
+            <CompanyProvider>
+                <ConfirmProvider>
+                    <BrowserRouter>
+                        <AppRoutes />
+                    </BrowserRouter>
+                </ConfirmProvider>
+            </CompanyProvider>
         </AuthProvider>
     );
 }
