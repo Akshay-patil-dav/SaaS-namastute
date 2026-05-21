@@ -56,6 +56,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/products/**", "/api/stocks/**", "/api/categories/**", "/api/subcategories/**", "/api/brands/**", "/api/units/**", "/api/warranties/**", "/api/sales/**", "/api/pos-sales/**", "/api/transfers/**", "/api/sales-returns/**", "/api/purchases/**", "/api/purchase-returns/**", "/api/settings/**", "/api/upload/**", "/uploads/**").permitAll()
+                        // AI Helper endpoints require a valid JWT — each user can only access their own data
+                        .requestMatchers("/api/ai/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
