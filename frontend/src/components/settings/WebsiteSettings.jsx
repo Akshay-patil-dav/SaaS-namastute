@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../hooks/useSettings';
+import { useCompany } from '../../context/CompanyContext';
 import { 
     Building, 
     Mail, 
@@ -189,6 +190,7 @@ export const SystemSettings = () => {
 
 export const CompanySettings = () => {
     const { settings, loading, saving, handleChange, saveSettings } = useSettings();
+    const { refreshCompany } = useCompany();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [companies, setCompanies] = useState([]);
     const [currentCompany, setCurrentCompany] = useState({});
@@ -308,6 +310,8 @@ export const CompanySettings = () => {
         setCompanies(updatedCompanies);
         // Pass data directly to avoid React's async state race condition
         saveSettings(null, { companies_list: jsonValue });
+        // Refresh the shared CompanyContext so sidebar/header/AI update instantly
+        refreshCompany();
     };
 
     const handleSaveCompany = () => {
