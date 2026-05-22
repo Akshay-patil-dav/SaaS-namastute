@@ -403,10 +403,10 @@ export default function AIHelper() {
               className="ai-panel__input"
               placeholder={
                 !canChat
-                  ? 'Add your API key in Settings → AI Settings to start chatting…'
+                  ? 'Setup API Key in Settings to chat...'
                   : isLoading
-                    ? 'Waiting for response…'
-                    : 'Type your message… (Enter to send, Shift+Enter for new line)'
+                    ? 'AI is typing...'
+                    : 'Ask AI Helper...'
               }
               value={input}
               onChange={e => setInput(e.target.value)}
