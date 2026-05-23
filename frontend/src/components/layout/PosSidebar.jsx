@@ -278,14 +278,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     </a>
                                 </li> */}
-                                 <li className="pos-menu-item">
+                                {/* <li className="pos-menu-item">
                                      <NavLink to="/pos" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                          <div className="pos-menu-link-content">
                                              <Monitor className="pos-menu-icon" strokeWidth={1.5} />
                                              <span>POS Terminal</span>
                                          </div>
                                      </NavLink>
-                                 </li>
+                                 </li> */}
                             </ul>
 
                             {/* Purchases Section */}
