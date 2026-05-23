@@ -3,6 +3,8 @@ package com.example.otpauth.service;
 import com.example.otpauth.dto.ProductRequest;
 import com.example.otpauth.model.Product;
 import com.example.otpauth.repository.ProductRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.UUID;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
@@ -232,6 +235,16 @@ public class ProductService {
         if (req.getWarranty()         != null) p.setWarranty(req.getWarranty());
         if (req.getManufacturer()     != null) p.setManufacturer(req.getManufacturer());
         if (req.getImages()           != null) p.setImages(req.getImages());
+
+        // Serialize variants list to JSON string
+        if (req.getVariants() != null) {
+            try {
+                p.setVariantsJson(objectMapper.writeValueAsString(req.getVariants()));
+            } catch (JsonProcessingException e) {
+                // If serialization fails, store as empty array
+                p.setVariantsJson("[]");
+            }
+        }
 
         if (req.getManufacturedDate() != null && !req.getManufacturedDate().isBlank()) {
             p.setManufacturedDate(LocalDate.parse(req.getManufacturedDate()));

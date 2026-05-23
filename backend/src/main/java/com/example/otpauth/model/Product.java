@@ -1,9 +1,15 @@
 package com.example.otpauth.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -62,6 +68,23 @@ public class Product {
     // ── Images (comma-separated URLs) ─────────────────────────────────────────
     @Column(columnDefinition = "TEXT")
     private String images;
+
+    // ── Variants (stored as JSON string) ─────────────────────────────────────
+    @JsonIgnore                          // don't expose the raw string in API responses
+    @Column(columnDefinition = "TEXT")
+    private String variantsJson;
+
+    // Expose parsed variants list in JSON responses
+    @Transient
+    @JsonProperty("variants")
+    public List<Object> getVariantsParsed() {
+        if (variantsJson == null || variantsJson.isBlank()) return Collections.emptyList();
+        try {
+            return new ObjectMapper().readValue(variantsJson, new TypeReference<List<Object>>() {});
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
 
     // ── Audit ─────────────────────────────────────────────────────────────────
     @Column(updatable = false)
@@ -134,6 +157,8 @@ public class Product {
     public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
     public String getImages() { return images; }
     public void setImages(String images) { this.images = images; }
+    public String getVariantsJson() { return variantsJson; }
+    public void setVariantsJson(String variantsJson) { this.variantsJson = variantsJson; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

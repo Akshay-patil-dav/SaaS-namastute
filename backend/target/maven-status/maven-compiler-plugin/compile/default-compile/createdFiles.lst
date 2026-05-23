@@ -33,6 +33,7 @@ com\example\otpauth\model\SalesReturn.class
 com\example\otpauth\service\StockService.class
 com\example\otpauth\dto\BuilderDto$PageDto.class
 com\example\otpauth\dto\StockBatchRequest$StockItemRequest.class
+com\example\otpauth\model\Product$1.class
 com\example\otpauth\config\SecurityConfig.class
 com\example\otpauth\dto\SalesReturnRequest$ReturnProduct.class
 com\example\otpauth\dto\StockUpdateRequest.class
