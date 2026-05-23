@@ -1,6 +1,7 @@
 package com.example.otpauth.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductRequest {
     private String name;
@@ -29,6 +30,7 @@ public class ProductRequest {
     private String manufacturedDate;  // received as "yyyy-MM-dd"
     private String expiryDate;        // received as "yyyy-MM-dd"
     private String images;            // comma-separated URLs
+    private List<Object> variants;    // JSON array of variant type objects
 
     // ── Getters & Setters ──────────────────────────────────────────────────
     public String getName() { return name; }
@@ -83,4 +85,6 @@ public class ProductRequest {
     public void setExpiryDate(String expiryDate) { this.expiryDate = expiryDate; }
     public String getImages() { return images; }
     public void setImages(String images) { this.images = images; }
+    public List<Object> getVariants() { return variants; }
+    public void setVariants(List<Object> variants) { this.variants = variants; }
 }
