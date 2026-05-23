@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AddCategoryModal from '../components/AddCategoryModal';
 import './CreateProduct.css';
 import { Link, useNavigate } from 'react-router-dom';
@@ -20,7 +20,10 @@ import {
     CheckCircle,
     AlertCircle,
     Loader,
-    Wand2
+    Wand2,
+    Layers,
+    Trash2,
+    Upload
 } from 'lucide-react';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/products`;
@@ -66,6 +69,12 @@ const CreateProduct = () => {
     const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
     const [generatingSku, setGeneratingSku] = useState(false);
     const [generatingBarcode, setGeneratingBarcode] = useState(false);
+
+    // ── Variant Types state ────────────────────────────────────────────────────
+    // variantTypes: [{ typeName: '', values: [{ value:'', price:'', sku:'', barcode:'', image:null }] }]
+    const [variantTypes, setVariantTypes] = useState([]);
+    const [vtUploading, setVtUploading] = useState({}); // key: `${typeIdx}-${valIdx}`
+    const vtFileRefs = useRef({});
     
     // Dynamic categories
     const [categories, setCategories] = useState([]);
@@ -191,10 +200,89 @@ const CreateProduct = () => {
         setImages(prev => prev.filter((_, i) => i !== index));
     };
 
+    // ── Variant Type helpers ────────────────────────────────────────────────────
+    const addVariantType = () => {
+        setVariantTypes(prev => [
+            ...prev,
+            { typeName: '', values: [{ value: '', price: '', sku: '', barcode: '', image: null }] }
+        ]);
+    };
+
+    const removeVariantType = (tIdx) => {
+        setVariantTypes(prev => prev.filter((_, i) => i !== tIdx));
+    };
+
+    const updateVariantTypeName = (tIdx, name) => {
+        setVariantTypes(prev => prev.map((t, i) => i === tIdx ? { ...t, typeName: name } : t));
+    };
+
+    const addVariantValue = (tIdx) => {
+        setVariantTypes(prev => prev.map((t, i) => i === tIdx
+            ? { ...t, values: [...t.values, { value: '', price: '', sku: '', barcode: '', image: null }] }
+            : t
+        ));
+    };
+
+    const removeVariantValue = (tIdx, vIdx) => {
+        setVariantTypes(prev => prev.map((t, i) => i === tIdx
+            ? { ...t, values: t.values.filter((_, vi) => vi !== vIdx) }
+            : t
+        ));
+    };
+
+    const updateVariantValue = (tIdx, vIdx, field, val) => {
+        setVariantTypes(prev => prev.map((t, i) => i === tIdx
+            ? { ...t, values: t.values.map((v, vi) => vi === vIdx ? { ...v, [field]: val } : v) }
+            : t
+        ));
+    };
+
+    const handleVtImageUpload = async (tIdx, vIdx, file) => {
+        if (!file) return;
+        const key = `${tIdx}-${vIdx}`;
+        setVtUploading(prev => ({ ...prev, [key]: true }));
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await axios.post(
+                `${import.meta.env.VITE_API_BASE_URL}/upload`,
+                formData,
+                { headers: { 'Content-Type': 'multipart/form-data' } }
+            );
+            const url = `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${res.data.url}`;
+            updateVariantValue(tIdx, vIdx, 'image', url);
+        } catch (err) {
+            showToast('error', 'Image upload failed: ' + (err.response?.data?.error || err.message));
+        } finally {
+            setVtUploading(prev => ({ ...prev, [key]: false }));
+            const ref = vtFileRefs.current[`${tIdx}-${vIdx}`];
+            if (ref) ref.value = '';
+        }
+    };
+
+    const generateVtSku = async (tIdx, vIdx) => {
+        try {
+            const res = await axios.get(`${API_BASE}/generate-sku`);
+            updateVariantValue(tIdx, vIdx, 'sku', res.data.sku);
+        } catch {
+            updateVariantValue(tIdx, vIdx, 'sku', 'SKU-' + Math.random().toString(36).substring(2, 10).toUpperCase());
+        }
+    };
+
+    const generateVtBarcode = async (tIdx, vIdx) => {
+        try {
+            const res = await axios.get(`${API_BASE}/generate-barcode`);
+            updateVariantValue(tIdx, vIdx, 'barcode', res.data.barcode);
+        } catch {
+            updateVariantValue(tIdx, vIdx, 'barcode', String(Math.floor(Math.random() * 9e12) + 1e12));
+        }
+    };
+
     // ── Reset ─────────────────────────────────────────────────────────────────
     const handleReset = () => {
         setForm(initialForm);
         setImages([]);
+        setVariantTypes([]);
     };
 
     // ── Submit ────────────────────────────────────────────────────────────────
@@ -243,6 +331,16 @@ const CreateProduct = () => {
                 manufacturedDate: form.showManufacturer && form.manufacturedDate ? form.manufacturedDate : null,
                 expiryDate:       form.showExpiry && form.expiryDate ? form.expiryDate : null,
                 images:           images.map(img => img.url).join(','),
+                variants:         variantTypes.map(t => ({
+                    typeName: t.typeName,
+                    values: t.values.map(v => ({
+                        value:   v.value,
+                        price:   parseFloat(v.price) || 0,
+                        sku:     v.sku,
+                        barcode: v.barcode,
+                        image:   v.image || '',
+                    }))
+                })),
             };
 
             await axios.post(API_BASE, payload);
@@ -619,6 +717,189 @@ const CreateProduct = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Variants Card — only for Variable Product */}
+                {form.productType === 'Variable Product' && (
+                    <div className="cp-card">
+                        <div className="cp-card-header">
+                            <div className="cp-card-title"><Layers size={18} /> Variant Types</div>
+                            <button type="button" className="btn-add-variant" onClick={addVariantType}>
+                                <Plus size={14} /> Add Variant Type
+                            </button>
+                        </div>
+                        <div className="cp-card-body">
+                            {variantTypes.length === 0 ? (
+                                <div className="variants-empty">
+                                    <Layers size={40} className="variants-empty-icon" />
+                                    <p>No variant types added yet.</p>
+                                    <span>e.g. Add "Color" then add Red, Blue, Green as values — each with its own price, image &amp; SKU.</span>
+                                </div>
+                            ) : (
+                                <div className="vt-list">
+                                    {variantTypes.map((vt, tIdx) => (
+                                        <div className="vt-block" key={tIdx}>
+                                            {/* Type header */}
+                                            <div className="vt-block-header">
+                                                <div className="vt-type-label-wrap">
+                                                    <span className="vt-type-index">{tIdx + 1}</span>
+                                                    <input
+                                                        type="text"
+                                                        className="cp-input vt-type-input"
+                                                        placeholder="Variant type name — e.g. Color, Size, Storage"
+                                                        value={vt.typeName}
+                                                        onChange={e => updateVariantTypeName(tIdx, e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="vt-block-actions">
+                                                    <button
+                                                        type="button"
+                                                        className="btn-add-vt-value"
+                                                        onClick={() => addVariantValue(tIdx)}
+                                                    >
+                                                        <Plus size={13} /> Add Value
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="variant-remove-btn"
+                                                        onClick={() => removeVariantType(tIdx)}
+                                                        title="Remove type"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Values table header */}
+                                            {vt.values.length > 0 && (
+                                                <div className="vt-values-wrap">
+                                                    <div className="vt-values-header">
+                                                        <span style={{width:72}}>Image</span>
+                                                        <span style={{flex:2}}>Value <span className="required">*</span></span>
+                                                        <span style={{flex:1.2}}>Price</span>
+                                                        <span style={{flex:2}}>SKU</span>
+                                                        <span style={{flex:2}}>Barcode</span>
+                                                        <span style={{width:32}}></span>
+                                                    </div>
+
+                                                    {vt.values.map((val, vIdx) => {
+                                                        const uploadKey = `${tIdx}-${vIdx}`;
+                                                        return (
+                                                            <div className="vt-value-row" key={vIdx}>
+                                                                {/* Image upload */}
+                                                                <div className="vt-img-cell">
+                                                                    <div
+                                                                        className="vt-img-box"
+                                                                        onClick={() => vtFileRefs.current[uploadKey]?.click()}
+                                                                        title="Click to upload image"
+                                                                    >
+                                                                        {vtUploading[uploadKey] ? (
+                                                                            <Loader size={18} className="spin text-muted" />
+                                                                        ) : val.image ? (
+                                                                            <>
+                                                                                <img src={val.image} alt={val.value} />
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="vt-img-remove"
+                                                                                    onClick={e => { e.stopPropagation(); updateVariantValue(tIdx, vIdx, 'image', null); }}
+                                                                                >
+                                                                                    <X size={10} />
+                                                                                </button>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <Upload size={14} />
+                                                                                <span>Photo</span>
+                                                                            </>
+                                                                        )}
+                                                                        <input
+                                                                            type="file"
+                                                                            accept="image/*"
+                                                                            style={{ display: 'none' }}
+                                                                            ref={el => vtFileRefs.current[uploadKey] = el}
+                                                                            onChange={e => handleVtImageUpload(tIdx, vIdx, e.target.files[0])}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Value name */}
+                                                                <div className="vt-cell" style={{flex:2}}>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="cp-input"
+                                                                        placeholder={`e.g. ${tIdx === 0 ? 'Red' : tIdx === 1 ? 'XL' : 'Option'}`}
+                                                                        value={val.value}
+                                                                        onChange={e => updateVariantValue(tIdx, vIdx, 'value', e.target.value)}
+                                                                    />
+                                                                </div>
+
+                                                                {/* Price */}
+                                                                <div className="vt-cell" style={{flex:1.2}}>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="cp-input"
+                                                                        placeholder="0.00"
+                                                                        min="0" step="0.01"
+                                                                        value={val.price}
+                                                                        onChange={e => updateVariantValue(tIdx, vIdx, 'price', e.target.value)}
+                                                                    />
+                                                                </div>
+
+                                                                {/* SKU */}
+                                                                <div className="vt-cell" style={{flex:2}}>
+                                                                    <div className="cp-input-group">
+                                                                        <input
+                                                                            type="text"
+                                                                            className="cp-input"
+                                                                            placeholder="SKU-XXXX"
+                                                                            value={val.sku}
+                                                                            onChange={e => updateVariantValue(tIdx, vIdx, 'sku', e.target.value)}
+                                                                        />
+                                                                        <button type="button" className="btn-generate" onClick={() => generateVtSku(tIdx, vIdx)} title="Generate">
+                                                                            <Wand2 size={11} />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Barcode */}
+                                                                <div className="vt-cell" style={{flex:2}}>
+                                                                    <div className="cp-input-group">
+                                                                        <input
+                                                                            type="text"
+                                                                            className="cp-input"
+                                                                            placeholder="1234567890"
+                                                                            value={val.barcode}
+                                                                            onChange={e => updateVariantValue(tIdx, vIdx, 'barcode', e.target.value)}
+                                                                        />
+                                                                        <button type="button" className="btn-generate" onClick={() => generateVtBarcode(tIdx, vIdx)} title="Generate">
+                                                                            <Wand2 size={11} />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Remove value */}
+                                                                <div className="vt-cell" style={{width:32, flexShrink:0}}>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="vt-remove-val-btn"
+                                                                        onClick={() => removeVariantValue(tIdx, vIdx)}
+                                                                        title="Remove value"
+                                                                        disabled={vt.values.length === 1}
+                                                                    >
+                                                                        <X size={13} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Custom Fields Card */}
                 <div className="cp-card">
