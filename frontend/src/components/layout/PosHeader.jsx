@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useCompany } from '../../context/CompanyContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
     ChevronsLeft, 
@@ -22,6 +23,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const { user, logout } = useAuth();
+    const { companyInfo } = useCompany();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -74,7 +76,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
             <div className="pos-header-actions">
                 <div className="pos-store-selector hide-on-mobile">
                     <Store className="pos-store-icon" size={16} />
-                    <span>Freshmart</span>
+                    <span>{companyInfo.name || 'My Store'}</span>
                     <ChevronDown size={14} color="#888" />
                 </div>
 
