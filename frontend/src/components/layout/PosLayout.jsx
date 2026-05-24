@@ -1,25 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import PosSidebar from './PosSidebar';
 import PosHeader from './PosHeader';
-import '../../assets/pos-layout.css'; // Import the custom POS layout styles
+import '../../assets/pos-layout.css';
 import AIHelper from '../ai/AIHelper';
 
-export default function PosLayout({ children }) {
-    // True means sidebar is expanded. We default to true on desktop.
-    const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 991);
+// ── Safe initial sidebar state ───────────────────────────────────────────────
+// Guard against `window` being undefined in SSR / test environments.
+// On desktop (> 991 px) start expanded; on mobile start collapsed.
+function getInitialSidebarState() {
+    if (typeof window === 'undefined') return true; // SSR default: open
+    return window.innerWidth > 991;
+}
 
-    // Close sidebar on route change on mobile, and handle resize
+export default function PosLayout({ children }) {
+    const [sidebarOpen, setSidebarOpen] = useState(getInitialSidebarState);
+
+    // Use matchMedia for efficient, event-driven breakpoint detection —
+    // avoids polling innerWidth on every resize event.
     useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth <= 991) {
-                setSidebarOpen(false);
-            } else {
-                setSidebarOpen(true);
-            }
+        if (typeof window === 'undefined') return;
+
+        const mql = window.matchMedia('(max-width: 991px)');
+
+        const handleChange = (e) => {
+            setSidebarOpen(!e.matches); // matches = mobile → close sidebar
         };
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        // Sync state immediately in case viewport changed before component mounted
+        setSidebarOpen(!mql.matches);
+
+        // Modern API (all browsers ≥ Safari 14)
+        if (mql.addEventListener) {
+            mql.addEventListener('change', handleChange);
+            return () => mql.removeEventListener('change', handleChange);
+        } else {
+            // Legacy fallback for older Safari
+            mql.addListener(handleChange);
+            return () => mql.removeListener(handleChange);
+        }
     }, []);
 
     return (

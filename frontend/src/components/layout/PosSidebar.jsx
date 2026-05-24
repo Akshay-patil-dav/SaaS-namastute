@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCompany } from '../../context/CompanyContext';
 import {
@@ -92,14 +92,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
             {/* Sidebar */}
             <aside className={`pos-sidebar`}>
                 <div className="pos-sidebar-header">
-                    <a href="/dashboard" className="pos-sidebar-logo">
+                    <Link to="/dashboard" className="pos-sidebar-logo">
                         {companyInfo.logo
                             ? <img src={companyInfo.logo} alt={companyInfo.name || 'Logo'} style={{ height: '32px', maxWidth: '120px', objectFit: 'contain' }} />
                             : <ShoppingBag className="pos-logo-icon" />}
                         <span style={{ color: '#1a1a1a', fontWeight: '800' }}>
                             {companyInfo.name || 'Namustute'}
                         </span>
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="pos-sidebar-content">
