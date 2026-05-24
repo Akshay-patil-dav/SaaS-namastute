@@ -17,6 +17,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     // ─── Read from backend/.env → FRONTEND_URL ────────────────────────────
     // To change the redirect URL: edit backend/.env  →  FRONTEND_URL=https://yourdomain.com
     // application.yml maps: app.frontend-url = ${FRONTEND_URL:http://localhost:5173}
+
+    
     @Value("${app.frontend-url}")
     private String frontendUrl;
 

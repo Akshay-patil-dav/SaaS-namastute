@@ -48,8 +48,8 @@ server:
   port: 3000
 
 app:
-  base-url: ${APP_BASE_URL:http://localhost:3000}
-  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  base-url: ${APP_BASE_URL:https://springboot-app-pb1v.onrender.com}
+  frontend-url: ${FRONTEND_URL:https://saa-s-namastute.vercel.app}
   # Optional comma-separated extra CORS origins (e.g. for dev ports, ngrok, staging)
   cors-extra-origins: ${CORS_EXTRA_ORIGINS:}
 
