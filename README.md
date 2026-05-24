@@ -238,9 +238,9 @@ SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=root
 JWT_SECRET=<hex-key>
 JWT_EXPIRATION=86400000
-APP_BASE_URL=http://localhost:3000
-FRONTEND_URL=http://localhost:5173
-CORS_EXTRA_ORIGINS=http://localhost:5174,http://localhost:3000
+APP_BASE_URL=https://springboot-app-pb1v.onrender.com
+FRONTEND_URL=https://saa-s-namastute.vercel.app/
+CORS_EXTRA_ORIGINS=http://localhost:5174,https://springboot-app-pb1v.onrender.com
 GOOGLE_CLIENT_ID=YOUR_ID
 GOOGLE_CLIENT_SECRET=YOUR_SECRET
 SUPER_ADMIN_EMAIL=admin@gmail.com
@@ -249,7 +249,7 @@ SUPER_ADMIN_PASSWORD=Admin@12345
 
 ### `frontend/.env`
 ```env
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=https://springboot-app-pb1v.onrender.com
 ```
 
 ---
@@ -274,7 +274,7 @@ cd backend
 cd frontend
 npm install
 npm run dev
-# Open: http://localhost:5173
+# Open: https://saa-s-namastute.vercel.app/
 ```
 
 ### 4. Default Login

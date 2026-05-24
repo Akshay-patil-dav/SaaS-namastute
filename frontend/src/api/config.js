@@ -14,14 +14,14 @@ import axios from 'axios';
 
 // ── Raw env values ─────────────────────────────────────────────────────────
 export const ENV = {
-  /** e.g.  http://localhost:3000/api   or   https://xxxx.ngrok-free.app/api */
-  API_BASE_URL:      import.meta.env.VITE_API_BASE_URL      || 'http://localhost:3000/api',
+  /** e.g.  https://springboot-app-pb1v.onrender.com/api   or   https://xxxx.ngrok-free.app/api */
+  API_BASE_URL:      import.meta.env.VITE_API_BASE_URL      || 'https://springboot-app-pb1v.onrender.com/api',
 
-  /** e.g.  http://localhost:3000  (no trailing slash) */
-  BACKEND_BASE_URL:  import.meta.env.VITE_BACKEND_BASE_URL  || 'http://localhost:3000',
+  /** e.g.  https://springboot-app-pb1v.onrender.com  (no trailing slash) */
+  BACKEND_BASE_URL:  import.meta.env.VITE_BACKEND_BASE_URL  || 'https://springboot-app-pb1v.onrender.com',
 
-  /** e.g.  http://localhost:5173 */
-  FRONTEND_URL:      import.meta.env.VITE_FRONTEND_URL      || 'http://localhost:5173',
+  /** e.g.  https://saa-s-namastute.vercel.app */
+  FRONTEND_URL:      import.meta.env.VITE_FRONTEND_URL      || 'https://saa-s-namastute.vercel.app',
 
   /** App branding */
   APP_NAME:          import.meta.env.VITE_APP_NAME          || 'Namastute POS',
