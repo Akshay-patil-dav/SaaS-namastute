@@ -1,63 +1,87 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { CompanyProvider } from './context/CompanyContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import GuestRoute from './components/auth/GuestRoute';
 import { ConfirmProvider } from './context/ConfirmContext';
-
-
-// ── Pages ──────────────────────────────────────────────────────────────────
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import LandingPage from './pages/LandingPage.jsx';
-import ITPortfolio from './pages/ITPortfolio.jsx';
-import BlogPage from './pages/BlogPage.jsx';
-import BlogDetail from './pages/BlogDetail.jsx';
-import Unauthorized from './pages/Unauthorized.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import Dashboard2 from './pages/Dashboard2.jsx';
-import SalesDashboard from './pages/SalesDashboard.jsx';
-import SuperDashboard from './pages/SuperDashboard.jsx';
-import SuperCompanies from './pages/SuperCompanies.jsx';
-import SuperSubscriptions from './pages/SuperSubscriptions.jsx';
-import SuperPackages from './pages/SuperPackages.jsx';
-import ManageStock from './pages/ManageStock.jsx';
-import StockAdjustment from './pages/StockAdjustment.jsx';
-import StockTransfer from './pages/StockTransfer.jsx';
-import OnlineOrders from './pages/OnlineOrders.jsx';
-import PosOrders from './pages/PosOrders.jsx';
-import POS from './pages/POS.jsx';
-import SalesReturn from './pages/SalesReturn.jsx';
-import Products from './pages/Products.jsx';
-import CreateProduct from './pages/CreateProduct.jsx';
-import EditProduct from './pages/EditProduct.jsx';
-import ExpiredProducts from './pages/ExpiredProducts.jsx';
-import LowStocks from './pages/LowStocks.jsx';
-import Category from './pages/Category.jsx';
-import SubCategory from './pages/SubCategory.jsx';
-import Brands from './pages/Brands.jsx';
-import Units from './pages/Units.jsx';
-// import VariantAttributes from './pages/VariantAttributes.jsx';
-import Warranties from './pages/Warranties.jsx';
-import PrintBarcode from './pages/PrintBarcode.jsx';
-import PrintQRCode from './pages/PrintQRCode.jsx';
-import Purchases from './pages/Purchases.jsx';
-import AddPurchase from './pages/AddPurchase.jsx';
-import EditPurchase from './pages/EditPurchase.jsx';
-import PurchaseReturn from './pages/PurchaseReturn.jsx';
-import AddPurchaseReturn from './pages/AddPurchaseReturn.jsx';
-import EditPurchaseReturn from './pages/EditPurchaseReturn.jsx';
-import Settings from './pages/Settings.jsx';
-import WebsiteBuilder from './pages/WebsiteBuilder.jsx';
-
-// ── Layouts ─────────────────────────────────────────────────────────────────
 import PosLayout from './components/layout/PosLayout';
 
+// ── Lazy-loaded Pages (code splitting — each route loads its JS on demand) ──
+const Login              = lazy(() => import('./pages/Login.jsx'));
+const Register           = lazy(() => import('./pages/Register.jsx'));
+const LandingPage        = lazy(() => import('./pages/LandingPage.jsx'));
+const ITPortfolio        = lazy(() => import('./pages/ITPortfolio.jsx'));
+const BlogPage           = lazy(() => import('./pages/BlogPage.jsx'));
+const BlogDetail         = lazy(() => import('./pages/BlogDetail.jsx'));
+const Unauthorized       = lazy(() => import('./pages/Unauthorized.jsx'));
+const Dashboard          = lazy(() => import('./pages/Dashboard.jsx'));
+const Dashboard2         = lazy(() => import('./pages/Dashboard2.jsx'));
+const SalesDashboard     = lazy(() => import('./pages/SalesDashboard.jsx'));
+const SuperDashboard     = lazy(() => import('./pages/SuperDashboard.jsx'));
+const SuperCompanies     = lazy(() => import('./pages/SuperCompanies.jsx'));
+const SuperSubscriptions = lazy(() => import('./pages/SuperSubscriptions.jsx'));
+const SuperPackages      = lazy(() => import('./pages/SuperPackages.jsx'));
+const ManageStock        = lazy(() => import('./pages/ManageStock.jsx'));
+const StockAdjustment    = lazy(() => import('./pages/StockAdjustment.jsx'));
+const StockTransfer      = lazy(() => import('./pages/StockTransfer.jsx'));
+const OnlineOrders       = lazy(() => import('./pages/OnlineOrders.jsx'));
+const PosOrders          = lazy(() => import('./pages/PosOrders.jsx'));
+const POS                = lazy(() => import('./pages/POS.jsx'));
+const SalesReturn        = lazy(() => import('./pages/SalesReturn.jsx'));
+const Products           = lazy(() => import('./pages/Products.jsx'));
+const CreateProduct      = lazy(() => import('./pages/CreateProduct.jsx'));
+const EditProduct        = lazy(() => import('./pages/EditProduct.jsx'));
+const ExpiredProducts    = lazy(() => import('./pages/ExpiredProducts.jsx'));
+const LowStocks          = lazy(() => import('./pages/LowStocks.jsx'));
+const Category           = lazy(() => import('./pages/Category.jsx'));
+const SubCategory        = lazy(() => import('./pages/SubCategory.jsx'));
+const Brands             = lazy(() => import('./pages/Brands.jsx'));
+const Units              = lazy(() => import('./pages/Units.jsx'));
+const Warranties         = lazy(() => import('./pages/Warranties.jsx'));
+const PrintBarcode       = lazy(() => import('./pages/PrintBarcode.jsx'));
+const PrintQRCode        = lazy(() => import('./pages/PrintQRCode.jsx'));
+const Purchases          = lazy(() => import('./pages/Purchases.jsx'));
+const AddPurchase        = lazy(() => import('./pages/AddPurchase.jsx'));
+const EditPurchase       = lazy(() => import('./pages/EditPurchase.jsx'));
+const PurchaseReturn     = lazy(() => import('./pages/PurchaseReturn.jsx'));
+const AddPurchaseReturn  = lazy(() => import('./pages/AddPurchaseReturn.jsx'));
+const EditPurchaseReturn = lazy(() => import('./pages/EditPurchaseReturn.jsx'));
+const Settings           = lazy(() => import('./pages/Settings.jsx'));
+const WebsiteBuilder     = lazy(() => import('./pages/WebsiteBuilder.jsx'));
+
 // ── Role constants ───────────────────────────────────────────────────────────
-const ALL_ROLES          = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
 const CLIENT_ADMIN_ROLES = ['ADMIN', 'CLIENT'];
 const ADMIN_ROLES        = ['ADMIN', 'CLIENT'];
 const SUPER_ADMIN_ROLES  = ['SUPER_ADMIN'];
+
+// ── Global page loading fallback ─────────────────────────────────────────────
+function PageLoader() {
+    return (
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100vh',
+            background: '#0f172a',
+            color: '#94a3b8',
+            fontSize: '16px',
+            fontFamily: 'Inter, sans-serif',
+            gap: '12px',
+        }}>
+            <div style={{
+                width: '28px',
+                height: '28px',
+                border: '3px solid #1e293b',
+                borderTopColor: '#6366f1',
+                borderRadius: '50%',
+                animation: 'spin 0.7s linear infinite',
+            }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            Loading...
+        </div>
+    );
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 const PosPage = ({ roles, children }) => (
@@ -69,172 +93,173 @@ const PosPage = ({ roles, children }) => (
 // ── Routes ───────────────────────────────────────────────────────────────────
 function AppRoutes() {
     return (
-        <Routes>
-            {/* Public routes — guests only (logged-in users are redirected to dashboard) */}
-            <Route path="/login"        element={<GuestRoute><Login /></GuestRoute>} />
-            <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
+        <Suspense fallback={<PageLoader />}>
+            <Routes>
+                {/* Public routes — guests only (logged-in users are redirected to dashboard) */}
+                <Route path="/login"        element={<GuestRoute><Login /></GuestRoute>} />
+                <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
 
-            {/* Root → IT Portfolio Landing Page */}
-            <Route path="/" element={<ITPortfolio />} />
-            <Route path="/retail-saas-platform" element={<LandingPage />} />
+                {/* Root → IT Portfolio Landing Page */}
+                <Route path="/" element={<ITPortfolio />} />
+                <Route path="/retail-saas-platform" element={<LandingPage />} />
 
-            {/* Blog routes – public */}
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogDetail />} />
+                {/* Blog routes – public */}
+                <Route path="/blog"       element={<BlogPage />} />
+                <Route path="/blog/:slug" element={<BlogDetail />} />
 
-            {/* ── CLIENT + ADMIN ───────────────────────── */}
-            <Route
-                path="/dashboard"
-                element={<PosPage roles={CLIENT_ADMIN_ROLES}><Dashboard /></PosPage>}
-            />
+                {/* ── CLIENT + ADMIN ───────────────────────── */}
+                <Route
+                    path="/dashboard"
+                    element={<PosPage roles={CLIENT_ADMIN_ROLES}><Dashboard /></PosPage>}
+                />
 
-            {/* ── ADMIN + SUPER ADMIN ─────────────────────────────────── */}
-            <Route
-                path="/dashboard/admin2"
-                element={<PosPage roles={ADMIN_ROLES}><Dashboard2 /></PosPage>}
-            />
-            <Route
-                path="/dashboard/sales"
-                element={<PosPage roles={ADMIN_ROLES}><SalesDashboard /></PosPage>}
-            />
-            <Route
-                path="/dashboard/manage-stock"
-                element={<PosPage roles={ADMIN_ROLES}><ManageStock /></PosPage>}
-            />
-            <Route
-                path="/dashboard/stock-adjustment"
-                element={<PosPage roles={ADMIN_ROLES}><StockAdjustment /></PosPage>}
-            />
-            <Route
-                path="/dashboard/stock-transfer"
-                element={<PosPage roles={ADMIN_ROLES}><StockTransfer /></PosPage>}
-            />
-            <Route
-                path="/dashboard/sales-online"
-                element={<PosPage roles={ADMIN_ROLES}><OnlineOrders /></PosPage>}
-            />
-            <Route
-                path="/dashboard/sales-pos"
-                element={<PosPage roles={ADMIN_ROLES}><PosOrders /></PosPage>}
-            />
-            <Route
-                path="/pos"
-                element={<ProtectedRoute allowedRoles={CLIENT_ADMIN_ROLES}><POS /></ProtectedRoute>}
-            />
-            <Route
-                path="/dashboard/sales-return"
-                element={<PosPage roles={ADMIN_ROLES}><SalesReturn /></PosPage>}
-            />
+                {/* ── ADMIN ─────────────────────────────────── */}
+                <Route
+                    path="/dashboard/admin2"
+                    element={<PosPage roles={ADMIN_ROLES}><Dashboard2 /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/sales"
+                    element={<PosPage roles={ADMIN_ROLES}><SalesDashboard /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/manage-stock"
+                    element={<PosPage roles={ADMIN_ROLES}><ManageStock /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/stock-adjustment"
+                    element={<PosPage roles={ADMIN_ROLES}><StockAdjustment /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/stock-transfer"
+                    element={<PosPage roles={ADMIN_ROLES}><StockTransfer /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/sales-online"
+                    element={<PosPage roles={ADMIN_ROLES}><OnlineOrders /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/sales-pos"
+                    element={<PosPage roles={ADMIN_ROLES}><PosOrders /></PosPage>}
+                />
+                <Route
+                    path="/pos"
+                    element={<ProtectedRoute allowedRoles={CLIENT_ADMIN_ROLES}><POS /></ProtectedRoute>}
+                />
+                <Route
+                    path="/dashboard/sales-return"
+                    element={<PosPage roles={ADMIN_ROLES}><SalesReturn /></PosPage>}
+                />
 
-            {/* Products — ADMIN + SUPER ADMIN */}
-            <Route
-                path="/products"
-                element={<PosPage roles={ADMIN_ROLES}><Products /></PosPage>}
-            />
-            <Route
-                path="/create-product"
-                element={<PosPage roles={ADMIN_ROLES}><CreateProduct /></PosPage>}
-            />
-            <Route
-                path="/edit-product/:id"
-                element={<PosPage roles={ADMIN_ROLES}><EditProduct /></PosPage>}
-            />
-            <Route
-                path="/expired-products"
-                element={<PosPage roles={ADMIN_ROLES}><ExpiredProducts /></PosPage>}
-            />
-            <Route
-                path="/low-stocks"
-                element={<PosPage roles={ADMIN_ROLES}><LowStocks /></PosPage>}
-            />
-            <Route
-                path="/category"
-                element={<PosPage roles={ADMIN_ROLES}><Category /></PosPage>}
-            />
-            <Route
-                path="/sub-category"
-                element={<PosPage roles={ADMIN_ROLES}><SubCategory /></PosPage>}
-            />
-            <Route
-                path="/brands"
-                element={<PosPage roles={ADMIN_ROLES}><Brands /></PosPage>}
-            />
-            <Route
-                path="/units"
-                element={<PosPage roles={ADMIN_ROLES}><Units /></PosPage>}
-            />
-{/* <Route
-                path="/variant-attributes"
-                element={<PosPage roles={ADMIN_ROLES}><VariantAttributes /></PosPage>}
-            /> */}
-            <Route
-                path="/warranties"
-                element={<PosPage roles={ADMIN_ROLES}><Warranties /></PosPage>}
-            />
-            <Route
-                path="/print-barcode"
-                element={<PosPage roles={ADMIN_ROLES}><PrintBarcode /></PosPage>}
-            />
-            <Route
-                path="/print-qrcode"
-                element={<PosPage roles={ADMIN_ROLES}><PrintQRCode /></PosPage>}
-            />
-            <Route
-                path="/purchases"
-                element={<PosPage roles={ADMIN_ROLES}><Purchases /></PosPage>}
-            />
-            <Route
-                path="/add-purchase"
-                element={<PosPage roles={ADMIN_ROLES}><AddPurchase /></PosPage>}
-            />
-            <Route
-                path="/edit-purchase/:id"
-                element={<PosPage roles={ADMIN_ROLES}><EditPurchase /></PosPage>}
-            />
-            <Route
-                path="/purchase-return"
-                element={<PosPage roles={ADMIN_ROLES}><PurchaseReturn /></PosPage>}
-            />
-            <Route
-                path="/add-purchase-return"
-                element={<PosPage roles={ADMIN_ROLES}><AddPurchaseReturn /></PosPage>}
-            />
-            <Route
-                path="/edit-purchase-return/:id"
-                element={<PosPage roles={ADMIN_ROLES}><EditPurchaseReturn /></PosPage>}
-            />
-            <Route
-                path="/settings/*"
-                element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
-            />
-            <Route
-                path="/website-builder"
-                element={<PosPage roles={CLIENT_ADMIN_ROLES}><WebsiteBuilder /></PosPage>}
-            />
+                {/* Products */}
+                <Route
+                    path="/products"
+                    element={<PosPage roles={ADMIN_ROLES}><Products /></PosPage>}
+                />
+                <Route
+                    path="/create-product"
+                    element={<PosPage roles={ADMIN_ROLES}><CreateProduct /></PosPage>}
+                />
+                <Route
+                    path="/edit-product/:id"
+                    element={<PosPage roles={ADMIN_ROLES}><EditProduct /></PosPage>}
+                />
+                <Route
+                    path="/expired-products"
+                    element={<PosPage roles={ADMIN_ROLES}><ExpiredProducts /></PosPage>}
+                />
+                <Route
+                    path="/low-stocks"
+                    element={<PosPage roles={ADMIN_ROLES}><LowStocks /></PosPage>}
+                />
+                <Route
+                    path="/category"
+                    element={<PosPage roles={ADMIN_ROLES}><Category /></PosPage>}
+                />
+                <Route
+                    path="/sub-category"
+                    element={<PosPage roles={ADMIN_ROLES}><SubCategory /></PosPage>}
+                />
+                <Route
+                    path="/brands"
+                    element={<PosPage roles={ADMIN_ROLES}><Brands /></PosPage>}
+                />
+                <Route
+                    path="/units"
+                    element={<PosPage roles={ADMIN_ROLES}><Units /></PosPage>}
+                />
+                <Route
+                    path="/warranties"
+                    element={<PosPage roles={ADMIN_ROLES}><Warranties /></PosPage>}
+                />
+                <Route
+                    path="/print-barcode"
+                    element={<PosPage roles={ADMIN_ROLES}><PrintBarcode /></PosPage>}
+                />
+                <Route
+                    path="/print-qrcode"
+                    element={<PosPage roles={ADMIN_ROLES}><PrintQRCode /></PosPage>}
+                />
 
+                {/* Purchases */}
+                <Route
+                    path="/purchases"
+                    element={<PosPage roles={ADMIN_ROLES}><Purchases /></PosPage>}
+                />
+                <Route
+                    path="/add-purchase"
+                    element={<PosPage roles={ADMIN_ROLES}><AddPurchase /></PosPage>}
+                />
+                <Route
+                    path="/edit-purchase/:id"
+                    element={<PosPage roles={ADMIN_ROLES}><EditPurchase /></PosPage>}
+                />
+                <Route
+                    path="/purchase-return"
+                    element={<PosPage roles={ADMIN_ROLES}><PurchaseReturn /></PosPage>}
+                />
+                <Route
+                    path="/add-purchase-return"
+                    element={<PosPage roles={ADMIN_ROLES}><AddPurchaseReturn /></PosPage>}
+                />
+                <Route
+                    path="/edit-purchase-return/:id"
+                    element={<PosPage roles={ADMIN_ROLES}><EditPurchaseReturn /></PosPage>}
+                />
 
-            {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
-            <Route
-                path="/dashboard/super-dashboard"
-                element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperDashboard /></PosPage>}
-            />
-            <Route
-                path="/dashboard/super-companies"
-                element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperCompanies /></PosPage>}
-            />
-            <Route
-                path="/dashboard/super-subscriptions"
-                element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperSubscriptions /></PosPage>}
-            />
-            <Route
-                path="/dashboard/super-packages"
-                element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperPackages /></PosPage>}
-            />
+                {/* Settings & Builder */}
+                <Route
+                    path="/settings/*"
+                    element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
+                />
+                <Route
+                    path="/website-builder"
+                    element={<PosPage roles={CLIENT_ADMIN_ROLES}><WebsiteBuilder /></PosPage>}
+                />
 
-            {/* Catch-all → login */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+                {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
+                <Route
+                    path="/dashboard/super-dashboard"
+                    element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperDashboard /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/super-companies"
+                    element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperCompanies /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/super-subscriptions"
+                    element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperSubscriptions /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/super-packages"
+                    element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperPackages /></PosPage>}
+                />
+
+                {/* Catch-all → login */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+        </Suspense>
     );
 }
 
