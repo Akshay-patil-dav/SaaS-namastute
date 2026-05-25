@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Loader, Upload, Image as ImageIcon, AlertCircle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
+import './modal-common.css';
 import './add-sub-category-modal.css';
 
 const API_BASE = `${ENV.API_BASE_URL}/subcategories`;
@@ -122,6 +123,7 @@ const AddSubCategoryModal = ({ isOpen, onClose, onSubCategoryAdded, subCategoryD
                             <Plus size={20} />
                         </div>
                         <h4>{isEditMode ? 'Edit Sub Category' : 'Add Sub Category'}</h4>
+                        <span className="modal-subtitle">{isEditMode ? 'Update sub-category details' : 'Create a new product sub-category'}</span>
                     </div>
                     <button className="close-btn" onClick={onClose}>
                         <X size={20} />

@@ -1,16 +1,21 @@
-﻿import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './Products.css';
 import './inventory-pages-custom.css';
 import { 
     FileText, 
     FileSpreadsheet, 
     RefreshCw, 
-    ChevronUp, 
     PlusCircle,
     Search,
-    ChevronDown,
     Pencil,
-    Trash2
+    Trash2,
+    CheckCircle,
+    AlertCircle,
+    X,
+    Loader,
+    Tag,
+    TrendingUp,
+    Award
 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import AddBrandModal from '../components/AddBrandModal';
@@ -24,25 +29,39 @@ const Brands = () => {
     const [data, setData] = useState([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingBrand, setEditingBrand] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState(null);
     const { confirm } = useConfirm();
 
-    const fetchBrands = async () => {
+    const showToast = (type, message) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 3500);
+    };
+
+    const fetchBrands = useCallback(async () => {
+        setLoading(true);
         try {
             const res = await apiClient.get(API_BASE);
             if (res.data && Array.isArray(res.data)) {
                 setData(res.data);
+            } else {
+                setData([]);
             }
         } catch (err) {
             console.error('Failed to fetch brands:', err);
+            showToast('error', 'Failed to fetch brands');
+        } finally {
+            setLoading(false);
         }
-    };
-
-    React.useEffect(() => {
-        fetchBrands();
     }, []);
+
+    useEffect(() => {
+        fetchBrands();
+    }, [fetchBrands]);
 
     const handleBrandAdded = () => {
         fetchBrands();
+        showToast('success', editingBrand ? 'Brand updated successfully.' : 'Brand added successfully.');
     };
 
     const filteredData = data.filter(item => {
@@ -74,53 +93,69 @@ const Brands = () => {
         if (!selectedIds.length) return;
         const isConfirmed = await confirm({
             title: 'Delete Brands',
-            message: `Are you sure you want to delete ${selectedIds.length} brands?`
+            message: `Are you sure you want to delete ${selectedIds.length} brand${selectedIds.length > 1 ? 's' : ''}? This action cannot be undone.`
         });
         if (!isConfirmed) return;
         
         try {
             await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            showToast('success', `${selectedIds.length} brand${selectedIds.length > 1 ? 's' : ''} deleted successfully.`);
             setSelectedIds([]);
             fetchBrands();
         } catch (err) {
             console.error('Failed to delete brands:', err);
-            alert('Failed to delete brands.');
+            showToast('error', 'Failed to delete selected brands.');
         }
     };
 
     const handleDelete = async (id) => {
         const isConfirmed = await confirm({
             title: 'Delete Brand',
-            message: 'Are you sure you want to delete this brand?'
+            message: 'Are you sure you want to delete this brand? Products using this brand will be unaffected.'
         });
         if (!isConfirmed) return;
         try {
             await apiClient.delete(`${API_BASE}/${id}`);
+            showToast('success', 'Brand deleted successfully.');
             fetchBrands();
         } catch (err) {
             console.error(err);
-            alert('Failed to delete brand');
+            showToast('error', 'Failed to delete brand.');
         }
     };
 
+    // Stats
+    const totalCount = data.length;
+    const activeCount = data.filter(b => b.status).length;
+    const inactiveCount = totalCount - activeCount;
+
     return (
-        <div className="product-page-container">
+        <div className="sub-category-page">
+            {/* Toast Notification */}
+            {toast && (
+                <div className={`prod-toast prod-toast-${toast.type}`}>
+                    {toast.type === 'success' ? <CheckCircle size={17} /> : <AlertCircle size={17} />}
+                    <span>{toast.message}</span>
+                    <button onClick={() => setToast(null)} className="toast-close"><X size={14} /></button>
+                </div>
+            )}
+
             {/* Header Section */}
             <div className="ss-header-row">
-                <div className="ss-page-title-area">
-                    <h2 className="ss-page-title">Brands</h2>
-                    <p className="ss-page-subtitle">Manage your brands</p>
+                <div>
+                    <h1 className="ss-page-title">Brands</h1>
+                    <p className="ss-page-subtitle">Manage your product brands and manufacturers</p>
                 </div>
                 
                 <div className="ss-header-actions">
-                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF">
-                        <FileText size={16} />
+                    <button className="ss-btn-icon-square" title="Export PDF">
+                        <FileText size={18} className="icon-red" />
                     </button>
-                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel">
-                        <FileSpreadsheet size={16} />
+                    <button className="ss-btn-icon-square" title="Export Excel">
+                        <FileSpreadsheet size={18} className="icon-green" />
                     </button>
                     <button className="ss-btn-icon-square" title="Refresh" onClick={fetchBrands}>
-                        <RefreshCw size={16} />
+                        <RefreshCw size={18} className={loading ? 'spin' : ''} />
                     </button>
                     {selectedIds.length > 0 && (
                         <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
@@ -133,9 +168,72 @@ const Brands = () => {
                 </div>
             </div>
 
+            {/* Stats Cards */}
+            <div className="ss-stats-container">
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Total Brands</h4>
+                            <p>{totalCount}</p>
+                        </div>
+                        <div className="ss-btn-icon-square icon-blue">
+                            <Award size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom">
+                        <TrendingUp size={14} /> All registered brands
+                    </div>
+                </div>
+
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Active</h4>
+                            <p>{activeCount}</p>
+                        </div>
+                        <div className="ss-btn-icon-square icon-green">
+                            <CheckCircle size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom">
+                        <TrendingUp size={14} /> Visible in products
+                    </div>
+                </div>
+
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>Inactive</h4>
+                            <p>{inactiveCount}</p>
+                        </div>
+                        <div className="ss-btn-icon-square icon-red">
+                            <AlertCircle size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom" style={{ color: '#ef4444' }}>
+                        Hidden from storefront
+                    </div>
+                </div>
+
+                <div className="ss-stat-card">
+                    <div className="ss-stat-top">
+                        <div className="ss-stat-info">
+                            <h4>With Logo</h4>
+                            <p>{data.filter(b => b.img).length}</p>
+                        </div>
+                        <div className="ss-btn-icon-square icon-orange">
+                            <Tag size={20} />
+                        </div>
+                    </div>
+                    <div className="ss-stat-bottom">
+                        <TrendingUp size={14} /> Brands with logos uploaded
+                    </div>
+                </div>
+            </div>
+
             {/* Table Card Area */}
             <div className="ss-main-panel">
-                
+
                 {/* Filter Row */}
                 <div className="ss-table-controls">
                     <div className="ss-search-wrap">
@@ -143,14 +241,14 @@ const Brands = () => {
                         <input 
                             type="text" 
                             className="ss-search-input"
-                            placeholder="Search" 
+                            placeholder="Search brands..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <div className="ss-filters-wrap">
                         <select className="ss-filter-select">
-                            <option value="">Status</option>
+                            <option value="">All Statuses</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
@@ -177,53 +275,79 @@ const Brands = () => {
                                 <th style={{ textAlign: 'center' }}>Action</th>
                             </tr>
                         </thead>
-                    <tbody>
-                        {filteredData.length > 0 ? (
-                            filteredData.map((item) => (
-                            <tr key={item.id}>
-                                <td>
-                                    <input 
-                                        type="checkbox" 
-                                        className="ss-checkbox" 
-                                        checked={selectedIds.includes(item.id)}
-                                        onChange={(e) => handleSelectItem(item.id, e.target.checked)}
-                                    />
-                                </td>
-                                <td className="ss-item-name">{item.name}</td>
-                                <td>
-                                    <div className="ss-table-img-wrapper">
-                                        <img src={item.img || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random`} alt={item.name} className="ss-table-img" />
-                                    </div>
-                                </td>
-                                <td>{item.desc}</td>
-                                <td>
-                                    <span className={item.status ? "ss-status-badge ss-status-active" : "ss-status-badge ss-status-inactive"}>
-                                        {item.status ? 'Active' : 'Inactive'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
-                                        <button className="ss-action-btn edit" title="Edit" onClick={() => { setEditingBrand(item); setIsAddModalOpen(true); }}>
-                                            <Pencil size={16} />
-                                        </button>
-                                        <button className="ss-action-btn delete" title="Delete" onClick={() => handleDelete(item.id)}>
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))
-                        ) : (
-                            <tr>
-                                <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                                    No product Avalable tehre
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '50px' }}>
+                                        <Loader className="spin" size={26} style={{ color: '#ff9b29', display: 'block', margin: '0 auto 12px' }} />
+                                        <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>Loading brands...</p>
+                                    </td>
+                                </tr>
+                            ) : filteredData.length > 0 ? (
+                                filteredData.map((item) => (
+                                    <tr key={item.id}>
+                                        <td>
+                                            <input 
+                                                type="checkbox" 
+                                                className="ss-checkbox" 
+                                                checked={selectedIds.includes(item.id)}
+                                                onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                            />
+                                        </td>
+                                        <td className="ss-item-name">{item.name}</td>
+                                        <td>
+                                            <div className="ss-table-img-wrapper">
+                                                <img 
+                                                    src={item.img || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=fff7ed&color=f97316&bold=true`} 
+                                                    alt={item.name} 
+                                                    className="ss-table-img" 
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="ss-description-cell">{item.desc || '—'}</td>
+                                        <td>
+                                            <span className={item.status ? "ss-status-badge ss-status-active" : "ss-status-badge ss-status-inactive"}>
+                                                {item.status ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
+                                                <button 
+                                                    className="ss-action-btn edit" 
+                                                    title="Edit Brand" 
+                                                    onClick={() => { setEditingBrand(item); setIsAddModalOpen(true); }}
+                                                >
+                                                    <Pencil size={14} />
+                                                </button>
+                                                <button 
+                                                    className="ss-action-btn delete" 
+                                                    title="Delete Brand" 
+                                                    onClick={() => handleDelete(item.id)}
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '50px' }}>
+                                        <div style={{ color: '#94a3b8' }}>
+                                            <Award size={44} strokeWidth={1} style={{ marginBottom: '12px', opacity: 0.4, display: 'block', margin: '0 auto 12px' }} />
+                                            <p style={{ margin: 0, fontWeight: 600, fontSize: '15px', color: '#64748b' }}>No brands found</p>
+                                            <p style={{ margin: '4px 0 0', fontSize: '13px' }}>
+                                                {searchTerm ? `No results for "${searchTerm}"` : 'Add your first brand to get started'}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-                {/* Pagination Section */}
+                {/* Pagination */}
                 <div className="ss-pagination-row">
                     <div className="ss-page-size">
                         Row Per Page 
@@ -235,14 +359,14 @@ const Brands = () => {
                         Entries
                     </div>
                     <div className="ss-page-controls">
-                        <button className="ss-page-btn">&lt;</button>
+                        <button className="ss-page-btn" disabled>&lt;</button>
                         <button className="ss-page-btn active">1</button>
                         <button className="ss-page-btn">&gt;</button>
                     </div>
                 </div>
             </div>
-        </div>
 
+            {/* Modal — rendered outside the table panels but inside the page root */}
             <AddBrandModal 
                 isOpen={isAddModalOpen} 
                 onClose={() => { setIsAddModalOpen(false); setEditingBrand(null); }}
