@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, ShieldCheck, Loader, AlertCircle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
-import './modal-common.css';
 import './add-warranty-modal.css';
 
 const API_BASE = `${ENV.API_BASE_URL}/warranties`;
@@ -96,8 +95,8 @@ const AddWarrantyModal = ({ isOpen, onClose, onWarrantyAdded, warrantyData }) =>
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content add-warranty-modal">
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content add-warranty-modal" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="modal-header">
                     <div className="header-title-wrap">
@@ -105,7 +104,6 @@ const AddWarrantyModal = ({ isOpen, onClose, onWarrantyAdded, warrantyData }) =>
                             <ShieldCheck size={20} />
                         </div>
                         <h4>{isEditMode ? 'Edit Warranty' : 'Add Warranty'}</h4>
-                        <span className="modal-subtitle">{isEditMode ? 'Update warranty policy' : 'Create a new warranty plan'}</span>
                     </div>
                     <button className="close-btn" onClick={onClose} type="button">
                         <X size={20} />

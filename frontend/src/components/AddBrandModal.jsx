@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Loader, Upload, Image as ImageIcon, AlertCircle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
-import './modal-common.css';
 import './add-brand-modal.css';
 
 const API_BASE = `${ENV.API_BASE_URL}/brands`;
@@ -104,8 +103,8 @@ const AddBrandModal = ({ isOpen, onClose, onBrandAdded, brandData }) => {
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content add-brand-modal">
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content add-brand-modal" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="modal-header">
                     <div className="header-title-wrap">
@@ -113,7 +112,6 @@ const AddBrandModal = ({ isOpen, onClose, onBrandAdded, brandData }) => {
                             <Plus size={20} />
                         </div>
                         <h4>{isEditMode ? 'Edit Brand' : 'Add Brand'}</h4>
-                        <span className="modal-subtitle">{isEditMode ? 'Update brand information' : 'Register a new brand'}</span>
                     </div>
                     <button className="close-btn" onClick={onClose} type="button">
                         <X size={20} />

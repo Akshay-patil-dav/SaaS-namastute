@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Loader, Tag, AlertCircle } from 'lucide-react';
+import { X, Loader } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
-import './modal-common.css';
+import './add-sales-modal.css';
 import './add-category-modal.css';
 
 const API_BASE = `${ENV.API_BASE_URL}/categories`;
@@ -29,15 +29,6 @@ const AddCategoryModal = ({ isOpen, onClose, onCategoryAdded, categoryData }) =>
     }, [categoryData, isOpen]);
 
     if (!isOpen) return null;
-
-    const handleNameChange = (e) => {
-        const val = e.target.value;
-        setCategoryName(val);
-        // Auto-generate slug from name if not in edit mode
-        if (!isEditMode) {
-            setCategorySlug(val.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -67,30 +58,20 @@ const AddCategoryModal = ({ isOpen, onClose, onCategoryAdded, categoryData }) =>
             if (onCategoryAdded) onCategoryAdded();
             onClose();
         } catch (err) {
-            setError(err.response?.data?.error || err.response?.data?.message || 'Failed to save category');
+            setError(err.response?.data?.error || 'Failed to add category');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content add-category-modal">
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content add-sales-modal add-category-modal" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="modal-header">
-                    <div className="header-title-wrap">
-                        <div className="header-icon">
-                            <Tag size={18} />
-                        </div>
-                        <div>
-                            <h4>{isEditMode ? 'Edit Category' : 'Add Category'}</h4>
-                            <span className="modal-subtitle">
-                                {isEditMode ? 'Update category details' : 'Create a new product category'}
-                            </span>
-                        </div>
-                    </div>
-                    <button className="close-btn" onClick={onClose} type="button" title="Close">
-                        <X size={16} />
+                    <h4>{isEditMode ? 'Edit Category' : 'Add Category'}</h4>
+                    <button className="close-btn-red" onClick={onClose} type="button">
+                        <X size={18} />
                     </button>
                 </div>
 
@@ -98,64 +79,54 @@ const AddCategoryModal = ({ isOpen, onClose, onCategoryAdded, categoryData }) =>
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
                         {error && (
-                            <div className="alert-error-custom">
-                                <AlertCircle size={16} />
+                            <div className="alert alert-danger" style={{ fontSize: '13px', padding: '10px', marginBottom: '15px', borderRadius: '6px' }}>
                                 {error}
                             </div>
                         )}
                         
-                        <div className="form-grid form-grid-1">
-                            <div className="form-group">
-                                <label>Category Name <span className="required">*</span></label>
-                                <input 
-                                    type="text" 
-                                    className="form-input-custom" 
-                                    placeholder="e.g. Electronics, Clothing"
-                                    value={categoryName}
-                                    onChange={handleNameChange}
-                                    required
-                                    autoFocus
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Category Slug <span className="required">*</span></label>
-                                <input 
-                                    type="text" 
-                                    className="form-input-custom" 
-                                    placeholder="e.g. electronics, clothing"
-                                    value={categorySlug}
-                                    onChange={(e) => setCategorySlug(e.target.value)}
-                                    required
-                                />
-                                <p className="input-help-text">URL-friendly identifier. Auto-generated from name.</p>
-                            </div>
+                        <div className="form-group mb-3">
+                            <label>Category <span className="required">*</span></label>
+                            <input 
+                                type="text" 
+                                className="form-input" 
+                                placeholder="Enter category name"
+                                value={categoryName}
+                                onChange={(e) => setCategoryName(e.target.value)}
+                                required
+                            />
                         </div>
 
-                        <div className="status-toggle-row">
-                            <div className="status-label">
-                                <strong>Status</strong>
-                                <span>Make this category visible in your storefront</span>
-                            </div>
-                            <label className="switch-custom">
+                        <div className="form-group mb-3">
+                            <label>Category Slug <span className="required">*</span></label>
+                            <input 
+                                type="text" 
+                                className="form-input" 
+                                placeholder="Enter category slug"
+                                value={categorySlug}
+                                onChange={(e) => setCategorySlug(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="status-toggle-container">
+                            <label>Status <span className="required">*</span></label>
+                            <label className="switch">
                                 <input 
                                     type="checkbox" 
                                     checked={status}
                                     onChange={(e) => setStatus(e.target.checked)}
                                 />
-                                <span className="slider-custom"></span>
+                                <span className="slider"></span>
                             </label>
                         </div>
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="modal-footer-custom">
-                        <button type="button" className="btn-cancel-custom" onClick={onClose} disabled={isSubmitting}>
-                            Cancel
-                        </button>
-                        <button type="submit" className="btn-submit-custom" disabled={isSubmitting}>
+                    <div className="modal-footer">
+                        <button type="button" className="btn-cancel-dark" onClick={onClose} disabled={isSubmitting}>Cancel</button>
+                        <button type="submit" className="btn-add-category" disabled={isSubmitting}>
                             {isSubmitting ? (
-                                <><Loader size={15} className="spin" /> {isEditMode ? 'Updating...' : 'Adding...'}</>
+                                <><Loader size={16} className="spin" style={{marginRight: '8px'}} /> {isEditMode ? 'Updating...' : 'Adding...'}</>
                             ) : (
                                 isEditMode ? 'Update Category' : 'Add Category'
                             )}

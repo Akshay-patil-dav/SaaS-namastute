@@ -8,13 +8,9 @@ import {
     ChevronUp, 
     PlusCircle,
     Search,
+    ChevronDown,
     Pencil,
-    Trash2,
-    CheckCircle,
-    AlertCircle,
-    X,
-    Loader,
-    Ruler
+    Trash2
 } from 'lucide-react';
 import apiClient, { API } from '../api/config';
 import { useConfirm } from '../context/ConfirmContext';
@@ -29,13 +25,7 @@ const Units = () => {
     const [loading, setLoading] = useState(true);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [currentEditItem, setCurrentEditItem] = useState(null);
-    const [toast, setToast] = useState(null);
     const { confirm } = useConfirm();
-
-    const showToast = (type, message) => {
-        setToast({ type, message });
-        setTimeout(() => setToast(null), 3500);
-    };
 
     const fetchUnits = async () => {
         setLoading(true);
@@ -90,12 +80,11 @@ const Units = () => {
         
         try {
             await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
-            showToast('success', `${selectedIds.length} unit${selectedIds.length > 1 ? 's' : ''} deleted successfully.`);
             setSelectedIds([]);
             fetchUnits();
         } catch (err) {
             console.error('Failed to delete units:', err);
-            showToast('error', 'Failed to delete selected units.');
+            alert('Failed to delete units.');
         }
     };
 
@@ -108,11 +97,10 @@ const Units = () => {
         
         try {
             await apiClient.delete(`${API_BASE}/${id}`);
-            showToast('success', 'Unit deleted successfully.');
             fetchUnits();
         } catch (err) {
             console.error(err);
-            showToast('error', 'Failed to delete unit.');
+            alert('Failed to delete unit');
         }
     };
 
@@ -127,16 +115,7 @@ const Units = () => {
     };
 
     return (
-        <div className="sub-category-page">
-            {/* Toast Notification */}
-            {toast && (
-                <div className={`prod-toast prod-toast-${toast.type}`}>
-                    {toast.type === 'success' ? <CheckCircle size={17} /> : <AlertCircle size={17} />}
-                    <span>{toast.message}</span>
-                    <button onClick={() => setToast(null)} className="toast-close"><X size={14} /></button>
-                </div>
-            )}
-
+        <div className="product-page-container">
             {/* Header Section */}
             <div className="ss-header-row">
                 <div className="ss-page-title-area">
@@ -278,10 +257,10 @@ const Units = () => {
             {/* Add/Edit Unit Modal */}
             <AddUnitModal 
                 isOpen={isAddModalOpen} 
-                onClose={() => { setIsAddModalOpen(false); setCurrentEditItem(null); }} 
+                onClose={() => setIsAddModalOpen(false)} 
                 onUnitAdded={() => {
+                    setIsAddModalOpen(false);
                     fetchUnits();
-                    showToast('success', currentEditItem ? 'Unit updated successfully.' : 'Unit added successfully.');
                 }} 
                 unitData={currentEditItem} 
             />
