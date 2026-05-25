@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import './CreateProduct.css'; // Reusing common form styles
 import './AddPurchase.css';    // Specific styles for Purchase table
 import { 
@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 
 const AddPurchase = () => {
     const navigate = useNavigate();
@@ -57,7 +57,7 @@ const AddPurchase = () => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`);
+                const res = await apiClient.get(`${ENV.API_BASE_URL}/products`);
                 // Map DB fields to our UI needs
                 const mapped = res.data.map(p => ({
                     ...p,
@@ -218,7 +218,7 @@ const AddPurchase = () => {
             notes: description
         };
 
-        axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchases`, newPurchase)
+        apiClient.post(`${ENV.API_BASE_URL}/purchases`, newPurchase)
             .then(res => {
                 setToast({ type: 'success', message: 'Purchase saved successfully!' });
                 setIsSubmitting(false);

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+﻿import React, { useState, useEffect, useCallback } from 'react';
+import apiClient, { API, ENV } from '@/api/config';
 import './inventory-pages-custom.css';
 import { 
     FileText, 
@@ -23,7 +23,7 @@ import {
 import AddCategoryModal from '../components/AddCategoryModal';
 import { useConfirm } from '../context/ConfirmContext';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/categories`;
+const API_BASE = `${ENV.API_BASE_URL}/categories`;
 
 const Category = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +39,7 @@ const Category = () => {
     const fetchCategories = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await axios.get(API_BASE);
+            const res = await apiClient.get(API_BASE);
             if (res.data && Array.isArray(res.data)) {
                 setCategories(res.data);
             } else {
@@ -71,7 +71,7 @@ const Category = () => {
         if (!isConfirmed) return;
 
         try {
-            await axios.delete(`${API_BASE}/${id}`);
+            await apiClient.delete(`${API_BASE}/${id}`);
             setCategories(prev => prev.filter(c => c.id !== id));
             showToast('success', 'Category deleted successfully.');
         } catch {
@@ -88,7 +88,7 @@ const Category = () => {
         if (!isConfirmed) return;
 
         try {
-            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
             showToast('success', `${selectedIds.length} categories deleted successfully.`);
             setSelectedIds([]);
             fetchCategories();

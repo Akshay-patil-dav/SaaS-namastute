@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './inventory-pages-custom.css';
 
@@ -17,7 +17,7 @@ import {
     Upload,
     MoreVertical
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import ViewPurchaseModal from '../components/ViewPurchaseModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import ImportPurchaseModal from '../components/ImportPurchaseModal';
@@ -47,8 +47,8 @@ const PurchaseReturn = () => {
         setLoading(true);
         try {
             const [returnsRes, purchasesRes] = await Promise.all([
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns`),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchases`)
+                apiClient.get(`${ENV.API_BASE_URL}/purchase-returns`),
+                apiClient.get(`${ENV.API_BASE_URL}/purchases`)
             ]);
             
             const returnPurchases = purchasesRes.data
@@ -83,9 +83,9 @@ const PurchaseReturn = () => {
         setIsDeleting(true);
         try {
             const url = itemToDelete.isFromPurchases 
-                ? `${import.meta.env.VITE_API_BASE_URL}/purchases/${itemToDelete.id}`
-                : `${import.meta.env.VITE_API_BASE_URL}/purchase-returns/${itemToDelete.id}`;
-            await axios.delete(url);
+                ? `${ENV.API_BASE_URL}/purchases/${itemToDelete.id}`
+                : `${ENV.API_BASE_URL}/purchase-returns/${itemToDelete.id}`;
+            await apiClient.delete(url);
             setDeleteModalOpen(false);
             setItemToDelete(null);
             fetchPurchaseReturns();
@@ -121,10 +121,10 @@ const PurchaseReturn = () => {
             
             const promises = [];
             if (purchaseIds.length > 0) {
-                promises.push(axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchases/delete-bulk`, { ids: purchaseIds }));
+                promises.push(apiClient.post(`${ENV.API_BASE_URL}/purchases/delete-bulk`, { ids: purchaseIds }));
             }
             if (returnIds.length > 0) {
-                promises.push(axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchase-returns/delete-bulk`, { ids: returnIds }));
+                promises.push(apiClient.post(`${ENV.API_BASE_URL}/purchase-returns/delete-bulk`, { ids: returnIds }));
             }
             
             await Promise.all(promises);

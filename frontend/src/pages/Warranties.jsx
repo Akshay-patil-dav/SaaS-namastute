@@ -12,11 +12,11 @@ import {
     Pencil,
     Trash2
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API } from '../api/config';
 import { useConfirm } from '../context/ConfirmContext';
 import AddWarrantyModal from '../components/AddWarrantyModal';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/warranties`;
+const API_BASE = API.WARRANTIES;
 
 const Warranties = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +32,7 @@ const Warranties = () => {
     const fetchWarranties = async () => {
         setIsLoading(true);
         try {
-            const res = await axios.get(API_BASE);
+            const res = await apiClient.get(API_BASE);
             setData(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             console.error('Fetch error:', err);
@@ -79,7 +79,7 @@ const Warranties = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
             setSelectedIds([]);
             fetchWarranties();
         } catch (err) {
@@ -96,7 +96,7 @@ const Warranties = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.delete(`${API_BASE}/${id}`);
+            await apiClient.delete(`${API_BASE}/${id}`);
             fetchWarranties();
         } catch (err) {
             console.error('Delete error:', err);

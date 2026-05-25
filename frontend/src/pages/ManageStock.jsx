@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
     Search, 
     FileText, 
@@ -12,7 +12,7 @@ import {
     ChevronLeft, 
     ChevronRight 
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './manage-stock.css';
 import './inventory-pages-custom.css';
 import AddStockModal from '../components/AddStockModal';
@@ -36,7 +36,7 @@ export default function ManageStock() {
     const fetchStocks = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/stocks`);
+            const response = await apiClient.get(`${ENV.API_BASE_URL}/stocks`);
             setStocks(response.data);
         } catch (error) {
             console.error('Error fetching stocks:', error);
@@ -78,7 +78,7 @@ export default function ManageStock() {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/stocks/${selectedStock.id}`);
+            await apiClient.delete(`${ENV.API_BASE_URL}/stocks/${selectedStock.id}`);
             fetchStocks();
             setIsDeleteModalOpen(false);
             setSelectedStock(null);

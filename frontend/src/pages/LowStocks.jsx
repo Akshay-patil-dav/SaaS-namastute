@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import './Products.css';
 import './inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import { 
     FileText, 
     FileSpreadsheet, 
@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useConfirm } from '../context/ConfirmContext';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/products`;
+const API_BASE = `${ENV.API_BASE_URL}/products`;
 
 // ── Colour mapping for category badges ────────────────────────────────────
 const categoryColors = {
@@ -51,7 +51,7 @@ const LowStocks = () => {
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await axios.get(API_BASE);
+            const res = await apiClient.get(API_BASE);
             setDbProducts(Array.isArray(res.data) ? res.data : []);
             setApiOnline(true);
         } catch {
@@ -111,7 +111,7 @@ const LowStocks = () => {
         if (!isConfirmed) return;
 
         try {
-            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
             setSelectedIds([]);
             fetchProducts();
         } catch (err) {
@@ -126,7 +126,7 @@ const LowStocks = () => {
         });
         if (!isConfirmed) return;
         try {
-            await axios.delete(`${API_BASE}/${id}`);
+            await apiClient.delete(`${API_BASE}/${id}`);
             fetchProducts();
         } catch (err) {
             console.error(err);

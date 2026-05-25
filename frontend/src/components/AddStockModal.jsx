@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Minus, Plus, Trash2 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-stock-modal.css';
 
 const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
@@ -43,7 +43,7 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
 
         const searchProducts = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/search?q=${searchQuery}`);
+                const response = await apiClient.get(`${ENV.API_BASE_URL}/products/search?q=${searchQuery}`);
                 setSearchResults(response.data);
                 setShowSuggestions(true);
             } catch (error) {
@@ -103,7 +103,7 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
                 }))
             };
 
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/stocks`, payload);
+            await apiClient.post(`${ENV.API_BASE_URL}/stocks`, payload);
             if (onSuccess) onSuccess();
             onClose();
         } catch (error) {

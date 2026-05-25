@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import './Products.css';
 import './inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import {
     FileText,
     FileSpreadsheet,
@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useConfirm } from '../context/ConfirmContext';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/products`;
+const API_BASE = `${ENV.API_BASE_URL}/products`;
 
 // ── Fallback mock data (shown when DB is empty or API is offline) ──────────
 const mockData = [];
@@ -67,7 +67,7 @@ const Products = () => {
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await axios.get(API_BASE);
+            const res = await apiClient.get(API_BASE);
             setDbProducts(res.data || []);
             setApiOnline(true);
         } catch {
@@ -128,7 +128,7 @@ const Products = () => {
         formData.append('file', importFile);
 
         try {
-            const res = await axios.post(`${API_BASE}/import`, formData, {
+            const res = await apiClient.post(`${API_BASE}/import`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -195,7 +195,7 @@ const Products = () => {
         if (!isConfirmed) return;
 
         try {
-            await axios.delete(`${API_BASE}/${id}`);
+            await apiClient.delete(`${API_BASE}/${id}`);
             setDbProducts(prev => prev.filter(p => p.id !== id));
             showToast('success', 'Product deleted successfully.');
         } catch {
@@ -212,7 +212,7 @@ const Products = () => {
         if (!isConfirmed) return;
 
         try {
-            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
             showToast('success', `${selectedIds.length} products deleted successfully.`);
             setSelectedIds([]);
             fetchProducts();

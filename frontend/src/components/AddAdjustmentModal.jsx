@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Minus, Plus, Trash2 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-adjustment-modal.css';
 
 const AddAdjustmentModal = ({ isOpen, onClose, onSuccess, initialData = null }) => {
@@ -76,7 +76,7 @@ const AddAdjustmentModal = ({ isOpen, onClose, onSuccess, initialData = null }) 
 
         const searchProducts = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/search?q=${searchQuery}`);
+                const response = await apiClient.get(`${ENV.API_BASE_URL}/products/search?q=${searchQuery}`);
                 setSearchResults(response.data);
                 setShowSuggestions(true);
             } catch (error) {

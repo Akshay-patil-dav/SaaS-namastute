@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { X, Loader } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-sales-modal.css';
 import './add-category-modal.css';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/categories`;
+const API_BASE = `${ENV.API_BASE_URL}/categories`;
 
 const AddCategoryModal = ({ isOpen, onClose, onCategoryAdded, categoryData }) => {
     const [categoryName, setCategoryName] = useState('');
@@ -37,13 +37,13 @@ const AddCategoryModal = ({ isOpen, onClose, onCategoryAdded, categoryData }) =>
         
         try {
             if (isEditMode) {
-                await axios.put(`${API_BASE}/${categoryData.id}`, {
+                await apiClient.put(`${API_BASE}/${categoryData.id}`, {
                     name: categoryName,
                     slug: categorySlug,
                     status: status
                 });
             } else {
-                await axios.post(API_BASE, {
+                await apiClient.post(API_BASE, {
                     name: categoryName,
                     slug: categorySlug,
                     status: status

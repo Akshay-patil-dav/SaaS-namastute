@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import { API } from '../api/config';
+import apiClient, { API } from '../api/config';
+
 
 const AuthContext = createContext(null);
 
@@ -35,10 +35,8 @@ export const AuthProvider = ({ children }) => {
                 setUser(parsed.user);
                 setToken(parsed.token);
 
-                // Re-attach token to axios default headers
-                if (parsed.token) {
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${parsed.token}`;
-                }
+                // Token is picked up automatically by apiClient's request interceptor
+                // (reads from localStorage on every request — no manual header needed)
             }
         } catch {
             localStorage.removeItem(STORAGE_KEY);
@@ -56,7 +54,7 @@ export const AuthProvider = ({ children }) => {
         const userData = { email, name: fullName ?? email, role, roles };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: jwtToken, user: userData }));
-        axios.defaults.headers.common['Authorization'] = `Bearer ${jwtToken}`;
+        // No need to set axios.defaults — apiClient interceptor reads from localStorage on every request
         setToken(jwtToken);
         setUser(userData);
 
@@ -69,7 +67,7 @@ export const AuthProvider = ({ children }) => {
      */
     const login = async ({ email, password }) => {
         try {
-            const res = await axios.post(`${AUTH_API}/login`, { email, password });
+            const res = await apiClient.post(`${AUTH_API}/login`, { email, password });
             const { token: jwt, email: userEmail, roles, fullName } = res.data;
             const { role } = _persist(jwt, userEmail, roles, fullName);
             return { success: true, role };
@@ -88,7 +86,7 @@ export const AuthProvider = ({ children }) => {
      */
     const register = async ({ fullName, email, password }) => {
         try {
-            const res = await axios.post(`${AUTH_API}/register`, { fullName, email, password });
+            const res = await apiClient.post(`${AUTH_API}/register`, { fullName, email, password });
             const { token: jwt, email: userEmail, roles } = res.data;
             const { role } = _persist(jwt, userEmail, roles, fullName);
             return { success: true, role };
@@ -103,7 +101,6 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         localStorage.removeItem(STORAGE_KEY);
-        delete axios.defaults.headers.common['Authorization'];
         setToken(null);
         setUser(null);
     };

@@ -92,21 +92,28 @@ public class SecurityConfig {
         //
         //  backend/.env:
         //    FRONTEND_URL=http://localhost:5173        ← your main allowed origin
-        //    CORS_EXTRA_ORIGINS=http://localhost:5174,http://localhost:3000
+        //    CORS_EXTRA_ORIGINS=http://localhost:5174,https://saa-s-namastute.vercel.app
         //
-        // Parse comma-separated extra origins from env
         List<String> origins = new java.util.ArrayList<>();
-        origins.add(frontendUrl);                      // FRONTEND_URL from backend/.env
+
+        // Strip trailing slash so "http://localhost:5173/" and "http://localhost:5173"
+        // both resolve to the same origin, preventing subtle CORS mismatches.
+        String primary = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
+        origins.add(primary);
+
         if (corsExtraOrigins != null && !corsExtraOrigins.isBlank()) {
             for (String o : corsExtraOrigins.split(",")) {
                 String trimmed = o.trim();
-                if (!trimmed.isEmpty()) origins.add(trimmed);
+                if (trimmed.endsWith("/")) trimmed = trimmed.substring(0, trimmed.length() - 1);
+                if (!trimmed.isEmpty() && !origins.contains(trimmed)) origins.add(trimmed);
             }
         }
         configuration.setAllowedOrigins(origins);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-Requested-With"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // cache preflight for 1 hour
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

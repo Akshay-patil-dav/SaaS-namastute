@@ -1,3 +1,4 @@
+﻿import { ENV } from '@/api/config';
 import { createContext, useContext, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 
@@ -46,7 +47,7 @@ export const RealtimeProvider = ({ children }) => {
 
         // Connect to SSE endpoint with token in query param (EventSource doesn't support custom headers)
         const connectSSE = () => {
-            const eventSource = new EventSource(`${import.meta.env.VITE_API_BASE_URL}/builder/notifications/stream?token=${encodeURIComponent(token)}`);
+            const eventSource = new EventSource(`${ENV.API_BASE_URL}/builder/notifications/stream?token=${encodeURIComponent(token)}`);
 
             eventSource.onopen = () => {
                 console.log('SSE connection established');

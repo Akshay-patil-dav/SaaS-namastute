@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, UploadCloud } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './import-transfer-modal.css';
 
 // Combined list of all possible warehouses
@@ -77,7 +77,7 @@ const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
             formDataPayload.append('shipping', formData.shipping);
             formDataPayload.append('description', formData.description);
 
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/transfers/import`, formDataPayload, {
+            await apiClient.post(`${ENV.API_BASE_URL}/transfers/import`, formDataPayload, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 

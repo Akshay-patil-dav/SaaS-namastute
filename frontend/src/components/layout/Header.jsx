@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Moon, Bell, Grid, Maximize, Settings, ChevronDown, Menu, Check, X, Folder, Clock, Users, User, LogOut, Zap, Building } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 
 export default function Header({ onMenuClick }) {
     const { user, isAdmin } = useAuth();
@@ -23,7 +23,7 @@ export default function Header({ onMenuClick }) {
 
     const fetchNotifications = useCallback(() => {
         setNotifLoading(true);
-        axios.get(`${import.meta.env.VITE_API_BASE_URL}/builder/notifications`)
+        apiClient.get(`${ENV.API_BASE_URL}/builder/notifications`)
         .then(res => setNotifications(res.data || []))
         .catch(() => {})
         .finally(() => setNotifLoading(false));
@@ -36,7 +36,7 @@ export default function Header({ onMenuClick }) {
         fetchNotifications();
 
         // 2. SSE stream — Open access (no token)
-        const url = `${import.meta.env.VITE_API_BASE_URL}/builder/notifications/stream`;
+        const url = `${ENV.API_BASE_URL}/builder/notifications/stream`;
         const es = new EventSource(url);
 
         es.addEventListener('invitation', (e) => {
@@ -81,7 +81,7 @@ export default function Header({ onMenuClick }) {
     const handleAccept = async (notif) => {
         setProcessingId(notif.id);
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/builder/notifications/${notif.id}/accept`, {});
+            await apiClient.post(`${ENV.API_BASE_URL}/builder/notifications/${notif.id}/accept`, {});
             setNotifications(prev => prev.filter(n => n.id !== notif.id));
             // Refresh sidebar so the shared folder appears immediately
             if (triggerRefresh) triggerRefresh();
@@ -95,7 +95,7 @@ export default function Header({ onMenuClick }) {
     const handleReject = async (notif) => {
         setProcessingId(notif.id);
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/builder/notifications/${notif.id}/reject`, {});
+            await apiClient.post(`${ENV.API_BASE_URL}/builder/notifications/${notif.id}/reject`, {});
             setNotifications(prev => prev.filter(n => n.id !== notif.id));
         } catch (err) {
             alert('Failed to reject invitation');

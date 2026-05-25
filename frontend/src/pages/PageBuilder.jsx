@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRealtime } from '../context/RealtimeContext';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import {
     Type, Image as ImageIcon, Layout as LayoutIcon,
     CreditCard, Move, Trash2, Save, GripVertical, FileText, Loader2,
     Table, BarChart, Activity, Calendar, Search, Square
 } from 'lucide-react';
 
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}/builder`;
+const API_URL = `${ENV.API_BASE_URL}/builder`;
 
 // Drag item types
 const ItemTypes = {
@@ -174,7 +174,7 @@ function PageBuilderContent() {
         setLoadingData(true);
 
         // Fetch the workspace purely to extract the page's current name for the header
-        axios.get(`${API_URL}/data`, axiosConfig)
+        apiClient.get(`${API_URL}/data`, axiosConfig)
             .then(res => {
                 const pages = res.data.pages || [];
                 const found = pages.find(p => p.id === pageId);
@@ -183,7 +183,7 @@ function PageBuilderContent() {
             .catch(err => console.error("Error fetching page name", err));
 
         // Fetch the layout configuration blocks!
-        axios.get(`${API_URL}/pages/${pageId}/blocks`, axiosConfig)
+        apiClient.get(`${API_URL}/pages/${pageId}/blocks`, axiosConfig)
             .then(res => {
                 setCanvasBlocks(res.data || []);
             })
@@ -235,7 +235,7 @@ function PageBuilderContent() {
 
         // Debounce save for 1 second
         autoSaveTimeoutRef.current = setTimeout(() => {
-            axios.put(`${API_URL}/pages/${pageId}/blocks`, blocks, axiosConfig)
+            apiClient.put(`${API_URL}/pages/${pageId}/blocks`, blocks, axiosConfig)
                 .then(() => {
                     setAutoSaveStatus('Saved');
                     setTimeout(() => setAutoSaveStatus(''), 2000);
@@ -327,7 +327,7 @@ function PageBuilderContent() {
         }
 
         setIsSaving(true);
-        axios.put(`${API_URL}/pages/${pageId}/blocks`, canvasBlocks, axiosConfig)
+        apiClient.put(`${API_URL}/pages/${pageId}/blocks`, canvasBlocks, axiosConfig)
             .then(() => {
                 setAutoSaveStatus('Saved!');
                 setTimeout(() => setAutoSaveStatus(''), 2000);

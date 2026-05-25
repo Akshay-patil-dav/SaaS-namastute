@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+﻿import React, { useState, useEffect, useCallback } from 'react';
+import apiClient, { API, ENV } from '@/api/config';
 import './inventory-pages-custom.css';
 import { 
     FileText, 
@@ -23,7 +23,7 @@ import {
 import AddSubCategoryModal from '../components/AddSubCategoryModal';
 import { useConfirm } from '../context/ConfirmContext';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/subcategories`;
+const API_BASE = `${ENV.API_BASE_URL}/subcategories`;
 
 const SubCategory = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +39,7 @@ const SubCategory = () => {
     const fetchSubCategories = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await axios.get(API_BASE);
+            const response = await apiClient.get(API_BASE);
             setData(Array.isArray(response.data) ? response.data : []);
         } catch (err) {
             console.error('Error fetching sub categories:', err);
@@ -94,7 +94,7 @@ const SubCategory = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
             showToast('success', `${selectedIds.length} sub-categories deleted successfully`);
             fetchSubCategories();
             setSelectedIds([]);
@@ -113,7 +113,7 @@ const SubCategory = () => {
         if (!isConfirmed) return;
 
         try {
-            await axios.delete(`${API_BASE}/${id}`);
+            await apiClient.delete(`${API_BASE}/${id}`);
             showToast('success', 'Sub-category deleted successfully');
             fetchSubCategories();
         } catch (err) {

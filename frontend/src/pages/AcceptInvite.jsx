@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
@@ -14,7 +14,7 @@ export default function AcceptInvite() {
     useEffect(() => {
         if (!authToken) return;
 
-        axios.post(`${import.meta.env.VITE_API_BASE_URL}/builder/invite/accept/${token}`, {}, {
+        apiClient.post(`${ENV.API_BASE_URL}/builder/invite/accept/${token}`, {}, {
             headers: { Authorization: `Bearer ${authToken}` }
         })
         .then(() => {

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useConfirm } from '../context/ConfirmContext';
 import {
     Search, FileText, Download, RotateCcw,
     ChevronUp, Plus, ChevronLeft, ChevronRight,
     Eye, Edit, Trash2, AlertCircle, Receipt,
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './online-orders.css';
 import './inventory-pages-custom.css';
 import AddPosModal        from '../components/AddPosModal';
@@ -14,7 +14,7 @@ import ViewSalesModal     from '../components/ViewSalesModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import InvoiceModal       from '../components/InvoiceModal';
 
-const BASE_URL     = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL     = ENV.API_BASE_URL;
 const ROWS_OPTIONS = [10, 25, 50];
 const STATUSES     = ['Completed', 'Pending', 'Cancelled'];
 const PAYMENTS     = ['Paid', 'Unpaid', 'Overdue'];
@@ -52,7 +52,7 @@ export default function PosOrders() {
         setLoading(true);
         setFetchError('');
         try {
-            const res = await axios.get(`${BASE_URL}/pos-sales`);
+            const res = await apiClient.get(`${BASE_URL}/pos-sales`);
             setOrders(Array.isArray(res.data) ? res.data : []);
         } catch {
             setFetchError('Could not load POS orders. Check backend is running.');
@@ -99,7 +99,7 @@ export default function PosOrders() {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${BASE_URL}/pos-sales/delete-bulk`, { ids: selectedRows });
+            await apiClient.post(`${BASE_URL}/pos-sales/delete-bulk`, { ids: selectedRows });
             setSelectedRows([]);
             fetchOrders();
         } catch (err) {
@@ -125,7 +125,7 @@ export default function PosOrders() {
         if (!activeOrder) return;
         setDeleting(true);
         try {
-            await axios.delete(`${BASE_URL}/pos-sales/${activeOrder.id}`);
+            await apiClient.delete(`${BASE_URL}/pos-sales/${activeOrder.id}`);
             setDeleteOpen(false);
             setActiveOrder(null);
             fetchOrders();
