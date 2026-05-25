@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Loader, Ruler, AlertCircle } from 'lucide-react';
+import { X, Loader } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
-import './modal-common.css';
+import './add-sales-modal.css';
 import './add-unit-modal.css';
 
 const API_BASE = `${ENV.API_BASE_URL}/units`;
@@ -60,23 +60,13 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, unitData }) => {
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content add-unit-modal">
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content add-sales-modal add-unit-modal" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="modal-header">
-                    <div className="header-title-wrap">
-                        <div className="header-icon">
-                            <Ruler size={18} />
-                        </div>
-                        <div>
-                            <h4>{isEditMode ? 'Edit Unit' : 'Add Unit'}</h4>
-                            <span className="modal-subtitle">
-                                {isEditMode ? 'Update measurement unit' : 'Add a new measurement unit'}
-                            </span>
-                        </div>
-                    </div>
-                    <button className="close-btn" type="button" onClick={onClose} title="Close">
-                        <X size={16} />
+                    <h4>{isEditMode ? 'Edit Unit' : 'Add Unit'}</h4>
+                    <button className="close-btn-red" type="button" onClick={onClose}>
+                        <X size={18} />
                     </button>
                 </div>
 
@@ -84,64 +74,52 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, unitData }) => {
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
                         {error && (
-                            <div className="alert-error-custom">
-                                <AlertCircle size={16} />
+                            <div className="alert alert-danger" style={{ fontSize: '13px', padding: '10px', marginBottom: '15px', borderRadius: '6px' }}>
                                 {error}
                             </div>
                         )}
                         
-                        <div className="form-grid form-grid-1">
-                            <div className="form-group">
-                                <label>Unit Name <span className="required">*</span></label>
-                                <input 
-                                    type="text" 
-                                    className="form-input-custom"
-                                    placeholder="e.g. Kilogram, Litre, Piece"
-                                    value={unitName}
-                                    onChange={(e) => setUnitName(e.target.value)}
-                                    required
-                                    autoFocus
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Short Name <span className="required">*</span></label>
-                                <input 
-                                    type="text" 
-                                    className="form-input-custom"
-                                    placeholder="e.g. kg, L, pcs"
-                                    value={shortName}
-                                    onChange={(e) => setShortName(e.target.value)}
-                                    required
-                                />
-                                <p className="input-help-text">Abbreviated label shown on invoices and POS.</p>
-                            </div>
+                        <div className="form-group mb-3">
+                            <label>Unit <span className="required" style={{color: 'red'}}>*</span></label>
+                            <input 
+                                type="text" 
+                                className="form-input" 
+                                value={unitName}
+                                onChange={(e) => setUnitName(e.target.value)}
+                                required
+                            />
                         </div>
 
-                        <div className="status-toggle-row">
-                            <div className="status-label">
-                                <strong>Status</strong>
-                                <span>Active units can be assigned to products</span>
-                            </div>
-                            <label className="switch-custom">
+                        <div className="form-group mb-3">
+                            <label>Short Name <span className="required" style={{color: 'red'}}>*</span></label>
+                            <input 
+                                type="text" 
+                                className="form-input" 
+                                value={shortName}
+                                onChange={(e) => setShortName(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="status-toggle-container">
+                            <label>Status</label>
+                            <label className="switch">
                                 <input 
                                     type="checkbox" 
                                     checked={status}
                                     onChange={(e) => setStatus(e.target.checked)}
                                 />
-                                <span className="slider-custom"></span>
+                                <span className="slider"></span>
                             </label>
                         </div>
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="modal-footer-custom">
-                        <button type="button" className="btn-cancel-custom" onClick={onClose} disabled={isSubmitting}>
-                            Cancel
-                        </button>
-                        <button type="submit" className="btn-submit-custom" disabled={isSubmitting}>
+                    <div className="modal-footer">
+                        <button type="button" className="btn-cancel-dark" onClick={onClose} disabled={isSubmitting}>Cancel</button>
+                        <button type="submit" className="btn-add-unit" disabled={isSubmitting}>
                             {isSubmitting ? (
-                                <><Loader size={15} className="spin" /> {isEditMode ? 'Updating...' : 'Adding...'}</>
+                                <><Loader size={16} className="spin" style={{marginRight: '8px'}} /> {isEditMode ? 'Updating...' : 'Adding...'}</>
                             ) : (
                                 isEditMode ? 'Update Unit' : 'Add Unit'
                             )}

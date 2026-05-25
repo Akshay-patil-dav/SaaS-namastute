@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Loader, Upload, Image as ImageIcon, AlertCircle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
-import './modal-common.css';
 import './add-sub-category-modal.css';
 
 const API_BASE = `${ENV.API_BASE_URL}/subcategories`;
@@ -114,8 +113,8 @@ const AddSubCategoryModal = ({ isOpen, onClose, onSubCategoryAdded, subCategoryD
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content add-sub-category-modal">
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content add-sub-category-modal" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="modal-header">
                     <div className="header-title-wrap">
@@ -123,9 +122,8 @@ const AddSubCategoryModal = ({ isOpen, onClose, onSubCategoryAdded, subCategoryD
                             <Plus size={20} />
                         </div>
                         <h4>{isEditMode ? 'Edit Sub Category' : 'Add Sub Category'}</h4>
-                        <span className="modal-subtitle">{isEditMode ? 'Update sub-category details' : 'Create a new product sub-category'}</span>
                     </div>
-                    <button className="close-btn" onClick={onClose}>
+                    <button className="close-btn" onClick={onClose} type="button">
                         <X size={20} />
                     </button>
                 </div>
