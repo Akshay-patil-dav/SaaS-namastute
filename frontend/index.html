@@ -31,11 +31,240 @@
     <!-- Performance: DNS prefetch & preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://springboot-app-pb1v.onrender.com" />
-    <link rel="dns-prefetch" href="https://springboot-app-pb1v.onrender.com" />
+    <link rel="preconnect" href="http://localhost:3000" />
+    <link rel="dns-prefetch" href="http://localhost:3000" />
+  <style>
+    /* ===== BRAND THEME TOKENS ===== */
+    /* Primary : #ff902f  (Namastute orange)                    */
+    /* Light bg : #f8f9fc → #ffffff  (Dashboard / Login theme)  */
+    /* Dark text: #1e293b  (from Dashboard headings)            */
+
+    /* ===== LOADING SCREEN ===== */
+    #app-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      /* White/light bg matching the app's #f8f9fc dashboard background */
+      background: #f8f9fc;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    #app-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Soft orange glow — visible on white bg */
+    #app-loader::before {
+      content: '';
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,144,47,0.10) 0%, rgba(255,144,47,0.04) 50%, transparent 70%);
+      animation: pulse-glow 2.4s ease-in-out infinite;
+    }
+
+    /* Subtle orange border ring */
+    #app-loader::after {
+      content: '';
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,144,47,0.14);
+      animation: ring-expand 2.4s ease-in-out infinite 0.6s;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1);    opacity: 0.8; }
+      50%       { transform: scale(1.18); opacity: 1;   }
+    }
+
+    @keyframes ring-expand {
+      0%   { transform: scale(0.85); opacity: 0.7; }
+      50%  { transform: scale(1.15); opacity: 0.2; }
+      100% { transform: scale(0.85); opacity: 0.7; }
+    }
+
+    /* ---- Logo bounce ---- */
+    .loader-logo-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      z-index: 1;
+    }
+
+    .loader-logo {
+      width: 90px;
+      height: 90px;
+      border-radius: 22px;
+      object-fit: contain;
+      animation: logo-bounce 0.85s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite alternate;
+      /* Softer orange glow on white — no dark shadow */
+      filter: drop-shadow(0 0 18px rgba(255,144,47,0.45))
+              drop-shadow(0 6px 16px rgba(255,144,47,0.18));
+    }
+
+    @keyframes logo-bounce {
+      0%   { transform: translateY(0px)   scale(1);    }
+      100% { transform: translateY(-22px) scale(1.07); }
+    }
+
+    /* Shadow under logo — orange on light bg */
+    .loader-shadow {
+      width: 60px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255,144,47,0.30) 0%, transparent 70%);
+      margin-top: 6px;
+      animation: shadow-squish 0.85s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite alternate;
+    }
+
+    @keyframes shadow-squish {
+      0%   { transform: scaleX(1)    scaleY(1);   opacity: 0.6; }
+      100% { transform: scaleX(0.5) scaleY(0.4); opacity: 0.15; }
+    }
+
+    /* ---- Brand name — dark navy text with orange shimmer ---- */
+    .loader-brand {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      /* Orange shimmer on white — starts and ends as the dark brand color */
+      background: linear-gradient(90deg, #1e293b, #ff902f, #ff7a18, #ff902f, #1e293b);
+      background-size: 280% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer-text 2.4s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes shimmer-text {
+      0%   { background-position: 0%   center; }
+      100% { background-position: 280% center; }
+    }
+
+    /* ---- Loading bar — orange on light gray track ---- */
+    .loader-bar-track {
+      width: 220px;
+      height: 4px;
+      border-radius: 99px;
+      /* Light gray track — matches the app's border/divider color */
+      background: #e2e8f0;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .loader-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #ff7a18, #ff902f, #ffb86c, #ff902f, #ff7a18);
+      background-size: 250% auto;
+      animation: bar-slide 1.6s ease-in-out infinite, shimmer-bar 2s linear infinite;
+    }
+
+    @keyframes bar-slide {
+      0%   { transform: translateX(-100%); }
+      50%  { transform: translateX(0%);    }
+      100% { transform: translateX(100%);  }
+    }
+
+    @keyframes shimmer-bar {
+      0%   { background-position: 0%   center; }
+      100% { background-position: 250% center; }
+    }
+
+    /* ---- Loading text + dots — muted slate on white ---- */
+    .loader-text {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      /* Slate gray — matches Dashboard's #94a3b8 subtitle color */
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      z-index: 1;
+    }
+
+    .loader-dot {
+      display: inline-block;
+      animation: dot-blink 1.4s ease-in-out infinite;
+      color: #ff902f;
+    }
+    .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-blink {
+      0%, 80%, 100% { opacity: 0.25; transform: translateY(0);   }
+      40%           { opacity: 1;    transform: translateY(-4px); }
+    }
+  </style>
   </head>
   <body>
+    <!-- ===== LOADING SCREEN ===== -->
+    <div id="app-loader">
+      <div class="loader-logo-wrap">
+        <img class="loader-logo" src="/logo.png" alt="Namastute Logo" />
+        <div class="loader-shadow"></div>
+      </div>
+      <div class="loader-brand">Namastute</div>
+      <div class="loader-bar-track">
+        <div class="loader-bar-fill"></div>
+      </div>
+      <div class="loader-text">
+        Loading
+        <span class="loader-dot">.</span>
+        <span class="loader-dot">.</span>
+        <span class="loader-dot">.</span>
+      </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      // Hide loader once React has mounted
+      (function () {
+        var loader = document.getElementById('app-loader');
+        var root   = document.getElementById('root');
+
+        // Observer: detect when React injects content into #root
+        var observer = new MutationObserver(function () {
+          if (root.children.length > 0) {
+            observer.disconnect();
+            // Small delay so the first frame is painted
+            setTimeout(function () {
+              loader.classList.add('hidden');
+              // Remove from DOM after fade finishes
+              setTimeout(function () {
+                loader.remove();
+              }, 700);
+            }, 350);
+          }
+        });
+
+        observer.observe(root, { childList: true, subtree: false });
+
+        // Fallback: hide after 6 s even if observer didn't fire
+        setTimeout(function () {
+          loader.classList.add('hidden');
+          setTimeout(function () { loader.remove(); }, 700);
+        }, 6000);
+      })();
+    </script>
   </body>
 </html>

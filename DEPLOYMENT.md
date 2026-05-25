@@ -119,8 +119,8 @@ npm run dev
 ### Local `.env` for Frontend (`frontend/.env`)
 The `.env` already points to the production backend. For local backend testing, change:
 ```env
-VITE_API_BASE_URL=http://localhost:3000/api
-VITE_BACKEND_BASE_URL=http://localhost:3000
+VITE_API_BASE_URL=http://localhost:3000/api , https://springboot-app-pb1v.onrender.com/api
+VITE_BACKEND_BASE_URL=http://localhost:3000 , https://springboot-app-pb1v.onrender.com
 ```
 
 ---
