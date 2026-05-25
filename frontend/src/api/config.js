@@ -14,11 +14,11 @@ import axios from 'axios';
 
 // ── Raw env values ─────────────────────────────────────────────────────────
 export const ENV = {
-  /** e.g.  https://springboot-app-pb1v.onrender.com/api   or   https://xxxx.ngrok-free.app/api */
-  API_BASE_URL:      import.meta.env.VITE_API_BASE_URL      || 'https://springboot-app-pb1v.onrender.com/api',
+  /** e.g.  http://localhost:3000/api   or   https://xxxx.ngrok-free.app/api */
+  API_BASE_URL:      import.meta.env.VITE_API_BASE_URL      || 'http://localhost:3000/api' || 'https://springboot-app-pb1v.onrender.com/api' ,
 
-  /** e.g.  https://springboot-app-pb1v.onrender.com  (no trailing slash) */
-  BACKEND_BASE_URL:  import.meta.env.VITE_BACKEND_BASE_URL  || 'https://springboot-app-pb1v.onrender.com',
+  /** e.g.  http://localhost:3000  (no trailing slash) */
+  BACKEND_BASE_URL:  import.meta.env.VITE_BACKEND_BASE_URL  || 'http://localhost:3000' || 'https://springboot-app-pb1v.onrender.com',
 
   /** e.g.  https://saa-s-namastute.vercel.app */
   FRONTEND_URL:      import.meta.env.VITE_FRONTEND_URL      || 'https://saa-s-namastute.vercel.app',
