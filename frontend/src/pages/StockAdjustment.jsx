@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useConfirm } from '../context/ConfirmContext';
 import { 
     Search, 
@@ -29,7 +29,7 @@ const initialAdjustmentData = [
     { id: 10, warehouse: 'Fulfillment Hub', store: 'Travel Mart', product: 'Borealis Backpack', date: '10 Sep 2024', person: 'Charlotte Klotz', qty: 550, productImg: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlotte' },
 ];
 
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import AddAdjustmentModal from '../components/AddAdjustmentModal';
 import ViewAdjustmentModal from '../components/ViewAdjustmentModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
@@ -50,7 +50,7 @@ export default function StockAdjustment() {
     const fetchStocks = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/stocks`);
+            const response = await apiClient.get(`${ENV.API_BASE_URL}/stocks`);
             setData(response.data.map(item => ({
                 id: item.id,
                 warehouse: item.warehouse || '',
@@ -97,7 +97,7 @@ export default function StockAdjustment() {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/stocks/delete-bulk`, { ids: selectedRows });
+            await apiClient.post(`${ENV.API_BASE_URL}/stocks/delete-bulk`, { ids: selectedRows });
             setSelectedRows([]);
             fetchStocks();
         } catch (err) {
@@ -144,7 +144,7 @@ export default function StockAdjustment() {
                     productCategory: product?.category,
                     productImg: product?.img
                 };
-                await axios.put(`${import.meta.env.VITE_API_BASE_URL}/stocks/${selectedAdjustment.id}`, payload);
+                await apiClient.put(`${ENV.API_BASE_URL}/stocks/${selectedAdjustment.id}`, payload);
             } else {
                 // Add new
                 const payload = {
@@ -158,7 +158,7 @@ export default function StockAdjustment() {
                         productImg: p.img
                     }))
                 };
-                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/stocks`, payload);
+                await apiClient.post(`${ENV.API_BASE_URL}/stocks`, payload);
             }
             fetchStocks();
         } catch (error) {
@@ -175,7 +175,7 @@ export default function StockAdjustment() {
     const handleConfirmDelete = async () => {
         if (!selectedAdjustment) return;
         try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/stocks/${selectedAdjustment.id}`);
+            await apiClient.delete(`${ENV.API_BASE_URL}/stocks/${selectedAdjustment.id}`);
             fetchStocks();
             setIsDeleteModalOpen(false);
             setSelectedAdjustment(null);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import './Products.css';
 import './inventory-pages-custom.css';
 import { 
@@ -12,11 +12,11 @@ import {
     Pencil,
     Trash2
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import AddBrandModal from '../components/AddBrandModal';
 import { useConfirm } from '../context/ConfirmContext';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/brands`;
+const API_BASE = `${ENV.API_BASE_URL}/brands`;
 
 const Brands = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -28,7 +28,7 @@ const Brands = () => {
 
     const fetchBrands = async () => {
         try {
-            const res = await axios.get(API_BASE);
+            const res = await apiClient.get(API_BASE);
             if (res.data && Array.isArray(res.data)) {
                 setData(res.data);
             }
@@ -79,7 +79,7 @@ const Brands = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
             setSelectedIds([]);
             fetchBrands();
         } catch (err) {
@@ -95,7 +95,7 @@ const Brands = () => {
         });
         if (!isConfirmed) return;
         try {
-            await axios.delete(`${API_BASE}/${id}`);
+            await apiClient.delete(`${API_BASE}/${id}`);
             fetchBrands();
         } catch (err) {
             console.error(err);

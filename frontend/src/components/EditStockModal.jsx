@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, Minus, Plus, Trash2, Search } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import './add-stock-modal.css';
 
@@ -59,7 +59,7 @@ const EditStockModal = ({ isOpen, onClose, stock, onSuccess }) => {
 
         const searchProducts = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/search?q=${searchQuery}`);
+                const response = await apiClient.get(`${ENV.API_BASE_URL}/products/search?q=${searchQuery}`);
                 setSearchResults(response.data);
                 setShowSuggestions(true);
             } catch (error) {
@@ -103,7 +103,7 @@ const EditStockModal = ({ isOpen, onClose, stock, onSuccess }) => {
                 productImg: activeProduct.productImg
             };
 
-            await axios.put(`${import.meta.env.VITE_API_BASE_URL}/stocks/${stock.id}`, payload);
+            await apiClient.put(`${ENV.API_BASE_URL}/stocks/${stock.id}`, payload);
             if (onSuccess) onSuccess();
             onClose();
         } catch (error) {
@@ -122,7 +122,7 @@ const EditStockModal = ({ isOpen, onClose, stock, onSuccess }) => {
         setShowDeleteConfirm(false);
         setIsSubmitting(true);
         try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/stocks/${stock.id}`);
+            await apiClient.delete(`${ENV.API_BASE_URL}/stocks/${stock.id}`);
             if (onSuccess) onSuccess();
             onClose();
         } catch (error) {

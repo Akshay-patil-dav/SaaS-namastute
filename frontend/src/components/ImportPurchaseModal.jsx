@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { X, UploadCloud, Plus, ChevronDown, Bold, Italic, Underline, Link as LinkIcon, ListOrdered, List, Type } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './import-transfer-modal.css'; // Reusing this CSS as it has the same base layout
 import '../pages/CreateProduct.css'; // For the rich text toolbar styles used in Description
 
@@ -77,7 +77,7 @@ const ImportPurchaseModal = ({ isOpen, onClose, onSuccess }) => {
             formDataPayload.append('notes', formData.description);
 
             // Assuming a backend endpoint exists, if not, this will gracefully fail with alert
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchases/import`, formDataPayload, {
+            await apiClient.post(`${ENV.API_BASE_URL}/purchases/import`, formDataPayload, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 

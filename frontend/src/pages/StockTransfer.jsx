@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useConfirm } from '../context/ConfirmContext';
 import { 
     Search, 
@@ -17,7 +17,7 @@ import {
     Package,
     AlertCircle
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './stock-transfer.css';
 import './inventory-pages-custom.css';
 import AddTransferModal from '../components/AddTransferModal';
@@ -53,13 +53,13 @@ const StockTransfer = () => {
     const [editModalData, setEditModalData] = useState(null);
     const [isViewMode, setIsViewMode] = useState(false);
 
-    const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/transfers`;
+    const API_BASE = `${ENV.API_BASE_URL}/transfers`;
 
     const fetchTransfers = useCallback(async () => {
         setIsRefreshing(true);
         if (loading) setLoading(true);
         try {
-            const response = await axios.get(API_BASE);
+            const response = await apiClient.get(API_BASE);
             setTransfers(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching transfers:', error);
@@ -137,7 +137,7 @@ const StockTransfer = () => {
         if (!transferToDelete) return;
         setIsDeleting(true);
         try {
-            await axios.delete(`${API_BASE}/${transferToDelete}`);
+            await apiClient.delete(`${API_BASE}/${transferToDelete}`);
             fetchTransfers();
             setIsDeleteModalOpen(false);
             setTransferToDelete(null);
@@ -173,7 +173,7 @@ const StockTransfer = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/transfers/delete-bulk`, { ids: selectedRows });
+            await apiClient.post(`${ENV.API_BASE_URL}/transfers/delete-bulk`, { ids: selectedRows });
             setSelectedRows([]);
             fetchTransfers();
         } catch (err) {

@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Trash2, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-sales-modal.css';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = ENV.API_BASE_URL;
 
 const EditPosModal = ({ isOpen, order, onClose, onSuccess }) => {
     const [form, setForm]           = useState({});
@@ -54,7 +54,7 @@ const EditPosModal = ({ isOpen, order, onClose, onSuccess }) => {
         const id = setTimeout(async () => {
             try {
                 const url = searchQ.trim() ? `${BASE_URL}/products/search?q=${encodeURIComponent(searchQ)}` : `${BASE_URL}/products`;
-                const { data } = await axios.get(url);
+                const { data } = await apiClient.get(url);
                 setResults(Array.isArray(data) ? (searchQ.trim() ? data : data.slice(0, 10)) : []);
             } catch { setResults([]); }
         }, 280);
@@ -92,7 +92,7 @@ const EditPosModal = ({ isOpen, order, onClose, onSuccess }) => {
         if (!products.length) return setError('Add at least one product.');
         setError(''); setSubmitting(true);
         try {
-            const { data: dbProducts } = await axios.get(`${BASE_URL}/products`);
+            const { data: dbProducts } = await apiClient.get(`${BASE_URL}/products`);
             const stockMap = {};
             if (Array.isArray(dbProducts)) {
                 dbProducts.forEach(p => {
@@ -115,7 +115,7 @@ const EditPosModal = ({ isOpen, order, onClose, onSuccess }) => {
                 return;
             }
 
-            await axios.put(`${BASE_URL}/pos-sales/${order.id}`, {
+            await apiClient.put(`${BASE_URL}/pos-sales/${order.id}`, {
                 ...form, orderTax:+form.orderTax, discount:+form.discount,
                 shipping:+form.shipping, paidAmount:+form.paidAmount, products
             });

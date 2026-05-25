@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { X, Loader } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-sales-modal.css';
 import './add-unit-modal.css';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/units`;
+const API_BASE = `${ENV.API_BASE_URL}/units`;
 
 const AddUnitModal = ({ isOpen, onClose, onUnitAdded, unitData }) => {
     const [unitName, setUnitName] = useState('');
@@ -43,9 +43,9 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, unitData }) => {
             };
 
             if (isEditMode) {
-                await axios.put(`${API_BASE}/${unitData.id}`, payload);
+                await apiClient.put(`${API_BASE}/${unitData.id}`, payload);
             } else {
-                await axios.post(API_BASE, payload);
+                await apiClient.post(API_BASE, payload);
             }
             
             if (onUnitAdded) onUnitAdded();

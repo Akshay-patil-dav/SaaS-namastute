@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import './CreateProduct.css'; // Reusing common form styles
 import './AddPurchase.css';    // Specific styles for Purchase table
 import { 
@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 
 const EditPurchase = () => {
     const { id } = useParams();
@@ -58,7 +58,7 @@ const EditPurchase = () => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`);
+                const res = await apiClient.get(`${ENV.API_BASE_URL}/products`);
                 // Map DB fields to our UI needs
                 const mapped = res.data.map(p => ({
                     ...p,
@@ -83,7 +83,7 @@ const EditPurchase = () => {
         if (!id) return;
         const fetchPurchase = async () => {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchases/${id}`);
+                const res = await apiClient.get(`${ENV.API_BASE_URL}/purchases/${id}`);
                 const data = res.data;
                 setSupplier(data.supplier || '');
                 setDate(data.date || new Date().toISOString().split('T')[0]);
@@ -250,7 +250,7 @@ const EditPurchase = () => {
             notes: description
         };
 
-        axios.put(`${import.meta.env.VITE_API_BASE_URL}/purchases/${id}`, newPurchase)
+        apiClient.put(`${ENV.API_BASE_URL}/purchases/${id}`, newPurchase)
             .then(res => {
                 setToast({ type: 'success', message: 'Purchase saved successfully!' });
                 setIsSubmitting(false);

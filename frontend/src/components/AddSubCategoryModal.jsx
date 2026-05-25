@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Loader, Upload, Image as ImageIcon, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-sub-category-modal.css';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/subcategories`;
-const CATEGORIES_API = `${import.meta.env.VITE_API_BASE_URL}/categories`;
+const API_BASE = `${ENV.API_BASE_URL}/subcategories`;
+const CATEGORIES_API = `${ENV.API_BASE_URL}/categories`;
 
 const AddSubCategoryModal = ({ isOpen, onClose, onSubCategoryAdded, subCategoryData }) => {
     const fileInputRef = useRef(null);
@@ -53,7 +53,7 @@ const AddSubCategoryModal = ({ isOpen, onClose, onSubCategoryAdded, subCategoryD
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(CATEGORIES_API);
+            const response = await apiClient.get(CATEGORIES_API);
             setCategories(response.data);
         } catch (err) {
             console.error('Failed to fetch categories:', err);
@@ -98,9 +98,9 @@ const AddSubCategoryModal = ({ isOpen, onClose, onSubCategoryAdded, subCategoryD
         
         try {
             if (isEditMode) {
-                await axios.put(`${API_BASE}/${subCategoryData.id}`, formData);
+                await apiClient.put(`${API_BASE}/${subCategoryData.id}`, formData);
             } else {
-                await axios.post(API_BASE, formData);
+                await apiClient.post(API_BASE, formData);
             }
             
             if (onSubCategoryAdded) onSubCategoryAdded();

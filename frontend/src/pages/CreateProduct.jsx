@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import AddCategoryModal from '../components/AddCategoryModal';
 import './CreateProduct.css';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import {
     RefreshCw,
     ChevronUp,
@@ -26,7 +26,7 @@ import {
     Upload
 } from 'lucide-react';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/products`;
+const API_BASE = `${ENV.API_BASE_URL}/products`;
 
 // ── Initial form state ──────────────────────────────────────────────────────
 const initialForm = {
@@ -88,11 +88,11 @@ const CreateProduct = () => {
     const fetchInitialData = async () => {
         try {
             const [catRes, subRes, brandRes, unitRes, warrantyRes] = await Promise.all([
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/subcategories`),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/brands`),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/units`),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/warranties`)
+                apiClient.get(`${ENV.API_BASE_URL}/categories`),
+                apiClient.get(`${ENV.API_BASE_URL}/subcategories`),
+                apiClient.get(`${ENV.API_BASE_URL}/brands`),
+                apiClient.get(`${ENV.API_BASE_URL}/units`),
+                apiClient.get(`${ENV.API_BASE_URL}/warranties`)
             ]);
             setCategories(catRes.data || []);
             setSubCategories(subRes.data || []);
@@ -139,7 +139,7 @@ const CreateProduct = () => {
     const handleGenerateSku = async () => {
         setGeneratingSku(true);
         try {
-            const res = await axios.get(`${API_BASE}/generate-sku`);
+            const res = await apiClient.get(`${API_BASE}/generate-sku`);
             setForm(prev => ({ ...prev, sku: res.data.sku }));
         } catch {
             // fallback local
@@ -154,7 +154,7 @@ const CreateProduct = () => {
     const handleGenerateBarcode = async () => {
         setGeneratingBarcode(true);
         try {
-            const res = await axios.get(`${API_BASE}/generate-barcode`);
+            const res = await apiClient.get(`${API_BASE}/generate-barcode`);
             setForm(prev => ({ ...prev, itemBarcode: res.data.barcode }));
         } catch {
             const local = String(Math.floor(Math.random() * 9e12) + 1e12);
@@ -174,14 +174,14 @@ const CreateProduct = () => {
             const uploadPromises = files.map(async (file) => {
                 const formData = new FormData();
                 formData.append('file', file);
-                const res = await axios.post(
-                    `${import.meta.env.VITE_API_BASE_URL}/upload`,
+                const res = await apiClient.post(
+                    `${ENV.API_BASE_URL}/upload`,
                     formData,
                     { headers: { 'Content-Type': 'multipart/form-data' } }
                 );
                 // Backend returns { url: '/uploads/uuid.ext' }
                 return {
-                    url: `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${res.data.url}`,
+                    url: `${ENV.API_BASE_URL.replace('/api', '')}${res.data.url}`,
                     name: file.name,
                 };
             });
@@ -244,12 +244,12 @@ const CreateProduct = () => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const res = await axios.post(
-                `${import.meta.env.VITE_API_BASE_URL}/upload`,
+            const res = await apiClient.post(
+                `${ENV.API_BASE_URL}/upload`,
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             );
-            const url = `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${res.data.url}`;
+            const url = `${ENV.API_BASE_URL.replace('/api', '')}${res.data.url}`;
             updateVariantValue(tIdx, vIdx, 'image', url);
         } catch (err) {
             showToast('error', 'Image upload failed: ' + (err.response?.data?.error || err.message));
@@ -262,7 +262,7 @@ const CreateProduct = () => {
 
     const generateVtSku = async (tIdx, vIdx) => {
         try {
-            const res = await axios.get(`${API_BASE}/generate-sku`);
+            const res = await apiClient.get(`${API_BASE}/generate-sku`);
             updateVariantValue(tIdx, vIdx, 'sku', res.data.sku);
         } catch {
             updateVariantValue(tIdx, vIdx, 'sku', 'SKU-' + Math.random().toString(36).substring(2, 10).toUpperCase());
@@ -271,7 +271,7 @@ const CreateProduct = () => {
 
     const generateVtBarcode = async (tIdx, vIdx) => {
         try {
-            const res = await axios.get(`${API_BASE}/generate-barcode`);
+            const res = await apiClient.get(`${API_BASE}/generate-barcode`);
             updateVariantValue(tIdx, vIdx, 'barcode', res.data.barcode);
         } catch {
             updateVariantValue(tIdx, vIdx, 'barcode', String(Math.floor(Math.random() * 9e12) + 1e12));
@@ -343,7 +343,7 @@ const CreateProduct = () => {
                 })),
             };
 
-            await axios.post(API_BASE, payload);
+            await apiClient.post(API_BASE, payload);
             showToast('success', `✓ Product "${form.name}" saved to database!`);
             setTimeout(() => navigate('/products'), 1800);
         } catch (err) {

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import {
     Search, Plus, Minus, Trash2, UserPlus, ChevronDown, Check,
     Clock, ArrowLeft, CreditCard, Smartphone, Shield, AlertTriangle,
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import './POS.css';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = ENV.API_BASE_URL;
 
 // --- FALLBACK MOCK DATA ---
 const MOCK_PRODUCTS = [
@@ -215,7 +215,7 @@ export default function POS() {
             setLoadingProducts(true);
             try {
                 // Fetch products from API
-                const prodRes = await axios.get(`${BASE_URL}/products`);
+                const prodRes = await apiClient.get(`${BASE_URL}/products`);
                 let dbProds = Array.isArray(prodRes.data) ? prodRes.data : [];
                 const mappedDb = dbProds.map(p => ({
                     id: p.id,
@@ -435,7 +435,7 @@ export default function POS() {
                 products: formattedProducts
             };
 
-            const res = await axios.post(`${BASE_URL}/pos-sales`, payload);
+            const res = await apiClient.post(`${BASE_URL}/pos-sales`, payload);
             setRecentOrderDetails({
                 ...res.data,
                 referenceNo: res.data.referenceNo || `ORD-${Math.floor(100000 + Math.random() * 900000)}`,

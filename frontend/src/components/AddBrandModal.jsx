@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Loader, Upload, Image as ImageIcon, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-brand-modal.css';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/brands`;
+const API_BASE = `${ENV.API_BASE_URL}/brands`;
 
 const AddBrandModal = ({ isOpen, onClose, onBrandAdded, brandData }) => {
     const fileInputRef = useRef(null);
@@ -88,9 +88,9 @@ const AddBrandModal = ({ isOpen, onClose, onBrandAdded, brandData }) => {
             };
 
             if (isEditMode) {
-                await axios.put(`${API_BASE}/${brandData.id}`, payload);
+                await apiClient.put(`${API_BASE}/${brandData.id}`, payload);
             } else {
-                await axios.post(API_BASE, payload);
+                await apiClient.post(API_BASE, payload);
             }
             
             if (onBrandAdded) onBrandAdded();

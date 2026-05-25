@@ -12,11 +12,11 @@ import {
     Pencil,
     Trash2
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API } from '../api/config';
 import { useConfirm } from '../context/ConfirmContext';
 import AddUnitModal from '../components/AddUnitModal';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/units`;
+const API_BASE = API.UNITS;
 
 const Units = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -30,7 +30,7 @@ const Units = () => {
     const fetchUnits = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(API_BASE);
+            const res = await apiClient.get(API_BASE);
             if (res.data && Array.isArray(res.data)) {
                 setData(res.data);
             }
@@ -79,7 +79,7 @@ const Units = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
             setSelectedIds([]);
             fetchUnits();
         } catch (err) {
@@ -96,7 +96,7 @@ const Units = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.delete(`${API_BASE}/${id}`);
+            await apiClient.delete(`${API_BASE}/${id}`);
             fetchUnits();
         } catch (err) {
             console.error(err);

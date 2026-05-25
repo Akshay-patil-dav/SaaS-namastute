@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './inventory-pages-custom.css';
 
@@ -17,7 +17,7 @@ import {
     Upload,
     MoreVertical
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import ViewPurchaseModal from '../components/ViewPurchaseModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import ImportPurchaseModal from '../components/ImportPurchaseModal';
@@ -57,7 +57,7 @@ const Purchases = () => {
     const fetchPurchases = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchases`);
+            const res = await apiClient.get(`${ENV.API_BASE_URL}/purchases`);
             // Format dates
             const formatted = res.data.map(p => ({
                 ...p,
@@ -79,7 +79,7 @@ const Purchases = () => {
         if (!itemToDelete) return;
         setIsDeleting(true);
         try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/purchases/${itemToDelete}`);
+            await apiClient.delete(`${ENV.API_BASE_URL}/purchases/${itemToDelete}`);
             setDeleteModalOpen(false);
             setItemToDelete(null);
             fetchPurchases();
@@ -100,7 +100,7 @@ const Purchases = () => {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/purchases/delete-bulk`, { ids: selectedIds });
+            await apiClient.post(`${ENV.API_BASE_URL}/purchases/delete-bulk`, { ids: selectedIds });
             setSelectedIds([]);
             fetchPurchases();
         } catch (err) {

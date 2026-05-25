@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, Calendar, Barcode, Trash2 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-sales-return-modal.css';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = ENV.API_BASE_URL;
 
 const EMPTY = {
     customerName: '',
@@ -56,7 +56,7 @@ const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
                 const url = searchQ.trim()
                     ? `${BASE_URL}/products/search?q=${encodeURIComponent(searchQ)}`
                     : `${BASE_URL}/products`;
-                const { data } = await axios.get(url);
+                const { data } = await apiClient.get(url);
                 setResults(Array.isArray(data) ? (searchQ.trim() ? data : data.slice(0, 10)) : []);
             } catch { setResults([]); }
         }, 280);
@@ -119,7 +119,7 @@ const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
         if (!products.length)          return setError('Add at least one product.');
         setError(''); setSubmitting(true);
         try {
-            await axios.post(`${BASE_URL}/sales-returns`, {
+            await apiClient.post(`${BASE_URL}/sales-returns`, {
                 customerName:  form.customerName,
                 date:          form.date,
                 referenceNo:   form.referenceNo,

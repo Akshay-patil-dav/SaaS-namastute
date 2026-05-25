@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { X, ShieldCheck, Loader, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './add-warranty-modal.css';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/warranties`;
+const API_BASE = `${ENV.API_BASE_URL}/warranties`;
 
 const AddWarrantyModal = ({ isOpen, onClose, onWarrantyAdded, warrantyData }) => {
     const [formData, setFormData] = useState({
@@ -73,9 +73,9 @@ const AddWarrantyModal = ({ isOpen, onClose, onWarrantyAdded, warrantyData }) =>
             };
 
             if (isEditMode) {
-                await axios.put(`${API_BASE}/${warrantyData.id}`, payload);
+                await apiClient.put(`${API_BASE}/${warrantyData.id}`, payload);
             } else {
-                await axios.post(API_BASE, payload);
+                await apiClient.post(API_BASE, payload);
             }
 
             if (onWarrantyAdded) onWarrantyAdded();

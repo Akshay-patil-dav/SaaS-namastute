@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useConfirm } from '../context/ConfirmContext';
 import {
     Search, FileText, Download, RotateCcw,
@@ -6,7 +6,7 @@ import {
     Eye, Edit, Trash2, AlertCircle,
     TrendingDown, DollarSign, CheckCircle, Clock,
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 import './online-orders.css';
 import './inventory-pages-custom.css';
 import AddSalesReturnModal  from '../components/AddSalesReturnModal';
@@ -15,7 +15,7 @@ import ViewSalesModal       from '../components/ViewSalesModal';
 import DeleteConfirmModal   from '../components/DeleteConfirmModal';
 import InvoiceModal         from '../components/InvoiceModal';
 
-const BASE_URL     = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL     = ENV.API_BASE_URL;
 const ROWS_OPTIONS = [10, 25, 50];
 const STATUSES     = ['Received', 'Pending', 'Cancelled'];
 const PAYMENTS     = ['Paid', 'Unpaid', 'Overdue'];
@@ -53,7 +53,7 @@ export default function SalesReturn() {
         setLoading(true);
         setFetchError('');
         try {
-            const res = await axios.get(`${BASE_URL}/sales-returns`);
+            const res = await apiClient.get(`${BASE_URL}/sales-returns`);
             setReturns(Array.isArray(res.data) ? res.data : []);
         } catch {
             setFetchError('Could not load sales returns. Check backend is running.');
@@ -100,7 +100,7 @@ export default function SalesReturn() {
         if (!isConfirmed) return;
         
         try {
-            await axios.post(`${BASE_URL}/sales-returns/delete-bulk`, { ids: selectedRows });
+            await apiClient.post(`${BASE_URL}/sales-returns/delete-bulk`, { ids: selectedRows });
             setSelectedRows([]);
             fetchReturns();
         } catch (err) {
@@ -132,7 +132,7 @@ export default function SalesReturn() {
         if (!activeReturn) return;
         setDeleting(true);
         try {
-            await axios.delete(`${BASE_URL}/sales-returns/${activeReturn.id}`);
+            await apiClient.delete(`${BASE_URL}/sales-returns/${activeReturn.id}`);
             setDeleteOpen(false);
             setActiveReturn(null);
             fetchReturns();

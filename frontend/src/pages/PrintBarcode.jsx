@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import BarcodeModal from '../components/BarcodeModal';
 import QRCodeModal from '../components/QRCodeModal';
-import axios from 'axios';
+import apiClient, { API, ENV } from '@/api/config';
 
 
 import './Products.css';
@@ -50,11 +50,11 @@ const PrintBarcode = () => {
             // If empty, we can either show all or show nothing. 
             // The user said "Apply it" to showing all on empty.
             let url = searchQuery.length > 0 
-                ? `${import.meta.env.VITE_API_BASE_URL}/products/search?q=${searchQuery}`
-                : `${import.meta.env.VITE_API_BASE_URL}/products`;
+                ? `${ENV.API_BASE_URL}/products/search?q=${searchQuery}`
+                : `${ENV.API_BASE_URL}/products`;
 
             try {
-                const response = await axios.get(url);
+                const response = await apiClient.get(url);
                 // Limit to 10 suggestions for performance if empty, otherwise show search results
                 setSearchResults(searchQuery.length > 0 ? response.data : response.data.slice(0, 10));
                 setShowSuggestions(true);

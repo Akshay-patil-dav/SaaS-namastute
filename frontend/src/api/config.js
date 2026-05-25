@@ -1,31 +1,50 @@
 /**
  * api/config.js — Centralized API Configuration
  * ─────────────────────────────────────────────────────────────────────────────
- * ALL API base URLs, keys, and flags are read from the .env file here.
- * Pages/components should import from this file, NOT use import.meta.env directly.
+ * ALL API base URLs, keys, and flags are read from the .env / .env.production
+ * files here. Pages/components should import from this file, NOT use
+ * import.meta.env directly.
  *
- * To change the backend URL:  edit frontend/.env  →  VITE_API_BASE_URL
- * To change the backend root: edit frontend/.env  →  VITE_BACKEND_BASE_URL
- * Then restart the dev server (npm run dev).
+ * Local dev  →  frontend/.env           →  points to http://localhost:3000
+ * Production →  frontend/.env.production →  points to https://springboot-app-pb1v.onrender.com
+ *               (or override via Vercel Dashboard → Settings → Environment Variables)
+ *
+ * After changing .env files restart the dev server: npm run dev
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
 import axios from 'axios';
 
+// ── Smart environment detection ─────────────────────────────────────────────
+// Vite sets import.meta.env.PROD = true during `vite build`, false in dev
+const isProduction = import.meta.env.PROD === true;
+
+const DEFAULT_API_BASE_URL = isProduction
+  ? 'https://springboot-app-pb1v.onrender.com/api'
+  : 'http://localhost:3000/api';
+
+const DEFAULT_BACKEND_BASE_URL = isProduction
+  ? 'https://springboot-app-pb1v.onrender.com'
+  : 'http://localhost:3000';
+
+const DEFAULT_FRONTEND_URL = isProduction
+  ? 'https://saa-s-namastute.vercel.app'
+  : 'http://localhost:5173';
+
 // ── Raw env values ─────────────────────────────────────────────────────────
 export const ENV = {
-  /** e.g.  http://localhost:3000/api   or   https://xxxx.ngrok-free.app/api */
-  API_BASE_URL:      import.meta.env.VITE_API_BASE_URL      || 'http://localhost:3000/api' || 'https://springboot-app-pb1v.onrender.com/api' ,
+  /** e.g.  http://localhost:3000/api   or   https://springboot-app-pb1v.onrender.com/api */
+  API_BASE_URL:     import.meta.env.VITE_API_BASE_URL     || DEFAULT_API_BASE_URL,
 
   /** e.g.  http://localhost:3000  (no trailing slash) */
-  BACKEND_BASE_URL:  import.meta.env.VITE_BACKEND_BASE_URL  || 'http://localhost:3000' || 'https://springboot-app-pb1v.onrender.com',
+  BACKEND_BASE_URL: import.meta.env.VITE_BACKEND_BASE_URL || DEFAULT_BACKEND_BASE_URL,
 
-  /** e.g.  https://saa-s-namastute.vercel.app */
-  FRONTEND_URL:      import.meta.env.VITE_FRONTEND_URL      || 'https://saa-s-namastute.vercel.app',
+  /** e.g.  https://saa-s-namastute.vercel.app  or  http://localhost:5173 */
+  FRONTEND_URL:     import.meta.env.VITE_FRONTEND_URL     || DEFAULT_FRONTEND_URL,
 
   /** App branding */
-  APP_NAME:          import.meta.env.VITE_APP_NAME          || 'Namastute POS',
-  APP_VERSION:       import.meta.env.VITE_APP_VERSION       || '1.0.0',
+  APP_NAME:    import.meta.env.VITE_APP_NAME    || 'Namastute POS',
+  APP_VERSION: import.meta.env.VITE_APP_VERSION || '1.0.0',
 
   /** Feature flags */
   ENABLE_GOOGLE_LOGIN:   import.meta.env.VITE_ENABLE_GOOGLE_LOGIN   !== 'false',
@@ -34,7 +53,7 @@ export const ENV = {
 };
 
 // ── Derived API endpoint groups ────────────────────────────────────────────
-// Add or change endpoint prefixes here — no need to touch individual pages.
+// Use these constants instead of building URL strings in every component.
 export const API = {
   BASE:          ENV.API_BASE_URL,
 
@@ -51,46 +70,51 @@ export const API = {
   WARRANTIES:    `${ENV.API_BASE_URL}/warranties`,
   TRANSFERS:     `${ENV.API_BASE_URL}/transfers`,
 
-  // Sales
-  SALES:         `${ENV.API_BASE_URL}/sales`,
-  SALES_RETURNS: `${ENV.API_BASE_URL}/sales-returns`,
-  POS_SALES:     `${ENV.API_BASE_URL}/pos-sales`,
-  PURCHASES:     `${ENV.API_BASE_URL}/purchases`,
+  // Sales & Purchases
+  SALES:           `${ENV.API_BASE_URL}/sales`,
+  SALES_RETURNS:   `${ENV.API_BASE_URL}/sales-returns`,
+  POS_SALES:       `${ENV.API_BASE_URL}/pos-sales`,
+  PURCHASES:       `${ENV.API_BASE_URL}/purchases`,
+  PURCHASE_RETURNS:`${ENV.API_BASE_URL}/purchase-returns`,
 
-  // Page Builder
-  BUILDER:       `${ENV.API_BASE_URL}/builder`,
-  SETTINGS:      `${ENV.API_BASE_URL}/settings`,
+  // Page Builder & Settings
+  BUILDER:  `${ENV.API_BASE_URL}/builder`,
+  SETTINGS: `${ENV.API_BASE_URL}/settings`,
+  UPLOAD:   `${ENV.API_BASE_URL}/upload`,
 
   // AI Helper (per-user, JWT-protected)
-  AI:            `${ENV.API_BASE_URL}/ai`,
+  AI: `${ENV.API_BASE_URL}/ai`,
 
   // OAuth2 redirect URLs (uses backend root, not /api prefix)
-  OAUTH_GOOGLE:  `${ENV.BACKEND_BASE_URL}/oauth2/authorization/google`,
-  OAUTH_FACEBOOK:`${ENV.BACKEND_BASE_URL}/oauth2/authorization/facebook`,
+  OAUTH_GOOGLE:   `${ENV.BACKEND_BASE_URL}/oauth2/authorization/google`,
+  OAUTH_FACEBOOK: `${ENV.BACKEND_BASE_URL}/oauth2/authorization/facebook`,
 };
 
 // ── Axios instance ─────────────────────────────────────────────────────────
 /**
- * Pre-configured Axios instance.
- * - baseURL set from .env automatically
- * - JWT token is attached via request interceptor (reads from localStorage)
- * - 401 responses auto-redirect to /login
+ * Pre-configured Axios instance — USE THIS EVERYWHERE instead of raw axios.
+ *
+ * Features:
+ *  - baseURL auto-set from .env (local) or .env.production (Vercel build)
+ *  - JWT token auto-attached via request interceptor (reads from localStorage)
+ *  - 401 responses auto-redirect to /login
+ *  - 45 s timeout for AI calls
  *
  * Usage:
  *   import apiClient from '@/api/config';
- *   const res = await apiClient.get('/products');        // hits API_BASE_URL/products
- *   const res = await apiClient.get(API.PRODUCTS);       // same, explicit
+ *   const res = await apiClient.get('/products');        // hits ENV.API_BASE_URL/products
+ *
+ *   import { API } from '@/api/config';
+ *   const res = await apiClient.get(API.PRODUCTS);       // same, explicit constant
  */
 const apiClient = axios.create({
   baseURL: ENV.API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 45000, // 45 s — AI calls can take longer
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 45_000, // 45 s — AI calls can take longer
 });
 
-// Attach JWT token from localStorage to every request
-// NOTE: Auth context stores the session at 'namastute_auth' as JSON {token, user}
+// ── Request interceptor: attach JWT ─────────────────────────────────────────
+// Auth context stores the session at 'namastute_auth' as JSON {token, user}
 apiClient.interceptors.request.use(
   (config) => {
     try {
@@ -102,19 +126,18 @@ apiClient.interceptors.request.use(
         }
       }
     } catch {
-      // ignore malformed storage
+      // ignore malformed localStorage entries
     }
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// Global error handling — redirect to login on 401
+// ── Response interceptor: handle 401 globally ───────────────────────────────
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Only redirect if not already on public pages
       const publicPaths = ['/login', '/register', '/', '/blog'];
       const isPublic = publicPaths.some((p) => window.location.pathname.startsWith(p));
       if (!isPublic) {

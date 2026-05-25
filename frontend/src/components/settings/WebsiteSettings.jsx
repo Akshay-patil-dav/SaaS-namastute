@@ -1,3 +1,4 @@
+﻿import { ENV } from '@/api/config';
 import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../hooks/useSettings';
 import { useCompany } from '../../context/CompanyContext';
@@ -31,13 +32,13 @@ export const SystemSettings = () => {
         formData.append('file', file);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
+            const response = await fetch(`${ENV.API_BASE_URL}/upload`, {
                 method: 'POST',
                 body: formData
             });
             const data = await response.json();
             if (data.url) {
-                const absoluteUrl = `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${data.url}`;
+                const absoluteUrl = `${ENV.API_BASE_URL.replace('/api', '')}${data.url}`;
                 handleChange(field, absoluteUrl);
             }
         } catch (error) {
@@ -288,7 +289,7 @@ export const CompanySettings = () => {
         formData.append('file', file);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
+            const response = await fetch(`${ENV.API_BASE_URL}/upload`, {
                 method: 'POST',
                 body: formData
             });
@@ -296,7 +297,7 @@ export const CompanySettings = () => {
             if (data.url) {
                 // Ensure the URL is absolute for the frontend to display it correctly
                 // The backend returns /uploads/..., we prepend the base URL
-                const absoluteUrl = `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${data.url}`;
+                const absoluteUrl = `${ENV.API_BASE_URL.replace('/api', '')}${data.url}`;
                 handleFormChange(field, absoluteUrl);
             }
         } catch (error) {
