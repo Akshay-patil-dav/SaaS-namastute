@@ -5,12 +5,15 @@ import {
     FileText, 
     FileSpreadsheet, 
     RefreshCw, 
-    ChevronUp, 
     PlusCircle,
     Search,
-    ChevronDown,
     Pencil,
-    Trash2
+    Trash2,
+    CheckCircle,
+    AlertCircle,
+    X,
+    Loader,
+    ShieldCheck
 } from 'lucide-react';
 import apiClient, { API } from '../api/config';
 import { useConfirm } from '../context/ConfirmContext';
@@ -23,7 +26,13 @@ const Warranties = () => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [toast, setToast] = useState(null);
     const { confirm } = useConfirm();
+
+    const showToast = (type, message) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 3500);
+    };
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -80,11 +89,12 @@ const Warranties = () => {
         
         try {
             await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            showToast('success', `${selectedIds.length} warrant${selectedIds.length > 1 ? 'ies' : 'y'} deleted successfully.`);
             setSelectedIds([]);
             fetchWarranties();
         } catch (err) {
             console.error('Bulk delete error:', err);
-            alert('Failed to delete warranties');
+            showToast('error', 'Failed to delete warranties.');
         }
     };
 
@@ -97,10 +107,11 @@ const Warranties = () => {
         
         try {
             await apiClient.delete(`${API_BASE}/${id}`);
+            showToast('success', 'Warranty deleted successfully.');
             fetchWarranties();
         } catch (err) {
             console.error('Delete error:', err);
-            alert('Failed to delete warranty');
+            showToast('error', 'Failed to delete warranty.');
         }
     };
 
@@ -116,10 +127,20 @@ const Warranties = () => {
 
     const handleWarrantyAdded = () => {
         fetchWarranties();
+        showToast('success', editingWarranty ? 'Warranty updated successfully.' : 'Warranty added successfully.');
     };
 
     return (
-        <div className="product-page-container">
+        <div className="sub-category-page">
+            {/* Toast Notification */}
+            {toast && (
+                <div className={`prod-toast prod-toast-${toast.type}`}>
+                    {toast.type === 'success' ? <CheckCircle size={17} /> : <AlertCircle size={17} />}
+                    <span>{toast.message}</span>
+                    <button onClick={() => setToast(null)} className="toast-close"><X size={14} /></button>
+                </div>
+            )}
+
             {/* Header Section */}
             <div className="ss-header-row">
                 <div className="ss-page-title-area">
@@ -252,12 +273,11 @@ const Warranties = () => {
                     </div>
                 </div>
             </div>
-        </div>
 
             {/* Add/Edit Modal */}
             <AddWarrantyModal 
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => { setIsModalOpen(false); setEditingWarranty(null); }}
                 onWarrantyAdded={handleWarrantyAdded}
                 warrantyData={editingWarranty}
             />
