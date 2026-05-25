@@ -312,7 +312,8 @@ Password: Admin@12345
 | Customer Management | ❌ Pending |
 | Payment Gateway | ❌ Pending |
 | Email/SMS Notifications | ❌ Pending |
-| Docker / CI-CD | ❌ Pending |
+| Docker / CI-CD | ✅ Done  |
+| AI Tool / AI chat  | ✅ Done  |
 | Mobile / PWA | ❌ Pending |
 
 ---
