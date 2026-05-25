@@ -3,11 +3,15 @@ spring:
     name: namastute-backend
 
   datasource:
-    # ── Read from Render environment variables (set in Render Dashboard → Environment)
-    # Fallback values used for local dev only (set these in backend/.env)
-    url:      ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/otp_auth_db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:root}
+    # Read from Render environment variables
+    # url: ${SPRING_DATASOURCE_URL}
+    # username: ${SPRING_DATASOURCE_USERNAME}
+    # password: ${SPRING_DATASOURCE_PASSWORD}
+    # driver-class-name: org.postgresql.Driver
+
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-d88p9cek1jcs73fpc33g-a.oregon-postgres.render.com:5432/namustutam_db?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:namustutam_db_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:V1EyJzIg7Ca4vzf2X12tc8Oszb1eifxR}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -17,7 +21,6 @@ spring:
     properties:
       hibernate:
         format_sql: false
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   security:
     oauth2:
@@ -27,17 +30,17 @@ spring:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID:YOUR_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET:YOUR_GOOGLE_CLIENT_SECRET}
             scope: email, profile
+
           facebook:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_ID:YOUR_FACEBOOK_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET:YOUR_FACEBOOK_CLIENT_SECRET}
             scope: email, public_profile
 
-  # ── File Upload Size Limits ──────────────────────────────────────────────────
   servlet:
     multipart:
       enabled: true
-      max-file-size: 10MB      # max size per individual file
-      max-request-size: 50MB   # max total size for all files in one request
+      max-file-size: 10MB
+      max-request-size: 50MB
 
 server:
   port: 3000
@@ -45,16 +48,11 @@ server:
 app:
   base-url: ${APP_BASE_URL:http://localhost:3000}
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
-  # Optional comma-separated extra CORS origins (e.g. for dev ports, ngrok, staging)
   cors-extra-origins: ${CORS_EXTRA_ORIGINS:}
 
 jwt:
   secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   expiration: ${JWT_EXPIRATION:86400000}
 
-# ── AI Helper — API Key Encryption ─────────────────────────────────────────────
-# AES-256-GCM key: must be exactly 64 hex characters (32 bytes = 256 bits).
-# Change this in production! Set AI_ENCRYPTION_SECRET environment variable.
-# Generate a new one: openssl rand -hex 32
 ai:
   encryption-secret: ${AI_ENCRYPTION_SECRET:6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b}
