@@ -32,7 +32,13 @@ import {
     Copy,
     Monitor,
     FileUp,
-    Globe
+    Globe,
+    Cpu,
+    Bell,
+    Wrench,
+    DollarSign,
+    Users,
+    Sparkles
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -46,23 +52,27 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const isDashboardActive = location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/dashboard/admin2' || location.pathname === '/dashboard/sales';
     const isSuperAdminActive = location.pathname.startsWith('/dashboard/super-');
     const isSalesActive = location.pathname.startsWith('/dashboard/sales-') && !location.pathname.startsWith('/dashboard/sales-return');
+    const isManufacturingActive = location.pathname.startsWith('/manufacturing/') || location.pathname.startsWith('/machines/') || location.pathname.startsWith('/qc/');
 
     const [openMenus, setOpenMenus] = useState({
         dashboard: isDashboardActive,
         superAdmin: isSuperAdminActive,
-        sales: isSalesActive
+        sales: isSalesActive,
+        manufacturing: isManufacturingActive
     });
 
     React.useEffect(() => {
         // When the route changes, ensure only the active section is open
         if (isDashboardActive) {
-            setOpenMenus({ dashboard: true, superAdmin: false, sales: false });
+            setOpenMenus({ dashboard: true, superAdmin: false, sales: false, manufacturing: false });
         } else if (isSuperAdminActive) {
-            setOpenMenus({ dashboard: false, superAdmin: true, sales: false });
+            setOpenMenus({ dashboard: false, superAdmin: true, sales: false, manufacturing: false });
         } else if (isSalesActive) {
-            setOpenMenus({ dashboard: false, superAdmin: false, sales: true });
+            setOpenMenus({ dashboard: false, superAdmin: false, sales: true, manufacturing: false });
+        } else if (isManufacturingActive) {
+            setOpenMenus({ dashboard: false, superAdmin: false, sales: false, manufacturing: true });
         }
-    }, [isDashboardActive, isSuperAdminActive, isSalesActive]);
+    }, [isDashboardActive, isSuperAdminActive, isSalesActive, isManufacturingActive]);
 
     const toggleMenu = (menu) => {
         setOpenMenus(prev => {
@@ -71,7 +81,8 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
             const newState = {
                 dashboard: false,
                 superAdmin: false,
-                sales: false
+                sales: false,
+                manufacturing: false
             };
             // If it wasn't open, open it (accordion effect)
             if (!isCurrentlyOpen) {
@@ -187,6 +198,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             <div className="pos-menu-section">Inventory</div>
                             <ul className="pos-menu-list">
                                 <li className="pos-menu-item"><NavLink to="/products" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Package className="pos-menu-icon" /><span>Products</span></div></NavLink></li>
+                                <li className="pos-menu-item"><NavLink to="/inventory/additions" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Layers className="pos-menu-icon" /><span>Inventory ERP Additions</span></div></NavLink></li>
                                 {/* <li className="pos-menu-item"><NavLink to="/create-product" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><FilePlus className="pos-menu-icon" /><span>Create Product</span></div></NavLink></li> */}
                                 <li className="pos-menu-item"><NavLink to="/expired-products" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><CalendarX className="pos-menu-icon" /><span>Expired Products</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/low-stocks" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><TrendingDown className="pos-menu-icon" /><span>Low Stocks</span></div></NavLink></li>
@@ -260,6 +272,11 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                 POS Orders
                                             </NavLink>
                                         </li>
+                                        <li>
+                                            <NavLink to="/sales/extension" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Sales ERP Additions
+                                            </NavLink>
+                                        </li>
                                     </ul>
                                 </li>
                                 <li className="pos-menu-item">
@@ -300,6 +317,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     </NavLink>
                                 </li>
+                                <li className="pos-menu-item">
+                                    <NavLink to="/purchases/extension" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <Layers className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Purchases ERP Additions</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
                                 {/* <li className="pos-menu-item">
                                     <NavLink to="/purchase-order" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                         <div className="pos-menu-link-content">
@@ -313,6 +338,113 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         <div className="pos-menu-link-content">
                                             <FileUp className="pos-menu-icon" strokeWidth={1.5} />
                                             <span>Purchase Return</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            </ul>
+                        </>
+                    )}
+
+                    {/* Manufacturing Section — CLIENT + ADMIN only */}
+                    {isClientOrAdmin && (
+                        <>
+                            <div className="pos-menu-divider"></div>
+                            <div className="pos-menu-section">Manufacturing</div>
+                            <ul className="pos-menu-list pb-4">
+                                <li className="pos-menu-item">
+                                    <a
+                                        className={`pos-menu-link ${isManufacturingActive ? 'active' : ''} ${openMenus.manufacturing ? 'open' : ''}`}
+                                        onClick={() => toggleMenu('manufacturing')}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <Cpu className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Manufacturing</span>
+                                        </div>
+                                        <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                    </a>
+                                    <ul className={`pos-submenu ${openMenus.manufacturing ? 'show' : ''}`}>
+                                        <li>
+                                            <NavLink to="/manufacturing/bom" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Bill of Materials (BOM)
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/manufacturing/orders" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Production Orders
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/manufacturing/workspace" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Operations Workspace
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/machines/details" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Machine Allocation
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/qc/inspection" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Quality Control
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </>
+                    )}
+
+                    {/* ERP Operations Section — CLIENT + ADMIN only */}
+                    {isClientOrAdmin && (
+                        <>
+                            <div className="pos-menu-divider"></div>
+                            <div className="pos-menu-section">ERP Operations</div>
+                            <ul className="pos-menu-list pb-4">
+                                <li className="pos-menu-item">
+                                    <NavLink to="/warehouse/list" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <Box className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Warehouse Depot</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
+                                    <NavLink to="/accounts/summary" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <DollarSign className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Financial Accounts</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
+                                    <NavLink to="/hr/employees" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <Users className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>HR & Attendance</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
+                                    <NavLink to="/reports/analytics" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <BarChart2 className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Analytics & Reports</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
+                                    <NavLink to="/alerts/notifications" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <Bell className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Centralized Alerts</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
+                                    <NavLink to="/advanced/scanners" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <Sparkles className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Advanced Tech (IoT)</span>
                                         </div>
                                     </NavLink>
                                 </li>
