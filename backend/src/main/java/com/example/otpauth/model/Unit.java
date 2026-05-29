@@ -23,6 +23,11 @@ public class Unit {
     @Column(nullable = false)
     private Boolean status = true;
 
+    // Nullable: system/global units have no owner; user-created units do
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -53,6 +58,9 @@ public class Unit {
     
     public Boolean getStatus() { return status; }
     public void setStatus(Boolean status) { this.status = status; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
