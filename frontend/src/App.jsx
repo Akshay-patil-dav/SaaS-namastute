@@ -50,6 +50,23 @@ const EditPurchaseReturn = lazy(() => import('./pages/EditPurchaseReturn.jsx'));
 const Settings           = lazy(() => import('./pages/Settings.jsx'));
 const WebsiteBuilder     = lazy(() => import('./pages/WebsiteBuilder.jsx'));
 
+// ERP Additions Lazy Imports
+const InventoryAdditions     = lazy(() => import('./pages/InventoryAdditions.jsx'));
+const BOM                    = lazy(() => import('./pages/manufacturing/BOM.jsx'));
+const ProductionOrders       = lazy(() => import('./pages/manufacturing/ProductionOrders.jsx'));
+const ManufacturingWorkspace = lazy(() => import('./pages/manufacturing/ManufacturingWorkspace.jsx'));
+const Machines               = lazy(() => import('./pages/machines/Machines.jsx'));
+const QualityControl         = lazy(() => import('./pages/quality/QualityControl.jsx'));
+const PurchasesExtension     = lazy(() => import('./pages/purchases/PurchasesExtension.jsx'));
+const SalesExtension         = lazy(() => import('./pages/sales/SalesExtension.jsx'));
+const WarehouseModule        = lazy(() => import('./pages/warehouse/WarehouseModule.jsx'));
+const AccountsModule         = lazy(() => import('./pages/accounts/AccountsModule.jsx'));
+const HRModule               = lazy(() => import('./pages/hr/HRModule.jsx'));
+const ReportsModule          = lazy(() => import('./pages/reports/ReportsModule.jsx'));
+const NotificationsPage      = lazy(() => import('./pages/NotificationsPage.jsx'));
+const AdvancedTech           = lazy(() => import('./pages/advanced/AdvancedTech.jsx'));
+
+
 // ── Role constants ───────────────────────────────────────────────────────────
 const CLIENT_ADMIN_ROLES = ['ADMIN', 'CLIENT'];
 const ADMIN_ROLES        = ['ADMIN', 'CLIENT'];
@@ -237,6 +254,23 @@ function AppRoutes() {
                     path="/website-builder"
                     element={<PosPage roles={CLIENT_ADMIN_ROLES}><WebsiteBuilder /></PosPage>}
                 />
+
+                {/* ERP Additions Routes */}
+                <Route path="/inventory/additions" element={<PosPage roles={ADMIN_ROLES}><InventoryAdditions /></PosPage>} />
+                <Route path="/manufacturing/bom" element={<PosPage roles={ADMIN_ROLES}><BOM /></PosPage>} />
+                <Route path="/manufacturing/orders" element={<PosPage roles={ADMIN_ROLES}><ProductionOrders /></PosPage>} />
+                <Route path="/manufacturing/workspace" element={<PosPage roles={ADMIN_ROLES}><ManufacturingWorkspace /></PosPage>} />
+                <Route path="/machines/details" element={<PosPage roles={ADMIN_ROLES}><Machines /></PosPage>} />
+                <Route path="/qc/inspection" element={<PosPage roles={ADMIN_ROLES}><QualityControl /></PosPage>} />
+                <Route path="/purchases/extension" element={<PosPage roles={ADMIN_ROLES}><PurchasesExtension /></PosPage>} />
+                <Route path="/sales/extension" element={<PosPage roles={ADMIN_ROLES}><SalesExtension /></PosPage>} />
+                <Route path="/warehouse/list" element={<PosPage roles={ADMIN_ROLES}><WarehouseModule /></PosPage>} />
+                <Route path="/accounts/summary" element={<PosPage roles={ADMIN_ROLES}><AccountsModule /></PosPage>} />
+                <Route path="/hr/employees" element={<PosPage roles={ADMIN_ROLES}><HRModule /></PosPage>} />
+                <Route path="/reports/analytics" element={<PosPage roles={ADMIN_ROLES}><ReportsModule /></PosPage>} />
+                <Route path="/alerts/notifications" element={<PosPage roles={ADMIN_ROLES}><NotificationsPage /></PosPage>} />
+                <Route path="/advanced/scanners" element={<PosPage roles={ADMIN_ROLES}><AdvancedTech /></PosPage>} />
+
 
                 {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
                 <Route
