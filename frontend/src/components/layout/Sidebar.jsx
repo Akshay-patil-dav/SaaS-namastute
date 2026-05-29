@@ -6,8 +6,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import apiClient, { API, ENV } from '@/api/config';
-import ContextMenu from '../ContextMenu';
-import IconPicker, { getIconByName } from '../IconPicker';
+import ContextMenu from '../modals/common/ContextMenu';
+import IconPicker, { getIconByName } from '../modals/common/IconPicker';
 
 export default function Sidebar() {
     const location = useLocation();
