@@ -21,15 +21,17 @@ public class UnitService {
     }
 
     public List<Unit> getAllUnits() {
-        List<Unit> units = unitRepository.findAll();
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        List<Unit> units = unitRepository.findByUserId(userId);
         units.forEach(unit -> {
-            unit.setProducts(productRepository.countByUnit(unit.getName()));
+            unit.setProducts(productRepository.countByUnitAndUserId(unit.getName(), userId));
         });
         return units;
     }
 
     public Unit createUnit(UnitRequest request) {
         Unit unit = new Unit();
+        unit.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         unit.setName(request.getName());
         unit.setShortName(request.getShortName());
         unit.setStatus(request.getStatus() != null ? request.getStatus() : true);
@@ -37,7 +39,7 @@ public class UnitService {
     }
 
     public Optional<Unit> updateUnit(Long id, UnitRequest request) {
-        return unitRepository.findById(id).map(existing -> {
+        return unitRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId()).map(existing -> {
             existing.setName(request.getName());
             existing.setShortName(request.getShortName());
             if (request.getStatus() != null) {
@@ -48,7 +50,7 @@ public class UnitService {
     }
 
     public boolean deleteUnit(Long id) {
-        if (unitRepository.existsById(id)) {
+        if (unitRepository.existsByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             unitRepository.deleteById(id);
             return true;
         }
@@ -56,6 +58,9 @@ public class UnitService {
     }
 
     public void bulkDeleteUnits(List<Long> ids) {
-        unitRepository.deleteAllById(ids);
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        List<Unit> units = unitRepository.findAllById(ids);
+        units.removeIf(u -> !u.getUserId().equals(userId));
+        unitRepository.deleteAll(units);
     }
 }

@@ -18,11 +18,12 @@ public class BrandService {
     }
 
     public List<Brand> getAllBrands() {
-        return brandRepository.findAll();
+        return brandRepository.findByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Brand createBrand(BrandRequest request) {
         Brand brand = new Brand();
+        brand.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         brand.setName(request.getName());
         brand.setDesc(request.getDesc());
         brand.setImg(request.getImg());
@@ -31,7 +32,7 @@ public class BrandService {
     }
 
     public Optional<Brand> updateBrand(Long id, BrandRequest request) {
-        return brandRepository.findById(id).map(brand -> {
+        return brandRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId()).map(brand -> {
             brand.setName(request.getName());
             if (request.getDesc() != null) {
                 brand.setDesc(request.getDesc());
@@ -47,7 +48,7 @@ public class BrandService {
     }
 
     public boolean deleteBrand(Long id) {
-        if (brandRepository.existsById(id)) {
+        if (brandRepository.existsByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             brandRepository.deleteById(id);
             return true;
         }
@@ -55,6 +56,9 @@ public class BrandService {
     }
 
     public void bulkDeleteBrands(List<Long> ids) {
-        brandRepository.deleteAllById(ids);
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        List<Brand> brands = brandRepository.findAllById(ids);
+        brands.removeIf(b -> !b.getUserId().equals(userId));
+        brandRepository.deleteAll(brands);
     }
 }

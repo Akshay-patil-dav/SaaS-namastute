@@ -9,6 +9,21 @@ public class PageFolder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private Long userId;
+
+    public Long getUserId() { return user != null ? user.getId() : null; }
+    public void setUserId(Long userId) {
+        if (userId != null) {
+            if (this.user == null) this.user = new User();
+            this.user.setId(userId);
+            this.userId = userId;
+        } else {
+            this.user = null;
+            this.userId = null;
+        }
+    }
+
     @Column(nullable = false)
     private String name;
 

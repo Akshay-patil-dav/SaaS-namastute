@@ -27,28 +27,29 @@ public class ProductService {
 
     /** List all products */
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     /** List expired products */
     public List<Product> getExpiredProducts() {
-        return productRepository.findByExpiryDateBefore(LocalDate.now());
+        return productRepository.findByExpiryDateBeforeAndUserId(LocalDate.now(), com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     /** Search products by name or barcode */
     public List<Product> searchProducts(String query) {
-        return productRepository.findByNameContainingIgnoreCaseOrItemBarcodeContainingIgnoreCase(query, query);
+        return productRepository.searchProductsByUserId(query, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
 
     /** Get single product */
     public Optional<Product> getProductById(@NonNull Long id) {
-        return productRepository.findById(Objects.requireNonNull(id));
+        return productRepository.findByIdAndUserId(Objects.requireNonNull(id), com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     /** Create a new product */
     public Product createProduct(ProductRequest req) {
         Product p = new Product();
+        p.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         mapRequestToProduct(req, p);
 
         // Auto-generate SKU if blank
@@ -67,7 +68,7 @@ public class ProductService {
     /** Update an existing product */
     public Optional<Product> updateProduct(@NonNull Long id, ProductRequest req) {
         long safeId = Objects.requireNonNull(id);
-        return productRepository.findById(safeId).map(p -> {
+        return productRepository.findByIdAndUserId(safeId, com.example.otpauth.util.SecurityUtils.getCurrentUserId()).map(p -> {
             mapRequestToProduct(req, p);
             return productRepository.save(p);   // Spring Data save never returns null
         });
@@ -75,7 +76,7 @@ public class ProductService {
 
     /** Delete a product */
     public boolean deleteProduct(@NonNull Long id) {
-        if (productRepository.existsById(Objects.requireNonNull(id))) {
+        if (productRepository.existsByIdAndUserId(Objects.requireNonNull(id), com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             productRepository.deleteById(id);
             return true;
         }
@@ -85,16 +86,20 @@ public class ProductService {
 
     public void bulkDeleteProducts(List<Long> ids) {
         if (ids != null && !ids.isEmpty()) {
-            productRepository.deleteAllByIdInBatch(ids);
+            Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+            List<Product> products = productRepository.findAllById(ids);
+            products.removeIf(p -> !p.getUserId().equals(userId));
+            productRepository.deleteAll(products);
         }
     }
 
     /** Generate a new unique SKU */
     public String generateSku() {
         String sku;
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
         do {
             sku = "SKU-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        } while (productRepository.existsBySku(sku));
+        } while (productRepository.existsBySkuAndUserId(sku, userId));
         return sku;
     }
 

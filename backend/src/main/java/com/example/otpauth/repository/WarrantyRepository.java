@@ -8,5 +8,9 @@ import java.util.List;
 
 @Repository
 public interface WarrantyRepository extends JpaRepository<Warranty, Long> {
-    List<Warranty> findAllByOrderByIdDesc();
+    List<Warranty> findByUserId(Long userId);
+    java.util.Optional<Warranty> findByIdAndUserId(Long id, Long userId);
+    boolean existsByIdAndUserId(Long id, Long userId);
+
+    List<Warranty> findAllByUserIdOrderByIdDesc(Long userId);
 }

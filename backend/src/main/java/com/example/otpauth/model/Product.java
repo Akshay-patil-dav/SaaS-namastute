@@ -12,21 +12,30 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Table(name = "products")
+@Table(name = "products", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "sku"}),
+    @UniqueConstraint(columnNames = {"user_id", "slug"})
+})
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id")
+    private Long userId;
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+
     // ── Product Information ───────────────────────────────────────────────────
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(unique = true, length = 255)
+    @Column(length = 255)
     private String slug;
 
-    @Column(unique = true, length = 100)
+    @Column(length = 100)
     private String sku;
 
     @Column(columnDefinition = "TEXT")

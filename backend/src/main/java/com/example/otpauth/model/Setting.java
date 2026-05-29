@@ -3,14 +3,22 @@ package com.example.otpauth.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "settings")
+@Table(name = "settings", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "key"})
+})
 public class Setting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "user_id")
+    private Long userId;
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+
+    @Column(nullable = false)
     private String settingKey;
 
     @Column(columnDefinition = "TEXT")

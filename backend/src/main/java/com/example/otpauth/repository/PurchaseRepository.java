@@ -8,22 +8,25 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
+    List<Purchase> findByUserId(Long userId);
+    java.util.Optional<Purchase> findByIdAndUserId(Long id, Long userId);
+    boolean existsByIdAndUserId(Long id, Long userId);
 
-    @Query("SELECT p FROM Purchase p WHERE LOWER(p.supplier) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.reference) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<Purchase> searchPurchases(@Param("query") String query);
+    @Query("SELECT p FROM Purchase p WHERE p.userId = :userId AND (LOWER(p.supplier) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.reference) LIKE LOWER(CONCAT('%', :query, '%')))")
+    List<Purchase> searchPurchasesByUserId(@Param("query") String query, @Param("userId") Long userId);
 
-    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p")
-    Double sumTotalPurchase();
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p WHERE p.userId = :userId")
+    Double sumTotalPurchaseByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p WHERE p.status IS NULL OR LOWER(p.status) NOT IN ('return', 'returned')")
-    Double sumTotalActivePurchase();
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p WHERE p.userId = :userId AND (p.status IS NULL OR LOWER(p.status) NOT IN ('return', 'returned'))")
+    Double sumTotalActivePurchaseByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p WHERE p.status IS NOT NULL AND LOWER(p.status) IN ('return', 'returned')")
-    Double sumTotalPurchaseReturns();
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Purchase p WHERE p.userId = :userId AND p.status IS NOT NULL AND LOWER(p.status) IN ('return', 'returned')")
+    Double sumTotalPurchaseReturnsByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT COUNT(p) FROM Purchase p WHERE p.status IS NULL OR LOWER(p.status) NOT IN ('return', 'returned')")
-    Long countActivePurchases();
+    @Query("SELECT COUNT(p) FROM Purchase p WHERE p.userId = :userId AND (p.status IS NULL OR LOWER(p.status) NOT IN ('return', 'returned'))")
+    Long countActivePurchasesByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT COUNT(p) FROM Purchase p WHERE p.status IS NOT NULL AND LOWER(p.status) IN ('return', 'returned')")
-    Long countPurchaseReturns();
+    @Query("SELECT COUNT(p) FROM Purchase p WHERE p.userId = :userId AND p.status IS NOT NULL AND LOWER(p.status) IN ('return', 'returned')")
+    Long countPurchaseReturnsByUserId(@Param("userId") Long userId);
 }

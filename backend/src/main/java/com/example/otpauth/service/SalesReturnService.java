@@ -31,10 +31,11 @@ public class SalesReturnService {
 
     /** Dashboard summary: total count, totalAmount, totalPaid, totalDue */
     public Map<String, Object> getSalesReturnSummary() {
-        long totalCount       = repository.count();
-        BigDecimal totalAmount = repository.sumAllGrandTotal();
-        BigDecimal totalPaid   = repository.sumAllPaidAmount();
-        BigDecimal totalDue    = repository.sumAllDueAmount();
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        long totalCount       = repository.findByUserId(userId).size();
+        BigDecimal totalAmount = repository.sumAllGrandTotalByUserId(userId);
+        BigDecimal totalPaid   = repository.sumAllPaidAmountByUserId(userId);
+        BigDecimal totalDue    = repository.sumAllDueAmountByUserId(userId);
 
         Map<String, Object> summary = new LinkedHashMap<>();
         summary.put("totalCount",  totalCount);
@@ -45,19 +46,20 @@ public class SalesReturnService {
     }
 
     public List<SalesReturn> getAllReturns() {
-        return repository.findAllByOrderByCreatedAtDesc();
+        return repository.findAllByUserIdOrderByCreatedAtDesc(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Optional<SalesReturn> getReturnById(Long id) {
-        return repository.findById(id);
+        return repository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public List<SalesReturn> searchReturns(String q) {
-        return repository.searchReturns(q);
+        return repository.searchReturnsByUserId(q, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public SalesReturn createReturn(SalesReturnRequest request) throws JsonProcessingException {
         SalesReturn salesReturn = new SalesReturn();
+        salesReturn.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         mapRequestToEntity(request, salesReturn);
         salesReturn.setReferenceNo("SR" + String.format("%06d", (long)(Math.random() * 1000000)));
         salesReturn.setBiller(request.getBiller() != null ? request.getBiller() : "Admin");
@@ -79,7 +81,7 @@ public class SalesReturnService {
     }
 
     public SalesReturn updateReturn(Long id, SalesReturnRequest request) throws JsonProcessingException {
-        SalesReturn salesReturn = repository.findById(id)
+        SalesReturn salesReturn = repository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("Sales return not found with id: " + id));
         mapRequestToEntity(request, salesReturn);
         if (request.getBiller() != null) salesReturn.setBiller(request.getBiller());
@@ -87,7 +89,7 @@ public class SalesReturnService {
     }
 
     public boolean deleteReturn(Long id) {
-        if (repository.existsById(id)) {
+        if (repository.existsByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             repository.deleteById(id);
             return true;
         }
@@ -95,7 +97,10 @@ public class SalesReturnService {
     }
 
     public void bulkDeleteReturns(List<Long> ids) {
-        repository.deleteAllById(ids);
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        List<SalesReturn> returns = repository.findAllById(ids);
+        returns.removeIf(r -> !r.getUserId().equals(userId));
+        repository.deleteAll(returns);
     }
 
     private void mapRequestToEntity(SalesReturnRequest req, SalesReturn salesReturn) throws JsonProcessingException {

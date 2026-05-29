@@ -27,29 +27,32 @@ public class PurchaseReturnService {
     }
 
     public List<PurchaseReturn> getAllPurchaseReturns() {
-        return purchaseReturnRepository.findAll();
+        return purchaseReturnRepository.findByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public List<PurchaseReturn> searchPurchaseReturns(String query) {
-        return purchaseReturnRepository.searchPurchaseReturns(query);
+        return purchaseReturnRepository.searchPurchaseReturnsByUserId(query, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Optional<PurchaseReturn> getPurchaseReturnById(Long id) {
-        return purchaseReturnRepository.findById(id);
+        return purchaseReturnRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Double getPurchaseReturnSummary() {
-        Double returnsSum = purchaseReturnRepository.sumTotalPurchaseReturn();
-        Double purchaseReturnsSum = purchaseRepository.sumTotalPurchaseReturns();
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        Double returnsSum = purchaseReturnRepository.sumTotalPurchaseReturnByUserId(userId);
+        Double purchaseReturnsSum = purchaseRepository.sumTotalPurchaseReturnsByUserId(userId);
         return (returnsSum != null ? returnsSum : 0.0) + (purchaseReturnsSum != null ? purchaseReturnsSum : 0.0);
     }
 
     public Long getPurchaseReturnCount() {
-        return purchaseReturnRepository.count() + purchaseRepository.countPurchaseReturns();
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        return purchaseReturnRepository.findByUserId(userId).size() + purchaseRepository.countPurchaseReturnsByUserId(userId);
     }
 
     public PurchaseReturn createPurchaseReturn(PurchaseReturnRequest request) {
         PurchaseReturn p = new PurchaseReturn();
+        p.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         mapRequestToEntity(request, p);
 
         // Decrease product quantity since it is returned to supplier
@@ -79,14 +82,14 @@ public class PurchaseReturnService {
     }
 
     public PurchaseReturn updatePurchaseReturn(Long id, PurchaseReturnRequest request) {
-        PurchaseReturn p = purchaseReturnRepository.findById(id)
+        PurchaseReturn p = purchaseReturnRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("PurchaseReturn not found with id: " + id));
         mapRequestToEntity(request, p);
         return purchaseReturnRepository.save(p);
     }
 
     public boolean deletePurchaseReturn(Long id) {
-        if (purchaseReturnRepository.existsById(id)) {
+        if (purchaseReturnRepository.existsByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             purchaseReturnRepository.deleteById(id);
             return true;
         }
@@ -94,7 +97,10 @@ public class PurchaseReturnService {
     }
 
     public void bulkDeletePurchaseReturns(List<Long> ids) {
-        purchaseReturnRepository.deleteAllById(ids);
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        List<PurchaseReturn> returns = purchaseReturnRepository.findAllById(ids);
+        returns.removeIf(r -> !r.getUserId().equals(userId));
+        purchaseReturnRepository.deleteAll(returns);
     }
 
     private void mapRequestToEntity(PurchaseReturnRequest request, PurchaseReturn p) {

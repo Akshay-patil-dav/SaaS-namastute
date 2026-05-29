@@ -24,27 +24,28 @@ public class PurchaseService {
     }
 
     public List<Purchase> getAllPurchases() {
-        return purchaseRepository.findAll();
+        return purchaseRepository.findByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public List<Purchase> searchPurchases(String query) {
-        return purchaseRepository.searchPurchases(query);
+        return purchaseRepository.searchPurchasesByUserId(query, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Optional<Purchase> getPurchaseById(Long id) {
-        return purchaseRepository.findById(id);
+        return purchaseRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Double getPurchaseSummary() {
-        return purchaseRepository.sumTotalActivePurchase();
+        return purchaseRepository.sumTotalActivePurchaseByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Long getPurchaseCount() {
-        return purchaseRepository.countActivePurchases();
+        return purchaseRepository.countActivePurchasesByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Purchase createPurchase(PurchaseRequest request) {
         Purchase p = new Purchase();
+        p.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         mapRequestToEntity(request, p);
         
         // Adjust product quantity
@@ -80,14 +81,14 @@ public class PurchaseService {
     }
 
     public Purchase updatePurchase(Long id, PurchaseRequest request) {
-        Purchase p = purchaseRepository.findById(id)
+        Purchase p = purchaseRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("Purchase not found with id: " + id));
         mapRequestToEntity(request, p);
         return purchaseRepository.save(p);
     }
 
     public boolean deletePurchase(Long id) {
-        if (purchaseRepository.existsById(id)) {
+        if (purchaseRepository.existsByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             purchaseRepository.deleteById(id);
             return true;
         }
@@ -95,7 +96,10 @@ public class PurchaseService {
     }
 
     public void bulkDeletePurchases(List<Long> ids) {
-        purchaseRepository.deleteAllById(ids);
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        List<Purchase> purchases = purchaseRepository.findAllById(ids);
+        purchases.removeIf(p -> !p.getUserId().equals(userId));
+        purchaseRepository.deleteAll(purchases);
     }
 
     private void mapRequestToEntity(PurchaseRequest request, Purchase p) {

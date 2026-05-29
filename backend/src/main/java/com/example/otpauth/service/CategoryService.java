@@ -23,15 +23,16 @@ public class CategoryService {
     }
 
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        return categoryRepository.findByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Optional<Category> getCategoryById(@NonNull Long id) {
-        return categoryRepository.findById(Objects.requireNonNull(id));
+        return categoryRepository.findByIdAndUserId(Objects.requireNonNull(id), com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Category createCategory(CategoryRequest req) {
         Category c = new Category();
+        c.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         c.setName(req.getName());
         
         // Auto-generate slug if not provided
@@ -49,7 +50,7 @@ public class CategoryService {
     }
 
     public Optional<Category> updateCategory(@NonNull Long id, CategoryRequest req) {
-        return categoryRepository.findById(Objects.requireNonNull(id)).map(c -> {
+        return categoryRepository.findByIdAndUserId(Objects.requireNonNull(id), com.example.otpauth.util.SecurityUtils.getCurrentUserId()).map(c -> {
             c.setName(req.getName());
             if (req.getSlug() != null && !req.getSlug().isBlank()) {
                 c.setSlug(req.getSlug());
@@ -62,7 +63,7 @@ public class CategoryService {
     }
 
     public boolean deleteCategory(@NonNull Long id) {
-        if (categoryRepository.existsById(Objects.requireNonNull(id))) {
+        if (categoryRepository.existsByIdAndUserId(Objects.requireNonNull(id), com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             categoryRepository.deleteById(id);
             return true;
         }
@@ -72,7 +73,10 @@ public class CategoryService {
 
     public void bulkDeleteCategories(List<Long> ids) {
         if (ids != null && !ids.isEmpty()) {
-            categoryRepository.deleteAllByIdInBatch(ids);
+            Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+            List<Category> cats = categoryRepository.findAllById(ids);
+            cats.removeIf(c -> !c.getUserId().equals(userId));
+            categoryRepository.deleteAll(cats);
         }
     }
 }

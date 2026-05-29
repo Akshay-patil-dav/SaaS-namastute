@@ -12,20 +12,23 @@ import java.util.List;
 
 @Repository
 public interface PosOrderRepository extends JpaRepository<PosOrder, Long> {
+    List<PosOrder> findByUserId(Long userId);
+    java.util.Optional<PosOrder> findByIdAndUserId(Long id, Long userId);
+    boolean existsByIdAndUserId(Long id, Long userId);
 
-    List<PosOrder> findAllByOrderByCreatedAtDesc();
+    List<PosOrder> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 
-    @Query("SELECT p FROM PosOrder p WHERE " +
+    @Query("SELECT p FROM PosOrder p WHERE p.userId = :userId AND (" +
            "LOWER(p.customerName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
            "LOWER(p.referenceNo) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
            "LOWER(p.status) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
-           "LOWER(p.paymentStatus) LIKE LOWER(CONCAT('%', :q, '%'))")
-    List<PosOrder> searchOrders(@Param("q") String q);
+           "LOWER(p.paymentStatus) LIKE LOWER(CONCAT('%', :q, '%')))")
+    List<PosOrder> searchOrdersByUserId(@Param("q") String q, @Param("userId") Long userId);
 
     /** Count all POS orders whose date equals the given date (today). */
-    long countByDate(LocalDate date);
+    long countByDateAndUserId(LocalDate date, Long userId);
 
     /** Sum grandTotal for all POS orders on a given date (returns 0 if none). */
-    @Query("SELECT COALESCE(SUM(p.grandTotal), 0) FROM PosOrder p WHERE p.date = :date")
-    BigDecimal sumGrandTotalByDate(@Param("date") LocalDate date);
+    @Query("SELECT COALESCE(SUM(p.grandTotal), 0) FROM PosOrder p WHERE p.date = :date AND p.userId = :userId")
+    BigDecimal sumGrandTotalByDateAndUserId(@Param("date") LocalDate date, @Param("userId") Long userId);
 }

@@ -6,9 +6,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import java.util.List;
+
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    Optional<Category> findBySlug(String slug);
-    boolean existsBySlug(String slug);
-    boolean existsByName(String name);
+    List<Category> findByUserId(Long userId);
+    Optional<Category> findByIdAndUserId(Long id, Long userId);
+    boolean existsByIdAndUserId(Long id, Long userId);
+
+    Optional<Category> findBySlugAndUserId(String slug, Long userId);
+    boolean existsBySlugAndUserId(String slug, Long userId);
+    boolean existsByNameAndUserId(String name, Long userId);
 }

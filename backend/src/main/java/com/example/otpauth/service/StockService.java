@@ -26,7 +26,7 @@ public class StockService {
     }
 
     public List<Stock> getAllStocks() {
-        return stockRepository.findAllByOrderByCreatedAtDesc();
+        return stockRepository.findAllByUserIdOrderByCreatedAtDesc(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     @Transactional
@@ -40,6 +40,7 @@ public class StockService {
 
             // Create Stock Record
             Stock stock = new Stock();
+            stock.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
             stock.setWarehouse(request.getWarehouse());
             stock.setStore(request.getStore());
             stock.setResponsiblePerson(request.getResponsiblePerson());
@@ -67,12 +68,12 @@ public class StockService {
     }
     
     public Optional<Stock> getStockById(Long id) {
-        return stockRepository.findById(id);
+        return stockRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     @Transactional
     public Stock updateStock(Long id, StockUpdateRequest req) {
-        Stock stock = stockRepository.findById(id)
+        Stock stock = stockRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("Stock record not found"));
 
         // Adjust product quantity and potentially swap product
@@ -116,7 +117,7 @@ public class StockService {
 
     @Transactional
     public boolean deleteStock(Long id) {
-        return stockRepository.findById(id).map(stock -> {
+        return stockRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId()).map(stock -> {
             // Revert product quantity
             productRepository.findById(stock.getProductId()).ifPresent(product -> {
                 product.setQuantity(Math.max(0, product.getQuantity() - stock.getQuantity()));

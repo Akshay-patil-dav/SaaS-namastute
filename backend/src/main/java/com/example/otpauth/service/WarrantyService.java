@@ -22,11 +22,12 @@ public class WarrantyService {
     }
 
     public List<Warranty> getAllWarranties() {
-        return warrantyRepository.findAllByOrderByIdDesc();
+        return warrantyRepository.findAllByUserIdOrderByIdDesc(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Warranty createWarranty(WarrantyRequest request) {
         Warranty warranty = new Warranty();
+        warranty.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         warranty.setName(request.getName());
         warranty.setDescription(request.getDescription());
         warranty.setDuration(request.getDuration());
@@ -36,7 +37,7 @@ public class WarrantyService {
     }
 
     public Optional<Warranty> updateWarranty(Long id, WarrantyRequest request) {
-        return warrantyRepository.findById(id).map(existing -> {
+        return warrantyRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId()).map(existing -> {
             existing.setName(request.getName());
             existing.setDescription(request.getDescription());
             existing.setDuration(request.getDuration());
@@ -49,7 +50,7 @@ public class WarrantyService {
     }
 
     public boolean deleteWarranty(Long id) {
-        if (warrantyRepository.existsById(id)) {
+        if (warrantyRepository.existsByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             warrantyRepository.deleteById(id);
             return true;
         }
@@ -58,6 +59,9 @@ public class WarrantyService {
 
     @Transactional
     public void bulkDeleteWarranties(List<Long> ids) {
-        warrantyRepository.deleteAllById(ids);
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        List<Warranty> warranties = warrantyRepository.findAllById(ids);
+        warranties.removeIf(w -> !w.getUserId().equals(userId));
+        warrantyRepository.deleteAll(warranties);
     }
 }

@@ -28,30 +28,31 @@ public class SaleOrderService {
     }
 
     public List<SaleOrder> getAllOrders() {
-        return repository.findAllByOrderByCreatedAtDesc();
+        return repository.findAllByUserIdOrderByCreatedAtDesc(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public Optional<SaleOrder> getOrderById(Long id) {
-        return repository.findById(id);
+        return repository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     public List<SaleOrder> searchOrders(String q) {
-        return repository.searchOrders(q);
+        return repository.searchOrdersByUserId(q, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     /** Returns the number of sale orders placed today (based on the `date` field). */
     public long countTodaySales() {
-        return repository.countByDate(LocalDate.now());
+        return repository.countByDateAndUserId(LocalDate.now(), com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
 
     /** Returns the sum of grandTotal for all sale orders placed today. */
     public BigDecimal sumTodayRevenue() {
-        BigDecimal result = repository.sumGrandTotalByDate(LocalDate.now());
+        BigDecimal result = repository.sumGrandTotalByDateAndUserId(LocalDate.now(), com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         return result != null ? result : BigDecimal.ZERO;
     }
 
     public SaleOrder createOrder(SaleOrderRequest request) throws JsonProcessingException {
         SaleOrder order = new SaleOrder();
+        order.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         mapRequestToEntity(request, order);
         order.setReferenceNo("SL" + String.format("%06d", (long)(Math.random() * 1000000)));
         order.setBiller(request.getBiller() != null ? request.getBiller() : "Admin");
@@ -77,7 +78,7 @@ public class SaleOrderService {
     }
 
     public SaleOrder updateOrder(Long id, SaleOrderRequest request) throws JsonProcessingException {
-        SaleOrder order = repository.findById(id)
+        SaleOrder order = repository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("Sale order not found with id: " + id));
         mapRequestToEntity(request, order);
         if (request.getBiller() != null) order.setBiller(request.getBiller());
@@ -85,7 +86,7 @@ public class SaleOrderService {
     }
 
     public boolean deleteOrder(Long id) {
-        if (repository.existsById(id)) {
+        if (repository.existsByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())) {
             repository.deleteById(id);
             return true;
         }
@@ -93,7 +94,10 @@ public class SaleOrderService {
     }
 
     public void bulkDeleteOrders(List<Long> ids) {
-        repository.deleteAllById(ids);
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        List<SaleOrder> orders = repository.findAllById(ids);
+        orders.removeIf(o -> !o.getUserId().equals(userId));
+        repository.deleteAll(orders);
     }
 
     // ── Internal mapping ─────────────────────────────────────────────────────
