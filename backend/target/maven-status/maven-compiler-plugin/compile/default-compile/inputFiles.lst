@@ -1,5 +1,6 @@
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\UnitController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\SubCategoryController.java
+C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\CrmController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\SettingController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\WarrantyController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\PurchaseRepository.java
@@ -7,6 +8,7 @@ C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\SalesReturn.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\UnitRepository.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\StockTransferController.java
+C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\CustomerRepository.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\SaleOrderController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\ProductService.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\PosOrderRepository.java
@@ -69,12 +71,14 @@ C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\OtpAuthApplication.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\PurchaseController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\SalesReturnService.java
+C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\Customer.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\SubCategory.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\BrandController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\StockTransferService.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\CustomPageRepository.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\PosOrderController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\PosOrderService.java
+C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\CrmService.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\util\AiApiKeyEncryptor.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\SalesReturnController.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\TransferRequest.java
@@ -92,6 +96,7 @@ C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\Role.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\SalesReturnRequest.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\SmsService.java
+C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\InteractionRepository.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\config\PasswordConfig.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\BuilderService.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\UnitRequest.java
@@ -106,5 +111,6 @@ C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\Purchase.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\PosOrderRequest.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\BrandRepository.java
+C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\Interaction.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\AuthService.java
 C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\SubCategoryService.java
