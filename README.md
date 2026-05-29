@@ -1,4 +1,4 @@
-# 📦 Namastute — SaaS Inventory & POS Platform
+  # 📦 Namastute — SaaS Inventory & POS Platform
 
 > **Comprehensive System Documentation** · v1.5 · May 2026  
 > A premium, scalable, multi-tenant Software-as-a-Service (SaaS) POS and Inventory Management system powered by **Spring Boot 3.x (Java 21)** and **React 19 + Vite 8**.
