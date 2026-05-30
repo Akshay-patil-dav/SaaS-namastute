@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient, { API, ENV } from '@/api/config';
 import {
@@ -99,55 +99,7 @@ const CATEGORIES = [
     { name: 'Appliance', icon: 'WashingMachine' }
 ];
 
-const MOCK_CUSTOMERS = [
-    { id: 'c-1', name: 'Walk-in Customer', bonus: 0, loyalty: 0 },
-    { id: 'c-2', name: 'James Anderson', bonus: 148, loyalty: 20 },
-    { id: 'c-3', name: 'Wesley Adrian', bonus: 290, loyalty: 45 },
-    { id: 'c-4', name: 'Jane Miller', bonus: 95, loyalty: 10 }
-];
-
-const INITIAL_CART = [
-    {
-        id: 'mock-1',
-        name: 'iPhone 14 64GB',
-        category: 'Mobiles',
-        price: 15800,
-        sku: 'IPH14-64',
-        images: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&auto=format&fit=crop&q=60',
-        quantity: 12,
-        cartQty: 1
-    },
-    {
-        id: 'mock-4',
-        name: 'Red Nike Angelo',
-        category: 'Shoes',
-        price: 398,
-        sku: 'NKE-ANG-R',
-        images: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=60',
-        quantity: 15,
-        cartQty: 4
-    },
-    {
-        id: 'mock-extra-1',
-        name: 'Tablet 1.02 inch',
-        category: 'Mobiles',
-        price: 3000,
-        sku: 'TAB-1.02',
-        images: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500',
-        quantity: 20,
-        cartQty: 4
-    },
-    {
-        id: 'mock-extra-2',
-        name: 'IdeaPad Slim 3i',
-        category: 'Laptops',
-        price: 3000,
-        sku: 'IP-SL3I',
-        images: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500',
-        quantity: 25,
-        cartQty: 4
-    }
-];
+const DEFAULT_CUSTOMER = { id: 'c-1', name: 'Walk-in Customer', bonus: 0, loyalty: 0 };
 
 export default function POS() {
     const navigate = useNavigate();
@@ -162,15 +114,16 @@ export default function POS() {
     const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
 
     // Cart & Order Information
-    const [cart, setCart] = useState(INITIAL_CART);
-    const [selectedCustomer, setSelectedCustomer] = useState(MOCK_CUSTOMERS[0]);
-    const [showCustomerCard, setShowCustomerCard] = useState(true);
+    const [cart, setCart] = useState([]);
+    const [customersList, setCustomersList] = useState([DEFAULT_CUSTOMER]);
+    const [selectedCustomer, setSelectedCustomer] = useState(DEFAULT_CUSTOMER);
+    const [showCustomerCard, setShowCustomerCard] = useState(false);
     
     // Summary Calculations (Default values from the image)
-    const [shipping, setShipping] = useState(40.21);
-    const [tax, setTax] = useState(25.00);
-    const [coupon, setCoupon] = useState(25.00);
-    const [discountApplied, setDiscountApplied] = useState(true); // 5% discount banner
+    const [shipping, setShipping] = useState(0.00);
+    const [tax, setTax] = useState(0.00);
+    const [coupon, setCoupon] = useState(0.00);
+    const [discountApplied, setDiscountApplied] = useState(false); // 5% discount banner
     const [showSummaryEdit, setShowSummaryEdit] = useState({ type: null, value: '' });
 
     // Modals
@@ -209,39 +162,68 @@ export default function POS() {
         return () => clearInterval(id);
     }, []);
 
-    // --- FETCH PRODUCTS & CATEGORIES ---
+    // --- FETCH PRODUCTS, CATEGORIES & CUSTOMERS ---
     useEffect(() => {
         const fetchAllData = async () => {
             setLoadingProducts(true);
             try {
+                // Fetch customers
+                const custRes = await apiClient.get(`${BASE_URL}/customers`);
+                let dbCusts = Array.isArray(custRes.data) ? custRes.data : [];
+                if (dbCusts.length > 0) {
+                    setCustomersList(dbCusts);
+                    setSelectedCustomer(dbCusts[0]);
+                } else {
+                    setCustomersList([DEFAULT_CUSTOMER]);
+                    setSelectedCustomer(DEFAULT_CUSTOMER);
+                }
+
                 // Fetch products from API
                 const prodRes = await apiClient.get(`${BASE_URL}/products`);
                 let dbProds = Array.isArray(prodRes.data) ? prodRes.data : [];
-                const mappedDb = dbProds.map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    category: p.category || 'Appliance',
-                    price: parseFloat(p.price) || 0,
-                    sku: p.sku || '',
-                    images: p.images ? p.images.split(',')[0].trim() : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500',
-                    quantity: p.quantity || 10
-                }));
+                let mappedDb = [];
+                dbProds.forEach(p => {
+                    if (p.productType === 'Variable Product' && Array.isArray(p.variants) && p.variants.length > 0) {
+                        p.variants.forEach((variantType, typeIdx) => {
+                            if (Array.isArray(variantType.values)) {
+                                variantType.values.forEach((variant, valIdx) => {
+                                    mappedDb.push({
+                                        id: p.id, // Must use parent id to link order items properly
+                                        cartKey: `${p.id}-var-${typeIdx}-${valIdx}`,
+                                        name: `${p.name} - ${variant.value}`,
+                                        category: p.category || 'Appliance',
+                                        price: variant.price ? parseFloat(variant.price) : (parseFloat(p.price) || 0),
+                                        sku: variant.sku || p.sku || '',
+                                        itemBarcode: variant.barcode || p.itemBarcode || '',
+                                        images: variant.image ? variant.image : (p.images ? p.images.split(',')[0].trim() : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'),
+                                        quantity: variant.quantity ? parseInt(variant.quantity) : (p.quantity || 10),
+                                        isVariant: true,
+                                        variantTypeName: variantType.typeName
+                                    });
+                                });
+                            }
+                        });
+                    } else {
+                        mappedDb.push({
+                            id: p.id,
+                            cartKey: `${p.id}`,
+                            name: p.name,
+                            category: p.category || 'Appliance',
+                            price: parseFloat(p.price) || 0,
+                            sku: p.sku || '',
+                            itemBarcode: p.itemBarcode || p.barcode || '',
+                            images: p.images ? p.images.split(',')[0].trim() : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500',
+                            quantity: p.quantity || 10
+                        });
+                    }
+                });
                 
                 // If database is not empty, use ONLY database products! If empty, fallback to rich mock data.
                 const finalProducts = mappedDb.length > 0 ? mappedDb : MOCK_PRODUCTS;
                 setProducts(finalProducts);
                 setFilteredProducts(finalProducts);
 
-                // Map the initial cart items to real database products if they exist
-                if (mappedDb.length > 0) {
-                    const firstFewProds = mappedDb.slice(0, 3).map((dbProd, index) => ({
-                        ...dbProd,
-                        cartQty: index === 0 ? 1 : 4 // mimicking standard mockup cart quantities
-                    }));
-                    setCart(firstFewProds);
-                } else {
-                    setCart(INITIAL_CART);
-                }
+                // No prefilling of cart. Empty by default!
 
                 // Dynamically build category list if database has new ones
                 const dbCats = ['All', ...new Set(dbProds.map(p => p.category).filter(Boolean))];
@@ -284,7 +266,8 @@ export default function POS() {
             const query = searchTerm.toLowerCase();
             result = result.filter(p => 
                 p.name?.toLowerCase().includes(query) || 
-                p.sku?.toLowerCase().includes(query)
+                p.sku?.toLowerCase().includes(query) ||
+                p.itemBarcode?.toLowerCase().includes(query)
             );
         }
 
@@ -293,29 +276,29 @@ export default function POS() {
 
     // --- CART ACTIONS ---
     const addToCart = (product) => {
-        const exist = cart.find(item => item.id === product.id);
+        const exist = cart.find(item => item.cartKey === product.cartKey);
         if (exist) {
             setCart(cart.map(item => 
-                item.id === product.id ? { ...item, cartQty: item.cartQty + 1 } : item
+                item.cartKey === product.cartKey ? { ...item, cartQty: item.cartQty + 1 } : item
             ));
         } else {
             setCart([...cart, { ...product, cartQty: 1 }]);
         }
     };
 
-    const updateCartQty = (productId, change) => {
-        const item = cart.find(x => x.id === productId);
+    const updateCartQty = (productKey, change) => {
+        const item = cart.find(x => x.cartKey === productKey);
         if (!item) return;
         const newQty = item.cartQty + change;
         if (newQty <= 0) {
-            removeFromCart(productId);
+            removeFromCart(productKey);
         } else {
-            setCart(cart.map(x => x.id === productId ? { ...x, cartQty: newQty } : x));
+            setCart(cart.map(x => x.cartKey === productKey ? { ...x, cartQty: newQty } : x));
         }
     };
 
-    const removeFromCart = (productId) => {
-        setCart(cart.filter(x => x.id !== productId));
+    const removeFromCart = (productKey) => {
+        setCart(cart.filter(x => x.cartKey !== productKey));
     };
 
     const clearCart = () => {
@@ -325,33 +308,35 @@ export default function POS() {
     // --- CUSTOMER ACTIONS ---
     const handleSelectCustomer = (e) => {
         const custId = e.target.value;
-        const found = MOCK_CUSTOMERS.find(c => c.id === custId);
+        const found = customersList.find(c => String(c.id) === String(custId));
         if (found) {
             setSelectedCustomer(found);
-            setShowCustomerCard(found.id !== 'c-1'); // hide info card for Walk-in Customer
+            setShowCustomerCard(String(found.id) !== 'c-1'); // hide info card for Walk-in Customer
         }
     };
 
     const handleApplyCustomerBonus = () => {
         // Mock Applying Loyalty
-        alert(`Successfully applied $${selectedCustomer.loyalty} Loyalty Balance as coupon discount!`);
-        setCoupon(prev => prev + selectedCustomer.loyalty);
+        alert(`Successfully applied $${selectedCustomer.loyalty || 0} Loyalty Balance as coupon discount!`);
+        setCoupon(prev => prev + (selectedCustomer.loyalty || 0));
         setShowCustomerCard(false);
     };
 
-    const handleCreateCustomer = () => {
+    const handleCreateCustomer = async () => {
         if (!newCustomerName.trim()) return;
-        const newCust = {
-            id: `c-${Date.now()}`,
-            name: newCustomerName,
-            bonus: 20,
-            loyalty: 5
-        };
-        MOCK_CUSTOMERS.push(newCust);
-        setSelectedCustomer(newCust);
-        setShowCustomerCard(true);
-        setNewCustomerName('');
-        setCustomerModalOpen(false);
+        try {
+            const res = await apiClient.post(`${BASE_URL}/customers`, { name: newCustomerName });
+            const newCust = res.data;
+            const updatedList = [...customersList, newCust];
+            setCustomersList(updatedList);
+            setSelectedCustomer(newCust);
+            setShowCustomerCard(true);
+            setNewCustomerName('');
+            setCustomerModalOpen(false);
+        } catch (error) {
+            console.error("Failed to create customer", error);
+            alert("Failed to add customer. Please try again.");
+        }
     };
 
     // --- CALCULATIONS ---
@@ -412,7 +397,7 @@ export default function POS() {
         try {
             // Map products list format for the Spring Boot endpoint
             const formattedProducts = cart.map(item => ({
-                productId: typeof item.id === 'string' && item.id.startsWith('mock') ? 1 : item.id, // Fallback to ID 1 if mock
+                productId: item.id,
                 name: item.name,
                 sku: item.sku,
                 quantity: item.cartQty,
@@ -497,12 +482,12 @@ export default function POS() {
     const handleReset = () => {
         if (window.confirm("Reset entire terminal to defaults?")) {
             clearCart();
-            setSelectedCustomer(MOCK_CUSTOMERS[0]);
+            setSelectedCustomer(customersList[0] || DEFAULT_CUSTOMER);
             setShowCustomerCard(false);
-            setShipping(40.21);
-            setTax(25.00);
-            setCoupon(25.00);
-            setDiscountApplied(true);
+            setShipping(0.00);
+            setTax(0.00);
+            setCoupon(0.00);
+            setDiscountApplied(false);
             setSearchTerm('');
             setSelectedCategory('All');
         }
@@ -755,12 +740,12 @@ export default function POS() {
                                     </thead>
                                     <tbody>
                                         {filteredProducts.map(p => {
-                                            const cartItem = cart.find(x => x.id === p.id);
+                                            const cartItem = cart.find(x => x.sku === p.sku);
                                             const inCart = !!cartItem;
                                             const isOutOfStock = p.quantity <= 0;
                                             
                                             return (
-                                                <tr key={p.id} className={inCart ? 'row-selected-in-cart' : ''}>
+                                                <tr key={p.sku} className={inCart ? 'row-selected-in-cart' : ''}>
                                                     <td>
                                                         <div className="pos-table-prod-info">
                                                             <img src={p.images} alt={p.name} className="pos-table-prod-img" onError={(e) => {
@@ -787,11 +772,11 @@ export default function POS() {
                                                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                                                             {inCart ? (
                                                                     <div className="pos-table-qty-controls" onClick={(e) => e.stopPropagation()}>
-                                                                        <button onClick={() => updateCartQty(p.id, -1)} className="pos-table-qty-btn">
+                                                                        <button onClick={() => updateCartQty(p.sku, -1)} className="pos-table-qty-btn">
                                                                             <Minus size={12} />
                                                                         </button>
                                                                         <span className="pos-table-qty-val">{cartItem.cartQty}</span>
-                                                                        <button onClick={() => updateCartQty(p.id, 1)} className="pos-table-qty-btn">
+                                                                        <button onClick={() => updateCartQty(p.sku, 1)} className="pos-table-qty-btn">
                                                                             <Plus size={12} />
                                                                         </button>
                                                                     </div>
@@ -818,7 +803,7 @@ export default function POS() {
                         ) : (
                             <div className="pos-products-grid">
                                 {filteredProducts.map(p => {
-                                    const cartItem = cart.find(x => x.id === p.id);
+                                    const cartItem = cart.find(x => x.sku === p.sku);
                                     const inCart = !!cartItem;
                                     const isAirpodSelected = p.name === 'Airpod 2';
                                     const hasHighlight = inCart || isAirpodSelected;
@@ -831,7 +816,7 @@ export default function POS() {
 
                                     return (
                                         <div 
-                                            key={p.id} 
+                                            key={p.sku} 
                                             className={`pos-product-card ${hasHighlight ? 'selected-in-cart' : ''}`}
                                             onClick={() => !inCart && addToCart(p)}
                                         >
@@ -858,7 +843,7 @@ export default function POS() {
                                                         <div className="pos-card-qty-controls" onClick={(e) => e.stopPropagation()}>
                                                             <button onClick={() => {
                                                                 if (cartItem) {
-                                                                    updateCartQty(p.id, -1);
+                                                                    updateCartQty(p.sku, -1);
                                                                 } else {
                                                                     addToCart({ ...p, cartQty: 3 });
                                                                 }
@@ -868,7 +853,7 @@ export default function POS() {
                                                             <span className="pos-card-qty-val">{cartItem ? cartItem.cartQty : 4}</span>
                                                             <button onClick={() => {
                                                                 if (cartItem) {
-                                                                    updateCartQty(p.id, 1);
+                                                                    updateCartQty(p.sku, 1);
                                                                 } else {
                                                                     addToCart(p);
                                                                 }
@@ -878,11 +863,11 @@ export default function POS() {
                                                         </div>
                                                     ) : inCart ? (
                                                         <div className="pos-card-qty-controls" onClick={(e) => e.stopPropagation()}>
-                                                            <button onClick={() => updateCartQty(p.id, -1)} className="pos-card-qty-btn">
+                                                            <button onClick={() => updateCartQty(p.sku, -1)} className="pos-card-qty-btn">
                                                                 <Minus size={12} />
                                                             </button>
                                                             <span className="pos-card-qty-val">{cartItem.cartQty}</span>
-                                                            <button onClick={() => updateCartQty(p.id, 1)} className="pos-card-qty-btn">
+                                                            <button onClick={() => updateCartQty(p.sku, 1)} className="pos-card-qty-btn">
                                                                 <Plus size={12} />
                                                             </button>
                                                         </div>
@@ -923,8 +908,8 @@ export default function POS() {
                     <div className="pos-customer-selection-card">
                         <div className="pos-customer-input-row">
                             <div className="pos-customer-select-wrapper">
-                                <select value={selectedCustomer.id} onChange={handleSelectCustomer}>
-                                    {MOCK_CUSTOMERS.map(c => (
+                                <select value={selectedCustomer?.id || ''} onChange={handleSelectCustomer}>
+                                    {customersList.map(c => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
                                 </select>
@@ -944,13 +929,13 @@ export default function POS() {
                             <div className="pos-loyalty-bonus-card animate-pop">
                                 <button className="pos-loyalty-close" onClick={() => setShowCustomerCard(false)}>×</button>
                                 <div className="pos-loyalty-info">
-                                    <h4>James Anderson</h4>
+                                    <h4>{selectedCustomer?.name}</h4>
                                     <div className="pos-loyalty-badges">
                                         <span className="pos-loyalty-badge bonus">
-                                            Bonus: <span className="bonus-val">148</span>
+                                            Bonus: <span className="bonus-val">{selectedCustomer?.bonus || 0}</span>
                                         </span>
                                         <span className="pos-loyalty-badge loyalty">
-                                            Loyalty: <span className="loyalty-val">$20</span>
+                                            Loyalty: <span className="loyalty-val">${selectedCustomer?.loyalty || 0}</span>
                                         </span>
                                     </div>
                                 </div>
@@ -989,7 +974,7 @@ export default function POS() {
                                 </div>
                             ) : (
                                 cart.map(item => (
-                                    <div className="pos-cart-item-row" key={item.id}>
+                                    <div className="pos-cart-item-row" key={item.cartKey}>
                                         <div className="pos-cart-item-info">
                                             <span className="pos-cart-item-bullet">📦</span>
                                             <span className="pos-cart-item-name" title={item.name}>{item.name}</span>
@@ -997,11 +982,11 @@ export default function POS() {
 
                                         <div className="pos-cart-qty-spinner-cell">
                                             <div className="pos-cart-qty-spinner">
-                                                <button onClick={() => updateCartQty(item.id, -1)} className="spinner-btn">
+                                                <button onClick={() => updateCartQty(item.cartKey, -1)} className="spinner-btn">
                                                     <Minus size={11} />
                                                 </button>
                                                 <span className="spinner-val">{item.cartQty}</span>
-                                                <button onClick={() => updateCartQty(item.id, 1)} className="spinner-btn">
+                                                <button onClick={() => updateCartQty(item.cartKey, 1)} className="spinner-btn">
                                                     <Plus size={11} />
                                                 </button>
                                             </div>

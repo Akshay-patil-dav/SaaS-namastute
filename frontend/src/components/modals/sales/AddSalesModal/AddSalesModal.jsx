@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Trash2, AlertTriangle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../AddPosModal/add-sales-modal.css';
@@ -41,9 +41,10 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
     }, [searchQ, isOpen]);
 
     const selectProduct = p => {
-        const existing = products.find(x => x.productId === p.id);
-        if (existing) setProducts(prev => prev.map(x => x.productId === p.id ? {...x, quantity: x.quantity+1} : x));
-        else setProducts(prev => [...prev, { productId:p.id, name:p.name, sku:p.sku||'', img: p.images?p.images.split(',')[0].trim():'', quantity:1, unitPrice:parseFloat(p.price)||0, discount:0, taxPercent:0 }]);
+        const productSku = p.sku || `TMP-${p.id}`;
+        const existing = products.find(x => x.sku === productSku);
+        if (existing) setProducts(prev => prev.map(x => x.sku === productSku ? {...x, quantity: x.quantity+1} : x));
+        else setProducts(prev => [...prev, { productId:p.id, name:p.name, sku:productSku, img: p.images?p.images.split(',')[0].trim():'', quantity:1, unitPrice:parseFloat(p.price)||0, discount:0, taxPercent:0 }]);
         setSearchQ(''); setShowDrop(false);
     };
 
@@ -70,33 +71,9 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
         if (!products.length) return setError('Add at least one product.');
         setError(''); setSubmitting(true);
         try {
-            // Validate product stocks before placing order
-            const { data: dbProducts } = await apiClient.get(`${BASE_URL}/products`);
-            const stockMap = {};
-            if (Array.isArray(dbProducts)) {
-                dbProducts.forEach(p => {
-                    stockMap[p.id] = p.quantity ?? 0;
-                });
-            }
-
-            const errorProds = products.filter(p => {
-                const stock = stockMap[p.productId] ?? 0;
-                return stock <= 0 || p.quantity > stock;
-            }).map(p => ({
-                ...p,
-                availableStock: stockMap[p.productId] ?? 0
-            }));
-
-            if (errorProds.length > 0) {
-                setWarningProducts(errorProds);
-                setWarningModalOpen(true);
-                setSubmitting(false);
-                return;
-            }
-
             await apiClient.post(`${BASE_URL}/sales`, { ...form, orderTax:+form.orderTax, discount:+form.discount, shipping:+form.shipping, paidAmount:+form.paidAmount, products });
             onSuccess?.(); onClose();
-        } catch (err) { setError(err.response?.data?.error || 'Failed to create sale.'); }
+        } catch (err) { setError(err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to create sale.'); }
         finally { setSubmitting(false); }
     };
 

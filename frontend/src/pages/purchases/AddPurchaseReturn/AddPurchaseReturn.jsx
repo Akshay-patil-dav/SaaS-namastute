@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../inventory/CreateProduct/CreateProduct.css'; // Reusing common form styles
 import '../AddPurchase/AddPurchase.css';    // Specific styles for Purchase table
 import { 
@@ -58,15 +58,43 @@ const AddPurchaseReturn = () => {
             setLoading(true);
             try {
                 const res = await apiClient.get(`${ENV.API_BASE_URL}/products`);
-                // Map DB fields to our UI needs
-                const mapped = res.data.map(p => ({
-                    ...p,
-                    barcode: p.itemBarcode || p.sku || '',
-                    image: p.images ? p.images.split(',')[0] : 'https://images.unsplash.com/photo-1586769852044-692d6e67741e?w=100&h=100&fit=crop',
-                    taxRate: p.tax ? parseInt(p.tax.replace(/[^0-9]/g, '')) : 0,
-                    // Use price from DB if available
-                    price: parseFloat(p.price) || 0
-                }));
+                // Map DB fields to our UI needs and flatten variants
+                const mapped = [];
+                res.data.forEach(p => {
+                    if (p.productType !== 'Variable Product') {
+                        mapped.push({
+                            ...p,
+                            sku: p.sku || `TMP-${p.id}`,
+                            barcode: p.itemBarcode || p.sku || '',
+                            image: p.images ? p.images.split(',')[0] : 'https://images.unsplash.com/photo-1586769852044-692d6e67741e?w=100&h=100&fit=crop',
+                            taxRate: p.tax ? parseInt(p.tax.replace(/[^0-9]/g, '')) : 0,
+                            price: parseFloat(p.price) || 0
+                        });
+                    } else {
+                        try {
+                            const variantTypes = p.variants || [];
+                            variantTypes.forEach(vt => {
+                                if (vt.values && Array.isArray(vt.values)) {
+                                    vt.values.forEach(v => {
+                                        mapped.push({
+                                            ...p,
+                                            id: p.id,
+                                            name: `${p.name} (${v.value})`,
+                                            sku: v.sku || `TMP-${p.id}-${v.value}`,
+                                            barcode: v.barcode || v.sku || '',
+                                            image: v.image || (p.images ? p.images.split(',')[0] : 'https://images.unsplash.com/photo-1586769852044-692d6e67741e?w=100&h=100&fit=crop'),
+                                            taxRate: p.tax ? parseInt(p.tax.replace(/[^0-9]/g, '')) : 0,
+                                            price: parseFloat(v.price) || 0,
+                                            quantity: parseInt(v.quantity) || 0
+                                        });
+                                    });
+                                }
+                            });
+                        } catch (e) {
+                            console.error('Error mapping variants', e);
+                        }
+                    }
+                });
                 setDbProducts(mapped);
             } catch (err) {
                 console.error('Failed to fetch products', err);
@@ -85,7 +113,8 @@ const AddPurchaseReturn = () => {
         if (val.length > 0) {
             const matches = dbProducts.filter(p => 
                 p.name.toLowerCase().includes(val.toLowerCase()) || 
-                (p.barcode && p.barcode.includes(val))
+                (p.barcode && String(p.barcode).toLowerCase().includes(val.toLowerCase())) ||
+                (p.sku && String(p.sku).toLowerCase().includes(val.toLowerCase()))
             );
             
             setSuggestions(matches);
@@ -132,9 +161,9 @@ const AddPurchaseReturn = () => {
         };
     };
 
-    const updateItemField = (id, field, value) => {
+    const updateItemField = (sku, field, value) => {
         setItems(prev => prev.map(item => {
-            if (item.id === id) {
+            if (item.sku === sku) {
                 let val = parseFloat(value);
                 if (isNaN(val)) val = 0;
                 return calculateItem({ ...item, [field]: val });
@@ -145,10 +174,10 @@ const AddPurchaseReturn = () => {
 
     const addItem = (product) => {
         setItems(prev => {
-            const existing = prev.find(item => item.id === product.id);
+            const existing = prev.find(item => item.sku === product.sku);
             if (existing) {
                 return prev.map(item => 
-                    item.id === product.id 
+                    item.sku === product.sku 
                     ? calculateItem({ ...item, qty: item.qty + 1 })
                     : item
                 );
@@ -162,11 +191,11 @@ const AddPurchaseReturn = () => {
         });
     };
 
-    const removeItem = (id) => {
-        setItems(prev => prev.filter(item => item.id !== id));
+    const removeItem = (sku) => {
+        setItems(prev => prev.filter(item => item.sku !== sku));
     };
 
-    const updateQty = (id, newQty) => {
+    const updateQty = (sku, newQty) => {
         let qty = newQty;
         if (qty !== '') {
             qty = parseInt(qty);
@@ -174,7 +203,7 @@ const AddPurchaseReturn = () => {
         }
 
         setItems(prev => prev.map(item => {
-            if (item.id === id) {
+            if (item.sku === sku) {
                 return calculateItem({ ...item, qty });
             }
             return item;
@@ -329,7 +358,7 @@ const AddPurchaseReturn = () => {
                             {showSuggestions && suggestions.length > 0 && (
                                 <ul className="search-suggestions-dropdown">
                                     {suggestions.map(p => (
-                                        <li key={p.id} onClick={() => handleSelectProduct(p)}>
+                                        <li key={p.sku} onClick={() => handleSelectProduct(p)}>
                                             <div className="suggestion-info">
                                                 <span className="suggestion-name">{p.name}</span>
                                                 <span className="suggestion-barcode">{p.barcode}</span>
@@ -361,7 +390,7 @@ const AddPurchaseReturn = () => {
                                 <tbody>
                                     {items.length > 0 ? (
                                         items.map((item) => (
-                                            <tr key={item.id}>
+                                            <tr key={item.sku}>
                                                 <td className="fw-bold text-dark">
                                                     <div className="ap-table-product">
                                                         <img src={item.image} alt={item.name} className="ap-table-product-img" />
@@ -370,36 +399,36 @@ const AddPurchaseReturn = () => {
                                                 </td>
                                                 <td style={{ width: '140px' }}>
                                                     <div className="ap-qty-selector">
-                                                        <button type="button" onClick={() => updateQty(item.id, item.qty + 1)}>
+                                                        <button type="button" onClick={() => updateQty(item.sku, item.qty + 1)}>
                                                             <PlusCircle size={18} />
                                                         </button>
                                                         <input 
                                                             type="number" 
                                                             className="cp-input text-center mx-1" 
                                                             value={item.qty} 
-                                                            onChange={(e) => updateQty(item.id, e.target.value)}
+                                                            onChange={(e) => updateQty(item.sku, e.target.value)}
                                                             style={{ width: '50px', padding: '2px 4px', height: '30px' }}
                                                         />
-                                                        <button type="button" onClick={() => updateQty(item.id, item.qty - 1)}>
+                                                        <button type="button" onClick={() => updateQty(item.sku, item.qty - 1)}>
                                                             <MinusCircle size={18} />
                                                         </button>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <input type="number" className="cp-input" value={item.price} onChange={(e) => updateItemField(item.id, 'price', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
+                                                    <input type="number" className="cp-input" value={item.price} onChange={(e) => updateItemField(item.sku, 'price', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
                                                 </td>
                                                 <td>
-                                                    <input type="number" className="cp-input" value={item.discount} onChange={(e) => updateItemField(item.id, 'discount', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
+                                                    <input type="number" className="cp-input" value={item.discount} onChange={(e) => updateItemField(item.sku, 'discount', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
                                                 </td>
                                                 <td>
-                                                    <input type="number" className="cp-input" value={item.taxRate} onChange={(e) => updateItemField(item.id, 'taxRate', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
+                                                    <input type="number" className="cp-input" value={item.taxRate} onChange={(e) => updateItemField(item.sku, 'taxRate', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
                                                 </td>
                                                 <td>{item.taxAmount.toFixed(2)}</td>
                                                 <td>{item.unitCost.toFixed(2)}</td>
                                                 <td className="fw-bold text-dark">{(item.totalCost).toFixed(2)}</td>
 
                                                 <td style={{ textAlign: 'center' }}>
-                                                    <button type="button" className="ss-action-btn delete" onClick={() => removeItem(item.id)}>
+                                                    <button type="button" className="ss-action-btn delete" onClick={() => removeItem(item.sku)}>
                                                         <Trash2 size={15} />
                                                     </button>
                                                 </td>

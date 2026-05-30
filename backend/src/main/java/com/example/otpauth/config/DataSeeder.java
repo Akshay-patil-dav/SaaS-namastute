@@ -80,17 +80,17 @@ public class DataSeeder {
             });
 
             // // ── 3. Upsert SUPER_ADMIN user (always sync password on startup) ──
-            // String superAdminEmail = "admin@gmail.com";
-            // String superAdminPassword = "Admin@12345";
-            // String superAdminName = "Super Admin";
+            String superAdminEmail = "admin@gmail.com";
+            String superAdminPassword = "Admin@12345";
+            String superAdminName = "Super Admin";
 
-            // User superAdmin = userRepository.findByEmail(superAdminEmail).orElseGet(() ->
-            // {
-            // User newUser = new User(superAdminEmail,
-            // passwordEncoder.encode(superAdminPassword), superAdminName);
-            // newUser.getRoles().add(superAdminRole);
-            // return userRepository.save(newUser);
-            // });
+            User superAdmin = userRepository.findByEmail(superAdminEmail).orElseGet(() ->
+            {
+            User newUser = new User(superAdminEmail,
+            passwordEncoder.encode(superAdminPassword), superAdminName);
+            newUser.getRoles().add(superAdminRole);
+            return userRepository.save(newUser);
+            });
 
             // ── 4. Seed default units for SUPER_ADMIN
             // ────────────────────────────────────────

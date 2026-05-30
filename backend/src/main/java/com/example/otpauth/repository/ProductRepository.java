@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByExpiryDateBeforeAndUserId(LocalDate date, Long userId);
     int countByUnitAndUserId(String unit, Long userId);
 
-    @org.springframework.data.jpa.repository.Query("SELECT p FROM Product p WHERE p.userId = :userId AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.itemBarcode) LIKE LOWER(CONCAT('%', :query, '%')))")
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Product p WHERE p.userId = :userId AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.itemBarcode) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.variantsJson) LIKE LOWER(CONCAT('%', :query, '%')))")
     List<Product> searchProductsByUserId(@org.springframework.data.repository.query.Param("query") String query, @org.springframework.data.repository.query.Param("userId") Long userId);
 }
 

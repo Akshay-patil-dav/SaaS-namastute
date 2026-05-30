@@ -66,9 +66,39 @@ public class PurchaseReturnService {
                     if (item.get("id") != null && item.get("qty") != null) {
                         Long productId = Long.valueOf(item.get("id").toString());
                         Integer qty = Integer.valueOf(item.get("qty").toString());
+                        String sku = item.get("sku") != null ? item.get("sku").toString() : null;
+
                         productRepository.findById(productId).ifPresent(product -> {
                             int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
                             product.setQuantity(currentQty - qty);
+
+                            if (sku != null && "Variable Product".equals(product.getProductType())) {
+                                try {
+                                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                                    java.util.List<java.util.Map<String, Object>> variantTypes = mapper.readValue(product.getVariantsJson(), new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {});
+                                    for (java.util.Map<String, Object> vtMap : variantTypes) {
+                                        Object valuesObj = vtMap.get("values");
+                                        if (valuesObj instanceof java.util.List) {
+                                            java.util.List<java.util.Map<String, Object>> valuesList = (java.util.List<java.util.Map<String, Object>>) valuesObj;
+                                            for (java.util.Map<String, Object> vMap : valuesList) {
+                                                if (sku.equals(vMap.get("sku"))) {
+                                                    Object qtyObj = vMap.get("quantity");
+                                                    int vQty = 0;
+                                                    if (qtyObj instanceof Number) vQty = ((Number) qtyObj).intValue();
+                                                    else if (qtyObj instanceof String) {
+                                                        try { vQty = Integer.parseInt((String) qtyObj); } catch(Exception ignored){}
+                                                    }
+                                                    vMap.put("quantity", vQty - qty);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    product.setVariantsJson(mapper.writeValueAsString(variantTypes));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
                             productRepository.save(product);
                         });
                     }

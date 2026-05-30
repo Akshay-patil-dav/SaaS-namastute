@@ -69,6 +69,40 @@ public class SaleOrderService {
                                 + " (Requested: " + op.getQuantity() + ", Available: " + currentQty + ")");
                     }
                     product.setQuantity(currentQty - op.getQuantity());
+                    
+                    if (op.getSku() != null && "Variable Product".equals(product.getProductType())) {
+                        try {
+                            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                            java.util.List<java.util.Map<String, Object>> variantTypes = mapper.readValue(product.getVariantsJson(), new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {});
+                            for (java.util.Map<String, Object> vtMap : variantTypes) {
+                                Object valuesObj = vtMap.get("values");
+                                if (valuesObj instanceof java.util.List) {
+                                    java.util.List<java.util.Map<String, Object>> valuesList = (java.util.List<java.util.Map<String, Object>>) valuesObj;
+                                    for (java.util.Map<String, Object> vMap : valuesList) {
+                                        if (op.getSku().equals(vMap.get("sku"))) {
+                                            Object qtyObj = vMap.get("quantity");
+                                            int vQty = 0;
+                                            if (qtyObj instanceof Number) vQty = ((Number) qtyObj).intValue();
+                                            else if (qtyObj instanceof String) {
+                                                try { vQty = Integer.parseInt((String) qtyObj); } catch(Exception ignored){}
+                                            }
+                                            if (op.getQuantity() > vQty) {
+                                                throw new RuntimeException("Insufficient stock for variant: " + op.getSku());
+                                            }
+                                            vMap.put("quantity", vQty - op.getQuantity());
+                                        }
+                                    }
+                                }
+                            }
+                            product.setVariantsJson(mapper.writeValueAsString(variantTypes));
+                        } catch (Exception e) {
+                            if (e instanceof RuntimeException && e.getMessage().contains("Insufficient stock for variant")) {
+                                throw (RuntimeException) e;
+                            }
+                            e.printStackTrace();
+                        }
+                    }
+
                     productRepository.save(product);
                 }
             }

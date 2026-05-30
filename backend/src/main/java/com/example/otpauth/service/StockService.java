@@ -61,6 +61,39 @@ public class StockService {
 
             // Update Product Quantity
             product.setQuantity(product.getQuantity() + item.getQuantity());
+            
+            if (item.getSku() != null && "Variable Product".equals(product.getProductType())) {
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    java.util.List<java.util.Map<String, Object>> variantTypes = mapper.readValue(product.getVariantsJson(), new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {});
+                    for (java.util.Map<String, Object> vtMap : variantTypes) {
+                        Object valuesObj = vtMap.get("values");
+                        if (valuesObj instanceof java.util.List) {
+                            java.util.List<java.util.Map<String, Object>> valuesList = (java.util.List<java.util.Map<String, Object>>) valuesObj;
+                            for (java.util.Map<String, Object> vMap : valuesList) {
+                                if (item.getSku().equals(vMap.get("sku"))) {
+                                    Object qtyObj = vMap.get("quantity");
+                                    int vQty = 0;
+                                    if (qtyObj instanceof Number) vQty = ((Number) qtyObj).intValue();
+                                    else if (qtyObj instanceof String) {
+                                        try { vQty = Integer.parseInt((String) qtyObj); } catch(Exception ignored){}
+                                    }
+                                    vMap.put("quantity", vQty + item.getQuantity());
+                                    stock.setProductSku(item.getSku());
+                                }
+                            }
+                        }
+                    }
+                    product.setVariantsJson(mapper.writeValueAsString(variantTypes));
+                    stockRepository.save(stock); // Re-save with updated SKU
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (item.getSku() != null) {
+                stock.setProductSku(item.getSku());
+                stockRepository.save(stock); // Re-save with updated SKU
+            }
+            
             productRepository.save(product);
         }
 

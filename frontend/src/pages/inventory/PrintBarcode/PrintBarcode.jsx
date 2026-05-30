@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import BarcodeModal from '../../../components/modals/inventory/BarcodeModal/BarcodeModal';
 import QRCodeModal from '../../../components/modals/inventory/QRCodeModal/QRCodeModal';
 import apiClient, { API, ENV } from '@/api/config';
@@ -55,8 +55,51 @@ const PrintBarcode = () => {
 
             try {
                 const response = await apiClient.get(url);
+                
+                // Flatten results to extract variants
+                let flattened = [];
+                response.data.forEach(product => {
+                    if (product.productType === 'Variable Product' && Array.isArray(product.variants) && product.variants.length > 0) {
+                        product.variants.forEach((variantType, typeIdx) => {
+                            if (Array.isArray(variantType.values)) {
+                                variantType.values.forEach((variant, valIdx) => {
+                                    flattened.push({
+                                        ...product,
+                                        id: `${product.id}-${typeIdx}-${valIdx}`,
+                                        name: `${product.name} - ${variant.value}`,
+                                        sku: variant.sku || product.sku,
+                                        itemBarcode: variant.barcode || product.itemBarcode,
+                                        price: variant.price || product.price,
+                                        images: variant.image || product.images,
+                                        isVariant: true,
+                                        parentId: product.id,
+                                        variantTypeName: variantType.typeName
+                                    });
+                                });
+                            }
+                        });
+                    } else {
+                        // ProductSearchDTO returns 'barcode' instead of 'itemBarcode'
+                        if (product.barcode && !product.itemBarcode) {
+                            product.itemBarcode = product.barcode;
+                        }
+                        flattened.push(product);
+                    }
+                });
+
+                // If searching, we should further filter flattened list to only include matching variants
+                if (searchQuery.length > 0) {
+                    const query = searchQuery.toLowerCase();
+                    flattened = flattened.filter(item => 
+                        (item.name && String(item.name).toLowerCase().includes(query)) ||
+                        (item.itemBarcode && String(item.itemBarcode).toLowerCase().includes(query)) ||
+                        (item.barcode && String(item.barcode).toLowerCase().includes(query)) ||
+                        (item.sku && String(item.sku).toLowerCase().includes(query))
+                    );
+                }
+
                 // Limit to 10 suggestions for performance if empty, otherwise show search results
-                setSearchResults(searchQuery.length > 0 ? response.data : response.data.slice(0, 10));
+                setSearchResults(searchQuery.length > 0 ? flattened : flattened.slice(0, 10));
                 setShowSuggestions(true);
             } catch (error) {
                 console.error('Search error:', error);
@@ -229,7 +272,7 @@ const PrintBarcode = () => {
                                                     </div>
                                                     
                                                     <div className="suggestion-barcode-badge">
-                                                        {product.itemBarcode}
+                                                        {product.itemBarcode || product.barcode || ''}
                                                     </div>
                                                 </div>
                                             </li>
@@ -265,7 +308,7 @@ const PrintBarcode = () => {
                                     <tr key={product.id}>
                                         <td style={{ padding: '16px', verticalAlign: 'middle' }}>{product.name}</td>
                                         <td style={{ padding: '16px', verticalAlign: 'middle', color: '#6b7280' }}>{product.sku}</td>
-                                        <td style={{ padding: '16px', verticalAlign: 'middle', color: '#6b7280' }}>{product.itemBarcode || 'N/A'}</td>
+                                        <td style={{ padding: '16px', verticalAlign: 'middle', color: '#6b7280' }}>{product.itemBarcode || product.barcode || 'N/A'}</td>
                                         <td style={{ padding: '16px', verticalAlign: 'middle' }}>
                                             <div className="d-inline-flex border rounded align-items-center" style={{ width: '100px', height: '36px', justifyContent: 'space-between' }}>
                                                 <button 

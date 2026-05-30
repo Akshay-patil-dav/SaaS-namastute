@@ -55,14 +55,19 @@ const BarcodeModal = ({
                                         
                                         <div className="barcode-image-container">
                                             <img 
-                                                src={`https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(product.sku)}&scale=2&rotate=N`} 
-                                                alt={`Barcode for ${product.sku}`}
+                                                src={`https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(product.itemBarcode || product.barcode || product.sku)}&scale=2&rotate=N`} 
+                                                alt={`Barcode for ${product.itemBarcode || product.barcode || product.sku}`}
                                                 className="barcode-image"
                                             />
                                         </div>
 
                                         
-                                        <div className="barcode-sku">{product.sku}</div>
+                                        <div className="barcode-sku" style={{fontSize: '11px', marginTop: '4px'}}>SKU: {product.sku}</div>
+                                        { (product.itemBarcode || product.barcode) && (
+                                            <div className="barcode-item" style={{fontSize: '11px', textAlign: 'center'}}>
+                                                Barcode: {product.itemBarcode || product.barcode}
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>

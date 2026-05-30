@@ -36,8 +36,83 @@ public class ProductService {
     }
 
     /** Search products by name or barcode */
-    public List<Product> searchProducts(String query) {
-        return productRepository.searchProductsByUserId(query, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+    public List<com.example.otpauth.dto.ProductSearchDTO> searchProducts(String query) {
+        List<Product> products = productRepository.searchProductsByUserId(query, com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+        List<com.example.otpauth.dto.ProductSearchDTO> results = new java.util.ArrayList<>();
+        String lowerQuery = query != null ? query.toLowerCase() : "";
+
+        for (Product p : products) {
+            if (!"Variable Product".equals(p.getProductType())) {
+                com.example.otpauth.dto.ProductSearchDTO dto = new com.example.otpauth.dto.ProductSearchDTO();
+                dto.setId(p.getId());
+                dto.setName(p.getName());
+                dto.setSku(p.getSku());
+                dto.setItemBarcode(p.getItemBarcode());
+                dto.setCategory(p.getCategory());
+                dto.setPrice(p.getPrice());
+                dto.setQuantity(p.getQuantity());
+                dto.setImages(p.getImages());
+                dto.setProductType(p.getProductType());
+                results.add(dto);
+            } else {
+                List<Object> variantTypes = p.getVariantsParsed();
+                for (Object vtObj : variantTypes) {
+                    if (vtObj instanceof java.util.Map) {
+                        java.util.Map<?, ?> vtMap = (java.util.Map<?, ?>) vtObj;
+                        Object valuesObj = vtMap.get("values");
+                        if (valuesObj instanceof java.util.List) {
+                            java.util.List<?> valuesList = (java.util.List<?>) valuesObj;
+                            for (Object valObj : valuesList) {
+                                if (valObj instanceof java.util.Map) {
+                                    java.util.Map<?, ?> vMap = (java.util.Map<?, ?>) valObj;
+                                    String vSku = (String) vMap.get("sku");
+                                    String vBarcode = (String) vMap.get("barcode");
+                                    String vValue = (String) vMap.get("value");
+                                    
+                                    boolean variantMatches = (vSku != null && vSku.toLowerCase().contains(lowerQuery)) ||
+                                                             (vBarcode != null && vBarcode.toLowerCase().contains(lowerQuery)) ||
+                                                             (p.getName() != null && p.getName().toLowerCase().contains(lowerQuery));
+
+                                    if (variantMatches) {
+                                        com.example.otpauth.dto.ProductSearchDTO dto = new com.example.otpauth.dto.ProductSearchDTO();
+                                        dto.setId(p.getId());
+                                        dto.setName(p.getName() + " (" + vValue + ")");
+                                        dto.setSku(vSku);
+                                        dto.setItemBarcode(vBarcode);
+                                        dto.setCategory(p.getCategory());
+                                        
+                                        Object pPrice = vMap.get("price");
+                                        if (pPrice instanceof Number) {
+                                            dto.setPrice(new java.math.BigDecimal(pPrice.toString()));
+                                        } else if (pPrice instanceof String) {
+                                            try { dto.setPrice(new java.math.BigDecimal((String) pPrice)); } catch (Exception e) { dto.setPrice(java.math.BigDecimal.ZERO); }
+                                        } else {
+                                            dto.setPrice(java.math.BigDecimal.ZERO);
+                                        }
+                                        
+                                        Object pQty = vMap.get("quantity");
+                                        if (pQty instanceof Number) {
+                                            dto.setQuantity(((Number) pQty).intValue());
+                                        } else if (pQty instanceof String) {
+                                            try { dto.setQuantity(Integer.parseInt((String) pQty)); } catch (Exception e) { dto.setQuantity(0); }
+                                        } else {
+                                            dto.setQuantity(0);
+                                        }
+
+                                        String vImg = (String) vMap.get("image");
+                                        dto.setImages((vImg != null && !vImg.trim().isEmpty()) ? vImg : p.getImages());
+                                        dto.setProductType(p.getProductType());
+                                        
+                                        results.add(dto);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return results;
     }
 
 

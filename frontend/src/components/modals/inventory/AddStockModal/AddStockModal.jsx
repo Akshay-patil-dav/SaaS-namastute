@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Minus, Plus, Trash2 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import './add-stock-modal.css';
@@ -56,10 +56,10 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
     }, [searchQuery, isOpen]);
 
     const handleSelectProduct = (product) => {
-        const existing = selectedProducts.find(p => p.id === product.id);
+        const existing = selectedProducts.find(p => p.sku === product.sku);
         if (existing) {
             setSelectedProducts(selectedProducts.map(p => 
-                p.id === product.id ? { ...p, qty: p.qty + 1 } : p
+                p.sku === product.sku ? { ...p, qty: p.qty + 1 } : p
             ));
         } else {
             setSelectedProducts([...selectedProducts, { 
@@ -75,14 +75,14 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
         setShowSuggestions(false);
     };
 
-    const updateQty = (id, delta) => {
+    const updateQty = (sku, delta) => {
         setSelectedProducts(prev => prev.map(p => 
-            p.id === id ? { ...p, qty: Math.max(1, p.qty + delta) } : p
+            p.sku === sku ? { ...p, qty: Math.max(1, p.qty + delta) } : p
         ));
     };
 
-    const removeProduct = (id) => {
-        setSelectedProducts(prev => prev.filter(p => p.id !== id));
+    const removeProduct = (sku) => {
+        setSelectedProducts(prev => prev.filter(p => p.sku !== sku));
     };
 
     const handleSave = async () => {
@@ -99,6 +99,7 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
                 responsiblePerson: formData.person,
                 products: selectedProducts.map(p => ({
                     productId: p.id,
+                    sku: p.sku,
                     quantity: p.qty
                 }))
             };
@@ -196,7 +197,7 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
                                 {searchResults.length > 0 ? (
                                     searchResults.map((product) => (
                                         <div 
-                                            key={product.id} 
+                                            key={product.sku} 
                                             className="stock-suggestion-item"
                                             onClick={() => handleSelectProduct(product)}
                                         >
@@ -232,7 +233,7 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
                                     </thead>
                                     <tbody>
                                         {selectedProducts.map((product) => (
-                                            <tr key={product.id}>
+                                            <tr key={product.sku}>
                                                 <td>
                                                     <div className="product-info-cell">
                                                         <img src={product.img} alt={product.name} />
@@ -243,13 +244,13 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
                                                 <td>{product.category}</td>
                                                 <td>
                                                     <div className="qty-control">
-                                                        <button className="qty-btn" onClick={() => updateQty(product.id, -1)}><Minus size={14} /></button>
+                                                        <button className="qty-btn" onClick={() => updateQty(product.sku, -1)}><Minus size={14} /></button>
                                                         <span className="qty-value">{product.qty}</span>
-                                                        <button className="qty-btn" onClick={() => updateQty(product.id, 1)}><Plus size={14} /></button>
+                                                        <button className="qty-btn" onClick={() => updateQty(product.sku, 1)}><Plus size={14} /></button>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <button className="remove-item-btn" onClick={() => removeProduct(product.id)}>
+                                                    <button className="remove-item-btn" onClick={() => removeProduct(product.sku)}>
                                                         <Trash2 size={16} />
                                                     </button>
                                                 </td>

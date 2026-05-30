@@ -35,7 +35,7 @@ public class ProductController {
 
     /** GET /api/products/search?q=... — search by name/barcode */
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> searchProducts(@RequestParam("q") String query) {
+    public ResponseEntity<List<com.example.otpauth.dto.ProductSearchDTO>> searchProducts(@RequestParam("q") String query) {
         if (query == null || query.length() < 2) {
             return ResponseEntity.ok(List.of());
         }

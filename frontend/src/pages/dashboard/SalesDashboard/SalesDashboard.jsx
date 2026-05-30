@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SalesDashboard.css';
 import { 
     Calendar, 
@@ -25,38 +25,44 @@ import {
     ResponsiveContainer 
 } from 'recharts';
 
-// I will use an online SVG for the world map just to be perfectly reliable in the browser.
-
-const chartData = [
-  { name: '', uv: 20000 },
-  { name: '', uv: 55000 },
-  { name: '', uv: 30000 },
-  { name: '', uv: 50000 },
-  { name: '', uv: 22000 },
-  { name: '', uv: 42000 },
-  { name: '', uv: 36000 },
-  { name: '', uv: 40000 },
-  { name: '', uv: 18000 }
-];
-
 export default function SalesDashboard() {
-  const [dateRange] = useState("03/01/2026 - 03/31/2026");
+  const [dateRange] = useState("Last 7 Days");
+  
+  const [dashboardData, setDashboardData] = useState({
+    weeklyEarnings: 0,
+    percentageIncrease: 0,
+    totalOrders: 0,
+    totalCustomers: 0,
+    bestSellers: [],
+    recentTransactions: [],
+    chartData: []
+  });
+  
+  const [isLoading, setIsLoading] = useState(true);
 
-  const bestSellers = [
-    { name: "Lenovo 3rd Generation", price: "$4420", sales: 6547, imgColor: "#e0e7ff", icon: <Laptop size={20} color="#4f46e5" /> },
-    { name: "Bold V3.2", price: "$1474", sales: 3474, imgColor: "#fee2e2", icon: <Smartphone size={20} color="#dc2626" /> },
-    { name: "Nike Jordan", price: "$8784", sales: 1478, imgColor: "#fce7f3", icon: <Activity size={20} color="#db2777" /> },
-    { name: "Apple Series 5 Watch", price: "$3240", sales: 987, imgColor: "#f1f5f9", icon: <Watch size={20} color="#475569" /> },
-    { name: "Amazon Echo Dot", price: "$597", sales: 784, imgColor: "#e2e8f0", icon: <Speaker size={20} color="#334155" /> },
-  ];
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:8080/api/dashboard/sales', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDashboardData(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard data", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
 
-  const recentTransactions = [
-    { id: 1, name: "Lobar Handy", time: "15 Mins", payment: "Paypal", tid: "#416645453773", status: "Success", stClass: "success", amount: "$1,099.00" },
-    { id: 2, name: "Red Premium Handy", time: "15 Mins", payment: "Apple Pay", tid: "#147784451554", status: "Cancelled", stClass: "danger", amount: "$600.55" },
-    { id: 3, name: "Iphone 14 Pro", time: "15 Mins", payment: "Stripe", tid: "#147784454554", status: "Completed", stClass: "info", amount: "$1,099.00" },
-    { id: 4, name: "Black Slim 200", time: "15 Mins", payment: "PayU", tid: "#147784454554", status: "Success", stClass: "success", amount: "$1,569.00" },
-    { id: 5, name: "Woodcraft Sandal", time: "15 Mins", payment: "Paytm", tid: "#147784454554", status: "Success", stClass: "success", amount: "$1,478.00" },
-  ];
+  const { bestSellers, recentTransactions, chartData, weeklyEarnings, percentageIncrease, totalOrders, totalCustomers } = dashboardData;
 
   return (
     <div className="sales-dashboard">
@@ -79,9 +85,9 @@ export default function SalesDashboard() {
         <div className="col-lg-6 col-md-12 mb-3 mb-lg-0">
           <div className="sd-stat-card sd-stat-card-white">
             <div className="sd-stat-title text-warning">Weekly Earning</div>
-            <div className="sd-stat-value">$95000.45</div>
+            <div className="sd-stat-value">${typeof weeklyEarnings === 'number' ? weeklyEarnings.toFixed(2) : weeklyEarnings}</div>
             <div className="sd-stat-subtitle text-success">
-              <ChevronUp size={14} /> 48% increase compare to last week
+              <ChevronUp size={14} /> {percentageIncrease.toFixed(1)}% increase compare to last week
             </div>
             <div className="sd-icon-bg sd-icon-bg-white">
               <Briefcase size={24} color="#10b981" />
@@ -92,7 +98,7 @@ export default function SalesDashboard() {
           <div className="sd-stat-card sd-stat-card-orange">
             <div className="sd-stat-title"><Activity size={18} className="me-2" /></div>
             <br />
-            <div className="sd-stat-value">10000</div>
+            <div className="sd-stat-value">{totalOrders}</div>
             <div className="sd-stat-subtitle">Total Orders</div>
             <div className="sd-icon-bg">
               <RefreshCw size={24} color="white" />
@@ -103,7 +109,7 @@ export default function SalesDashboard() {
           <div className="sd-stat-card sd-stat-card-navy">
             <div className="sd-stat-title"><ShoppingBag size={18} className="me-2" /></div>
             <br />
-            <div className="sd-stat-value">800</div>
+            <div className="sd-stat-value">{totalCustomers}</div>
             <div className="sd-stat-subtitle">Total Customers</div>
             <div className="sd-icon-bg">
               <RefreshCw size={24} color="white" />
@@ -123,7 +129,7 @@ export default function SalesDashboard() {
               {bestSellers.map((item, index) => (
                 <div className="sd-bestseller-item" key={index}>
                   <div className="sd-bs-info">
-                    <div className="sd-bs-img" style={{backgroundColor: item.imgColor}}>{item.icon}</div>
+                    <div className="sd-bs-img" style={{backgroundColor: '#e0e7ff'}}><ShoppingBag size={20} color="#4f46e5" /></div>
                     <div>
                       <h6 className="sd-bs-name">{item.name}</h6>
                       <p className="sd-bs-price">{item.price}</p>

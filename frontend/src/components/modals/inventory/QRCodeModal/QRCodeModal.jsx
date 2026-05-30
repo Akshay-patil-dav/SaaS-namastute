@@ -54,14 +54,19 @@ const QRCodeModal = ({
                                             {showPrice && <div className="qrcode-price-text">Price: {product.price}</div>}
                                             <div className="qrcode-image-container">
                                                 <img 
-                                                    src={`https://bwipjs-api.metafloor.com/?bcid=qrcode&text=${encodeURIComponent(product.sku || product.itemBarcode || 'N/A')}&scale=4`} 
+                                                    src={`https://bwipjs-api.metafloor.com/?bcid=qrcode&text=${encodeURIComponent(product.sku || product.itemBarcode || product.barcode || 'N/A')}&scale=4`} 
                                                     alt={`QR Code for ${product.sku}`}
                                                     className="qrcode-image"
                                                 />
                                             </div>
-                                            <div className="qrcode-ref-text">
-                                                Ref No :{product.sku || product.itemBarcode || 'N/A'}
+                                            <div className="qrcode-ref-text" style={{fontSize: '11px', marginTop: '4px'}}>
+                                                SKU: {product.sku || 'N/A'}
                                             </div>
+                                            { (product.itemBarcode || product.barcode) && (
+                                                <div className="qrcode-barcode-text" style={{fontSize: '11px', textAlign: 'center'}}>
+                                                    Barcode: {product.itemBarcode || product.barcode}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

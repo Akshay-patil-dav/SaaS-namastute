@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Calendar, Barcode, Trash2 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import './add-sales-return-modal.css';
@@ -66,16 +66,17 @@ const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
 
     /* ── product helpers ── */
     const selectProduct = p => {
-        const existing = products.find(x => x.productId === p.id);
+        const productSku = p.sku || `TMP-${p.id}`;
+        const existing = products.find(x => x.sku === productSku);
         if (existing) {
             setProducts(prev => prev.map(x =>
-                x.productId === p.id ? { ...x, quantity: x.quantity + 1 } : x
+                x.sku === productSku ? { ...x, quantity: x.quantity + 1 } : x
             ));
         } else {
             setProducts(prev => [...prev, {
                 productId:  p.id,
                 name:       p.name,
-                sku:        p.sku || '',
+                sku:        productSku,
                 img:        p.images ? p.images.split(',')[0].trim() : '',
                 stock:      p.quantity ?? 0,
                 quantity:   1,
