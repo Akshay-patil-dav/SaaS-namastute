@@ -167,6 +167,7 @@ const EditProduct = () => {
                                 sku:     v.sku     || '',
                                 barcode: v.barcode || '',
                                 image:   v.image   || null,
+                                quantity: v.quantity != null ? String(v.quantity) : '',
                                 isDefault: v.isDefault || false,
                             }))
                         }));
@@ -189,6 +190,7 @@ const EditProduct = () => {
                                 sku:     v.sku     || '',
                                 barcode: v.barcode || '',
                                 image:   v.image   || null,
+                                quantity: v.quantity != null ? String(v.quantity) : '',
                                 isDefault: false,
                             }))
                         }]);
@@ -302,7 +304,7 @@ const EditProduct = () => {
     const addVariantType = () => {
         setVariantTypes(prev => [
             ...prev,
-            { typeName: '', values: [{ value: '', price: '', sku: '', barcode: '', image: null }] }
+            { typeName: '', values: [{ value: '', price: '', sku: '', barcode: '', image: null, quantity: '' }] }
         ]);
     };
 
@@ -316,7 +318,7 @@ const EditProduct = () => {
 
     const addVariantValue = (tIdx) => {
         setVariantTypes(prev => prev.map((t, i) => i === tIdx
-            ? { ...t, values: [...t.values, { value: '', price: '', sku: '', barcode: '', image: null }] }
+            ? { ...t, values: [...t.values, { value: '', price: '', sku: '', barcode: '', image: null, quantity: '' }] }
             : t
         ));
     };
@@ -415,7 +417,9 @@ const EditProduct = () => {
                 unit:             form.unit,
                 barcodeSymbology: form.barcodeSymbology,
                 itemBarcode:      form.itemBarcode,
-                quantity:         parseInt(form.quantity) || 0,
+                quantity:         form.productType === 'Variable Product'
+                                    ? variantTypes.reduce((sum, t) => sum + t.values.reduce((vSum, v) => vSum + (parseInt(v.quantity) || 0), 0), 0)
+                                    : (parseInt(form.quantity) || 0),
                 price:            parseFloat(form.price) || 0,
                 productType:      form.productType,
                 taxType:          form.taxType,
@@ -436,6 +440,7 @@ const EditProduct = () => {
                         sku:     v.sku,
                         barcode: v.barcode,
                         image:   v.image || '',
+                        quantity: parseInt(v.quantity) || 0,
                         isDefault: defaultVariant === `${tIdx}-${vIdx}`,
                     }))
                 })),
@@ -462,6 +467,8 @@ const EditProduct = () => {
             </div>
         );
     }
+
+    const totalVariantQuantity = variantTypes.reduce((sum, t) => sum + t.values.reduce((vSum, v) => vSum + (parseInt(v.quantity) || 0), 0), 0);
 
     // ─────────────────────────────────────────────────────────────────────────
     return (
@@ -782,6 +789,19 @@ const EditProduct = () => {
                             </>
                             )}
                             <div className="col-md-4 cp-form-group mb-1">
+                                <label className="cp-label">Quantity</label>
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    className={`cp-input ${form.productType === 'Variable Product' ? 'bg-light' : ''}`}
+                                    placeholder="0"
+                                    min="0"
+                                    value={form.productType === 'Variable Product' ? totalVariantQuantity : form.quantity}
+                                    onChange={handleChange}
+                                    readOnly={form.productType === 'Variable Product'}
+                                />
+                            </div>
+                            <div className="col-md-4 cp-form-group mb-1">
                                 <label className="cp-label">Quantity Alert</label>
                                 <input
                                     type="number"
@@ -902,6 +922,7 @@ const EditProduct = () => {
                                                         <span style={{width:72}}>Image</span>
                                                         <span style={{flex:2}}>Value <span className="required">*</span></span>
                                                         <span style={{flex:1.2}}>Price</span>
+                                                        <span style={{width:70}}>Qty</span>
                                                         <span style={{flex:2}}>SKU</span>
                                                         <span style={{flex:2}}>Barcode</span>
                                                         <span style={{width:32}}></span>
@@ -974,6 +995,20 @@ const EditProduct = () => {
                                                                         onChange={e => updateVariantValue(tIdx, vIdx, 'price', e.target.value)}
                                                                     />
                                                                 </div>
+
+                                                                {/* Quantity */}
+                                                                <div className="vt-cell" style={{width:70}}>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="cp-input"
+                                                                        placeholder="0"
+                                                                        min="0"
+                                                                        value={val.quantity}
+                                                                        onChange={e => updateVariantValue(tIdx, vIdx, 'quantity', e.target.value)}
+                                                                        style={{paddingLeft: '8px', paddingRight: '8px'}}
+                                                                    />
+                                                                </div>
+
                                                                 <div className="vt-cell" style={{flex:2}}>
                                                                     <div className="cp-input-group">
                                                                         <input

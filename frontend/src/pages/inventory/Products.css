@@ -1512,6 +1512,7 @@ input:checked + .ls-slider:before {
 .vvt-img  { width: 44px; flex-shrink: 0; }
 .vvt-val  { flex: 2; gap: 6px; flex-wrap: wrap; }
 .vvt-price { flex: 1; font-weight: 600; color: #1e293b; }
+.vvt-qty   { flex: 0.8; font-weight: 600; color: #475569; }
 .vvt-sku  { flex: 1.5; font-family: monospace; font-size: 0.78rem; color: #64748b; }
 .vvt-bar  { flex: 1.5; font-family: monospace; font-size: 0.78rem; color: #64748b; }
 
@@ -1545,61 +1546,5 @@ input:checked + .ls-slider:before {
     border-radius: 99px;
     letter-spacing: 0.3px;
     text-transform: uppercase;
-}
-
-/* ── Variant sub-rows in the product list table ───────────────────────────── */
-.variant-sub-row td {
-    background: #fafcff;
-    border-bottom: 1px dashed #e8edf5 !important;
-}
-
-.variant-sub-row td:first-child {
-    border-left: 3px solid #e2e8f0;
-}
-
-.variant-sub-row:hover td {
-    background: #f1f6ff !important;
-}
-
-/* Default variant row gets an orange accent */
-.variant-sub-row--default td {
-    background: linear-gradient(90deg, #fff9f5 0%, #fafcff 100%);
-}
-
-.variant-sub-row--default td:first-child {
-    border-left: 3px solid #f97316;
-}
-
-.variant-sub-row--default:hover td {
-    background: #fff3e8 !important;
-}
-
-/* ── Variant type pill (shown on parent rows in list) ─────────────────────── */
-.variant-type-pill {
-    display: inline-block;
-    margin-left: 6px;
-    background: #ede9fe;
-    color: #7c3aed;
-    font-size: 0.62rem;
-    font-weight: 700;
-    padding: 1px 7px;
-    border-radius: 99px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    vertical-align: middle;
-}
-
-/* ── Default variant pill (shown on variant rows in list) ─────────────────── */
-.variant-default-pill {
-    display: inline-block;
-    background: #f97316;
-    color: #fff;
-    font-size: 0.62rem;
-    font-weight: 700;
-    padding: 1px 7px;
-    border-radius: 99px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    vertical-align: middle;
 }
 
