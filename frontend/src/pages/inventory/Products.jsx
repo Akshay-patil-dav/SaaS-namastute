@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Products.css';
 import './inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
@@ -19,7 +19,8 @@ import {
     AlertCircle,
     CheckCircle,
     X,
-    UploadCloud
+    UploadCloud,
+    Layers
 } from 'lucide-react';
 import { useConfirm } from '../../context/ConfirmContext';
 
@@ -166,17 +167,70 @@ const Products = () => {
     const filtered = allProducts.filter(item => {
         if (!searchTerm) return true;
         const t = searchTerm.toLowerCase();
-        return (
+        const basic = (
             (item.name        || '').toLowerCase().includes(t) ||
             (item.sku         || '').toLowerCase().includes(t) ||
             (item.brand       || '').toLowerCase().includes(t) ||
             (item.category    || '').toLowerCase().includes(t)
         );
+        if (basic) return true;
+        // Also match variant type names, values, and SKUs
+        if (Array.isArray(item.variants)) {
+            return item.variants.some(vt =>
+                (vt.typeName || '').toLowerCase().includes(t) ||
+                (vt.values || []).some(v =>
+                    (v.value   || '').toLowerCase().includes(t) ||
+                    (v.sku     || '').toLowerCase().includes(t)
+                )
+            );
+        }
+        return false;
+    });
+
+    // ── Flatten Variable Products into variant rows ───────────────────────
+    // Variable products are hidden as parent; each variant value becomes its own row.
+    const displayRows = [];
+    filtered.forEach(item => {
+        if (
+            item.productType === 'Variable Product' &&
+            Array.isArray(item.variants) &&
+            item.variants.length > 0
+        ) {
+            let addedAny = false;
+            item.variants.forEach((vt, tIdx) => {
+                (vt.values || []).forEach((val, vIdx) => {
+                    if (!val.value) return; // skip blank slots
+                    addedAny = true;
+                    displayRows.push({
+                        ...item,
+                        _isVariantRow:    true,
+                        _parentId:        item.id,
+                        _variantTypeName: vt.typeName || '',
+                        _variantValue:    val.value,
+                        _variantPrice:    val.price,
+                        _variantSku:      val.sku || item.sku || '',
+                        _variantBarcode:  val.barcode || '',
+                        _variantImage:    val.image   || null,
+                        _isDefault:       val.isDefault || false,
+                        _variantKey:      `${item.id}-vt${tIdx}-v${vIdx}`,
+                        // override columns shown in the row
+                        price: val.price != null ? val.price : item.price,
+                        sku:   val.sku   || item.sku || '',
+                    });
+                });
+            });
+            if (!addedAny) {
+                // Variable product but all values are blank — show parent row as fallback
+                displayRows.push(item);
+            }
+        } else {
+            displayRows.push(item);
+        }
     });
 
     // ── Pagination ───────────────────────────────────────────────────────
-    const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
-    const paginated  = filtered.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+    const totalPages = Math.max(1, Math.ceil(displayRows.length / rowsPerPage));
+    const paginated  = displayRows.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
     const goToPage = (p) => setCurrentPage(Math.min(Math.max(1, p), totalPages));
 
@@ -223,7 +277,11 @@ const Products = () => {
 
     const handleSelectAll = (isChecked) => {
         if (isChecked) {
-            setSelectedIds(paginated.map(item => item.id));
+            // Only select non-variant rows (real product ids)
+            const selectableIds = paginated
+                .filter(item => !item._isVariantRow)
+                .map(item => item.id);
+            setSelectedIds(selectableIds);
         } else {
             setSelectedIds([]);
         }
@@ -393,50 +451,104 @@ const Products = () => {
                         ))}
 
                         {/* Actual rows */}
-                        {!loading && paginated.length > 0 && paginated.map((item) => (
-                            <tr key={item.id} className={item._isMock ? 'mock-row' : 'db-row'}>
+                        {!loading && paginated.length > 0 && paginated.map((item) => {
+                            const isVariant = item._isVariantRow;
+                            const rowKey    = isVariant ? item._variantKey : item.id;
+                            const rowClass  = isVariant
+                                ? `db-row variant-sub-row${item._isDefault ? ' variant-sub-row--default' : ''}`
+                                : (item._isMock ? 'mock-row' : 'db-row');
+
+                            // Image to show: variant image → first product image → avatar
+                            const thumbSrc = isVariant
+                                ? (item._variantImage || (item.images && item.images.split(',')[0]?.trim()) || null)
+                                : (item.images && item.images.split(',')[0]?.trim()) || null;
+
+                            const avatarText = isVariant
+                                ? getInitials(item._variantValue || item.name)
+                                : getInitials(item.name);
+                            const avatarColor = isVariant
+                                ? getAvatarColor(item._variantValue || item.name)
+                                : getAvatarColor(item.name);
+
+                            return (
+                            <tr key={rowKey} className={rowClass}>
+                                {/* Checkbox — hidden for variant sub-rows */}
                                 <td>
-                                    <input 
-                                        type="checkbox" 
-                                        className="ss-checkbox" 
-                                        checked={selectedIds.includes(item.id)}
-                                        onChange={(e) => handleSelectItem(item.id, e.target.checked)}
-                                    />
+                                    {!isVariant && (
+                                        <input
+                                            type="checkbox"
+                                            className="ss-checkbox"
+                                            checked={selectedIds.includes(item.id)}
+                                            onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                        />
+                                    )}
                                 </td>
+
+                                {/* SKU */}
                                 <td>
                                     <span className="ss-code-badge">{item.sku || '—'}</span>
                                 </td>
+
+                                {/* Product / Variant name */}
                                 <td>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        {/* Show real product image if available, else initials avatar */}
-                                        {item.images && item.images.split(',')[0]?.trim() ? (
+                                        {/* Thumbnail */}
+                                        {thumbSrc ? (
                                             <img
-                                                src={item.images.split(',')[0].trim()}
+                                                src={thumbSrc}
                                                 alt={item.name}
-                                                style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
-                                                }}
+                                                style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
+                                                onError={e => { e.target.style.display = 'none'; }}
                                             />
-                                        ) : null}
-                                        {/* Initials avatar — shown when no image or image fails */}
-                                        <div
-                                            style={{
+                                        ) : (
+                                            <div style={{
                                                 width: '28px', height: '28px', borderRadius: '4px',
-                                                background: getAvatarColor(item.name),
-                                                display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex',
-                                                alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px', fontWeight: '600'
-                                            }}
-                                        >
-                                            {getInitials(item.name)}
-                                        </div>
-                                        <div>
-                                            <span className="ss-item-name">{item.name}</span>
-                                            {item._isMock && <span style={{ marginLeft: '5px', fontSize: '10px', color: '#999', fontStyle: 'italic' }}>demo</span>}
-                                        </div>
+                                                background: avatarColor, display: 'flex',
+                                                alignItems: 'center', justifyContent: 'center',
+                                                color: '#fff', fontSize: '10px', fontWeight: '600', flexShrink: 0
+                                            }}>
+                                                {avatarText}
+                                            </div>
+                                        )}
+
+                                        {isVariant ? (
+                                            /* Variant row name cell */
+                                            <div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                    <span className="ss-item-name" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 400 }}>
+                                                        {item.name}
+                                                    </span>
+                                                </div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
+                                                    {item._variantTypeName && (
+                                                        <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                                                            {item._variantTypeName}:
+                                                        </span>
+                                                    )}
+                                                    <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
+                                                        {item._variantValue}
+                                                    </span>
+                                                    {item._isDefault && (
+                                                        <span className="variant-default-pill">Default</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            /* Regular product name cell */
+                                            <div>
+                                                <span className="ss-item-name">{item.name}</span>
+                                                {item._isMock && (
+                                                    <span style={{ marginLeft: '5px', fontSize: '10px', color: '#999', fontStyle: 'italic' }}>demo</span>
+                                                )}
+                                                {item.productType === 'Variable Product' && (
+                                                    <span className="variant-type-pill">Variable</span>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </td>
+
+                                {/* Category */}
                                 <td>
                                     <span
                                         className="ss-status-badge ss-status-active"
@@ -445,38 +557,62 @@ const Products = () => {
                                         {item.category || '—'}
                                     </span>
                                 </td>
+
+                                {/* Brand */}
                                 <td>{item.brand || '—'}</td>
+
+                                {/* Price */}
                                 <td style={{ fontWeight: '600' }}>{formatPrice(item.price)}</td>
+
+                                {/* Unit */}
                                 <td>{item.unit || 'Pc'}</td>
+
+                                {/* Qty */}
                                 <td>
-                                    <span className={`ss-status-badge ${item.quantity <= 0 ? 'ss-status-inactive' : item.quantity < 50 ? 'ss-status-pending' : 'ss-status-active'}`}>
+                                    <span className={`ss-status-badge ${
+                                        (item.quantity ?? 0) <= 0  ? 'ss-status-inactive' :
+                                        (item.quantity ?? 0) < 50  ? 'ss-status-pending'  :
+                                        'ss-status-active'
+                                    }`}>
                                         {item.quantity ?? 0}
                                     </span>
                                 </td>
+
+                                {/* Added On */}
                                 <td style={{ color: '#5b6670', fontSize: '13px' }}>{formatDate(item.createdAt)}</td>
+
+                                {/* Actions — always use parent product id */}
                                 <td>
                                     <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
-                                        <button 
-                                            className="ss-action-btn view" 
+                                        <button
+                                            className="ss-action-btn view"
                                             title="View"
-                                            onClick={() => { setViewProduct(item); setActiveImgIndex(0); }}
+                                            onClick={() => {
+                                                // For variant rows, view the parent product
+                                                const base = isVariant
+                                                    ? dbProducts.find(p => p.id === item._parentId) || item
+                                                    : item;
+                                                setViewProduct(base);
+                                                setActiveImgIndex(0);
+                                            }}
                                         >
                                             <Eye size={15} />
                                         </button>
-                                        <Link to={`/edit-product/${item.id}`} className="ss-action-btn edit" title="Edit">
+                                        <Link to={`/edit-product/${isVariant ? item._parentId : item.id}`} className="ss-action-btn edit" title="Edit">
                                             <Pencil size={15} />
                                         </Link>
                                         <button
                                             className="ss-action-btn delete"
                                             title="Delete"
-                                            onClick={() => handleDelete(item.id)}
+                                            onClick={() => handleDelete(isVariant ? item._parentId : item.id)}
                                         >
                                             <Trash2 size={15} />
                                         </button>
                                     </div>
                                 </td>
                             </tr>
-                        ))}
+                            );
+                        })}
 
                         {/* Empty state */}
                         {!loading && paginated.length === 0 && (
@@ -499,7 +635,7 @@ const Products = () => {
                 </div>
 
                 {/* Pagination */}
-                {!loading && filtered.length > 0 && (
+                {!loading && displayRows.length > 0 && (
                     <div className="ss-pagination-row">
                         <div className="ss-page-size">
                             Row Per Page&nbsp;
@@ -509,7 +645,7 @@ const Products = () => {
                             >
                                 {ROWS_PER_PAGE_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
                             </select>
-                            &nbsp;| Showing {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, filtered.length)} of {filtered.length}
+                            &nbsp;| Showing {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, displayRows.length)} of {displayRows.length}
                         </div>
                         <div className="ss-page-controls">
                             <button className="ss-page-btn" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
@@ -625,7 +761,47 @@ const Products = () => {
                                         </div>
                                     </div>
 
-                                    {/* Section 2: Pricing & Tax */}
+                                    {/* Section 2: Pricing & Tax OR Variants */}
+                                    {viewProduct.productType === 'Variable Product' && viewProduct.variants && viewProduct.variants.length > 0 ? (
+                                        <div className="info-section">
+                                            <h6 className="section-title"><Layers size={14} style={{marginRight:5}} />Variant Details</h6>
+                                            {viewProduct.variants.map((vt, tIdx) => (
+                                                <div key={tIdx} className="view-variant-block">
+                                                    <div className="view-variant-type-header">
+                                                        <span className="view-variant-type-name">{vt.typeName || `Variant Type ${tIdx + 1}`}</span>
+                                                        <span className="view-variant-count">{vt.values?.length || 0} options</span>
+                                                    </div>
+                                                    <div className="view-variant-table">
+                                                        <div className="view-variant-table-head">
+                                                            <span className="vvt-col vvt-img">Image</span>
+                                                            <span className="vvt-col vvt-val">Value</span>
+                                                            <span className="vvt-col vvt-price">Price</span>
+                                                            <span className="vvt-col vvt-sku">SKU</span>
+                                                            <span className="vvt-col vvt-bar">Barcode</span>
+                                                        </div>
+                                                        {(vt.values || []).map((val, vIdx) => (
+                                                            <div key={vIdx} className={`view-variant-table-row${val.isDefault ? ' view-variant-default' : ''}`}>
+                                                                <span className="vvt-col vvt-img">
+                                                                    {val.image ? (
+                                                                        <img src={val.image} alt={val.value} className="vvt-thumb" />
+                                                                    ) : (
+                                                                        <div className="vvt-thumb-placeholder" style={{background: getAvatarColor(val.value || 'V')}}>{(val.value || 'V')[0]?.toUpperCase()}</div>
+                                                                    )}
+                                                                </span>
+                                                                <span className="vvt-col vvt-val">
+                                                                    {val.value || '—'}
+                                                                    {val.isDefault && <span className="vvt-default-badge">Default</span>}
+                                                                </span>
+                                                                <span className="vvt-col vvt-price">{formatPrice(val.price)}</span>
+                                                                <span className="vvt-col vvt-sku">{val.sku || '—'}</span>
+                                                                <span className="vvt-col vvt-bar">{val.barcode || '—'}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
                                     <div className="info-section">
                                         <h6 className="section-title">Pricing & Taxation</h6>
                                         <div className="view-grid">
@@ -649,6 +825,7 @@ const Products = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    )}
 
                                     {/* Section 3: Manufacturing & Barcode */}
                                     <div className="info-section no-border">

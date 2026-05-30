@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AddCategoryModal from '../../components/modals/inventory/AddCategoryModal';
 import './CreateProduct.css';
 import { Link, useNavigate } from 'react-router-dom';
@@ -75,6 +75,8 @@ const CreateProduct = () => {
     const [variantTypes, setVariantTypes] = useState([]);
     const [vtUploading, setVtUploading] = useState({}); // key: `${typeIdx}-${valIdx}`
     const vtFileRefs = useRef({});
+    // default variant: `typeIdx-valIdx` string, e.g. '0-1'
+    const [defaultVariant, setDefaultVariant] = useState('0-0');
     
     // Dynamic categories
     const [categories, setCategories] = useState([]);
@@ -283,6 +285,7 @@ const CreateProduct = () => {
         setForm(initialForm);
         setImages([]);
         setVariantTypes([]);
+        setDefaultVariant('0-0');
     };
 
     // ── Submit ────────────────────────────────────────────────────────────────
@@ -293,7 +296,7 @@ const CreateProduct = () => {
             showToast('error', 'Product name is required.');
             return;
         }
-        if (!form.price) {
+        if (form.productType !== 'Variable Product' && !form.price) {
             showToast('error', 'Price is required.');
             return;
         }
@@ -331,14 +334,15 @@ const CreateProduct = () => {
                 manufacturedDate: form.showManufacturer && form.manufacturedDate ? form.manufacturedDate : null,
                 expiryDate:       form.showExpiry && form.expiryDate ? form.expiryDate : null,
                 images:           images.map(img => img.url).join(','),
-                variants:         variantTypes.map(t => ({
+                variants:         variantTypes.map((t, tIdx) => ({
                     typeName: t.typeName,
-                    values: t.values.map(v => ({
+                    values: t.values.map((v, vIdx) => ({
                         value:   v.value,
                         price:   parseFloat(v.price) || 0,
                         sku:     v.sku,
                         barcode: v.barcode,
                         image:   v.image || '',
+                        isDefault: defaultVariant === `${tIdx}-${vIdx}`,
                     }))
                 })),
             };
@@ -438,6 +442,7 @@ const CreateProduct = () => {
                                     onChange={handleChange}
                                 />
                             </div>
+                            {form.productType !== 'Variable Product' && (
                             <div className="col-md-6 cp-form-group">
                                 <label className="cp-label">SKU <span className="required">*</span></label>
                                 <div className="cp-input-group">
@@ -459,6 +464,7 @@ const CreateProduct = () => {
                                     </button>
                                 </div>
                             </div>
+                            )}
                             <div className="col-md-6 cp-form-group">
                                 <label className="cp-label">Selling Type <span className="required">*</span></label>
                                 <select name="sellingType" className="cp-input text-muted" value={form.sellingType} onChange={handleChange}>
@@ -529,6 +535,7 @@ const CreateProduct = () => {
                                     <option>Code 39</option>
                                 </select>
                             </div>
+                            {form.productType !== 'Variable Product' && (
                             <div className="col-md-6 cp-form-group">
                                 <label className="cp-label">Item Barcode</label>
                                 <div className="cp-input-group">
@@ -550,6 +557,7 @@ const CreateProduct = () => {
                                     </button>
                                 </div>
                             </div>
+                            )}
                             <div className="col-12 cp-form-group mb-1">
                                 <label className="cp-label">Description</label>
                                 <div className="rt-editor">
@@ -612,6 +620,8 @@ const CreateProduct = () => {
                                 </div>
                             </div>
 
+                            {form.productType !== 'Variable Product' && (
+                            <>
                             <div className="col-md-4 cp-form-group">
                                 <label className="cp-label">Price <span className="required">*</span></label>
                                 <input
@@ -664,6 +674,8 @@ const CreateProduct = () => {
                                     onChange={handleChange}
                                 />
                             </div>
+                            </>
+                            )}
                             <div className="col-md-4 cp-form-group mb-1">
                                 <label className="cp-label">Quantity Alert</label>
                                 <input
@@ -676,6 +688,14 @@ const CreateProduct = () => {
                                     onChange={handleChange}
                                 />
                             </div>
+                            {form.productType === 'Variable Product' && (
+                                <div className="col-12">
+                                    <div className="vp-info-note">
+                                        <span className="vp-info-icon">ℹ</span>
+                                        Price, Tax, Discount &amp; SKU/Barcode are set individually per variant below.
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -734,7 +754,7 @@ const CreateProduct = () => {
                                     <p>No variant types added yet.</p>
                                     <span>e.g. Add "Color" then add Red, Blue, Green as values — each with its own price, image &amp; SKU.</span>
                                 </div>
-                            ) : (
+                            ) : (// variant list
                                 <div className="vt-list">
                                     {variantTypes.map((vt, tIdx) => (
                                         <div className="vt-block" key={tIdx}>
@@ -773,6 +793,7 @@ const CreateProduct = () => {
                                             {vt.values.length > 0 && (
                                                 <div className="vt-values-wrap">
                                                     <div className="vt-values-header">
+                                                        <span style={{width:36}} title="Set as default variant">Default</span>
                                                         <span style={{width:72}}>Image</span>
                                                         <span style={{flex:2}}>Value <span className="required">*</span></span>
                                                         <span style={{flex:1.2}}>Price</span>
@@ -784,7 +805,18 @@ const CreateProduct = () => {
                                                     {vt.values.map((val, vIdx) => {
                                                         const uploadKey = `${tIdx}-${vIdx}`;
                                                         return (
-                                                            <div className="vt-value-row" key={vIdx}>
+                                                            <div className={`vt-value-row ${defaultVariant === `${tIdx}-${vIdx}` ? 'vt-value-row--default' : ''}`} key={vIdx}>
+                                                                {/* Default variant radio */}
+                                                                <div className="vt-cell vt-default-cell" style={{width:36, flexShrink:0}} title="Set as default variant to display first">
+                                                                    <label className="vt-default-radio">
+                                                                        <input
+                                                                            type="radio"
+                                                                            name="defaultVariant"
+                                                                            checked={defaultVariant === `${tIdx}-${vIdx}`}
+                                                                            onChange={() => setDefaultVariant(`${tIdx}-${vIdx}`)}
+                                                                        />
+                                                                    </label>
+                                                                </div>
                                                                 {/* Image upload */}
                                                                 <div className="vt-img-cell">
                                                                     <div
