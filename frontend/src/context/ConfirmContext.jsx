@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
-import DeleteConfirmModal from '../components/modals/common/DeleteConfirmModal';
+import DeleteConfirmModal from '../components/modals/common/DeleteConfirmModal/DeleteConfirmModal';
 
 const ConfirmContext = createContext();
 

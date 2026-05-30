@@ -32,28 +32,28 @@ public class DataSeeder {
         return args -> {
             try {
                 jdbcTemplate.execute("""
-                    DO $$
-                    DECLARE
-                        r RECORD;
-                    BEGIN
-                        FOR r IN (
-                            SELECT tc.constraint_name, tc.table_name
-                            FROM information_schema.table_constraints tc
-                            JOIN information_schema.key_column_usage kcu
-                              ON tc.constraint_name = kcu.constraint_name
-                            WHERE tc.constraint_type = 'UNIQUE'
-                              AND tc.table_name IN ('products', 'categories', 'settings')
-                              AND kcu.column_name IN ('sku', 'slug', 'key')
-                              AND (
-                                  SELECT COUNT(*)
-                                  FROM information_schema.key_column_usage
-                                  WHERE constraint_name = tc.constraint_name
-                              ) = 1
-                        ) LOOP
-                            EXECUTE 'ALTER TABLE ' || r.table_name || ' DROP CONSTRAINT ' || r.constraint_name;
-                        END LOOP;
-                    END $$;
-                """);
+                            DO $$
+                            DECLARE
+                                r RECORD;
+                            BEGIN
+                                FOR r IN (
+                                    SELECT tc.constraint_name, tc.table_name
+                                    FROM information_schema.table_constraints tc
+                                    JOIN information_schema.key_column_usage kcu
+                                      ON tc.constraint_name = kcu.constraint_name
+                                    WHERE tc.constraint_type = 'UNIQUE'
+                                      AND tc.table_name IN ('products', 'categories', 'settings')
+                                      AND kcu.column_name IN ('sku', 'slug', 'key')
+                                      AND (
+                                          SELECT COUNT(*)
+                                          FROM information_schema.key_column_usage
+                                          WHERE constraint_name = tc.constraint_name
+                                      ) = 1
+                                ) LOOP
+                                    EXECUTE 'ALTER TABLE ' || r.table_name || ' DROP CONSTRAINT ' || r.constraint_name;
+                                END LOOP;
+                            END $$;
+                        """);
                 System.out.println("DataSeeder: Dropped old single-column unique constraints.");
             } catch (Exception e) {
                 System.out.println("Could not drop old unique constraints: " + e.getMessage());
@@ -79,18 +79,21 @@ public class DataSeeder {
                 return roleRepository.save(r);
             });
 
-            // ── 3. Upsert SUPER_ADMIN user (always sync password on startup) ──
-            String superAdminEmail = "admin@gmail.com";
-            String superAdminPassword = "Admin@12345";
-            String superAdminName = "Super Admin";
+            // // ── 3. Upsert SUPER_ADMIN user (always sync password on startup) ──
+            // String superAdminEmail = "admin@gmail.com";
+            // String superAdminPassword = "Admin@12345";
+            // String superAdminName = "Super Admin";
 
-            User superAdmin = userRepository.findByEmail(superAdminEmail).orElseGet(() -> {
-                User newUser = new User(superAdminEmail, passwordEncoder.encode(superAdminPassword), superAdminName);
-                newUser.getRoles().add(superAdminRole);
-                return userRepository.save(newUser);
-            });
+            // User superAdmin = userRepository.findByEmail(superAdminEmail).orElseGet(() ->
+            // {
+            // User newUser = new User(superAdminEmail,
+            // passwordEncoder.encode(superAdminPassword), superAdminName);
+            // newUser.getRoles().add(superAdminRole);
+            // return userRepository.save(newUser);
+            // });
 
-            // ── 4. Seed default units for SUPER_ADMIN ────────────────────────────────────────
+            // ── 4. Seed default units for SUPER_ADMIN
+            // ────────────────────────────────────────
             if (unitRepository.count() == 0) {
                 Unit pieces = new Unit();
                 pieces.setName("Pieces");
