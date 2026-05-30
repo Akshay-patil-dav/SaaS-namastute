@@ -54,6 +54,7 @@ const WebDevelopment     = lazy(() => import('./pages/website/WebDevelopment/Web
 const AIAutomation       = lazy(() => import('./pages/website/AIAutomation/AIAutomation.jsx'));
 const Ecommerce          = lazy(() => import('./pages/website/Ecommerce/Ecommerce.jsx'));
 const ContactUs          = lazy(() => import('./pages/website/ContactUs/ContactUs.jsx'));
+const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePreview.jsx'));
 
 
 
@@ -250,6 +251,10 @@ function AppRoutes() {
                 <Route
                     path="/website-builder"
                     element={<PosPage roles={CLIENT_ADMIN_ROLES}><WebsiteBuilder /></PosPage>}
+                />
+                <Route
+                    path="/builder-preview"
+                    element={<LivePreview />}
                 />
 
 

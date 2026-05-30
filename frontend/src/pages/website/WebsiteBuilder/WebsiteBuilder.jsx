@@ -217,7 +217,7 @@ const STARTER_LAYOUTS = {
 /* ────────────────────────────────────────────────────────────────────────── */
 /*  BLOCK RENDERER                                                            */
 /* ────────────────────────────────────────────────────────────────────────── */
-function renderBlock(block) {
+export function renderBlock(block, isPreview = false) {
   const p = block.props;
   switch (block.type) {
 
@@ -326,7 +326,7 @@ function renderBlock(block) {
       const Tag = p.level || 'h2';
       return (
         <div className="wb-block-heading" style={{ textAlign: p.align || 'left' }}>
-          <Tag contentEditable suppressContentEditableWarning style={{ outline: 'none' }}>
+          <Tag contentEditable={!isPreview ? true : undefined} suppressContentEditableWarning={!isPreview ? true : undefined} style={{ outline: 'none' }}>
             {p.text}
           </Tag>
         </div>
@@ -336,7 +336,7 @@ function renderBlock(block) {
     case 'TEXT':
       return (
         <div className="wb-block-text">
-          <p contentEditable suppressContentEditableWarning style={{ outline: 'none' }}>
+          <p contentEditable={!isPreview ? true : undefined} suppressContentEditableWarning={!isPreview ? true : undefined} style={{ outline: 'none' }}>
             {p.text}
           </p>
         </div>
@@ -1185,7 +1185,7 @@ export default function WebsiteBuilder() {
             <button className="wb-icon-btn" onClick={() => setShowSetup(true)} title="Reconfigure setup">
               <Building2 size={14} /><span>Change Business</span>
             </button>
-            <button className="wb-icon-btn" onClick={() => window.open('', '_blank')} title="Preview site">
+            <button className="wb-icon-btn" onClick={() => window.open('/builder-preview', '_blank')} title="Preview site">
               <Eye size={14} /><span>Preview</span>
             </button>
             <button className="wb-btn-orange" onClick={save}>
