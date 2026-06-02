@@ -89,18 +89,19 @@ const CreateProduct = () => {
     // Fetch categories, sub-categories, brands and units on mount
     const fetchInitialData = async () => {
         try {
-            const [catRes, subRes, brandRes, unitRes, warrantyRes] = await Promise.all([
+            const results = await Promise.allSettled([
                 apiClient.get(`${ENV.API_BASE_URL}/categories`),
                 apiClient.get(`${ENV.API_BASE_URL}/subcategories`),
                 apiClient.get(`${ENV.API_BASE_URL}/brands`),
                 apiClient.get(`${ENV.API_BASE_URL}/units`),
                 apiClient.get(`${ENV.API_BASE_URL}/warranties`)
             ]);
-            setCategories(catRes.data || []);
-            setSubCategories(subRes.data || []);
-            setBrands(brandRes.data || []);
-            setUnits(unitRes.data || []);
-            setWarranties(warrantyRes.data || []);
+            
+            setCategories(results[0].status === 'fulfilled' ? (results[0].value.data || []) : []);
+            setSubCategories(results[1].status === 'fulfilled' ? (results[1].value.data || []) : []);
+            setBrands(results[2].status === 'fulfilled' ? (results[2].value.data || []) : []);
+            setUnits(results[3].status === 'fulfilled' ? (results[3].value.data || []) : []);
+            setWarranties(results[4].status === 'fulfilled' ? (results[4].value.data || []) : []);
         } catch (err) {
             console.error('Failed to fetch initial data', err);
         }

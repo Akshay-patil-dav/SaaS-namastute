@@ -55,10 +55,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/upload/**", "/uploads/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands", "/api/units", "/api/warranties").permitAll()
                         // AI Helper endpoints require a valid JWT — each user can only access their own data
                         .requestMatchers("/api/ai/**").authenticated()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(e -> e
+                        .defaultAuthenticationEntryPointFor(
+                                (request, response, authException) -> {
+                                    response.setStatus(401);
+                                    response.setContentType("application/json");
+                                    response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                                },
+                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/**")
+                        )
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
