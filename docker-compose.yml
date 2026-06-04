@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    # Scale to 2 replicas for load balancing
+    deploy:
+      replicas: 2
+    environment:
+      # Use host.docker.internal to connect to the Postgres database running on the host machine
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/namustute_db_pos
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=root
+    # We don't map ports here directly to the host because Nginx will handle external traffic
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend

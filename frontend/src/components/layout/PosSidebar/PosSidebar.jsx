@@ -38,7 +38,8 @@ import {
     Wrench,
     DollarSign,
     Users,
-    Sparkles
+    Sparkles,
+    Palette
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -359,8 +360,31 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         }}>NEW</span>
                                     </NavLink>
                                 </li>
+                                <li className="pos-menu-item">
+                                    <NavLink
+                                        to="/website-theme-editor"
+                                        className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <Palette className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Website Theme Editor</span>
+                                        </div>
+                                        <span style={{
+                                            fontSize: '9px',
+                                            fontWeight: 800,
+                                            background: 'linear-gradient(135deg,#ec4899,#f43f5e)',
+                                            color: '#fff',
+                                            borderRadius: '4px',
+                                            padding: '2px 6px',
+                                            letterSpacing: '0.04em',
+                                            textTransform: 'uppercase',
+                                            flexShrink: 0
+                                        }}>NEW</span>
+                                    </NavLink>
+                                </li>
                             </ul>
                         </>
+
                     )}
                 </div>
             </aside>

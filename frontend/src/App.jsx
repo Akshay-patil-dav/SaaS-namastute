@@ -12,6 +12,7 @@ const Login              = lazy(() => import('./pages/auth/Login/Login.jsx'));
 const Register           = lazy(() => import('./pages/auth/Register/Register.jsx'));
 const LandingPage        = lazy(() => import('./pages/website/LandingPage/LandingPage.jsx'));
 const ITPortfolio        = lazy(() => import('./pages/website/ITPortfolio/ITPortfolio.jsx'));
+const AkshayPatil        = lazy(() => import('./pages/website/AkshayPatil/AkshayPatil.jsx'));
 const BlogPage           = lazy(() => import('./pages/website/BlogPage/BlogPage.jsx'));
 const BlogDetail         = lazy(() => import('./pages/website/BlogDetail/BlogDetail.jsx'));
 const Unauthorized       = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
@@ -55,6 +56,7 @@ const AIAutomation       = lazy(() => import('./pages/website/AIAutomation/AIAut
 const Ecommerce          = lazy(() => import('./pages/website/Ecommerce/Ecommerce.jsx'));
 const ContactUs          = lazy(() => import('./pages/website/ContactUs/ContactUs.jsx'));
 const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePreview.jsx'));
+const WebsiteThemeEditor = lazy(() => import('./pages/website/WebsiteThemeEditor/WebsiteThemeEditor.jsx'));
 
 
 
@@ -113,6 +115,7 @@ function AppRoutes() {
                 {/* Root → IT Portfolio Landing Page */}
                 <Route path="/" element={<ITPortfolio />} />
                 <Route path="/retail-saas-platform" element={<LandingPage />} />
+                <Route path="/Akshay-Patil" element={<AkshayPatil />} />
 
                 {/* Blog routes – public */}
                 <Route path="/blog"       element={<BlogPage />} />
@@ -255,6 +258,10 @@ function AppRoutes() {
                 <Route
                     path="/builder-preview"
                     element={<LivePreview />}
+                />
+                <Route
+                    path="/website-theme-editor"
+                    element={<PosPage roles={CLIENT_ADMIN_ROLES}><WebsiteThemeEditor /></PosPage>}
                 />
 
 

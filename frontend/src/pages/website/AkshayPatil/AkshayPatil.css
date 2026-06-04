@@ -1,0 +1,48 @@
+.akshay-patil-container {
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    background-color: #0f172a;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.portfolio-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.portfolio-header h1 {
+    font-size: 3rem;
+    color: #6366f1;
+    margin-bottom: 0.5rem;
+}
+
+.portfolio-header p {
+    font-size: 1.25rem;
+    color: #94a3b8;
+}
+
+.portfolio-main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-section, .projects-section {
+    background-color: #1e293b;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.about-section h2, .projects-section h2 {
+    color: #e2e8f0;
+    border-bottom: 2px solid #334155;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.about-section p, .projects-section p {
+    color: #cbd5e1;
+    line-height: 1.6;
+}
