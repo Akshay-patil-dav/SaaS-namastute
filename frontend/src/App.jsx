@@ -49,7 +49,6 @@ const PurchaseReturn     = lazy(() => import('./pages/purchases/PurchaseReturn/P
 const AddPurchaseReturn  = lazy(() => import('./pages/purchases/AddPurchaseReturn/AddPurchaseReturn.jsx'));
 const EditPurchaseReturn = lazy(() => import('./pages/purchases/EditPurchaseReturn/EditPurchaseReturn.jsx'));
 const Settings           = lazy(() => import('./pages/settings/Settings/Settings.jsx'));
-const WebsiteBuilder     = lazy(() => import('./pages/website/WebsiteBuilder/WebsiteBuilder.jsx'));
 const ServiceDetail      = lazy(() => import('./pages/website/ServiceDetail/ServiceDetail.jsx'));
 const WebDevelopment     = lazy(() => import('./pages/website/WebDevelopment/WebDevelopment.jsx'));
 const AIAutomation       = lazy(() => import('./pages/website/AIAutomation/AIAutomation.jsx'));
@@ -251,10 +250,6 @@ function AppRoutes() {
                     element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
                 />
                 <Route
-                    path="/website-builder"
-                    element={<PosPage roles={CLIENT_ADMIN_ROLES}><WebsiteBuilder /></PosPage>}
-                />
-                <Route
                     path="/builder-preview"
                     element={<LivePreview />}
                 />
@@ -286,11 +281,74 @@ function AppRoutes() {
     );
 }
 
+const WarningBanner = () => {
+    const text = '⚠️ WARNING: This web application and business is currently under development. ⚠️';
+    
+    return (
+        <div style={{
+            background: 'linear-gradient(135deg, #ff902f 0%, #ff5f1f 100%)',
+            color: '#ffffff',
+            padding: '0',
+            fontWeight: '600',
+            fontSize: '14px',
+            width: '100%',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 999999,
+            display: 'flex',
+            alignItems: 'center',
+            height: '34px'
+        }}>
+            <style>{`
+                body {
+                    padding-top: 34px !important;
+                }
+                .lp-nav {
+                    top: 34px !important;
+                }
+                .pos-sidebar {
+                    top: 34px !important;
+                    height: calc(100vh - 34px) !important;
+                }
+                .pos-header {
+                    top: 34px !important;
+                }
+                .lp-mobile-menu {
+                    top: calc(68px + 34px) !important;
+                }
+                @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                .marquee-track {
+                    display: flex;
+                    width: max-content;
+                    animation: marquee 50s linear infinite;
+                }
+                .marquee-item {
+                    padding-right: 60px;
+                    white-space: nowrap;
+                    line-height: 34px;
+                }
+            `}</style>
+            <div className="marquee-track">
+                {Array(20).fill(text).map((t, i) => (
+                    <div key={i} className="marquee-item">{t}</div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 export default function App() {
     return (
         <AuthProvider>
             <CompanyProvider>
                 <ConfirmProvider>
+                    <WarningBanner />
                     <BrowserRouter>
                         <AppRoutes />
                     </BrowserRouter>

@@ -291,22 +291,22 @@ export default function LandingPage() {
 
                     <div className="lp-hero-stats">
                         <div className="lp-stat">
-                            <div className="lp-stat-num">500<span>+</span></div>
+                            <div className="lp-stat-num">0<span>+</span></div>
                             <div className="lp-stat-label">Active Businesses</div>
                         </div>
                         <div className="lp-stat-divider" />
                         <div className="lp-stat">
-                            <div className="lp-stat-num">₹12<span>Cr+</span></div>
+                            <div className="lp-stat-num">₹0<span>+</span></div>
                             <div className="lp-stat-label">Transactions Processed</div>
                         </div>
                         <div className="lp-stat-divider" />
                         <div className="lp-stat">
-                            <div className="lp-stat-num">99.9<span>%</span></div>
+                            <div className="lp-stat-num">0<span>%</span></div>
                             <div className="lp-stat-label">Uptime SLA</div>
                         </div>
                         <div className="lp-stat-divider" />
                         <div className="lp-stat">
-                            <div className="lp-stat-num">4.9<span>★</span></div>
+                            <div className="lp-stat-num">0<span>★</span></div>
                             <div className="lp-stat-label">Average Rating</div>
                         </div>
                     </div>

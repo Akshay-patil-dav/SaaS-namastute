@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import logo from '../../../assets/logo.svg';
 import '../../../pages/website/BlogDetail/LandingPage.css';
 
@@ -74,6 +74,8 @@ export const NavLogo = () => (
 
 const WebsiteNavbar = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const showCTA = location.pathname === '/retail-saas-platform';
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
@@ -215,10 +217,12 @@ const WebsiteNavbar = () => {
                     <li><Link to="/contact" style={{ color: 'var(--primary)', fontWeight: 700 }}>Contact</Link></li>
                 </ul>
 
-                <div className="lp-nav-cta">
-                    <button className="lp-btn-ghost" onClick={() => navigate('/login')}>Log In</button>
-                    <button className="lp-btn-primary" onClick={() => navigate('/register')}>Get Started Free</button>
-                </div>
+                {showCTA && (
+                    <div className="lp-nav-cta">
+                        <button className="lp-btn-ghost" onClick={() => navigate('/login')}>Log In</button>
+                        <button className="lp-btn-primary" onClick={() => navigate('/register')}>Get Started Free</button>
+                    </div>
+                )}
 
                 <button
                     className={`lp-hamburger ${menuOpen ? 'open' : ''}`}
@@ -279,10 +283,12 @@ const WebsiteNavbar = () => {
                     <Link to="/blog" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'block', fontSize: 15 }}>Blog</Link>
                     <Link to="/contact" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'block', fontSize: 15 }}>Contact Us</Link>
                 </div>
-                <div className="lp-mobile-menu-cta">
-                    <a href="#" className="lp-btn-ghost" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Log In</a>
-                    <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/register'); }}>Get Started Free</a>
-                </div>
+                {showCTA && (
+                    <div className="lp-mobile-menu-cta">
+                        <a href="#" className="lp-btn-ghost" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Log In</a>
+                        <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/register'); }}>Get Started Free</a>
+                    </div>
+                )}
             </div>
         </>
     );

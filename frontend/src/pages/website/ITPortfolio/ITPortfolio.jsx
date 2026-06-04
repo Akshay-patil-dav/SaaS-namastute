@@ -91,69 +91,57 @@ export default function ITPortfolio() {
         }
     ];
 
-    const [activePortfolioTab, setActivePortfolioTab] = useState('App Development');
+    const [activePortfolioTab, setActivePortfolioTab] = useState('wordpress UI Dev');
     const portfolioTabsData = [
-        { id: 'Data Analysis', icon: '📊' },
-        { id: 'UI/UX Designing', icon: '🎨' },
-        { id: 'App Development', icon: '📱' },
-        { id: 'Wp Development', icon: '⚙️' },
-        { id: '3D Design Solution', icon: '🧊' }
+        { id: 'wordpress UI Dev', icon: '💻' },
+        { id: 'Shopify Dev', icon: '🛍️' },
+        { id: 'Custome SOftware Dev', icon: '⚙️' },
+        { id: 'Custome Web Dev', icon: '🌐' }
     ];
     const portfolioContentData = {
-        'App Development': {
-            mainImg: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
-            title: 'Detailing Of Our Project',
-            desc: 'There are many variations passages of Lorem Ipsum available but the majority have suffered alteration in some form by injected humour,',
-            features: [
-                { icon: '💻', title: 'Responsive\nWebsite' },
-                { icon: '⭐', title: '100% Customers\nSatisfaction' },
-                { icon: '☁️', title: 'Big Data &\nAnalytics' }
-            ],
-            innerImg: '/dashboard1.png'
-        },
-        'Data Analysis': {
-            mainImg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
-            title: 'Data Insights & Analytics',
-            desc: 'Unlock the power of your data with our advanced analytics solutions, providing actionable insights for business growth.',
-            features: [
-                { icon: '📈', title: 'Real-time\nMetrics' },
-                { icon: '🎯', title: 'Predictive\nModeling' },
-                { icon: '🔒', title: 'Secure Data\nPipelines' }
-            ],
-            innerImg: '/dashboard2.png'
-        },
-        'UI/UX Designing': {
-            mainImg: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800',
-            title: 'User-Centric Design',
-            desc: 'We craft intuitive and engaging user experiences that delight your customers and drive conversions.',
-            features: [
-                { icon: '✨', title: 'Pixel-Perfect\nUI' },
-                { icon: '🔍', title: 'User\nResearch' },
-                { icon: '📱', title: 'Interactive\nPrototypes' }
-            ],
-            innerImg: '/dashboard1.png'
-        },
-        'Wp Development': {
+        'wordpress UI Dev': {
             mainImg: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800',
-            title: 'Custom WordPress Solutions',
-            desc: 'Scalable and secure WordPress websites tailored to your unique business needs, with easy content management.',
+            title: 'WordPress UI Development',
+            desc: 'Custom WordPress UI development ensuring scalable and secure websites tailored to your unique business needs, with easy content management.',
             features: [
                 { icon: '⚡', title: 'Optimized\nPerformance' },
                 { icon: '🛡️', title: 'Enhanced\nSecurity' },
-                { icon: '🧩', title: 'Custom\nPlugins' }
+                { icon: '🎨', title: 'Custom\nDesign' }
             ],
             innerImg: '/dashboard2.png'
         },
-        '3D Design Solution': {
-            mainImg: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800',
-            title: 'Immersive 3D Experiences',
-            desc: 'Bring your ideas to life with stunning 3D models and interactive environments for web and mobile.',
+        'Shopify Dev': {
+            mainImg: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=800',
+            title: 'Shopify Development',
+            desc: 'High-converting online stores engineered for maximum sales and seamless checkout experiences.',
             features: [
-                { icon: '🧊', title: 'High-Fidelity\nModeling' },
-                { icon: '🎮', title: 'Interactive\nWebGL' },
-                { icon: '👁️', title: 'AR/VR\nReady' }
+                { icon: '🛍️', title: 'E-commerce\nOptimization' },
+                { icon: '⭐', title: '100% Customers\nSatisfaction' },
+                { icon: '📈', title: 'Sales\nGrowth' }
             ],
             innerImg: '/dashboard1.png'
+        },
+        'Custome SOftware Dev': {
+            mainImg: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
+            title: 'Custom Software Development',
+            desc: 'End-to-end multi-tenant application development with robust backend architecture and scalable solutions.',
+            features: [
+                { icon: '💻', title: 'Robust\nArchitecture' },
+                { icon: '☁️', title: 'Cloud\nIntegration' },
+                { icon: '🔒', title: 'Secure Data\nPipelines' }
+            ],
+            innerImg: '/dashboard1.png'
+        },
+        'Custome Web Dev': {
+            mainImg: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800',
+            title: 'Custom Web Development',
+            desc: 'We craft intuitive and engaging web applications that delight your customers and drive business operations.',
+            features: [
+                { icon: '✨', title: 'Pixel-Perfect\nUI' },
+                { icon: '🌐', title: 'Responsive\nDesign' },
+                { icon: '⚡', title: 'Fast\nLoading' }
+            ],
+            innerImg: '/dashboard2.png'
         }
     };
     const activeContent = portfolioContentData[activePortfolioTab];
@@ -165,6 +153,15 @@ export default function ITPortfolio() {
             {/* ── Hero Section ──────────────────────── */}
             <section className="portfolio-hero">
                 <div className="portfolio-hero-bg">
+                    <video 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline
+                        className="portfolio-hero-video"
+                    >
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-code-2256-large.mp4" type="video/mp4" />
+                    </video>
                     <div className="portfolio-glow-orb orb-1"></div>
                     <div className="portfolio-glow-orb orb-2"></div>
                     <div className="portfolio-glow-orb orb-3"></div>

@@ -328,43 +328,6 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
                         </>
                     )}
-
-
-
-                    {/* Website Builder Section — CLIENT + ADMIN only */}
-                    {isClientOrAdmin && (
-                        <>
-                            <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Website Builder</div>
-                            <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <NavLink
-                                        to="/website-builder"
-                                        className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}
-                                        style={({ isActive }) => isActive ? {} : {}}
-                                    >
-                                        <div className="pos-menu-link-content">
-                                            <Globe className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Website Builder</span>
-                                        </div>
-                                        <span style={{
-                                            fontSize: '9px',
-                                            fontWeight: 800,
-                                            background: 'linear-gradient(135deg,#6366f1,#a855f7)',
-                                            color: '#fff',
-                                            borderRadius: '4px',
-                                            padding: '2px 6px',
-                                            letterSpacing: '0.04em',
-                                            textTransform: 'uppercase',
-                                            flexShrink: 0
-                                        }}>NEW</span>
-                                    </NavLink>
-                                </li>
-                      
-                            </ul>
-                        </>
-
-                    )}
                 </div>
             </aside>
         </>
