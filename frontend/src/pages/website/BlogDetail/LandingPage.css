@@ -1329,109 +1329,7 @@
   flex-wrap: wrap;
   position: relative; z-index: 1;
 }
-/* ─── FOOTER ─────────────────────────────────────────────────────────── */
-.lp-footer {
-  background: white;
-  padding: 80px 0 40px;
-  border-top: 1px solid var(--border-soft);
-  color: #1a1a1a;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-.lp-footer-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 5%;
-}
-.lp-footer-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-  margin-bottom: 80px;
-}
-.lp-footer-col h4 {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #1a1a1a;
-  margin-bottom: 24px;
-}
-.lp-footer-col ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.lp-footer-col ul li a {
-  font-size: 13px;
-  color: #666;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.lp-footer-col ul li a:hover {
-  color: #000;
-}
 
-.lp-footer-contact {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.lp-footer-contact a {
-  font-size: 13px;
-  color: #666;
-  text-decoration: none;
-}
-.lp-footer-contact a:hover { color: #000; }
-
-.lp-footer-socials {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-}
-.lp-social-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #f5f5f7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-  transition: all 0.2s;
-}
-.lp-social-icon:hover {
-  background: #e8e8ed;
-  color: #000;
-  transform: translateY(-2px);
-}
-
-.lp-footer-bottom {
-  border-top: 1px solid #f2f2f2;
-  padding-top: 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.lp-footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  font-size: 16px;
-  color: #000;
-}
-.lp-footer-logo-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #6e67ff; 
-}
-.lp-footer-bottom p {
-  font-size: 12px;
-  color: #999;
-}
 
 /* ─── ALTERNATING BG SECTIONS ───────────────────────────────────────── */
 .lp-section-alt {
@@ -1452,7 +1350,7 @@
 
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .lp-footer-grid { grid-template-columns: repeat(2, 1fr); }
+
 }
 
 @media (max-width: 768px) {
@@ -1489,16 +1387,11 @@
 
   .lp-cta-inner { padding: 44px 28px; }
 
-  .lp-footer-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
-  .lp-footer-bottom {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-  }
+
 }
 
 @media (max-width: 480px) {
-  .lp-footer-grid { grid-template-columns: 1fr; }
+
   .lp-mockup-cards { grid-template-columns: 1fr 1fr; }
   .lp-mockup-cards .lp-mockup-card:last-child { display: none; }
   .lp-pricing-grid { grid-template-columns: 1fr; }
