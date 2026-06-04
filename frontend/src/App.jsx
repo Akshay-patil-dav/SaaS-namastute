@@ -56,7 +56,6 @@ const AIAutomation       = lazy(() => import('./pages/website/AIAutomation/AIAut
 const Ecommerce          = lazy(() => import('./pages/website/Ecommerce/Ecommerce.jsx'));
 const ContactUs          = lazy(() => import('./pages/website/ContactUs/ContactUs.jsx'));
 const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePreview.jsx'));
-const WebsiteThemeEditor = lazy(() => import('./pages/website/WebsiteThemeEditor/WebsiteThemeEditor.jsx'));
 
 
 
@@ -258,10 +257,6 @@ function AppRoutes() {
                 <Route
                     path="/builder-preview"
                     element={<LivePreview />}
-                />
-                <Route
-                    path="/website-theme-editor"
-                    element={<PosPage roles={CLIENT_ADMIN_ROLES}><WebsiteThemeEditor /></PosPage>}
                 />
 
 
