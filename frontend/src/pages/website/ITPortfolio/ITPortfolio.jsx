@@ -96,11 +96,11 @@ export default function ITPortfolio() {
         { id: 'wordpress UI Dev', icon: '💻' },
         { id: 'Shopify Dev', icon: '🛍️' },
         { id: 'Custome SOftware Dev', icon: '⚙️' },
-        { id: 'Custome Web Dev', icon: '🌐' }
+        { id: 'Custome Web App', icon: '🌐' }
     ];
     const portfolioContentData = {
-        'wordpress UI Dev': {
-            mainImg: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800',
+                'wordpress UI Dev': {
+            mainImg: '/wpweb11.png',
             title: 'WordPress UI Development',
             desc: 'Custom WordPress UI development ensuring scalable and secure websites tailored to your unique business needs, with easy content management.',
             features: [
@@ -108,10 +108,10 @@ export default function ITPortfolio() {
                 { icon: '🛡️', title: 'Enhanced\nSecurity' },
                 { icon: '🎨', title: 'Custom\nDesign' }
             ],
-            innerImg: '/dashboard2.png'
+            innerImg: '/wpweb1.png'
         },
         'Shopify Dev': {
-            mainImg: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=800',
+            mainImg: '/shopify11.png',
             title: 'Shopify Development',
             desc: 'High-converting online stores engineered for maximum sales and seamless checkout experiences.',
             features: [
@@ -121,7 +121,7 @@ export default function ITPortfolio() {
             ],
             innerImg: '/dashboard1.png'
         },
-        'Custome SOftware Dev': {
+        'Custome SOftware App': {
             mainImg: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
             title: 'Custom Software Development',
             desc: 'End-to-end multi-tenant application development with robust backend architecture and scalable solutions.',
@@ -134,7 +134,7 @@ export default function ITPortfolio() {
         },
         'Custome Web Dev': {
             mainImg: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800',
-            title: 'Custom Web Development',
+            title: 'Custom Web App',
             desc: 'We craft intuitive and engaging web applications that delight your customers and drive business operations.',
             features: [
                 { icon: '✨', title: 'Pixel-Perfect\nUI' },
