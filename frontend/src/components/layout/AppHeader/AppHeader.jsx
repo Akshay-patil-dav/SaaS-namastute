@@ -41,7 +41,7 @@ export default function AppHeader() {
                     )
                 }
                 <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
-                    {companyInfo.name || 'Namastute'}
+                    {companyInfo.name || 'Namustutam'}
                 </span>
             </div>
 

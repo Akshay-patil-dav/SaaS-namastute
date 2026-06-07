@@ -36,7 +36,7 @@ export default function ITPortfolio() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        document.title = "Namastute | IT Services & Solutions";
+        document.title = "Namustutam | IT Services & Solutions";
     }, []);
 
     const scrollTo = (id) => {
@@ -91,15 +91,15 @@ export default function ITPortfolio() {
         }
     ];
 
-    const [activePortfolioTab, setActivePortfolioTab] = useState('wordpress UI Dev');
+    const [activePortfolioTab, setActivePortfolioTab] = useState('WordPress UI Dev');
     const portfolioTabsData = [
-        { id: 'wordpress UI Dev', icon: '💻' },
+        { id: 'WordPress UI Dev', icon: '💻' },
         { id: 'Shopify Dev', icon: '🛍️' },
-        { id: 'Custome SOftware Dev', icon: '⚙️' },
-        { id: 'Custome Web App', icon: '🌐' }
+        { id: 'Custom Software Dev', icon: '⚙️' },
+        { id: 'Custom Web App', icon: '🌐' }
     ];
     const portfolioContentData = {
-                'wordpress UI Dev': {
+        'WordPress UI Dev': {
             mainImg: '/wpweb11.png',
             title: 'WordPress UI Development',
             desc: 'Custom WordPress UI development ensuring scalable and secure websites tailored to your unique business needs, with easy content management.',
@@ -121,7 +121,7 @@ export default function ITPortfolio() {
             ],
             innerImg: '/dashboard1.png'
         },
-        'Custome SOftware App': {
+        'Custom Software Dev': {
             mainImg: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
             title: 'Custom Software Development',
             desc: 'End-to-end multi-tenant application development with robust backend architecture and scalable solutions.',
@@ -132,7 +132,7 @@ export default function ITPortfolio() {
             ],
             innerImg: '/dashboard1.png'
         },
-        'Custome Web Dev': {
+        'Custom Web App': {
             mainImg: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800',
             title: 'Custom Web App',
             desc: 'We craft intuitive and engaging web applications that delight your customers and drive business operations.',
@@ -212,8 +212,8 @@ export default function ITPortfolio() {
                     subtitle="Comprehensive solutions tailored to accelerate your digital growth and streamline operations."
                     features={services}
                     centerNode={{
-                        title: "Namastute",
-                        icon: <img src="/logo.png" alt="Namastute Logo" style={{ width: '177px', height: '177px', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }} />
+                        title: "Namustutam",
+                        icon: <img src="/logo.png" alt="Namustutam Logo" style={{ width: '177px', height: '177px', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }} />
                     }}
                 />
             </section>

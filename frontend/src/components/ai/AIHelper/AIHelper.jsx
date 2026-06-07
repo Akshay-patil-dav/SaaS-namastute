@@ -11,14 +11,14 @@ import { useCompany } from '../../../context/CompanyContext';
 import './AIHelper.css';
 
 // ── System prompt sent with every request ────────────────────────────────────
-const SYSTEM_PROMPT = `You are an intelligent AI assistant integrated into Namastute POS — a SaaS business management platform.
+const SYSTEM_PROMPT = `You are an intelligent AI assistant integrated into Namustutam POS — a SaaS business management platform.
 Help users with: inventory management, POS sales, product management, purchase orders, stock adjustments, stock transfers, reports, settings configuration, and any feature questions.
 Keep responses clear, concise, and actionable. For code or configuration, use code blocks. For steps, use numbered lists.`;
 
 // ── Quick action prompts ──────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
   { icon: '🔧', label: 'Fix Error', prompt: 'I have an error in the system. Help me troubleshoot it: ' },
-  { icon: '📖', label: 'Explain Feature', prompt: 'Please explain how this feature works in Namastute POS: ' },
+  { icon: '📖', label: 'Explain Feature', prompt: 'Please explain how this feature works in Namustutam POS: ' },
   { icon: '✨', label: 'Improve Workflow', prompt: 'How can I improve my workflow for: ' },
   { icon: '💡', label: 'Best Practice', prompt: 'What are the best practices for: ' },
 ];
@@ -117,7 +117,7 @@ export default function AIHelper() {
 
     // First time — show welcome
     const firstName = user?.name ? user.name.split(' ')[0] : 'there';
-    const bizName = companyInfo.name || 'Namastute POS';
+    const bizName = companyInfo.name || 'Namustutam POS';
     const welcome = [{
       role: 'assistant',
       content: `👋 Hi ${firstName}! I'm your ${bizName} AI Helper.\n\nI can help you with inventory, sales, settings, product management, and more. Try the quick actions above, or just type your question!`,
@@ -361,7 +361,7 @@ export default function AIHelper() {
               className="ai-panel__fix-btn"
               onClick={() => {
                 setShowQuickActions(false);
-                sendMessage('What can you help me with in Namastute POS?');
+                sendMessage('What can you help me with in Namustutam POS?');
               }}
               disabled={!canChat || isLoading}
             >

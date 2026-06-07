@@ -1,6 +1,6 @@
 spring:
   application:
-    name: namastute-backend
+    name: namustutam-backend
 
   datasource:
     # Read from Render environment variables

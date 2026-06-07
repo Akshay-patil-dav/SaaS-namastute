@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 
 // AUTH_API is read from frontend/.env → VITE_API_BASE_URL (via api/config.js)
 const AUTH_API = API.AUTH;
-const STORAGE_KEY = 'namastute_auth';
+const STORAGE_KEY = 'namustutam_auth';
 
 /**
  * Decode the primary role from the roles array returned by the backend.

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { NavLogo } from '../WebsiteNavbar/WebsiteNavbar';
 import './WebsiteFooter.css';
 
 const WebsiteFooter = () => {
@@ -28,9 +29,8 @@ const WebsiteFooter = () => {
                     <div className="premium-footer-grid">
                         
                         <div className="premium-footer-brand">
-                            <div className="logo">
-                                <div className="logo-icon"></div>
-                                <span>Namastute</span>
+                            <div className="logo" style={{ marginBottom: '16px' }}>
+                                <NavLogo />
                             </div>
                             <p>Empowering businesses with intelligent SaaS solutions. Build, scale, and innovate faster with our comprehensive platform designed for the modern web.</p>
                             
@@ -94,7 +94,7 @@ const WebsiteFooter = () => {
                     </div>
 
                     <div className="premium-footer-bottom">
-                        <p>© 2026 Namastute Inc. All rights reserved.</p>
+                        <p>© 2026 Namustutam Inc. All rights reserved.</p>
                         <div className="premium-footer-bottom-links">
                             <a href="#">Privacy Policy</a>
                             <a href="#">Terms of Service</a>

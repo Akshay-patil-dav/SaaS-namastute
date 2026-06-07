@@ -7,7 +7,7 @@ $BACKEND_DIR = "$ROOT_DIR\backend"
 
 Write-Host ""
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "  Starting Namastute Load Balanced Cluster" -ForegroundColor Cyan
+Write-Host "  Starting Namustutam Load Balanced Cluster" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
 

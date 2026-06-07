@@ -102,7 +102,7 @@ public class SecurityConfig {
         //
         //  backend/.env:
         //    FRONTEND_URL=http://localhost:5173        ← your main allowed origin
-        //    CORS_EXTRA_ORIGINS=http://localhost:5174,https://saa-s-namastute.vercel.app
+        //    CORS_EXTRA_ORIGINS=http://localhost:5174,https://saa-s-namustutam.vercel.app
         //
         List<String> origins = new java.util.ArrayList<>();
 

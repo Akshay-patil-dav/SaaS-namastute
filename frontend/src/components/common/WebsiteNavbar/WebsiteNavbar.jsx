@@ -67,8 +67,8 @@ const dropdownMap = {
 
 export const NavLogo = () => (
     <Link to="/" className="lp-nav-logo">
-        <img src={logo} alt="Namastute Logo" className="lp-nav-logo-img" />
-        <span className="lp-nav-logo-text">amas<span>tute</span></span>
+        <img src={logo} alt="Namustutam Logo" className="lp-nav-logo-img" />
+        <span className="lp-nav-logo-text">amus<span>tutam</span></span>
     </Link>
 );
 

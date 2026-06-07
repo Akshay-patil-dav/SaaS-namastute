@@ -41,7 +41,7 @@ export default function BlogDetail() {
     const [blog, setBlog] = useState(() => {
         if (location.state?.blog) return location.state.blog;
         try {
-            const saved = JSON.parse(localStorage.getItem('namastute_blogs') || '[]');
+            const saved = JSON.parse(localStorage.getItem('namustutam_blogs') || '[]');
             // Also check default blogs if not found in saved
             return saved.find(b => b.slug === slug) || null;
         } catch { return null; }
@@ -51,7 +51,7 @@ export default function BlogDetail() {
     const [related, setRelated] = useState([]);
     useEffect(() => {
         try {
-            const saved = JSON.parse(localStorage.getItem('namastute_blogs') || '[]');
+            const saved = JSON.parse(localStorage.getItem('namustutam_blogs') || '[]');
             const rel = saved.filter(b => b.id !== blog?.id && b.category === blog?.category).slice(0, 3);
             setRelated(rel);
         } catch { setRelated([]); }
@@ -184,10 +184,10 @@ export default function BlogDetail() {
                     <div className="blog-detail-sidebar-card" style={{ background: 'var(--gradient)', border: 'none' }}>
                         <div style={{ fontSize: 32, marginBottom: 10 }}>🚀</div>
                         <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 17, fontWeight: 800, color: 'white', marginBottom: 8 }}>
-                            Try Namastute Free
+                            Try Namustutam Free
                         </div>
                         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.78)', lineHeight: 1.65, marginBottom: 16 }}>
-                            Join 500+ businesses using Namastute POS to manage inventory and grow faster.
+                            Join 500+ businesses using Namustutam POS to manage inventory and grow faster.
                         </p>
                         <button className="lp-btn-primary" style={{ background: 'white', color: 'var(--primary-d)', width: '100%', borderRadius: 10 }} onClick={() => navigate('/register')}>
                             Get Started Free →

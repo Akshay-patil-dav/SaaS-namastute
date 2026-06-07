@@ -378,8 +378,8 @@ export default function OnlineOrders() {
 
             {/* Footer */}
             <footer className="oo-footer">
-                <div>2014 - 2026 © Namastute. All Rights Reserved</div>
-                <div>Designed &amp; Developed by <span>Namastute</span></div>
+                <div>2014 - 2026 © Namustutam. All Rights Reserved</div>
+                <div>Designed &amp; Developed by <span>Namustutam</span></div>
             </footer>
 
             {/* ── Modals ────────────────────────────────────── */}

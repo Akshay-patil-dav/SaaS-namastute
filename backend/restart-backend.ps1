@@ -7,7 +7,7 @@ $BACKEND = "C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend"
 
 Write-Host ""
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "  Namastute Backend Restart Script" -ForegroundColor Cyan
+Write-Host "  Namustutam Backend Restart Script" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
 

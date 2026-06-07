@@ -85,7 +85,7 @@ function DashboardShowcase() {
                 <div className="lp-mockup-dot" />
                 <div className="lp-mockup-dot" />
                 <div className="lp-mockup-dot" />
-                <div className="lp-showcase-url">app.namastute.com/dashboard</div>
+                <div className="lp-showcase-url">app.namustutam.com/dashboard</div>
                 <div className="lp-showcase-tabs">
                     {tabs.map((t, i) => (
                         <button
@@ -225,7 +225,7 @@ export default function LandingPage() {
     const testimonials = [
         {
             stars: '⭐⭐⭐⭐⭐',
-            text: '"Namastute transformed our retail operations. We cut manual work by 80% and our stock accuracy is now near-perfect."',
+            text: '"Namustutam transformed our retail operations. We cut manual work by 80% and our stock accuracy is now near-perfect."',
             name: 'Priya S.',
             role: 'Owner, StyleHub Boutique',
             avatar: 'P',
@@ -265,7 +265,7 @@ export default function LandingPage() {
 
                     <h1 className="lp-hero-title">
                         Manage Your Business<br />
-                        With <span className="gradient-text">Namastute POS</span>
+                        With <span className="gradient-text">Namustutam POS</span>
                     </h1>
 
                     <p className="lp-hero-subtitle">
@@ -326,10 +326,10 @@ export default function LandingPage() {
                 <NodeFeatures 
                     badgeTitle="Features"
                     title={<>All Features in One</>}
-                    subtitle="From inventory to billing to analytics — Namastute is the only tool your team will ever need."
+                    subtitle="From inventory to billing to analytics — Namustutam is the only tool your team will ever need."
                     features={features}
                     centerNode={{
-                        title: "Namastute",
+                        title: "Namustutam",
                         icon: <svg viewBox="0 0 24 24" width="48" height="48" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
                     }}
                 />
@@ -381,7 +381,7 @@ export default function LandingPage() {
                     <div className="lp-section-label">Testimonials</div>
                     <h2 className="lp-section-title">Loved by Retailers Across India</h2>
                     <p className="lp-section-sub">
-                        Join hundreds of businesses that trust Namastute every day.
+                        Join hundreds of businesses that trust Namustutam every day.
                     </p>
                 </div>
                 <div className="lp-testimonials-grid">
@@ -407,14 +407,14 @@ export default function LandingPage() {
                     <div className="lp-section-label">Blog</div>
                     <h2 className="lp-section-title">Latest from Our Team</h2>
                     <p className="lp-section-sub">
-                        Insights on software, development, and retail technology — straight from the Namastute team.
+                        Insights on software, development, and retail technology — straight from the Namustutam team.
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 1200, margin: '0 auto' }}>
                     {[
-                        { emoji: '📦', color: 'linear-gradient(135deg,#6366f1,#8b5cf6)', cat: 'Software',    title: 'How Namastute Transformed Retail Inventory', slug: 'namastute-retail-inventory' },
+                        { emoji: '📦', color: 'linear-gradient(135deg,#6366f1,#8b5cf6)', cat: 'Software',    title: 'How Namustutam Transformed Retail Inventory', slug: 'namustutam-retail-inventory' },
                         { emoji: '🏗️', color: 'linear-gradient(135deg,#10b981,#06b6d4)', cat: 'Development', title: 'Building a Multi-Tenant SaaS with Spring Boot',  slug: 'multi-tenant-saas-spring-boot' },
-                        { emoji: '🚀', color: 'linear-gradient(135deg,#ff902f,#ff5f1f)', cat: 'Updates',     title: 'Namastute v2.0 Launch: What\'s New',           slug: 'namastute-v2-launch' },
+                        { emoji: '🚀', color: 'linear-gradient(135deg,#ff902f,#ff5f1f)', cat: 'Updates',     title: 'Namustutam v2.0 Launch: What\'s New',           slug: 'namustutam-v2-launch' },
                     ].map((b, i) => (
                         <div
                             key={i}

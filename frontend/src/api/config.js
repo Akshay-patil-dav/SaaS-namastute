@@ -28,7 +28,7 @@ const DEFAULT_BACKEND_BASE_URL = isProduction
   : 'http://localhost:3000';
 
 const DEFAULT_FRONTEND_URL = isProduction
-  ? 'https://saa-s-namastute.vercel.app'
+  ? 'https://saa-s-namustutam.vercel.app'
   : 'http://localhost:5173';
 
 // ── Raw env values ─────────────────────────────────────────────────────────
@@ -39,11 +39,11 @@ export const ENV = {
   /** e.g.  http://localhost:3000  (no trailing slash) */
   BACKEND_BASE_URL: import.meta.env.VITE_BACKEND_BASE_URL || DEFAULT_BACKEND_BASE_URL,
 
-  /** e.g.  https://saa-s-namastute.vercel.app  or  http://localhost:5173 */
+  /** e.g.  https://saa-s-namustutam.vercel.app  or  http://localhost:5173 */
   FRONTEND_URL:     import.meta.env.VITE_FRONTEND_URL     || DEFAULT_FRONTEND_URL,
 
   /** App branding */
-  APP_NAME:    import.meta.env.VITE_APP_NAME    || 'Namastute POS',
+  APP_NAME:    import.meta.env.VITE_APP_NAME    || 'Namustutam POS',
   APP_VERSION: import.meta.env.VITE_APP_VERSION || '1.0.0',
 
   /** Feature flags */
@@ -114,11 +114,11 @@ const apiClient = axios.create({
 });
 
 // ── Request interceptor: attach JWT ─────────────────────────────────────────
-// Auth context stores the session at 'namastute_auth' as JSON {token, user}
+// Auth context stores the session at 'namustutam_auth' as JSON {token, user}
 apiClient.interceptors.request.use(
   (config) => {
     try {
-      const stored = localStorage.getItem('namastute_auth');
+      const stored = localStorage.getItem('namustutam_auth');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed?.token) {
@@ -141,7 +141,7 @@ apiClient.interceptors.response.use(
       const publicPaths = ['/login', '/register', '/', '/blog'];
       const isPublic = publicPaths.some((p) => window.location.pathname.startsWith(p));
       if (!isPublic) {
-        localStorage.removeItem('namastute_auth');
+        localStorage.removeItem('namustutam_auth');
         window.location.href = '/login';
       }
     }

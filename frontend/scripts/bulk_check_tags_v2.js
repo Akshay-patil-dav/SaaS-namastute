@@ -90,12 +90,12 @@ function checkFile(filePath) {
 }
 
 const files = [
-    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namastute\\frontend\\src\\pages\\StockTransfer.jsx',
-    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namastute\\frontend\\src\\pages\\OnlineOrders.jsx',
-    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namastute\\frontend\\src\\pages\\PosOrders.jsx',
-    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namastute\\frontend\\src\\pages\\Products.jsx',
-    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namastute\\frontend\\src\\pages\\Dashboard2.jsx',
-    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namastute\\frontend\\src\\pages\\Dashboard.jsx'
+    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namustutam\\frontend\\src\\pages\\StockTransfer.jsx',
+    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namustutam\\frontend\\src\\pages\\OnlineOrders.jsx',
+    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namustutam\\frontend\\src\\pages\\PosOrders.jsx',
+    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namustutam\\frontend\\src\\pages\\Products.jsx',
+    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namustutam\\frontend\\src\\pages\\Dashboard2.jsx',
+    'c:\\Users\\aksha\\OneDrive\\Desktop\\Namustutam\\SaaS-namustutam\\frontend\\src\\pages\\Dashboard.jsx'
 ];
 
 files.forEach(checkFile);

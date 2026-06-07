@@ -37,10 +37,10 @@ function useReveal() {
 const DEFAULT_BLOGS = [
     {
         id: 'b1',
-        title: 'How Namastute Transformed Retail Inventory Management',
-        slug: 'namastute-retail-inventory',
+        title: 'How Namustutam Transformed Retail Inventory Management',
+        slug: 'namustutam-retail-inventory',
         excerpt: 'Discover how our AI-powered inventory engine saves modern Indian retailers hours every week and reduces stockouts by 40%.',
-        content: `## Introduction\n\nInventory management has long been the Achilles heel of retail businesses across India. With Namastute POS, we set out to fundamentally change that.\n\n## The Problem\n\nManual stock tracking leads to costly errors, overstocking, and missed sales opportunities. Small businesses often rely on spreadsheets that don't scale.\n\n## Our Solution\n\nNamestute's real-time inventory engine automatically tracks every transaction, triggers low-stock alerts, and generates purchase orders — all from one unified dashboard.\n\n## Results\n\n- 40% reduction in stockouts\n- 60% faster stock reconciliation\n- 80% less manual data entry\n\n## Conclusion\n\nModern retail demands modern tools. Namastute gives you the edge to compete — and win.`,
+        content: `## Introduction\n\nInventory management has long been the Achilles heel of retail businesses across India. With Namustutam POS, we set out to fundamentally change that.\n\n## The Problem\n\nManual stock tracking leads to costly errors, overstocking, and missed sales opportunities. Small businesses often rely on spreadsheets that don't scale.\n\n## Our Solution\n\nNamestute's real-time inventory engine automatically tracks every transaction, triggers low-stock alerts, and generates purchase orders — all from one unified dashboard.\n\n## Results\n\n- 40% reduction in stockouts\n- 60% faster stock reconciliation\n- 80% less manual data entry\n\n## Conclusion\n\nModern retail demands modern tools. Namustutam gives you the edge to compete — and win.`,
         category: 'Software',
         author: 'Akshay Patil',
         authorRole: 'Founder & CTO',
@@ -55,7 +55,7 @@ const DEFAULT_BLOGS = [
         title: 'Building a Multi-Tenant SaaS Architecture with Spring Boot',
         slug: 'multi-tenant-saas-spring-boot',
         excerpt: 'A deep dive into how we built a scalable, secure multi-tenant backend that serves hundreds of businesses from a single deployment.',
-        content: `## Overview\n\nDesigning a multi-tenant SaaS platform is one of the most challenging architectural decisions you'll make. Here's how we did it at Namastute.\n\n## Database Strategy\n\nWe chose a shared-schema approach with tenant IDs on every table, giving us the best balance of cost efficiency and data isolation.\n\n## Security\n\nEvery API request is intercepted at the filter layer to validate the tenant context before any business logic runs.\n\n## Lessons Learned\n\n1. Plan your tenant isolation model early\n2. Use database-level RLS where possible\n3. Cache aggressively at the tenant level\n\n## Conclusion\n\nWith the right architecture, a single Spring Boot application can serve thousands of tenants reliably.`,
+        content: `## Overview\n\nDesigning a multi-tenant SaaS platform is one of the most challenging architectural decisions you'll make. Here's how we did it at Namustutam.\n\n## Database Strategy\n\nWe chose a shared-schema approach with tenant IDs on every table, giving us the best balance of cost efficiency and data isolation.\n\n## Security\n\nEvery API request is intercepted at the filter layer to validate the tenant context before any business logic runs.\n\n## Lessons Learned\n\n1. Plan your tenant isolation model early\n2. Use database-level RLS where possible\n3. Cache aggressively at the tenant level\n\n## Conclusion\n\nWith the right architecture, a single Spring Boot application can serve thousands of tenants reliably.`,
         category: 'Development',
         author: 'Rahul Sharma',
         authorRole: 'Backend Engineer',
@@ -70,7 +70,7 @@ const DEFAULT_BLOGS = [
         title: 'POS Billing for Indian Retailers: What to Look For',
         slug: 'pos-billing-indian-retailers',
         excerpt: 'A buyer\'s guide for choosing the right POS system for your Indian retail or F&B business.',
-        content: `## Why Your POS Choice Matters\n\nYour Point of Sale system is the nerve center of your retail operation. Choosing poorly costs you time, money, and customers.\n\n## Key Features Checklist\n\n- GST-compliant billing\n- Offline mode support\n- Barcode & QR generation\n- Real-time inventory sync\n- Multi-role staff management\n\n## Namastute vs. Alternatives\n\nWe compared five leading platforms on price, features, and Indian compliance. Namastute came out on top for mid-sized retailers.\n\n## Conclusion\n\nDon't settle for generic software. Demand a platform built specifically for Indian retail.`,
+        content: `## Why Your POS Choice Matters\n\nYour Point of Sale system is the nerve center of your retail operation. Choosing poorly costs you time, money, and customers.\n\n## Key Features Checklist\n\n- GST-compliant billing\n- Offline mode support\n- Barcode & QR generation\n- Real-time inventory sync\n- Multi-role staff management\n\n## Namustutam vs. Alternatives\n\nWe compared five leading platforms on price, features, and Indian compliance. Namustutam came out on top for mid-sized retailers.\n\n## Conclusion\n\nDon't settle for generic software. Demand a platform built specifically for Indian retail.`,
         category: 'Business',
         author: 'Priya S.',
         authorRole: 'Product Manager',
@@ -82,10 +82,10 @@ const DEFAULT_BLOGS = [
     },
     {
         id: 'b4',
-        title: 'Namastute v2.0 Launch: What\'s New',
-        slug: 'namastute-v2-launch',
+        title: 'Namustutam v2.0 Launch: What\'s New',
+        slug: 'namustutam-v2-launch',
         excerpt: 'Barcode & QR printing overhaul, role-based access improvements, and a brand-new analytics dashboard — all live now.',
-        content: `## What's in v2.0\n\nAfter months of development, we're thrilled to announce Namastute v2.0.\n\n## New Features\n\n### Barcode & QR Printing\nCustomize label sizes, choose which fields to display, and print in bulk.\n\n### Advanced Analytics\nNew sales trend charts, product performance heatmaps, and exportable reports.\n\n### Role-Based Access\nFine-grained permissions for every page and action.\n\n## How to Upgrade\n\nExisting customers are automatically upgraded. No action required.\n\n## Roadmap\n\nV2.1 will bring WhatsApp notifications and UPI payment reconciliation.`,
+        content: `## What's in v2.0\n\nAfter months of development, we're thrilled to announce Namustutam v2.0.\n\n## New Features\n\n### Barcode & QR Printing\nCustomize label sizes, choose which fields to display, and print in bulk.\n\n### Advanced Analytics\nNew sales trend charts, product performance heatmaps, and exportable reports.\n\n### Role-Based Access\nFine-grained permissions for every page and action.\n\n## How to Upgrade\n\nExisting customers are automatically upgraded. No action required.\n\n## Roadmap\n\nV2.1 will bring WhatsApp notifications and UPI payment reconciliation.`,
         category: 'Updates',
         author: 'Akshay Patil',
         authorRole: 'Founder & CTO',
@@ -99,8 +99,8 @@ const DEFAULT_BLOGS = [
         id: 'b5',
         title: 'How to Set Up Barcode Printing in Under 5 Minutes',
         slug: 'barcode-printing-tutorial',
-        excerpt: 'Step-by-step guide to configuring your barcode label printer with Namastute POS — no technical expertise needed.',
-        content: `## Prerequisites\n\n- A supported thermal printer (Zebra, TSC, or any USB printer)\n- Namastute POS account (any plan)\n\n## Step 1 — Connect Your Printer\n\nPlug in your printer and install the manufacturer driver. Namastute uses your browser's native print dialog.\n\n## Step 2 — Configure Labels\n\nGo to Print Barcode → Configure. Choose your label size (36mm × 22mm, 38mm × 25mm, etc.) and toggle which fields to display.\n\n## Step 3 — Select Products\n\nSearch for products by name or scan existing barcodes. Add them to your print queue.\n\n## Step 4 — Print\n\nClick "Print" and select your thermal printer from the dialog. Done!\n\n## Tips\n\n- Preview before printing to avoid waste\n- Use the quantity multiplier for bulk jobs`,
+        excerpt: 'Step-by-step guide to configuring your barcode label printer with Namustutam POS — no technical expertise needed.',
+        content: `## Prerequisites\n\n- A supported thermal printer (Zebra, TSC, or any USB printer)\n- Namustutam POS account (any plan)\n\n## Step 1 — Connect Your Printer\n\nPlug in your printer and install the manufacturer driver. Namustutam uses your browser's native print dialog.\n\n## Step 2 — Configure Labels\n\nGo to Print Barcode → Configure. Choose your label size (36mm × 22mm, 38mm × 25mm, etc.) and toggle which fields to display.\n\n## Step 3 — Select Products\n\nSearch for products by name or scan existing barcodes. Add them to your print queue.\n\n## Step 4 — Print\n\nClick "Print" and select your thermal printer from the dialog. Done!\n\n## Tips\n\n- Preview before printing to avoid waste\n- Use the quantity multiplier for bulk jobs`,
         category: 'Tutorial',
         author: 'Dev Team',
         authorRole: 'Engineering',
@@ -115,7 +115,7 @@ const DEFAULT_BLOGS = [
         title: '5 Ways to Reduce Retail Shrinkage with Better Inventory Tech',
         slug: 'reduce-retail-shrinkage',
         excerpt: 'Shrinkage costs Indian retailers billions every year. Here are five proven strategies powered by smart inventory software.',
-        content: `## The Shrinkage Problem\n\nRetail shrinkage — from theft, damage, or administrative errors — can silently eat 1–3% of your revenue.\n\n## 1. Real-Time Stock Tracking\n\nKnow your exact stock levels at all times. Discrepancies trigger automatic alerts.\n\n## 2. Barcode Scanning on Every Transaction\n\nManual data entry is the #1 cause of administrative shrinkage. Scan everything.\n\n## 3. Role-Based Access Control\n\nLimit who can apply discounts, process returns, and adjust stock.\n\n## 4. Regular Automated Audits\n\nSchedule daily or weekly stock reconciliation reports instead of annual counts.\n\n## 5. Supplier Verification\n\nCross-check inbound deliveries against purchase orders automatically.\n\n## Conclusion\n\nWith the right tools, shrinkage is manageable. Namastute helps you stay in control.`,
+        content: `## The Shrinkage Problem\n\nRetail shrinkage — from theft, damage, or administrative errors — can silently eat 1–3% of your revenue.\n\n## 1. Real-Time Stock Tracking\n\nKnow your exact stock levels at all times. Discrepancies trigger automatic alerts.\n\n## 2. Barcode Scanning on Every Transaction\n\nManual data entry is the #1 cause of administrative shrinkage. Scan everything.\n\n## 3. Role-Based Access Control\n\nLimit who can apply discounts, process returns, and adjust stock.\n\n## 4. Regular Automated Audits\n\nSchedule daily or weekly stock reconciliation reports instead of annual counts.\n\n## 5. Supplier Verification\n\nCross-check inbound deliveries against purchase orders automatically.\n\n## Conclusion\n\nWith the right tools, shrinkage is manageable. Namustutam helps you stay in control.`,
         category: 'Business',
         author: 'Ananya K.',
         authorRole: 'Business Analyst',
@@ -221,7 +221,7 @@ export default function BlogPage() {
     // Load blogs: custom + defaults
     const [allBlogs] = useState(() => {
         try {
-            const saved = JSON.parse(localStorage.getItem('namastute_blogs') || '[]');
+            const saved = JSON.parse(localStorage.getItem('namustutam_blogs') || '[]');
             const combined = [...saved, ...DEFAULT_BLOGS];
             // deduplicate by id
             const seen = new Set();
@@ -267,7 +267,7 @@ export default function BlogPage() {
                         Insights on <span className="gradient-text">Software & Development</span>
                     </h1>
                     <p className="blog-hero-sub">
-                        Expert articles on SaaS, retail technology, backend development, and business growth — straight from the Namastute team.
+                        Expert articles on SaaS, retail technology, backend development, and business growth — straight from the Namustutam team.
                     </p>
 
                     {/* Search */}

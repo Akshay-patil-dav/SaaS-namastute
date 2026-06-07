@@ -609,7 +609,7 @@ public class AiController {
                 .map(m -> m.get("content"))
                 .filter(c -> c != null && !c.isBlank())
                 .findFirst()
-                .orElse("You are a helpful AI assistant for a SaaS business management platform called Namastute POS.");
+                .orElse("You are a helpful AI assistant for a SaaS business management platform called Namustutam POS.");
 
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("model",      claudeModel);
@@ -779,8 +779,8 @@ public class AiController {
                 "https://openrouter.ai/api/v1/chat/completions",
                 "OpenRouter", messages,
                 Map.of(
-                    "HTTP-Referer", "https://namastute.app",
-                    "X-Title",      "Namastute POS AI Helper"
+                    "HTTP-Referer", "https://namustutam.app",
+                    "X-Title",      "Namustutam POS AI Helper"
                 ));
     }
 }

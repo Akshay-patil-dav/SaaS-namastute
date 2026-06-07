@@ -15,7 +15,7 @@ export default function ContactUs() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        document.title = "Contact Us | Namastute";
+        document.title = "Contact Us | Namustutam";
     }, []);
 
     const handleChange = (e) => {

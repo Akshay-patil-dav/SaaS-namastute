@@ -38,7 +38,7 @@ export default function ServiceDetail() {
     useEffect(() => {
         window.scrollTo(0, 0);
         if (service) {
-            document.title = `Namastute | ${service.title}`;
+            document.title = `Namustutam | ${service.title}`;
         } else {
             navigate('/');
         }

@@ -173,7 +173,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         <div className="inv-logo-area">
                             <div className="inv-logo-mark">
                                 <div className="inv-logo-icon">N</div>
-                                <span className="inv-company-name">Namastute</span>
+                                <span className="inv-company-name">Namustutam</span>
                             </div>
                             <div className="inv-company-addr">
                                 123 Business Park, Pune, MH 411001<br />
@@ -199,10 +199,10 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         {/* From */}
                         <div>
                             <div className="inv-party-label">From</div>
-                            <div className="inv-party-name">{order.biller || 'Namastute Admin'}</div>
+                            <div className="inv-party-name">{order.biller || 'Namustutam Admin'}</div>
                             <div className="inv-party-detail">
                                 123 Business Park, Pune, MH 411001<br />
-                                Email : <a href="mailto:admin@namastute.com">admin@namastute.com</a><br />
+                                Email : <a href="mailto:admin@namustutam.com">admin@namustutam.com</a><br />
                                 Phone : +91 98765 43210
                             </div>
                         </div>
@@ -327,10 +327,10 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                     <div className="inv-footer-strip">
                         <div className="inv-footer-logo">
                             <div className="inv-logo-icon" style={{ width: 24, height: 24, fontSize: 11 }}>N</div>
-                            <span style={{ fontSize: 16, fontWeight: 800, color: '#1b2850' }}>Namastute</span>
+                            <span style={{ fontSize: 16, fontWeight: 800, color: '#1b2850' }}>Namustutam</span>
                         </div>
                         <div className="inv-footer-pay">
-                            Payment Made Via <strong>bank transfer / UPI</strong> in the name of <span style={{ color: '#ff9f43', fontWeight: 600 }}>Namastute Pvt. Ltd.</span>
+                            Payment Made Via <strong>bank transfer / UPI</strong> in the name of <span style={{ color: '#ff9f43', fontWeight: 600 }}>Namustutam Pvt. Ltd.</span>
                         </div>
                         <div className="inv-footer-bank">
                             Bank Name : HDFC Bank &nbsp;|&nbsp; Account Number : 50100XXXXXXXX &nbsp;|&nbsp; IFSC : HDFC0001234
