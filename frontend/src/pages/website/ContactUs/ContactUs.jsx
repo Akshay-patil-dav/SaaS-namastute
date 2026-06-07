@@ -67,7 +67,7 @@ export default function ContactUs() {
                                     <div className="contact-icon">📞</div>
                                     <div>
                                         <h4>whatsapp Phone</h4>
-                                        <p>+91 9580112795</p>
+                                        <p>+91 82375 12742</p>
                                     </div>
                                 </div>
                                 <div className="contact-detail-item">
