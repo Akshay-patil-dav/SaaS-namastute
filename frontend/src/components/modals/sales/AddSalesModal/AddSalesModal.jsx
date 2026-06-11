@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Trash2, AlertTriangle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../AddPosModal/add-sales-modal.css';
@@ -44,7 +44,7 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
         const productSku = p.sku || `TMP-${p.id}`;
         const existing = products.find(x => x.sku === productSku);
         if (existing) setProducts(prev => prev.map(x => x.sku === productSku ? {...x, quantity: x.quantity+1} : x));
-        else setProducts(prev => [...prev, { productId:p.id, name:p.name, sku:productSku, img: p.images?p.images.split(',')[0].trim():'', quantity:1, unitPrice:parseFloat(p.price)||0, discount:0, taxPercent:0 }]);
+        else setProducts(prev => [...prev, { productId:p.id, id:p.id, name:p.name, sku:productSku, img: p.images?p.images.split(',')[0].trim():'', quantity:1, unitPrice:parseFloat(p.price)||0, purchasePrice:parseFloat(p.purchasePrice)||0, discount:0, taxPercent:0 }]);
         setSearchQ(''); setShowDrop(false);
     };
 

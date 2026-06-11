@@ -372,13 +372,13 @@ export default function Dashboard() {
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div>
                                         <h4 className="fw-bold fs-5 mb-1 text-dark">
-                                            {loadingSales || loadingPurchase ? (
+                                            {loadingAnalytics ? (
                                                 <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:18,height:18}} />
                                             ) : (
-                                                fmt(overallProfit)
+                                                fmt(dashboardAnalytics?.totalStockProfit ?? 0)
                                             )}
                                         </h4>
-                                        <p className="text-secondary small mb-0">Profit</p>
+                                        <p className="text-secondary small mb-0">Today's Profit</p>
                                     </div>
                                     <div className="icon-rounded-white bg-light-blue">
                                         <DollarSign size={20} />
@@ -395,13 +395,13 @@ export default function Dashboard() {
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div>
                                         <h4 className="fw-bold fs-5 mb-1 text-dark">
-                                            {loadingSales ? (
+                                            {loadingAnalytics ? (
                                                 <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:18,height:18}} />
                                             ) : (
-                                                fmt(overallIncome)
+                                                fmt(dashboardAnalytics?.totalSellingStockValue ?? 0)
                                             )}
                                         </h4>
-                                        <p className="text-secondary small mb-0">Total Revenue</p>
+                                        <p className="text-secondary small mb-0">Today's Revenue</p>
                                     </div>
                                     <div className="icon-rounded-white bg-light-teal">
                                         <TrendingUp size={20} />
@@ -418,13 +418,13 @@ export default function Dashboard() {
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div>
                                         <h4 className="fw-bold fs-5 mb-1 text-dark">
-                                            {loadingPurchase ? (
+                                            {loadingAnalytics ? (
                                                 <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:18,height:18}} />
                                             ) : (
-                                                fmt(overallExpenses)
+                                                fmt(dashboardAnalytics?.totalPurchaseStockValue ?? 0)
                                             )}
                                         </h4>
-                                        <p className="text-secondary small mb-0">Total Expenses</p>
+                                        <p className="text-secondary small mb-0">Today's Purchase Cost</p>
                                     </div>
                                     <div className="icon-rounded-white bg-light-orange">
                                         <Activity size={20} />

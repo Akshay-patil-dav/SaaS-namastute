@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../Brands/Products.css';
 import '../Brands/inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
@@ -365,7 +365,6 @@ const Products = () => {
                                 <th>Category</th>
                                 <th>Brand</th>
                                 <th>Purchase Price</th>
-                                <th>Selling Price</th>
                                 <th>Unit</th>
                                 <th>Qty</th>
                                 <th>Added On</th>
@@ -386,7 +385,6 @@ const Products = () => {
                                 </td>
                                 <td><div className="skel skel-sm" /></td>
                                 <td><div className="skel skel-md" /></td>
-                                <td><div className="skel skel-sm" /></td>
                                 <td><div className="skel skel-sm" /></td>
                                 <td><div className="skel skel-sm" /></td>
                                 <td><div className="skel skel-sm" /></td>
@@ -450,7 +448,6 @@ const Products = () => {
                                 </td>
                                 <td>{item.brand || '—'}</td>
                                 <td>{formatPrice(item.purchasePrice)}</td>
-                                <td style={{ fontWeight: '600' }}>{formatPrice(item.price)}</td>
                                 <td>{item.unit || 'Pc'}</td>
                                 <td>
                                     <span className={`ss-status-badge ${item.quantity <= 0 ? 'ss-status-inactive' : item.quantity < 50 ? 'ss-status-pending' : 'ss-status-active'}`}>
@@ -485,7 +482,7 @@ const Products = () => {
                         {/* Empty state */}
                         {!loading && paginated.length === 0 && (
                             <tr>
-                                <td colSpan="11">
+                                <td colSpan="10">
                                     <div className="empty-state">
                                         <Package size={48} strokeWidth={1} />
                                         <p>{searchTerm ? 'No products match your search.' : 'No products available.'}</p>

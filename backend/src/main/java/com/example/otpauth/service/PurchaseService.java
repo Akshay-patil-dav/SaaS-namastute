@@ -48,39 +48,93 @@ public class PurchaseService {
         p.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
         mapRequestToEntity(request, p);
         
-        // Adjust product quantity
+        // Adjust product quantity and selling prices
         if (request.getProductsJson() != null && !request.getProductsJson().isBlank()) {
-            try {
-                java.util.List<java.util.Map<String, Object>> items = objectMapper.readValue(
-                    request.getProductsJson(), 
-                    new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {}
-                );
-                boolean isReturn = request.getStatus() != null && 
-                    ("Return".equalsIgnoreCase(request.getStatus()) || "Returned".equalsIgnoreCase(request.getStatus()));
-                for (java.util.Map<String, Object> item : items) {
-                    if (item.get("id") != null && item.get("qty") != null) {
-                        Long productId = Long.valueOf(item.get("id").toString());
-                        Integer qty = Integer.valueOf(item.get("qty").toString());
-                        String sku = item.get("sku") != null ? item.get("sku").toString() : null;
+            applyProductUpdates(request.getProductsJson(), request.getStatus(), true);
+        }
 
-                        productRepository.findById(productId).ifPresent(product -> {
+        return purchaseRepository.save(p);
+    }
+
+    public Purchase updatePurchase(Long id, PurchaseRequest request) {
+        Purchase p = purchaseRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())
+                .orElseThrow(() -> new RuntimeException("Purchase not found with id: " + id));
+        mapRequestToEntity(request, p);
+        
+        // Update selling prices (skip stock adjustment to avoid double-adding)
+        if (request.getProductsJson() != null && !request.getProductsJson().isBlank()) {
+            applyProductUpdates(request.getProductsJson(), request.getStatus(), false);
+        }
+        
+        return purchaseRepository.save(p);
+    }
+
+    private void applyProductUpdates(String productsJson, String status, boolean adjustStock) {
+        try {
+            java.util.List<java.util.Map<String, Object>> items = objectMapper.readValue(
+                productsJson, 
+                new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {}
+            );
+            boolean isReturn = status != null && 
+                ("Return".equalsIgnoreCase(status) || "Returned".equalsIgnoreCase(status));
+            for (java.util.Map<String, Object> item : items) {
+                if (item.get("id") != null && item.get("qty") != null) {
+                    Long productId = Long.valueOf(item.get("id").toString());
+                    Integer qty = Integer.valueOf(item.get("qty").toString());
+                    String sku = item.get("sku") != null ? item.get("sku").toString() : null;
+                    java.math.BigDecimal newSellingPrice = null;
+                    if (item.get("sellingPrice") != null) {
+                        try { newSellingPrice = new java.math.BigDecimal(item.get("sellingPrice").toString()); } 
+                        catch (Exception ignored) {}
+                    }
+                    final java.math.BigDecimal finalSellingPrice = newSellingPrice;
+
+                    java.math.BigDecimal newPurchasePrice = null;
+                    if (item.get("price") != null) {
+                        try { newPurchasePrice = new java.math.BigDecimal(item.get("price").toString()); } 
+                        catch (Exception ignored) {}
+                    }
+                    final java.math.BigDecimal finalPurchasePrice = newPurchasePrice;
+
+                    productRepository.findById(productId).ifPresent(product -> {
+                        // 1. Update overall selling price and purchase price if provided
+                        if (finalSellingPrice != null && finalSellingPrice.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                            product.setPrice(finalSellingPrice);
+                        }
+                        if (finalPurchasePrice != null && finalPurchasePrice.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                            product.setPurchasePrice(finalPurchasePrice);
+                        }
+
+                        // 2. Adjust Stock if required
+                        if (adjustStock) {
                             int currentQty = product.getQuantity() != null ? product.getQuantity() : 0;
                             if (isReturn) {
                                 product.setQuantity(currentQty - qty);
                             } else {
                                 product.setQuantity(currentQty + qty);
                             }
+                        }
 
-                            if (sku != null && "Variable Product".equals(product.getProductType())) {
-                                try {
-                                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                                    java.util.List<java.util.Map<String, Object>> variantTypes = mapper.readValue(product.getVariantsJson(), new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {});
-                                    for (java.util.Map<String, Object> vtMap : variantTypes) {
-                                        Object valuesObj = vtMap.get("values");
-                                        if (valuesObj instanceof java.util.List) {
-                                            java.util.List<java.util.Map<String, Object>> valuesList = (java.util.List<java.util.Map<String, Object>>) valuesObj;
-                                            for (java.util.Map<String, Object> vMap : valuesList) {
-                                                if (sku.equals(vMap.get("sku"))) {
+                        // 3. Variant specific logic
+                        if (sku != null && "Variable Product".equals(product.getProductType())) {
+                            try {
+                                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                                java.util.List<java.util.Map<String, Object>> variantTypes = mapper.readValue(product.getVariantsJson(), new com.fasterxml.jackson.core.type.TypeReference<java.util.List<java.util.Map<String, Object>>>() {});
+                                for (java.util.Map<String, Object> vtMap : variantTypes) {
+                                    Object valuesObj = vtMap.get("values");
+                                    if (valuesObj instanceof java.util.List) {
+                                        java.util.List<java.util.Map<String, Object>> valuesList = (java.util.List<java.util.Map<String, Object>>) valuesObj;
+                                        for (java.util.Map<String, Object> vMap : valuesList) {
+                                            if (sku.equals(vMap.get("sku"))) {
+                                                // Update variant prices
+                                                if (finalSellingPrice != null && finalSellingPrice.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                                                    vMap.put("price", finalSellingPrice.toPlainString());
+                                                }
+                                                if (finalPurchasePrice != null && finalPurchasePrice.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                                                    vMap.put("purchasePrice", finalPurchasePrice.toPlainString());
+                                                }
+                                                // Adjust variant stock
+                                                if (adjustStock) {
                                                     Object qtyObj = vMap.get("quantity");
                                                     int vQty = 0;
                                                     if (qtyObj instanceof Number) vQty = ((Number) qtyObj).intValue();
@@ -96,29 +150,21 @@ public class PurchaseService {
                                             }
                                         }
                                     }
-                                    product.setVariantsJson(mapper.writeValueAsString(variantTypes));
-                                } catch (Exception e) {
-                                    e.printStackTrace();
                                 }
+                                product.setVariantsJson(mapper.writeValueAsString(variantTypes));
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
+                        }
 
-                            productRepository.save(product);
-                        });
-                    }
+                        productRepository.save(product);
+                    });
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        return purchaseRepository.save(p);
-    }
-
-    public Purchase updatePurchase(Long id, PurchaseRequest request) {
-        Purchase p = purchaseRepository.findByIdAndUserId(id, com.example.otpauth.util.SecurityUtils.getCurrentUserId())
-                .orElseThrow(() -> new RuntimeException("Purchase not found with id: " + id));
-        mapRequestToEntity(request, p);
-        return purchaseRepository.save(p);
     }
 
     public boolean deletePurchase(Long id) {

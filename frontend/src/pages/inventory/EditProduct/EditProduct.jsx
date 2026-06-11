@@ -165,6 +165,7 @@ const EditProduct = () => {
                             typeName: t.typeName || '',
                             values: (t.values || []).map(v => ({
                                 value:   v.value   || '',
+                                purchasePrice: v.purchasePrice != null ? String(v.purchasePrice) : '',
                                 price:   v.price   != null ? String(v.price) : '',
                                 sku:     v.sku     || '',
                                 barcode: v.barcode || '',
@@ -188,6 +189,7 @@ const EditProduct = () => {
                             typeName: 'Variants',
                             values: p.variants.map(v => ({
                                 value:   v.name    || '',
+                                purchasePrice: v.purchasePrice != null ? String(v.purchasePrice) : '',
                                 price:   v.price   != null ? String(v.price) : '',
                                 sku:     v.sku     || '',
                                 barcode: v.barcode || '',
@@ -306,7 +308,7 @@ const EditProduct = () => {
     const addVariantType = () => {
         setVariantTypes(prev => [
             ...prev,
-            { typeName: '', values: [{ value: '', price: '', sku: '', barcode: '', image: null, quantity: '' }] }
+            { typeName: '', values: [{ value: '', purchasePrice: '', price: '', sku: '', barcode: '', image: null, quantity: '' }] }
         ]);
     };
 
@@ -320,7 +322,7 @@ const EditProduct = () => {
 
     const addVariantValue = (tIdx) => {
         setVariantTypes(prev => prev.map((t, i) => i === tIdx
-            ? { ...t, values: [...t.values, { value: '', price: '', sku: '', barcode: '', image: null, quantity: '' }] }
+            ? { ...t, values: [...t.values, { value: '', purchasePrice: '', price: '', sku: '', barcode: '', image: null, quantity: '' }] }
             : t
         ));
     };
@@ -423,7 +425,14 @@ const EditProduct = () => {
                                     ? variantTypes.reduce((sum, t) => sum + t.values.reduce((vSum, v) => vSum + (parseInt(v.quantity) || 0), 0), 0)
                                     : (parseInt(form.quantity) || 0),
                 purchasePrice:    parseFloat(form.purchasePrice) || 0,
-                price:            parseFloat(form.price) || 0,
+                price:            form.productType === 'Variable Product' 
+                                    ? variantTypes.reduce((acc, t, tIdx) => {
+                                        t.values.forEach((v, vIdx) => {
+                                            if (defaultVariant === `${tIdx}-${vIdx}`) acc = parseFloat(v.price) || 0;
+                                        });
+                                        return acc;
+                                      }, 0)
+                                    : (parseFloat(form.price) || 0),
                 productType:      form.productType,
                 taxType:          form.taxType,
                 tax:              form.tax,
@@ -439,6 +448,7 @@ const EditProduct = () => {
                     typeName: t.typeName,
                     values: t.values.map((v, vIdx) => ({
                         value:   v.value,
+                        purchasePrice: parseFloat(v.purchasePrice) || 0,
                         price:   parseFloat(v.price) || 0,
                         sku:     v.sku,
                         barcode: v.barcode,
@@ -937,7 +947,8 @@ const EditProduct = () => {
                                                         <span style={{width:36}} title="Set as default variant">Default</span>
                                                         <span style={{width:72}}>Image</span>
                                                         <span style={{flex:2}}>Value <span className="required">*</span></span>
-                                                        <span style={{flex:1.2}}>Price</span>
+                                                        <span style={{flex:1.5}}>Purchase Price</span>
+                                                        <span style={{flex:1.5}}>Selling Price</span>
                                                         <span style={{width:70}}>Qty</span>
                                                         <span style={{flex:2}}>SKU</span>
                                                         <span style={{flex:2}}>Barcode</span>
@@ -1001,7 +1012,18 @@ const EditProduct = () => {
                                                                         onChange={e => updateVariantValue(tIdx, vIdx, 'value', e.target.value)}
                                                                     />
                                                                 </div>
-                                                                <div className="vt-cell" style={{flex:1.2}}>
+                                                                <div className="vt-cell" style={{flex:1.5}}>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="cp-input"
+                                                                        placeholder="0.00"
+                                                                        min="0" step="0.01"
+                                                                        value={val.purchasePrice}
+                                                                        onChange={e => updateVariantValue(tIdx, vIdx, 'purchasePrice', e.target.value)}
+                                                                        title="Purchase Price"
+                                                                    />
+                                                                </div>
+                                                                <div className="vt-cell" style={{flex:1.5}}>
                                                                     <input
                                                                         type="number"
                                                                         className="cp-input"
@@ -1009,6 +1031,7 @@ const EditProduct = () => {
                                                                         min="0" step="0.01"
                                                                         value={val.price}
                                                                         onChange={e => updateVariantValue(tIdx, vIdx, 'price', e.target.value)}
+                                                                        title="Selling Price"
                                                                     />
                                                                 </div>
 

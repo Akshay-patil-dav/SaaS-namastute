@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../inventory/CreateProduct/CreateProduct.css'; // Reusing common form styles
 import './AddPurchase.css';    // Specific styles for Purchase table
 import { 
@@ -68,7 +68,8 @@ const AddPurchase = () => {
                             barcode: p.itemBarcode || p.sku || '',
                             image: p.images ? p.images.split(',')[0] : 'https://images.unsplash.com/photo-1586769852044-692d6e67741e?w=100&h=100&fit=crop',
                             taxRate: p.tax ? parseInt(p.tax.replace(/[^0-9]/g, '')) : 0,
-                            price: parseFloat(p.price) || 0
+                            price: parseFloat(p.purchasePrice) || 0,
+                            sellingPrice: parseFloat(p.price) || 0
                         });
                     } else {
                         try {
@@ -84,7 +85,8 @@ const AddPurchase = () => {
                                             barcode: v.barcode || v.sku || '',
                                             image: v.image || (p.images ? p.images.split(',')[0] : 'https://images.unsplash.com/photo-1586769852044-692d6e67741e?w=100&h=100&fit=crop'),
                                             taxRate: p.tax ? parseInt(p.tax.replace(/[^0-9]/g, '')) : 0,
-                                            price: parseFloat(v.price) || 0,
+                                            price: parseFloat(v.purchasePrice) || parseFloat(p.purchasePrice) || 0,
+                                            sellingPrice: parseFloat(v.price) || parseFloat(p.price) || 0,
                                             quantity: parseInt(v.quantity) || 0
                                         });
                                     });
@@ -186,7 +188,8 @@ const AddPurchase = () => {
                 ...product,
                 qty: 1,
                 discount: 0,
-                taxRate: product.taxRate || 0
+                taxRate: product.taxRate || 0,
+                sellingPrice: product.sellingPrice || 0
             })];
         });
     };
@@ -382,6 +385,7 @@ const AddPurchase = () => {
                                         <th style={{ background: '#f8fafc' }}>Product Name</th>
                                         <th style={{ background: '#f8fafc', textAlign: 'center' }}>QTY</th>
                                         <th style={{ background: '#f8fafc' }}>Purchase Price(₹)</th>
+                                        <th style={{ background: '#f8fafc' }}>Selling Price(₹)</th>
                                         <th style={{ background: '#f8fafc' }}>Discount(₹)</th>
                                         <th style={{ background: '#f8fafc' }}>Tax %</th>
                                         <th style={{ background: '#f8fafc' }}>Tax Amount(₹)</th>
@@ -422,6 +426,9 @@ const AddPurchase = () => {
                                                     <input type="number" className="cp-input" value={item.price} onChange={(e) => updateItemField(item.sku, 'price', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
                                                 </td>
                                                 <td>
+                                                    <input type="number" className="cp-input border-primary" value={item.sellingPrice} onChange={(e) => updateItemField(item.sku, 'sellingPrice', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px', background: '#f0f9ff' }} title="Update product's selling price" />
+                                                </td>
+                                                <td>
                                                     <input type="number" className="cp-input" value={item.discount} onChange={(e) => updateItemField(item.sku, 'discount', e.target.value)} style={{ width: '80px', padding: '4px 8px', height: '30px' }} />
                                                 </td>
                                                 <td>
@@ -440,7 +447,7 @@ const AddPurchase = () => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="9" style={{ textAlign: 'center', padding: '40px' }}>
+                                            <td colSpan="10" style={{ textAlign: 'center', padding: '40px' }}>
                                                 <div className="empty-state">
                                                     <ShoppingCart size={40} strokeWidth={1} style={{ opacity: 0.2, marginBottom: '10px' }} />
                                                     <p style={{ color: '#94a3b8', fontSize: '13px' }}>Please search and add products to the list.</p>

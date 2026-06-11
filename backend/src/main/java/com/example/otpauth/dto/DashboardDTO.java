@@ -12,6 +12,9 @@ public class DashboardDTO {
     private List<RecentTransactionDTO> recentTransactions;
     private List<ChartDataDTO> chartData;
     private List<LowStockProductDTO> lowStockProducts;
+    private BigDecimal totalSellingStockValue;
+    private BigDecimal totalPurchaseStockValue;
+    private BigDecimal totalStockProfit;
 
     // Getters and Setters
 
@@ -77,5 +80,29 @@ public class DashboardDTO {
 
     public void setLowStockProducts(List<LowStockProductDTO> lowStockProducts) {
         this.lowStockProducts = lowStockProducts;
+    }
+
+    public BigDecimal getTotalSellingStockValue() {
+        return totalSellingStockValue;
+    }
+
+    public void setTotalSellingStockValue(BigDecimal totalSellingStockValue) {
+        this.totalSellingStockValue = totalSellingStockValue;
+    }
+
+    public BigDecimal getTotalPurchaseStockValue() {
+        return totalPurchaseStockValue;
+    }
+
+    public void setTotalPurchaseStockValue(BigDecimal totalPurchaseStockValue) {
+        this.totalPurchaseStockValue = totalPurchaseStockValue;
+    }
+
+    public BigDecimal getTotalStockProfit() {
+        return totalStockProfit;
+    }
+
+    public void setTotalStockProfit(BigDecimal totalStockProfit) {
+        this.totalStockProfit = totalStockProfit;
     }
 }

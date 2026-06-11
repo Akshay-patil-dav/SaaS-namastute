@@ -246,6 +246,99 @@ public class DashboardService {
 
         dashboard.setLowStockProducts(lowStockProducts);
 
+        // 8. Stock Profit (Today's Sales Revenue - Today's Purchase Cost of Goods Sold)
+        BigDecimal totalSellingStock = BigDecimal.ZERO;
+        BigDecimal totalPurchaseStock = BigDecimal.ZERO;
+         BigDecimal totalprofitvalue = BigDecimal.ZERO;
+
+        for (Object order : combinedOrders) {
+            String status = order instanceof PosOrder ? ((PosOrder) order).getStatus() : ((SaleOrder) order).getStatus();
+            if ("Cancelled".equalsIgnoreCase(status)) {
+                continue;
+            }
+
+            LocalDate orderDate = order instanceof PosOrder ? ((PosOrder) order).getDate() : ((SaleOrder) order).getDate();
+            if (orderDate != null && orderDate.equals(today)) {
+                String json = order instanceof PosOrder ? ((PosOrder) order).getProductsJson() : ((SaleOrder) order).getProductsJson();
+                if (json != null && !json.isBlank()) {
+                    try {
+                        List<Map<String, Object>> items = objectMapper.readValue(json, new TypeReference<List<Map<String, Object>>>() {});
+                        for (Map<String, Object> item : items) {
+                            int qty = 1;
+                            if (item.containsKey("quantity")) {
+                                Object q = item.get("quantity");
+                                if (q instanceof Integer) qty = (Integer) q;
+                                else if (q instanceof String && !((String) q).isEmpty()) qty = Integer.parseInt((String) q);
+                            }
+
+                            BigDecimal sPrice = BigDecimal.ZERO;
+                            if (item.containsKey("price")) {
+                                Object p = item.get("price");
+                                if (p instanceof Number) sPrice = new BigDecimal(p.toString());
+                                else if (p instanceof String && !((String) p).isEmpty()) sPrice = new BigDecimal((String) p);
+                            } else if (item.containsKey("unitPrice")) {
+                                Object p = item.get("unitPrice");
+                                if (p instanceof Number) sPrice = new BigDecimal(p.toString());
+                                else if (p instanceof String && !((String) p).isEmpty()) sPrice = new BigDecimal((String) p);
+                            }
+
+                            BigDecimal pPrice = BigDecimal.ZERO;
+                            if (item.containsKey("purchasePrice")) {
+                                Object pp = item.get("purchasePrice");
+                                if (pp instanceof Number) pPrice = new BigDecimal(pp.toString());
+                                else if (pp instanceof String && !((String) pp).isEmpty()) pPrice = new BigDecimal((String) pp);
+                            } else if (item.containsKey("id")) {
+                                // Fallback: look up in database for existing orders without purchasePrice
+                                Object idObj = item.get("id");
+                                Long prodId = null;
+                                if (idObj instanceof Number) prodId = ((Number) idObj).longValue();
+                                else if (idObj instanceof String) prodId = Long.parseLong((String) idObj);
+
+                                if (prodId != null) {
+                                    Optional<Product> optP = productRepository.findById(prodId);
+                                    if (optP.isPresent()) {
+                                        Product p = optP.get();
+                                        if ("VARIABLE".equalsIgnoreCase(p.getProductType()) || "Variable Product".equalsIgnoreCase(p.getProductType())) {
+                                            String itemSku = item.containsKey("sku") ? (String) item.get("sku") : null;
+                                            List<Object> variants = p.getVariantsParsed();
+                                            for (Object vObj : variants) {
+                                                if (vObj instanceof Map) {
+                                                    Map<String, Object> typeMap = (Map<String, Object>) vObj;
+                                                    List<Map<String, Object>> values = (List<Map<String, Object>>) typeMap.get("values");
+                                                    if (values != null) {
+                                                        for (Map<String, Object> val : values) {
+                                                            if (itemSku != null && itemSku.equals(val.get("sku"))) {
+                                                                Object ppObj = val.get("purchasePrice");
+                                                                if (ppObj instanceof Number) pPrice = new BigDecimal(ppObj.toString());
+                                                                else if (ppObj instanceof String && !((String) ppObj).isEmpty()) pPrice = new BigDecimal((String) ppObj);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            pPrice = p.getPurchasePrice() != null ? p.getPurchasePrice() : BigDecimal.ZERO;
+                                        }
+                                    }
+                                }
+                            }
+
+                            totalSellingStock = totalSellingStock.add(sPrice.multiply(new BigDecimal(qty)));
+                            totalPurchaseStock = totalPurchaseStock.add(pPrice.multiply(new BigDecimal(qty)));
+
+                            totalprofitvalue = totalSellingStock.subtract(totalPurchaseStock);
+                        }
+                    } catch (Exception e) {
+                        // Skip invalid JSON parsing
+                    }
+                }
+            }
+        }
+
+        dashboard.setTotalSellingStockValue(totalSellingStock);
+        dashboard.setTotalPurchaseStockValue(totalPurchaseStock);
+        dashboard.setTotalStockProfit(totalprofitvalue);
+
         return dashboard;
     }
 }
