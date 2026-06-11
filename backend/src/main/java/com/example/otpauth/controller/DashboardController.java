@@ -45,4 +45,25 @@ public class DashboardController {
             return ResponseEntity.badRequest().body("Error fetching dashboard data: " + e.getMessage());
         }
     }
+
+    @GetMapping("/chart")
+    public ResponseEntity<?> getSalesPurchaseChartData(
+            @RequestHeader("Authorization") String token,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "1W", required = false) String period) {
+        try {
+            String jwt = token.substring(7);
+            String email = jwtUtil.extractUsername(jwt);
+            Optional<User> userOptional = userRepository.findByEmail(email);
+
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body("User not found");
+            }
+
+            Long userId = userOptional.get().getId();
+            java.util.List<com.example.otpauth.dto.SalesPurchaseChartDTO> chartData = dashboardService.getSalesPurchaseChartData(userId, period);
+            return ResponseEntity.ok(chartData);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error fetching chart data: " + e.getMessage());
+        }
+    }
 }

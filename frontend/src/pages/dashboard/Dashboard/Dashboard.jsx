@@ -14,21 +14,7 @@ import {
 } from 'recharts';
 import './Dashboard.css';
 
-// Chart Data
-const salesPurchaseData = [
-  { name: '2 Jan', purchase: 35, sales: 10 },
-  { name: '4 Jan', purchase: 28, sales: 8 },
-  { name: '6 Jan', purchase: 28, sales: 12 },
-  { name: '8 Jan', purchase: 45, sales: 25 },
-  { name: '10 Jan', purchase: 45, sales: 25 },
-  { name: '12 Jan', purchase: 42, sales: 22 },
-  { name: '14 Jan', purchase: 20, sales: 5 },
-  { name: '16 Jan', purchase: 30, sales: 15 },
-  { name: '18 Jan', purchase: 50, sales: 30 },
-  { name: '20 Jan', purchase: 38, sales: 18 },
-  { name: '22 Jan', purchase: 45, sales: 20 },
-  { name: '24 Jan', purchase: 30, sales: 10 },
-];
+// Dynamic Chart Data State will replace static salesPurchaseData
 
 const salesStatisticsData = [
     { name: 'Jan', revenue: 70, returns: -50 },
@@ -193,6 +179,39 @@ export default function Dashboard() {
         const interval = setInterval(fetchDashboardAnalytics, 60_000);
         return () => { cancelled = true; clearInterval(interval); };
     }, []);
+
+    // Sales & Purchase Chart Data
+    const [chartPeriod, setChartPeriod] = useState('1W');
+    const [chartData, setChartData] = useState([]);
+    const [loadingChart, setLoadingChart] = useState(true);
+    const [chartTotals, setChartTotals] = useState({ purchase: 0, sales: 0 });
+
+    useEffect(() => {
+        let cancelled = false;
+        const fetchChartData = async () => {
+            setLoadingChart(true);
+            try {
+                const res = await apiClient.get(`/dashboard/chart?period=${chartPeriod}`);
+                if (!cancelled) {
+                    const data = res.data;
+                    setChartData(data);
+                    
+                    let tPurchase = 0;
+                    let tSales = 0;
+                    data.forEach(item => {
+                        tPurchase += Number(item.purchase || 0);
+                        tSales += Number(item.sales || 0);
+                    });
+                    setChartTotals({ purchase: tPurchase, sales: tSales });
+                }
+            } catch (err) {
+                console.error('Failed to fetch chart data:', err);
+            } finally {
+                if (!cancelled) setLoadingChart(false);
+            }
+        };
+        fetchChartData();
+    }, [chartPeriod]);
 
 
     const totalCount   = todaySummary?.totalCount   ?? 0;
@@ -587,35 +606,45 @@ export default function Dashboard() {
                                 <div className="d-flex justify-content-between align-items-center mb-4">
                                     <h5 className="dash-title mb-0"><Activity size={20} className="text-orange" color="#ea580c"/> Sales & Purchase</h5>
                                     <div className="d-flex bg-light rounded-2 p-1">
-                                        <button className="btn btn-sm btn-light bg-white shadow-sm px-3">1D</button>
-                                        <button className="btn btn-sm text-secondary px-3">1W</button>
-                                        <button className="btn btn-sm text-secondary px-3">1M</button>
-                                        <button className="btn btn-sm text-secondary px-3">3M</button>
-                                        <button className="btn btn-sm text-secondary px-3">6M</button>
-                                        <button className="btn btn-sm btn-warning text-white px-3 fw-medium" style={{backgroundColor: '#f97316', borderColor: '#f97316'}}>1Y</button>
+                                        {['1D', '1W', '1M', '3M', '6M', '1Y'].map(period => (
+                                            <button 
+                                                key={period}
+                                                onClick={() => setChartPeriod(period)}
+                                                className={`btn btn-sm px-3 ${chartPeriod === period ? 'btn-warning text-white shadow-sm fw-medium' : 'text-secondary bg-transparent border-0'}`} 
+                                                style={chartPeriod === period ? {backgroundColor: '#f97316', borderColor: '#f97316'} : {}}
+                                            >
+                                                {period}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                                 <div className="d-flex gap-4 mb-4">
                                     <div className="px-3 border-start border-3 border-secondary border-opacity-25 form-check">
                                         <span className="small text-muted d-block"><span className="text-warning">●</span> Total Purchase</span>
-                                        <span className="fw-bold fs-5">3K</span>
+                                        <span className="fw-bold fs-5">{fmt(chartTotals.purchase)}</span>
                                     </div>
                                     <div className="px-3 border-start border-3 border-secondary border-opacity-25 form-check">
                                         <span className="small text-muted d-block"><span className="text-dark">●</span> Total Sales</span>
-                                        <span className="fw-bold fs-5">1K</span>
+                                        <span className="fw-bold fs-5">{fmt(chartTotals.sales)}</span>
                                     </div>
                                 </div>
                                 <div style={{ width: '100%', height: 260 }}>
-                                    <ResponsiveContainer>
-                                        <BarChart data={salesPurchaseData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }} barSize={16}>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
-                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                                            <Tooltip cursor={{fill: 'transparent'}} />
-                                            <Bar dataKey="purchase" stackId="a" fill="#fed7aa" radius={[0, 0, 4, 4]} />
-                                            <Bar dataKey="sales" stackId="a" fill="#f97316" radius={[4, 4, 0, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                    {loadingChart ? (
+                                        <div className="d-flex justify-content-center align-items-center h-100">
+                                            <div className="spinner-border text-orange" role="status" />
+                                        </div>
+                                    ) : (
+                                        <ResponsiveContainer>
+                                            <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }} barSize={16}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
+                                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} tickFormatter={(val) => val > 1000 ? (val/1000).toFixed(1) + 'k' : val} />
+                                                <Tooltip cursor={{fill: 'transparent'}} formatter={(value) => [fmt(value)]} />
+                                                <Bar dataKey="purchase" stackId="a" fill="#fed7aa" radius={[0, 0, 4, 4]} />
+                                                <Bar dataKey="sales" stackId="a" fill="#f97316" radius={[4, 4, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -626,17 +655,17 @@ export default function Dashboard() {
                                 <div className="row g-2 mb-4">
                                     <div className="col-4 text-center">
                                         <div className="bg-light-blue p-2 rounded-2 mb-2 d-inline-block"><Users size={16}/></div>
-                                        <h6 className="fw-bold mb-0">6897</h6>
+                                        <h6 className="fw-bold mb-0">{dashboardAnalytics?.totalReception || 0}</h6>
                                         <p className="small text-muted mb-0">Reception</p>
                                     </div>
                                     <div className="col-4 text-center">
                                         <div className="bg-light-orange p-2 rounded-2 mb-2 d-inline-block"><Users size={16}/></div>
-                                        <h6 className="fw-bold mb-0">4895</h6>
+                                        <h6 className="fw-bold mb-0">{dashboardAnalytics?.totalCustomers || 0}</h6>
                                         <p className="small text-muted mb-0">Customer</p>
                                     </div>
                                     <div className="col-4 text-center">
                                         <div className="bg-light-teal p-2 rounded-2 mb-2 d-inline-block"><ShoppingCart size={16}/></div>
-                                        <h6 className="fw-bold mb-0">487</h6>
+                                        <h6 className="fw-bold mb-0">{dashboardAnalytics?.totalOrders || 0}</h6>
                                         <p className="small text-muted mb-0">Orders</p>
                                     </div>
                                 </div>
@@ -649,25 +678,43 @@ export default function Dashboard() {
                                     <div style={{width: 140, height: 140, marginLeft: '-15px'}}>
                                         <ResponsiveContainer>
                                             <PieChart>
-                                                <Pie data={customerOverviewData} innerRadius={40} outerRadius={60} paddingAngle={2} dataKey="value" stroke="none">
-                                                    {customerOverviewData.map((entry, index) => (
+                                                <Pie 
+                                                    data={[
+                                                        { name: 'Loss Time', value: dashboardAnalytics?.customerOverview?.lossTime || 0, color: '#f97316' },
+                                                        { name: 'Return', value: dashboardAnalytics?.customerOverview?.returns || 0, color: '#0f172a' },
+                                                        { name: 'Active', value: dashboardAnalytics?.customerOverview?.active || 0, color: '#20c997' }
+                                                    ]} 
+                                                    innerRadius={45} 
+                                                    outerRadius={65} 
+                                                    paddingAngle={2} 
+                                                    dataKey="value" 
+                                                    stroke="none"
+                                                >
+                                                    {[
+                                                        { name: 'Loss Time', value: dashboardAnalytics?.customerOverview?.lossTime || 0, color: '#f97316' },
+                                                        { name: 'Return', value: dashboardAnalytics?.customerOverview?.returns || 0, color: '#0f172a' },
+                                                        { name: 'Active', value: dashboardAnalytics?.customerOverview?.active || 0, color: '#20c997' }
+                                                    ].map((entry, index) => (
                                                         <Cell key={`cell-${index}`} fill={entry.color} />
                                                     ))}
                                                 </Pie>
-                                                <Tooltip />
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </div>
                                     <div>
                                         <div className="mb-3">
-                                            <h4 className="fw-bold mb-0">5.5K</h4>
-                                            <p className="small text-muted mb-1"><span className="text-orange fw-bold">●</span> Loss Time</p>
-                                            <span className="pill-badge pill-green">+22%</span>
+                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.lossTime || 0).replace('₹', '')}</h5>
+                                            <div className="d-flex align-items-center gap-2">
+                                                <span className="small text-muted"><span className="text-orange">●</span> Loss Time</span>
+                                                <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-2">+{dashboardAnalytics?.customerOverview?.lossTimePercentage?.toFixed(0) || 0}%</span>
+                                            </div>
                                         </div>
                                         <div>
-                                            <h4 className="fw-bold mb-0">3.5K</h4>
-                                            <p className="small text-muted mb-1"><span className="text-dark fw-bold">●</span> Return</p>
-                                            <span className="pill-badge pill-green">+10%</span>
+                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.returns || 0).replace('₹', '')}</h5>
+                                            <div className="d-flex align-items-center gap-2">
+                                                <span className="small text-muted"><span className="text-dark">●</span> Return</span>
+                                                <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-2">+{dashboardAnalytics?.customerOverview?.returnPercentage?.toFixed(0) || 0}%</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

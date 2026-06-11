@@ -8,6 +8,8 @@ public class DashboardDTO {
     private Double percentageIncrease;
     private Long totalOrders;
     private Long totalCustomers;
+    private Long totalReception;
+    private CustomerOverviewDTO customerOverview;
     private List<BestSellerDTO> bestSellers;
     private List<RecentTransactionDTO> recentTransactions;
     private List<ChartDataDTO> chartData;
@@ -104,5 +106,21 @@ public class DashboardDTO {
 
     public void setTotalStockProfit(BigDecimal totalStockProfit) {
         this.totalStockProfit = totalStockProfit;
+    }
+
+    public Long getTotalReception() {
+        return totalReception;
+    }
+
+    public void setTotalReception(Long totalReception) {
+        this.totalReception = totalReception;
+    }
+
+    public CustomerOverviewDTO getCustomerOverview() {
+        return customerOverview;
+    }
+
+    public void setCustomerOverview(CustomerOverviewDTO customerOverview) {
+        this.customerOverview = customerOverview;
     }
 }
