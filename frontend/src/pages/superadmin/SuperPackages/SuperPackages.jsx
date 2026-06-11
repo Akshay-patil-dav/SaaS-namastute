@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { 
   PlusCircle, 
   Search, 
@@ -18,14 +18,14 @@ import './super-packages.css';
 
 export default function SuperPackages() {
   const tableData = [
-    { name: 'Basic', type: 'Monthly', subscribers: 56, price: '$50', date: '14 Jan 2024', status: 'Active' },
-    { name: 'Advanced', type: 'Monthly', subscribers: 99, price: '$200', date: '21 Jan 2024', status: 'Active' },
-    { name: 'Premium', type: 'Monthly', subscribers: 58, price: '$300', date: '10 Feb 2024', status: 'Active' },
-    { name: 'Enterprise', type: 'Monthly', subscribers: 67, price: '$400', date: '18 Feb 2024', status: 'Active' },
-    { name: 'Basic', type: 'Yearly', subscribers: 78, price: '$600', date: '15 Mar 2024', status: 'Active' },
-    { name: 'Advanced', type: 'Yearly', subscribers: 99, price: '$2400', date: '26 Mar 2024', status: 'Active' },
-    { name: 'Premium', type: 'Yearly', subscribers: 48, price: '$3600', date: '05 Apr 2024', status: 'Active' },
-    { name: 'Enterprise', type: 'Yearly', subscribers: 17, price: '$4800', date: '16 Apr 2024', status: 'Active' },
+    { name: 'Basic', type: 'Monthly', subscribers: 56, price: '₹50', date: '14 Jan 2024', status: 'Active' },
+    { name: 'Advanced', type: 'Monthly', subscribers: 99, price: '₹200', date: '21 Jan 2024', status: 'Active' },
+    { name: 'Premium', type: 'Monthly', subscribers: 58, price: '₹300', date: '10 Feb 2024', status: 'Active' },
+    { name: 'Enterprise', type: 'Monthly', subscribers: 67, price: '₹400', date: '18 Feb 2024', status: 'Active' },
+    { name: 'Basic', type: 'Yearly', subscribers: 78, price: '₹600', date: '15 Mar 2024', status: 'Active' },
+    { name: 'Advanced', type: 'Yearly', subscribers: 99, price: '₹2400', date: '26 Mar 2024', status: 'Active' },
+    { name: 'Premium', type: 'Yearly', subscribers: 48, price: '₹3600', date: '05 Apr 2024', status: 'Active' },
+    { name: 'Enterprise', type: 'Yearly', subscribers: 17, price: '₹4800', date: '16 Apr 2024', status: 'Active' },
   ];
 
   const [searchQuery, setSearchQuery] = useState('');

@@ -407,7 +407,7 @@ function PageBuilderContent() {
                     <div className="bg-white p-5 border border-gray-200 rounded-xl shadow-sm flex items-center justify-between mb-2">
                         <div>
                             <p className="text-xs text-gray-500 font-bold uppercase tracking-wide outline-none" contentEditable suppressContentEditableWarning onBlur={handleBlur}>Total Revenue</p>
-                            <h3 className="text-3xl font-black text-gray-800 mt-1">$45,231.00</h3>
+                            <h3 className="text-3xl font-black text-gray-800 mt-1">₹45,231.00</h3>
                             <p className="text-[10px] text-emerald-500 font-bold mt-1">+14.5% from last month</p>
                         </div>
                         <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">

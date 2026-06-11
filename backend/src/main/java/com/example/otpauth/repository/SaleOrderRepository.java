@@ -31,4 +31,10 @@ public interface SaleOrderRepository extends JpaRepository<SaleOrder, Long> {
     /** Sum grandTotal for all sale orders on a given date (returns null if none). */
     @Query("SELECT COALESCE(SUM(s.grandTotal), 0) FROM SaleOrder s WHERE s.date = :date AND s.userId = :userId")
     BigDecimal sumGrandTotalByDateAndUserId(@Param("date") LocalDate date, @Param("userId") Long userId);
+
+    /** Sum grandTotal for all sale orders (returns 0 if none). */
+    @Query("SELECT COALESCE(SUM(s.grandTotal), 0) FROM SaleOrder s WHERE s.userId = :userId")
+    BigDecimal sumGrandTotalByUserId(@Param("userId") Long userId);
+
+    long countByUserId(Long userId);
 }

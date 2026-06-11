@@ -380,12 +380,12 @@ const EditPurchaseReturn = () => {
                                     <tr>
                                         <th style={{ background: '#f8fafc' }}>Product Name</th>
                                         <th style={{ background: '#f8fafc', textAlign: 'center' }}>QTY</th>
-                                        <th style={{ background: '#f8fafc' }}>Return Price($)</th>
-                                        <th style={{ background: '#f8fafc' }}>Discount($)</th>
+                                        <th style={{ background: '#f8fafc' }}>Return Price(₹)</th>
+                                        <th style={{ background: '#f8fafc' }}>Discount(₹)</th>
                                         <th style={{ background: '#f8fafc' }}>Tax %</th>
-                                        <th style={{ background: '#f8fafc' }}>Tax Amount($)</th>
-                                        <th style={{ background: '#f8fafc' }}>Unit Cost($)</th>
-                                        <th style={{ background: '#f8fafc' }}>Total Cost ($)</th>
+                                        <th style={{ background: '#f8fafc' }}>Tax Amount(₹)</th>
+                                        <th style={{ background: '#f8fafc' }}>Unit Cost(₹)</th>
+                                        <th style={{ background: '#f8fafc' }}>Total Cost (₹)</th>
                                         <th style={{ background: '#f8fafc', textAlign: 'center' }}>Action</th>
                                     </tr>
                                 </thead>
@@ -462,15 +462,15 @@ const EditPurchaseReturn = () => {
                     <div className="cp-card-body">
                         <div className="row">
                             <div className="col-md-3 cp-form-group">
-                                <label className="cp-label">Order Tax ($)</label>
+                                <label className="cp-label">Order Tax (₹)</label>
                                 <input type="number" className="cp-input" value={orderTax} onChange={(e) => setOrderTax(e.target.value)} />
                             </div>
                             <div className="col-md-3 cp-form-group">
-                                <label className="cp-label">Discount ($)</label>
+                                <label className="cp-label">Discount (₹)</label>
                                 <input type="number" className="cp-input" value={orderDiscount} onChange={(e) => setOrderDiscount(e.target.value)} />
                             </div>
                             <div className="col-md-3 cp-form-group">
-                                <label className="cp-label">Shipping ($)</label>
+                                <label className="cp-label">Shipping (₹)</label>
                                 <input type="number" className="cp-input" value={shipping} onChange={(e) => setShipping(e.target.value)} />
                             </div>
                             <div className="col-md-3 cp-form-group">

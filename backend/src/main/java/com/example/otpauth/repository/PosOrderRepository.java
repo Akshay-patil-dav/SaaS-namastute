@@ -31,4 +31,10 @@ public interface PosOrderRepository extends JpaRepository<PosOrder, Long> {
     /** Sum grandTotal for all POS orders on a given date (returns 0 if none). */
     @Query("SELECT COALESCE(SUM(p.grandTotal), 0) FROM PosOrder p WHERE p.date = :date AND p.userId = :userId")
     BigDecimal sumGrandTotalByDateAndUserId(@Param("date") LocalDate date, @Param("userId") Long userId);
+
+    /** Sum grandTotal for all POS orders (returns 0 if none). */
+    @Query("SELECT COALESCE(SUM(p.grandTotal), 0) FROM PosOrder p WHERE p.userId = :userId")
+    BigDecimal sumGrandTotalByUserId(@Param("userId") Long userId);
+
+    long countByUserId(Long userId);
 }

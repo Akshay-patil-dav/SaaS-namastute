@@ -1,11 +1,11 @@
-import React, { useRef } from 'react';
+﻿import React, { useRef } from 'react';
 import { X, Printer, Download, ArrowLeft, FileText } from 'lucide-react';
 import './invoice-modal.css';
 
 /* ── helpers ─────────────────────────────────────────────── */
 const fmtMoney = v => {
     const n = parseFloat(v);
-    return isNaN(n) ? '$0.00' : `$${n.toFixed(2)}`;
+    return isNaN(n) ? '₹0.00' : `₹${n.toFixed(2)}`;
 };
 
 const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',

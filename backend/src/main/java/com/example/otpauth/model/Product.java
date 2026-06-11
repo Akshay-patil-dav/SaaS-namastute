@@ -55,6 +55,9 @@ public class Product {
     @Column(nullable = false)
     private Integer quantity = 0;
 
+    @Column(precision = 10, scale = 2)
+    private BigDecimal purchasePrice = BigDecimal.ZERO;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price = BigDecimal.ZERO;
 
@@ -142,6 +145,8 @@ public class Product {
     public void setItemBarcode(String itemBarcode) { this.itemBarcode = itemBarcode; }
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public BigDecimal getPurchasePrice() { return purchasePrice; }
+    public void setPurchasePrice(BigDecimal purchasePrice) { this.purchasePrice = purchasePrice; }
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
     public String getProductType() { return productType; }

@@ -116,8 +116,8 @@ const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
                     <div className="sm-body">
                         {products.length > 0 && (
                             <div className="sm-prod-header">
-                                <span>Product</span><span>Qty</span><span>Unit Price ($)</span>
-                                <span>Discount ($)</span><span>Tax (%)</span><span>Total ($)</span><span></span>
+                                <span>Product</span><span>Qty</span><span>Unit Price (₹)</span>
+                                <span>Discount (₹)</span><span>Tax (%)</span><span>Total (₹)</span><span></span>
                             </div>
                         )}
                         {products.length > 0 && (
@@ -195,10 +195,10 @@ const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
                         </div>
 
                         <div className="sm-form-grid-4">
-                            <div className="sm-form-group"><label>Order Tax ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.orderTax} onChange={e=>setForm(f=>({...f,orderTax:e.target.value}))}/></div>
-                            <div className="sm-form-group"><label>Discount ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.discount} onChange={e=>setForm(f=>({...f,discount:e.target.value}))}/></div>
-                            <div className="sm-form-group"><label>Shipping ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.shipping} onChange={e=>setForm(f=>({...f,shipping:e.target.value}))}/></div>
-                            <div className="sm-form-group"><label>Paid Amount ($)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.paidAmount} onChange={e=>setForm(f=>({...f,paidAmount:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Order Tax (₹)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.orderTax} onChange={e=>setForm(f=>({...f,orderTax:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Discount (₹)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.discount} onChange={e=>setForm(f=>({...f,discount:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Shipping (₹)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.shipping} onChange={e=>setForm(f=>({...f,shipping:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Paid Amount (₹)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.paidAmount} onChange={e=>setForm(f=>({...f,paidAmount:e.target.value}))}/></div>
                         </div>
 
                         <div className="sm-form-grid-3">

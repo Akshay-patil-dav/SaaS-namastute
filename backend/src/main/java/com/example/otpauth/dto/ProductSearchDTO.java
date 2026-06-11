@@ -8,6 +8,7 @@ public class ProductSearchDTO {
     private String sku;
     private String itemBarcode;
     private String category;
+    private BigDecimal purchasePrice;
     private BigDecimal price;
     private Integer quantity;
     private String images;
@@ -29,6 +30,9 @@ public class ProductSearchDTO {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public BigDecimal getPurchasePrice() { return purchasePrice; }
+    public void setPurchasePrice(BigDecimal purchasePrice) { this.purchasePrice = purchasePrice; }
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }

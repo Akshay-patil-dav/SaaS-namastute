@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient, { API, ENV } from '@/api/config';
+import { useAuth } from '@/context/AuthContext';
 import {
     Search, Plus, Minus, Trash2, UserPlus, ChevronDown, Check,
     Clock, ArrowLeft, CreditCard, Smartphone, Shield, AlertTriangle,
@@ -103,6 +104,8 @@ const DEFAULT_CUSTOMER = { id: 'c-1', name: 'Walk-in Customer', bonus: 0, loyalt
 
 export default function POS() {
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const currentDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
     // --- STATE ---
     const [products, setProducts] = useState([]);
@@ -218,8 +221,8 @@ export default function POS() {
                     }
                 });
                 
-                // If database is not empty, use ONLY database products! If empty, fallback to rich mock data.
-                const finalProducts = mappedDb.length > 0 ? mappedDb : MOCK_PRODUCTS;
+                // Always use database products, no more offline fallback
+                const finalProducts = mappedDb;
                 setProducts(finalProducts);
                 setFilteredProducts(finalProducts);
 
@@ -236,9 +239,9 @@ export default function POS() {
                 });
                 setCategories(cleanCats);
             } catch (err) {
-                console.error("Could not fetch database products, using rich mock data instead.", err);
-                setProducts(MOCK_PRODUCTS);
-                setFilteredProducts(MOCK_PRODUCTS);
+                console.error("Could not fetch database products.", err);
+                setProducts([]);
+                setFilteredProducts([]);
             } finally {
                 setLoadingProducts(false);
             }
@@ -317,7 +320,7 @@ export default function POS() {
 
     const handleApplyCustomerBonus = () => {
         // Mock Applying Loyalty
-        alert(`Successfully applied $${selectedCustomer.loyalty || 0} Loyalty Balance as coupon discount!`);
+        alert(`Successfully applied ₹${selectedCustomer.loyalty || 0} Loyalty Balance as coupon discount!`);
         setCoupon(prev => prev + (selectedCustomer.loyalty || 0));
         setShowCustomerCard(false);
     };
@@ -342,7 +345,7 @@ export default function POS() {
     // --- CALCULATIONS ---
     const cartSubtotal = cart.reduce((sum, item) => sum + (item.price * item.cartQty), 0);
     
-    // Apply 5% discount if banner is active and subtotal > $20
+    // Apply 5% discount if banner is active and subtotal > ₹20
     const autoDiscountValue = (discountApplied && cartSubtotal >= 20) ? (cartSubtotal * 0.05) : 0;
     
     const grandTotal = Math.max(0, cartSubtotal + shipping + tax - coupon - autoDiscountValue);
@@ -415,7 +418,7 @@ export default function POS() {
                 discount: coupon + autoDiscountValue,
                 shipping: shipping,
                 paidAmount: finalPaymentStatus === 'Paid' ? grandTotal : 0,
-                biller: 'Admin',
+                biller: user?.name || 'Admin',
                 notes: 'Order created via new premium POS terminal screen.',
                 products: formattedProducts
             };
@@ -435,22 +438,7 @@ export default function POS() {
             setPaymentSuccess(true);
         } catch (err) {
             console.error("Failed to post order to backend", err);
-            // Fallback Success for fully interactive offline/demo mode
-            setRecentOrderDetails({
-                id: Date.now(),
-                referenceNo: `ORD-${Math.floor(100000 + Math.random() * 900000)}`,
-                customerName: selectedCustomer.name,
-                date: new Date().toLocaleDateString(),
-                cart: [...cart],
-                subtotal: cartSubtotal,
-                grandTotal,
-                paidAmount: finalPaymentStatus === 'Paid' ? grandTotal : 0,
-                changeDue: finalPaymentStatus === 'Paid' ? Math.max(0, parseFloat(amountPaid) - grandTotal) : 0,
-                paymentType,
-                status: finalStatus,
-                paymentStatus: finalPaymentStatus
-            });
-            setPaymentSuccess(true);
+            setOrderError("Failed to connect to actual backend. Order not submitted.");
         } finally {
             setSubmittingOrder(false);
         }
@@ -458,7 +446,7 @@ export default function POS() {
 
     const handleConfirmPayment = () => {
         if (parseFloat(amountPaid) < grandTotal) {
-            setOrderError(`Paid amount must be at least $${grandTotal.toFixed(2)}`);
+            setOrderError(`Paid amount must be at least ₹${grandTotal.toFixed(2)}`);
             return;
         }
         submitOrderToBackend('Completed', 'Paid');
@@ -602,7 +590,7 @@ export default function POS() {
                         </button>
                         
                         <div className="pos-user-profile">
-                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Wesley" alt="User Avatar" />
+                            <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.name || 'Admin'}`} alt="User Avatar" />
                         </div>
                     </div>
                 </div>
@@ -658,8 +646,8 @@ export default function POS() {
                     {/* Welcome & Search Bar Header */}
                     <div className="pos-search-header-row">
                         <div className="pos-welcome-banner">
-                            <h2>Welcome, Wesley Adrian</h2>
-                            <p>December 24, 2024</p>
+                            <h2>Welcome, {user?.name || 'Admin'}</h2>
+                            <p>{currentDate}</p>
                         </div>
 
                         <div className="pos-search-controls">
@@ -805,14 +793,7 @@ export default function POS() {
                                 {filteredProducts.map(p => {
                                     const cartItem = cart.find(x => x.sku === p.sku);
                                     const inCart = !!cartItem;
-                                    const isAirpodSelected = p.name === 'Airpod 2';
-                                    const hasHighlight = inCart || isAirpodSelected;
-                                    const showFakeControls = [
-                                        'iPhone 14 64GB',
-                                        'MacBook Pro',
-                                        'Rolex Tribute V3',
-                                        'Red Nike Angelo'
-                                    ].includes(p.name);
+                                    const hasHighlight = inCart;
 
                                     return (
                                         <div 
@@ -839,29 +820,7 @@ export default function POS() {
                                                 <div className="pos-card-footer">
                                                     <span className="pos-card-price">${p.price.toLocaleString()}</span>
                                                     
-                                                    {showFakeControls ? (
-                                                        <div className="pos-card-qty-controls" onClick={(e) => e.stopPropagation()}>
-                                                            <button onClick={() => {
-                                                                if (cartItem) {
-                                                                    updateCartQty(p.sku, -1);
-                                                                } else {
-                                                                    addToCart({ ...p, cartQty: 3 });
-                                                                }
-                                                            }} className="pos-card-qty-btn">
-                                                                <Minus size={12} />
-                                                            </button>
-                                                            <span className="pos-card-qty-val">{cartItem ? cartItem.cartQty : 4}</span>
-                                                            <button onClick={() => {
-                                                                if (cartItem) {
-                                                                    updateCartQty(p.sku, 1);
-                                                                } else {
-                                                                    addToCart(p);
-                                                                }
-                                                            }} className="pos-card-qty-btn">
-                                                                <Plus size={12} />
-                                                            </button>
-                                                        </div>
-                                                    ) : inCart ? (
+                                                    {inCart ? (
                                                         <div className="pos-card-qty-controls" onClick={(e) => e.stopPropagation()}>
                                                             <button onClick={() => updateCartQty(p.sku, -1)} className="pos-card-qty-btn">
                                                                 <Minus size={12} />
@@ -1009,7 +968,7 @@ export default function POS() {
                                     </div>
                                     <div className="coupon-text">
                                         <h5>Discount 5%</h5>
-                                        <p>For $20 Minimum Purchase, all Items</p>
+                                        <p>For ₹20 Minimum Purchase, all Items</p>
                                     </div>
                                 </div>
                                 <button className="coupon-remove-btn" onClick={() => setDiscountApplied(false)}>
@@ -1101,7 +1060,7 @@ export default function POS() {
                         </div>
                         <div className="pos-modal-body">
                             <div className="pos-input-group">
-                                <label>Enter value in USD ($)</label>
+                                <label>Enter value in USD (₹)</label>
                                 <input 
                                     type="number" 
                                     step="0.01" 
@@ -1211,7 +1170,7 @@ export default function POS() {
                                         <div className="payment-amount-input-block">
                                             <label>Enter Amount Received</label>
                                             <div className="pay-amount-field-wrap">
-                                                <span className="currency-prefix">$</span>
+                                                <span className="currency-prefix">₹</span>
                                                 <input 
                                                     type="number" 
                                                     step="0.01" 
@@ -1242,7 +1201,7 @@ export default function POS() {
                                             onClick={handleConfirmPayment}
                                             disabled={submittingOrder}
                                         >
-                                            {submittingOrder ? 'Processing...' : `Confirm Paid $${grandTotal.toFixed(2)}`}
+                                            {submittingOrder ? 'Processing...' : `Confirm Paid ₹${grandTotal.toFixed(2)}`}
                                         </button>
                                     </div>
                                 </div>
@@ -1318,7 +1277,7 @@ export default function POS() {
                             <div className="invoice-meta-details">
                                 <p><b>Invoice No:</b> {recentOrderDetails.referenceNo}</p>
                                 <p><b>Date:</b> {recentOrderDetails.date || new Date().toLocaleString()}</p>
-                                <p><b>Biller:</b> Admin</p>
+                                <p><b>Biller:</b> {user?.name || 'Admin'}</p>
                                 <p><b>Customer:</b> {recentOrderDetails.customerName}</p>
                                 <p><b>Payment Status:</b> Paid ({recentOrderDetails.paymentType})</p>
                             </div>

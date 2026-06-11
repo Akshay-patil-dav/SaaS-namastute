@@ -49,6 +49,7 @@ public class ProductService {
                 dto.setSku(p.getSku());
                 dto.setItemBarcode(p.getItemBarcode());
                 dto.setCategory(p.getCategory());
+                dto.setPurchasePrice(p.getPurchasePrice());
                 dto.setPrice(p.getPrice());
                 dto.setQuantity(p.getQuantity());
                 dto.setImages(p.getImages());
@@ -241,6 +242,10 @@ public class ProductService {
                         try {
                             req.setQuantity(Integer.parseInt(val));
                         } catch (NumberFormatException ignored) {}
+                    } else if (header.equals("purchaseprice") || header.equals("purchase_price") || header.equals("purchase price")) {
+                        try {
+                            req.setPurchasePrice(new java.math.BigDecimal(val));
+                        } catch (NumberFormatException ignored) {}
                     } else if (header.equals("price") || header.equals("selling price") || header.equals("selling_price") || header.equals("rate")) {
                         try {
                             req.setPrice(new java.math.BigDecimal(val));
@@ -305,6 +310,7 @@ public class ProductService {
         if (req.getBarcodeSymbology() != null) p.setBarcodeSymbology(req.getBarcodeSymbology());
         if (req.getItemBarcode()      != null) p.setItemBarcode(req.getItemBarcode());
         if (req.getQuantity()         != null) p.setQuantity(req.getQuantity());
+        if (req.getPurchasePrice()    != null) p.setPurchasePrice(req.getPurchasePrice());
         if (req.getPrice()            != null) p.setPrice(req.getPrice());
         if (req.getProductType()      != null) p.setProductType(req.getProductType());
         if (req.getTaxType()          != null) p.setTaxType(req.getTaxType());

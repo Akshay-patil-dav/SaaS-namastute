@@ -63,6 +63,27 @@ public class SaleOrderController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * GET /api/sales/summary
+     * Returns total counts AND revenue (grandTotal sum) across all time for Online Sales, POS Sales, and combined.
+     */
+    @GetMapping("/summary")
+    public ResponseEntity<Map<String, Object>> getSummary() {
+        long       onlineCount  = saleOrderService.countAllSales();
+        long       posCount     = posOrderService.countAllSales();
+        BigDecimal onlineAmount = saleOrderService.sumAllRevenue();
+        BigDecimal posAmount    = posOrderService.sumAllRevenue();
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("onlineCount",  onlineCount);
+        body.put("posCount",     posCount);
+        body.put("totalCount",   onlineCount + posCount);
+        body.put("onlineAmount", onlineAmount);
+        body.put("posAmount",    posAmount);
+        body.put("totalAmount",  onlineAmount.add(posAmount));
+        return ResponseEntity.ok(body);
+    }
+
     /** GET /api/sales/today/count — legacy alias, returns { "count": total } */
     @GetMapping("/today/count")
     public ResponseEntity<Map<String, Long>> getTodayCount() {

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { X, User, Calendar, Tag, CreditCard, FileText, Package } from 'lucide-react';
 import '../../sales/AddPosModal/add-sales-modal.css'; // Reusing the same css as view sales modal for consistency
 
@@ -26,7 +26,7 @@ const ViewPurchaseModal = ({ isOpen, purchase, onClose }) => {
     let prods = [];
     try { prods = JSON.parse(purchase.productsJson || '[]'); } catch {}
 
-    const fmtMoney = v => `$${parseFloat(v||0).toFixed(2)}`;
+    const fmtMoney = v => `₹${parseFloat(v||0).toFixed(2)}`;
 
     return (
         <div className="sm-overlay" onClick={e => e.target===e.currentTarget && onClose()}>

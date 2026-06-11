@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import '../Brands/Products.css';
 import '../Brands/inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
@@ -246,7 +246,7 @@ const Products = () => {
     // ── Format price ─────────────────────────────────────────────────────
     const formatPrice = (price) => {
         if (price == null) return '—';
-        return `$${Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `₹${Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
     // ── Format date ──────────────────────────────────────────────────────
@@ -364,7 +364,8 @@ const Products = () => {
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Brand</th>
-                                <th>Price</th>
+                                <th>Purchase Price</th>
+                                <th>Selling Price</th>
                                 <th>Unit</th>
                                 <th>Qty</th>
                                 <th>Added On</th>
@@ -385,6 +386,7 @@ const Products = () => {
                                 </td>
                                 <td><div className="skel skel-sm" /></td>
                                 <td><div className="skel skel-md" /></td>
+                                <td><div className="skel skel-sm" /></td>
                                 <td><div className="skel skel-sm" /></td>
                                 <td><div className="skel skel-sm" /></td>
                                 <td><div className="skel skel-sm" /></td>
@@ -447,6 +449,7 @@ const Products = () => {
                                     </span>
                                 </td>
                                 <td>{item.brand || '—'}</td>
+                                <td>{formatPrice(item.purchasePrice)}</td>
                                 <td style={{ fontWeight: '600' }}>{formatPrice(item.price)}</td>
                                 <td>{item.unit || 'Pc'}</td>
                                 <td>
@@ -482,7 +485,7 @@ const Products = () => {
                         {/* Empty state */}
                         {!loading && paginated.length === 0 && (
                             <tr>
-                                <td colSpan="10">
+                                <td colSpan="11">
                                     <div className="empty-state">
                                         <Package size={48} strokeWidth={1} />
                                         <p>{searchTerm ? 'No products match your search.' : 'No products available.'}</p>
@@ -672,6 +675,10 @@ const Products = () => {
                                     <div className="info-section">
                                         <h6 className="section-title">Pricing & Taxation</h6>
                                         <div className="view-grid">
+                                            <div className="view-item">
+                                                <span className="view-label">Purchase Price</span>
+                                                <span className="view-value">{formatPrice(viewProduct.purchasePrice)}</span>
+                                            </div>
                                             <div className="view-item">
                                                 <span className="view-label">Net Selling Price</span>
                                                 <span className="view-value-price">{formatPrice(viewProduct.price)}</span>

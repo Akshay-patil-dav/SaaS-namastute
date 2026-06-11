@@ -70,6 +70,10 @@ export default function Dashboard() {
     const [returnSummary, setReturnSummary] = useState(null);
     const [loadingReturn, setLoadingReturn] = useState(true);
 
+    // Sales summary (all time) — fetched from /api/sales/summary
+    const [salesSummary, setSalesSummary] = useState(null);
+    const [loadingSales, setLoadingSales] = useState(true);
+
     useEffect(() => {
         let cancelled = false;
         const fetchTodaySummary = async () => {
@@ -86,6 +90,24 @@ export default function Dashboard() {
         fetchTodaySummary();
         // Poll every 60 s so numbers stay fresh without a manual reload
         const interval = setInterval(fetchTodaySummary, 60_000);
+        return () => { cancelled = true; clearInterval(interval); };
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+        const fetchSalesSummary = async () => {
+            try {
+                const res = await apiClient.get(`${API.SALES}/summary`);
+                if (!cancelled) setSalesSummary(res.data);
+            } catch (err) {
+                console.error('Failed to fetch sales summary:', err);
+                if (!cancelled) setSalesSummary({ totalCount: 0, totalAmount: 0 });
+            } finally {
+                if (!cancelled) setLoadingSales(false);
+            }
+        };
+        fetchSalesSummary();
+        const interval = setInterval(fetchSalesSummary, 60_000);
         return () => { cancelled = true; clearInterval(interval); };
     }, []);
 
@@ -151,6 +173,28 @@ export default function Dashboard() {
         return () => { cancelled = true; clearInterval(interval); };
     }, []);
 
+    // Analytics from Dashboard Service
+    const [dashboardAnalytics, setDashboardAnalytics] = useState({ bestSellers: [], lowStockProducts: [] });
+    const [loadingAnalytics, setLoadingAnalytics] = useState(true);
+
+    useEffect(() => {
+        let cancelled = false;
+        const fetchDashboardAnalytics = async () => {
+            try {
+                const res = await apiClient.get('/dashboard/sales');
+                if (!cancelled) setDashboardAnalytics(res.data);
+            } catch (err) {
+                console.error('Failed to fetch dashboard analytics:', err);
+            } finally {
+                if (!cancelled) setLoadingAnalytics(false);
+            }
+        };
+        fetchDashboardAnalytics();
+        const interval = setInterval(fetchDashboardAnalytics, 60_000);
+        return () => { cancelled = true; clearInterval(interval); };
+    }, []);
+
+
     const totalCount   = todaySummary?.totalCount   ?? 0;
     const onlineCount  = todaySummary?.onlineCount  ?? 0;
     const posCount     = todaySummary?.posCount     ?? 0;
@@ -165,6 +209,11 @@ export default function Dashboard() {
         if (isNaN(num)) return '₹0.00';
         return '₹' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
+
+    const overallIncome = Math.max(0, (salesSummary?.totalAmount ?? 0) - (returnSummary?.totalAmount ?? 0));
+    const overallExpenses = Math.max(0, (purchaseSummary?.totalAmount ?? 0) - (purchaseReturnSummary?.totalAmount ?? 0));
+    const overallProfit = overallIncome - overallExpenses;
+    const overallReturns = (returnSummary?.totalAmount ?? 0) + (purchaseReturnSummary?.totalAmount ?? 0);
 
     return (
         <div className="dashboard-wrapper">
@@ -271,7 +320,7 @@ export default function Dashboard() {
                                         <h3 className="mb-0 fw-bold">
                                             {loadingPurchase || loadingPurchaseReturn
                                                 ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
-                                                : fmt((purchaseSummary?.totalAmount ?? 0) - (purchaseReturnSummary?.totalAmount ?? 0))}
+                                                : fmt(Math.max(0, (purchaseSummary?.totalAmount ?? 0) - (purchaseReturnSummary?.totalAmount ?? 0)))}
                                         </h3>
                                         <h6 className="text-white-50" style={{marginTop: '4px'}}>
                                             <b>Total Purchases : </b>{loadingPurchase ? '…' : (purchaseSummary?.totalCount ?? 0)}
@@ -322,7 +371,13 @@ export default function Dashboard() {
                             <div className="dash-card">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <h4 className="fw-bold fs-5 mb-1 text-dark">$8,458,758</h4>
+                                        <h4 className="fw-bold fs-5 mb-1 text-dark">
+                                            {loadingSales || loadingPurchase ? (
+                                                <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:18,height:18}} />
+                                            ) : (
+                                                fmt(overallProfit)
+                                            )}
+                                        </h4>
                                         <p className="text-secondary small mb-0">Profit</p>
                                     </div>
                                     <div className="icon-rounded-white bg-light-blue">
@@ -339,8 +394,14 @@ export default function Dashboard() {
                             <div className="dash-card">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <h4 className="fw-bold fs-5 mb-1 text-dark">$48,988,78</h4>
-                                        <p className="text-secondary small mb-0">Income Use</p>
+                                        <h4 className="fw-bold fs-5 mb-1 text-dark">
+                                            {loadingSales ? (
+                                                <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:18,height:18}} />
+                                            ) : (
+                                                fmt(overallIncome)
+                                            )}
+                                        </h4>
+                                        <p className="text-secondary small mb-0">Total Revenue</p>
                                     </div>
                                     <div className="icon-rounded-white bg-light-teal">
                                         <TrendingUp size={20} />
@@ -356,7 +417,13 @@ export default function Dashboard() {
                             <div className="dash-card">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <h4 className="fw-bold fs-5 mb-1 text-dark">$8,980,097</h4>
+                                        <h4 className="fw-bold fs-5 mb-1 text-dark">
+                                            {loadingPurchase ? (
+                                                <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:18,height:18}} />
+                                            ) : (
+                                                fmt(overallExpenses)
+                                            )}
+                                        </h4>
                                         <p className="text-secondary small mb-0">Total Expenses</p>
                                     </div>
                                     <div className="icon-rounded-white bg-light-orange">
@@ -373,7 +440,13 @@ export default function Dashboard() {
                             <div className="dash-card">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <h4 className="fw-bold fs-5 mb-1 text-dark">$78,458,758</h4>
+                                        <h4 className="fw-bold fs-5 mb-1 text-dark">
+                                            {loadingReturn || loadingPurchaseReturn ? (
+                                                <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:18,height:18}} />
+                                            ) : (
+                                                fmt(overallReturns)
+                                            )}
+                                        </h4>
                                         <p className="text-secondary small mb-0">Total Payment Returns</p>
                                     </div>
                                     <div className="icon-rounded-white bg-light-purple">
@@ -610,41 +683,24 @@ export default function Dashboard() {
                                     <h5 className="dash-title mb-0"><TrendingUp size={20} className="text-pink-500" color="#ec4899"/> Top Selling Products</h5>
                                     <button className="dash-select text-primary bg-light border-0 fw-semibold">View All &gt;</button>
                                 </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-light-orange"></div>
-                                        <div><p className="item-title">Oculus Quest 2 VR Headset</p><p className="item-desc">$299.00 • <span className="text-primary">342 Sales</span></p></div>
+                                {loadingAnalytics ? (
+                                    <div className="text-center py-4">
+                                        <div className="spinner-border text-primary" role="status" style={{width:24,height:24}} />
                                     </div>
-                                    <span className="pill-badge pill-green">+ 15%</span>
-                                </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-dark"></div>
-                                        <div><p className="item-title">Sony WF-1000XM4 P-Earbuds</p><p className="item-desc">$278.00 • <span className="text-primary">284 Sales</span></p></div>
-                                    </div>
-                                    <span className="pill-badge pill-green">+ 10%</span>
-                                </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-success"></div>
-                                        <div><p className="item-title">Apple AirPods 3</p><p className="item-desc">$400.00 • <span className="text-primary">200 Sales</span></p></div>
-                                    </div>
-                                    <span className="pill-badge pill-green">+ 10%</span>
-                                </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-secondary"></div>
-                                        <div><p className="item-title">Vacuum Cleaner</p><p className="item-desc">$199.00 • <span className="text-primary">150 Sales</span></p></div>
-                                    </div>
-                                    <span className="pill-badge pill-red">- 22%</span>
-                                </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-primary"></div>
-                                        <div><p className="item-title">Samsung Galaxy S22 Ultra</p><p className="item-desc">$899.00 • <span className="text-primary">100 Sales</span></p></div>
-                                    </div>
-                                    <span className="pill-badge pill-green">+ 08%</span>
-                                </div>
+                                ) : (
+                                    (dashboardAnalytics?.bestSellers || []).map((product, index) => (
+                                        <div className="dash-list-item" key={index}>
+                                            <div className="item-flex">
+                                                <div className={`item-img bg-${['light-orange', 'dark', 'success', 'secondary', 'primary'][index % 5]}`}></div>
+                                                <div>
+                                                    <p className="item-title">{product.name}</p>
+                                                    <p className="item-desc">{product.price} • <span className="text-primary">{product.sales} Sales</span></p>
+                                                </div>
+                                            </div>
+                                            <span className="pill-badge pill-green">+ 10%</span>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
 
@@ -654,41 +710,27 @@ export default function Dashboard() {
                                     <h5 className="dash-title mb-0"><Activity size={20} className="text-danger" color="#ef4444"/> Low Stock Products</h5>
                                     <button className="dash-select text-primary bg-light border-0 fw-semibold">View All &gt;</button>
                                 </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-dark"></div>
-                                        <div><p className="item-title">Dell XPS 13</p><p className="item-desc">ID : #01243A</p></div>
+                                {loadingAnalytics ? (
+                                    <div className="text-center py-4">
+                                        <div className="spinner-border text-danger" role="status" style={{width:24,height:24}} />
                                     </div>
-                                    <div className="text-end"><p className="small text-muted mb-0">Stock</p><span className="text-danger fw-bold">10</span></div>
-                                </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-primary"></div>
-                                        <div><p className="item-title">Vacuum Cleaner Robot</p><p className="item-desc">ID : #53245B</p></div>
-                                    </div>
-                                    <div className="text-end"><p className="small text-muted mb-0">Stock</p><span className="text-danger fw-bold">14</span></div>
-                                </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-warning"></div>
-                                        <div><p className="item-title">Kitchenaid Stand Mixer</p><p className="item-desc">ID : #12245C</p></div>
-                                    </div>
-                                    <div className="text-end"><p className="small text-muted mb-0">Stock</p><span className="text-danger fw-bold">21</span></div>
-                                </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-info"></div>
-                                        <div><p className="item-title">Levi's Trucker Jacket</p><p className="item-desc">ID : #12445D</p></div>
-                                    </div>
-                                    <div className="text-end"><p className="small text-muted mb-0">Stock</p><span className="text-danger fw-bold">12</span></div>
-                                </div>
-                                <div className="dash-list-item">
-                                    <div className="item-flex">
-                                        <div className="item-img bg-danger"></div>
-                                        <div><p className="item-title">Lay's Classic</p><p className="item-desc">ID : #33445E</p></div>
-                                    </div>
-                                    <div className="text-end"><p className="small text-muted mb-0">Stock</p><span className="text-danger fw-bold">13</span></div>
-                                </div>
+                                ) : (
+                                    (dashboardAnalytics?.lowStockProducts || []).map((product, index) => (
+                                        <div className="dash-list-item" key={index}>
+                                            <div className="item-flex">
+                                                <div className={`item-img bg-${['dark', 'primary', 'warning', 'info', 'danger'][index % 5]}`}></div>
+                                                <div>
+                                                    <p className="item-title">{product.name}</p>
+                                                    <p className="item-desc">SKU : {product.sku}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-end">
+                                                <p className="small text-muted mb-0">Stock</p>
+                                                <span className="text-danger fw-bold">{product.stock}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>

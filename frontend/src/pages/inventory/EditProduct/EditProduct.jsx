@@ -45,6 +45,7 @@ const initialForm = {
     description: '',
     productType: 'Single Product',
     quantity: '',
+    purchasePrice: '',
     price: '',
     taxType: '',
     tax: '',
@@ -130,6 +131,7 @@ const EditProduct = () => {
                     description: p.description || '',
                     productType: p.productType || 'Single Product',
                     quantity: p.quantity != null ? String(p.quantity) : '',
+                    purchasePrice: p.purchasePrice != null ? String(p.purchasePrice) : '',
                     price: p.price != null ? String(p.price) : '',
                     taxType: p.taxType || '',
                     tax: p.tax || '',
@@ -420,6 +422,7 @@ const EditProduct = () => {
                 quantity:         form.productType === 'Variable Product'
                                     ? variantTypes.reduce((sum, t) => sum + t.values.reduce((vSum, v) => vSum + (parseInt(v.quantity) || 0), 0), 0)
                                     : (parseInt(form.quantity) || 0),
+                purchasePrice:    parseFloat(form.purchasePrice) || 0,
                 price:            parseFloat(form.price) || 0,
                 productType:      form.productType,
                 taxType:          form.taxType,
@@ -735,7 +738,20 @@ const EditProduct = () => {
                             {form.productType !== 'Variable Product' && (
                             <>
                             <div className="col-md-4 cp-form-group">
-                                <label className="cp-label">Price <span className="required">*</span></label>
+                                <label className="cp-label">Purchase Price</label>
+                                <input
+                                    type="number"
+                                    name="purchasePrice"
+                                    className="cp-input"
+                                    placeholder="0.00"
+                                    min="0"
+                                    step="0.01"
+                                    value={form.purchasePrice}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="col-md-4 cp-form-group">
+                                <label className="cp-label">Selling Price <span className="required">*</span></label>
                                 <input
                                     type="number"
                                     name="price"

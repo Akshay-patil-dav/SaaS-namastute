@@ -50,6 +50,17 @@ public class SaleOrderService {
         return result != null ? result : BigDecimal.ZERO;
     }
 
+    /** Returns the number of all sale orders. */
+    public long countAllSales() {
+        return repository.countByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+    }
+
+    /** Returns the sum of grandTotal for all sale orders. */
+    public BigDecimal sumAllRevenue() {
+        BigDecimal result = repository.sumGrandTotalByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+        return result != null ? result : BigDecimal.ZERO;
+    }
+
     public SaleOrder createOrder(SaleOrderRequest request) throws JsonProcessingException {
         SaleOrder order = new SaleOrder();
         order.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());

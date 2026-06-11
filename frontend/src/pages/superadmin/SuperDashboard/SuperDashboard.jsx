@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { CalendarRange, Building2, Users, CreditCard, ChevronDown, CheckSquare, Settings } from 'lucide-react';
 import './super-dashboard.css';
 
@@ -97,7 +97,7 @@ export default function SuperDashboard() {
             </div>
             <span className="sd-stat-badge badge-red">-16%</span>
           </div>
-          <div className="sd-stat-value">$89,878.58</div>
+          <div className="sd-stat-value">₹89,878.58</div>
           <div className="sd-stat-label">Total Earnings</div>
           <div className="sd-stat-chart-mock">
             <div className="sd-stat-chart-bar c-green" style={{height: '60%'}}></div>
@@ -142,7 +142,7 @@ export default function SuperDashboard() {
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <div>
-              <div className="sd-stat-value" style={{fontSize: '20px'}}>$45787</div>
+              <div className="sd-stat-value" style={{fontSize: '20px'}}>₹45787</div>
               <div style={{fontSize: '12px', color: '#888'}}><span style={{color: '#22c55e', fontWeight: 'bold'}}>+40%</span> increased from last year</div>
             </div>
             <div style={{fontSize: '12px', color: '#888', display: 'flex', alignItems: 'center', gap: '4px'}}>
@@ -206,7 +206,7 @@ export default function SuperDashboard() {
               </div>
             </div>
             <div className="sd-list-value">
-              <h4>+$245</h4>
+              <h4>+₹245</h4>
               <p>Basic</p>
             </div>
           </div>
@@ -219,7 +219,7 @@ export default function SuperDashboard() {
               </div>
             </div>
             <div className="sd-list-value">
-              <h4>+$395</h4>
+              <h4>+₹395</h4>
               <p>Enterprise</p>
             </div>
           </div>

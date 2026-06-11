@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { 
   Search, 
   Eye, 
@@ -26,7 +26,7 @@ export default function SuperSubscriptions() {
       plan: 'Advanced (Monthly)',
       billingCycle: '30 Days',
       paymentMethod: 'Credit Card',
-      amount: '$200',
+      amount: '₹200',
       createdDate: '12 Sep 2024',
       expiringOn: '11 Oct 2024',
       status: 'Paid'
@@ -37,7 +37,7 @@ export default function SuperSubscriptions() {
       plan: 'Basic (Yearly)',
       billingCycle: '365 Days',
       paymentMethod: 'Paypal',
-      amount: '$600',
+      amount: '₹600',
       createdDate: '24 Oct 2024',
       expiringOn: '23 Oct 2026',
       status: 'Paid'
@@ -48,7 +48,7 @@ export default function SuperSubscriptions() {
       plan: 'Advanced (Monthly)',
       billingCycle: '30 Days',
       paymentMethod: 'Debit Card',
-      amount: '$200',
+      amount: '₹200',
       createdDate: '18 Feb 2024',
       expiringOn: '17 Mar 2024',
       status: 'Paid'
@@ -59,7 +59,7 @@ export default function SuperSubscriptions() {
       plan: 'Advanced (Monthly)',
       billingCycle: '30 Days',
       paymentMethod: 'Paypal',
-      amount: '$200',
+      amount: '₹200',
       createdDate: '17 Oct 2024',
       expiringOn: '16 Nov 2024',
       status: 'Paid'
@@ -70,7 +70,7 @@ export default function SuperSubscriptions() {
       plan: 'Enterprise (Monthly)',
       billingCycle: '30 Days',
       paymentMethod: 'Credit Card',
-      amount: '$400',
+      amount: '₹400',
       createdDate: '20 Jul 2024',
       expiringOn: '19 Aug 2024',
       status: 'Paid'
@@ -81,7 +81,7 @@ export default function SuperSubscriptions() {
       plan: 'Advanced (Monthly)',
       billingCycle: '30 Days',
       paymentMethod: 'Paypal',
-      amount: '$200',
+      amount: '₹200',
       createdDate: '10 Apr 2024',
       expiringOn: '19 Aug 2024',
       status: 'Paid'
@@ -92,7 +92,7 @@ export default function SuperSubscriptions() {
       plan: 'Enterprise (Yearly)',
       billingCycle: '365 Days',
       paymentMethod: 'Credit Card',
-      amount: '$4800',
+      amount: '₹4800',
       createdDate: '29 Aug 2024',
       expiringOn: '28 Aug 2026',
       status: 'Paid'
@@ -103,7 +103,7 @@ export default function SuperSubscriptions() {
       plan: 'Basic (Monthly)',
       billingCycle: '30 Days',
       paymentMethod: 'Credit Card',
-      amount: '$50',
+      amount: '₹50',
       createdDate: '22 Feb 2024',
       expiringOn: '21 Mar 2024',
       status: 'Unpaid'
@@ -114,7 +114,7 @@ export default function SuperSubscriptions() {
       plan: 'Basic (Yearly)',
       billingCycle: '365 Days',
       paymentMethod: 'Paypal',
-      amount: '$600',
+      amount: '₹600',
       createdDate: '03 Nov 2024',
       expiringOn: '02 Nov 2026',
       status: 'Paid'
@@ -125,7 +125,7 @@ export default function SuperSubscriptions() {
       plan: 'Advanced (Monthly)',
       billingCycle: '30 Days',
       paymentMethod: 'Credit Card',
-      amount: '$200',
+      amount: '₹200',
       createdDate: '17 Dec 2024',
       expiringOn: '16 Jan 2024',
       status: 'Paid'
@@ -210,7 +210,7 @@ export default function SuperSubscriptions() {
           <div className="ss-stat-top">
             <div className="ss-stat-info">
               <h4>Total Transaction</h4>
-              <p>$5,340</p>
+              <p>₹5,340</p>
             </div>
             <svg className="ss-stat-sparkline" viewBox="0 0 100 40">
               <polyline points="0,30 10,25 20,35 30,15 40,28 50,18 60,32 70,12 80,22 90,5 100,20" fill="none" stroke="#ff902f" strokeWidth="2" strokeLinejoin="round" />

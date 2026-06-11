@@ -3,12 +3,15 @@ package com.example.otpauth.service;
 import com.example.otpauth.dto.BestSellerDTO;
 import com.example.otpauth.dto.ChartDataDTO;
 import com.example.otpauth.dto.DashboardDTO;
+import com.example.otpauth.dto.LowStockProductDTO;
 import com.example.otpauth.dto.RecentTransactionDTO;
 import com.example.otpauth.model.PosOrder;
 import com.example.otpauth.model.SaleOrder;
 import com.example.otpauth.repository.CustomerRepository;
 import com.example.otpauth.repository.PosOrderRepository;
+import com.example.otpauth.repository.ProductRepository;
 import com.example.otpauth.repository.SaleOrderRepository;
+import com.example.otpauth.model.Product;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,15 +28,18 @@ public class DashboardService {
     private final PosOrderRepository posOrderRepository;
     private final SaleOrderRepository saleOrderRepository;
     private final CustomerRepository customerRepository;
+    private final ProductRepository productRepository;
     private final ObjectMapper objectMapper;
 
     public DashboardService(PosOrderRepository posOrderRepository,
                             SaleOrderRepository saleOrderRepository,
                             CustomerRepository customerRepository,
+                            ProductRepository productRepository,
                             ObjectMapper objectMapper) {
         this.posOrderRepository = posOrderRepository;
         this.saleOrderRepository = saleOrderRepository;
         this.customerRepository = customerRepository;
+        this.productRepository = productRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -123,7 +129,7 @@ public class DashboardService {
                         p.getReferenceNo() != null ? p.getReferenceNo() : "N/A",
                         p.getStatus() != null ? p.getStatus() : "Completed",
                         stClass,
-                        "$" + (p.getGrandTotal() != null ? p.getGrandTotal() : "0.00")
+                        "₹" + (p.getGrandTotal() != null ? p.getGrandTotal() : "0.00")
                 ));
             } else {
                 SaleOrder s = (SaleOrder) order;
@@ -139,7 +145,7 @@ public class DashboardService {
                         s.getReferenceNo() != null ? s.getReferenceNo() : "N/A",
                         s.getStatus() != null ? s.getStatus() : "Completed",
                         stClass,
-                        "$" + (s.getGrandTotal() != null ? s.getGrandTotal() : "0.00")
+                        "₹" + (s.getGrandTotal() != null ? s.getGrandTotal() : "0.00")
                 ));
             }
         }
@@ -172,6 +178,11 @@ public class DashboardService {
         Map<String, BigDecimal> productPrices = new HashMap<>();
 
         for (Object order : combinedOrders) {
+            String status = order instanceof PosOrder ? ((PosOrder) order).getStatus() : ((SaleOrder) order).getStatus();
+            if ("Cancelled".equalsIgnoreCase(status)) {
+                continue;
+            }
+
             String json = order instanceof PosOrder ? ((PosOrder) order).getProductsJson() : ((SaleOrder) order).getProductsJson();
             if (json != null && !json.isBlank()) {
                 try {
@@ -209,16 +220,31 @@ public class DashboardService {
                 .map(e -> {
                     String name = e.getKey();
                     BigDecimal price = productPrices.getOrDefault(name, BigDecimal.ZERO);
-                    return new BestSellerDTO(name, "$" + price.toString(), e.getValue());
+                    return new BestSellerDTO(name, "₹" + price.toString(), e.getValue());
                 })
                 .collect(Collectors.toList());
 
         // Fallback if no best sellers found
         if (bestSellers.isEmpty()) {
-            bestSellers.add(new BestSellerDTO("No products sold yet", "$0.00", 0));
+            bestSellers.add(new BestSellerDTO("No products sold yet", "₹0.00", 0));
         }
 
         dashboard.setBestSellers(bestSellers);
+
+        // 7. Low Stock Products
+        List<Product> allProducts = productRepository.findByUserId(userId);
+        List<LowStockProductDTO> lowStockProducts = allProducts.stream()
+                .filter(p -> p.getQuantity() != null && p.getQuantityAlert() != null && p.getQuantity() <= p.getQuantityAlert())
+                .sorted(Comparator.comparingInt(Product::getQuantity))
+                .limit(5)
+                .map(p -> new LowStockProductDTO(p.getName(), p.getSku(), Math.max(0, p.getQuantity())))
+                .collect(Collectors.toList());
+
+        if (lowStockProducts.isEmpty()) {
+            lowStockProducts.add(new LowStockProductDTO("All stocks are healthy", "N/A", 0));
+        }
+
+        dashboard.setLowStockProducts(lowStockProducts);
 
         return dashboard;
     }

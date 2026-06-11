@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+﻿import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
@@ -76,7 +76,7 @@ export default function Ecommerce() {
                             <div className="ec-card-img"></div>
                             <div className="ec-card-info">
                                 <h4>Premium Headphones</h4>
-                                <div className="ec-price">$299.00</div>
+                                <div className="ec-price">₹299.00</div>
                                 <button className="ec-btn-add">Add to Cart</button>
                             </div>
                         </div>
@@ -84,14 +84,14 @@ export default function Ecommerce() {
                             <div className="ec-card-img alt-1"></div>
                             <div className="ec-card-info">
                                 <h4>Smart Watch</h4>
-                                <div className="ec-price">$199.00</div>
+                                <div className="ec-price">₹199.00</div>
                             </div>
                         </div>
                         <div className="ec-product-card card-side-2">
                             <div className="ec-card-img alt-2"></div>
                             <div className="ec-card-info">
                                 <h4>Minimalist Desk</h4>
-                                <div className="ec-price">$450.00</div>
+                                <div className="ec-price">₹450.00</div>
                             </div>
                         </div>
                     </div>

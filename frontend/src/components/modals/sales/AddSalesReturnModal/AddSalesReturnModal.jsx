@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { X, Calendar, Barcode, Trash2 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import './add-sales-return-modal.css';
@@ -249,12 +249,12 @@ const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Net Unit Price($)</th>
+                                    <th>Net Unit Price(₹)</th>
                                     <th>Stock</th>
                                     <th>QTY</th>
-                                    <th>Discount($)</th>
+                                    <th>Discount(₹)</th>
                                     <th>Tax %</th>
-                                    <th>Subtotal ($)</th>
+                                    <th>Subtotal (₹)</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -326,10 +326,10 @@ const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
                         <div className="srm-summary-table-wrap">
                             <table className="srm-summary-table">
                                 <tbody>
-                                    <tr><td>Order Tax</td>      <td>$ {(+form.orderTax).toFixed(2)}</td></tr>
-                                    <tr><td>Discount</td>       <td>$ {(+form.discount).toFixed(2)}</td></tr>
-                                    <tr><td>Shipping</td>       <td>$ {(+form.shipping).toFixed(2)}</td></tr>
-                                    <tr className="srm-summary-grand"><td>Grand Total</td><td>$ {grandTotal.toFixed(2)}</td></tr>
+                                    <tr><td>Order Tax</td>      <td>₹ {(+form.orderTax).toFixed(2)}</td></tr>
+                                    <tr><td>Discount</td>       <td>₹ {(+form.discount).toFixed(2)}</td></tr>
+                                    <tr><td>Shipping</td>       <td>₹ {(+form.shipping).toFixed(2)}</td></tr>
+                                    <tr className="srm-summary-grand"><td>Grand Total</td><td>₹ {grandTotal.toFixed(2)}</td></tr>
                                 </tbody>
                             </table>
                         </div>

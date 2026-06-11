@@ -18,6 +18,7 @@ public class ProductRequest {
     private String barcodeSymbology;
     private String itemBarcode;
     private Integer quantity;
+    private BigDecimal purchasePrice;
     private BigDecimal price;
     private String productType;
     private String taxType;
@@ -61,6 +62,8 @@ public class ProductRequest {
     public void setItemBarcode(String itemBarcode) { this.itemBarcode = itemBarcode; }
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public BigDecimal getPurchasePrice() { return purchasePrice; }
+    public void setPurchasePrice(BigDecimal purchasePrice) { this.purchasePrice = purchasePrice; }
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
     public String getProductType() { return productType; }

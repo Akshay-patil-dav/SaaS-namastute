@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
 
@@ -241,7 +241,7 @@ export const Currencies = () => {
                     <tr>
                         <td>US Dollar</td>
                         <td>USD</td>
-                        <td>$</td>
+                        <td>₹</td>
                         <td><button className="btn-action dark">Edit</button></td>
                     </tr>
                     <tr>
@@ -274,7 +274,7 @@ export const Currencies = () => {
                         </div>
                         <div className="settings-form-group mb-3">
                             <label>Currency Symbol <span className="required" style={{color: 'red'}}>*</span></label>
-                            <input type="text" placeholder="e.g. $" />
+                            <input type="text" placeholder="e.g. ₹" />
                         </div>
                     </div>
                     <div className="modal-footer" style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>

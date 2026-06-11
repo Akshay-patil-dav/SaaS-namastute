@@ -11,6 +11,7 @@ public class DashboardDTO {
     private List<BestSellerDTO> bestSellers;
     private List<RecentTransactionDTO> recentTransactions;
     private List<ChartDataDTO> chartData;
+    private List<LowStockProductDTO> lowStockProducts;
 
     // Getters and Setters
 
@@ -68,5 +69,13 @@ public class DashboardDTO {
 
     public void setChartData(List<ChartDataDTO> chartData) {
         this.chartData = chartData;
+    }
+
+    public List<LowStockProductDTO> getLowStockProducts() {
+        return lowStockProducts;
+    }
+
+    public void setLowStockProducts(List<LowStockProductDTO> lowStockProducts) {
+        this.lowStockProducts = lowStockProducts;
     }
 }
