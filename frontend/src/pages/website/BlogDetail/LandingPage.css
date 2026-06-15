@@ -1348,6 +1348,26 @@
   transform: translateY(0);
 }
 
+.lp-reveal-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.lp-reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.lp-reveal-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.lp-reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
 

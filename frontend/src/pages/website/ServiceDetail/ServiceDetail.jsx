@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { servicesData } from '../../../data/servicesData';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
+import BlogPreviewSection from '../../../components/common/BlogPreviewSection/BlogPreviewSection';
 import './ServiceDetail.css';
 
 function useReveal() {
@@ -167,6 +168,9 @@ export default function ServiceDetail() {
                     <button className="sd-btn-cta">Start Your Project Today</button>
                 </div>
             </section>
+
+            {/* ── Blog Preview ────────────────── */}
+            <BlogPreviewSection />
 
             <WebsiteFooter />
         </div>

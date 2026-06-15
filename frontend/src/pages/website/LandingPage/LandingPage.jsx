@@ -4,34 +4,14 @@ import '../BlogDetail/LandingPage.css';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
 import NodeFeatures from '../../../components/common/NodeFeatures/NodeFeatures';
+import BlogPreviewSection from '../../../components/common/BlogPreviewSection/BlogPreviewSection';
 
-/* ── Scroll-reveal hook ─────────────────────────────────────────────────── */
-function useReveal() {
-    const ref = useRef(null);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    el.classList.add('visible');
-                    observer.disconnect();
-                }
-            },
-            { threshold: 0.1 }
-        );
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, []);
-    return ref;
-}
+
 
 /* ── Feature Card ───────────────────────────────────────────────────────── */
 function FeatureCard({ icon, title, desc, delay = 0 }) {
-    const ref = useReveal();
     return (
         <div
-            ref={ref}
             className="lp-feature-card lp-reveal"
             style={{ transitionDelay: `${delay}ms` }}
         >
@@ -45,9 +25,8 @@ function FeatureCard({ icon, title, desc, delay = 0 }) {
 /* ── Pricing Card ───────────────────────────────────────────────────────── */
 function PricingCard({ plan, price, desc, features, popular, cta }) {
     const navigate = useNavigate();
-    const ref = useReveal();
     return (
-        <div ref={ref} className={`lp-pricing-card lp-reveal ${popular ? 'popular' : ''}`}>
+        <div className={`lp-pricing-card lp-reveal ${popular ? 'popular' : ''}`}>
             {popular && <div className="lp-pricing-badge">Most Popular</div>}
             <div className="lp-pricing-plan">{plan}</div>
             <div className="lp-pricing-price">
@@ -118,17 +97,29 @@ function DashboardShowcase() {
 export default function LandingPage() {
     const navigate = useNavigate();
 
-    // hero refs
-    const featuresRef   = useReveal();
-    const howRef        = useReveal();
-    const pricingRef    = useReveal();
-    const testimonialRef = useReveal();
-    const ctaRef        = useReveal();
-    const blogRef       = useReveal();
-
     useEffect(() => {
         window.scrollTo(0, 0);
         document.title = "Retail SaaS Platform";
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+        );
+
+        const elements = document.querySelectorAll('.lp-reveal, .lp-reveal-left, .lp-reveal-right');
+        elements.forEach((el) => observer.observe(el));
+
+        return () => {
+            elements.forEach((el) => observer.unobserve(el));
+            observer.disconnect();
+        };
     }, []);
 
     const scrollTo = (id) => {
@@ -337,7 +328,7 @@ export default function LandingPage() {
 
             {/* ── How It Works ────────────────── */}
             <section className="lp-section lp-section-alt" id="how-it-works">
-                <div ref={howRef} className="lp-reveal">
+                <div className="lp-reveal">
                     <div className="lp-section-label">How It Works</div>
                     <h2 className="lp-section-title">Up & Running in Minutes</h2>
                     <p className="lp-section-sub">
@@ -361,7 +352,7 @@ export default function LandingPage() {
 
             {/* ── Pricing ─────────────────────── */}
             <section className="lp-section" id="pricing">
-                <div ref={pricingRef} className="lp-reveal">
+                <div className="lp-reveal">
                     <div className="lp-section-label">Pricing</div>
                     <h2 className="lp-section-title">Simple, Transparent Pricing</h2>
                     <p className="lp-section-sub">
@@ -377,7 +368,7 @@ export default function LandingPage() {
 
             {/* ── Testimonials ────────────────── */}
             <section className="lp-section" id="testimonials">
-                <div ref={testimonialRef} className="lp-reveal">
+                <div className="lp-reveal">
                     <div className="lp-section-label">Testimonials</div>
                     <h2 className="lp-section-title">Loved by Retailers Across India</h2>
                     <p className="lp-section-sub">
@@ -402,62 +393,11 @@ export default function LandingPage() {
             </section>
 
             {/* ── Blog Preview ────────────────── */}
-            <section className="lp-section lp-section-alt" id="blog">
-                <div className="lp-reveal" ref={blogRef}>
-                    <div className="lp-section-label">Blog</div>
-                    <h2 className="lp-section-title">Latest from Our Team</h2>
-                    <p className="lp-section-sub">
-                        Insights on software, development, and retail technology — straight from the Namustutam team.
-                    </p>
-                </div>
-                <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 1200, margin: '0 auto' }}>
-                    {[
-                        { emoji: '📦', color: 'linear-gradient(135deg,#6366f1,#8b5cf6)', cat: 'Software',    title: 'How Namustutam Transformed Retail Inventory', slug: 'namustutam-retail-inventory' },
-                        { emoji: '🏗️', color: 'linear-gradient(135deg,#10b981,#06b6d4)', cat: 'Development', title: 'Building a Multi-Tenant SaaS with Spring Boot',  slug: 'multi-tenant-saas-spring-boot' },
-                        { emoji: '🚀', color: 'linear-gradient(135deg,#ff902f,#ff5f1f)', cat: 'Updates',     title: 'Namustutam v2.0 Launch: What\'s New',           slug: 'namustutam-v2-launch' },
-                    ].map((b, i) => (
-                        <div
-                            key={i}
-                            onClick={() => navigate(`/blog/${b.slug}`)}
-                            style={{
-                                background: 'var(--glass-bg)',
-                                backdropFilter: 'var(--glass-blur)',
-                                border: '1.5px solid var(--glass-border)',
-                                borderRadius: 20,
-                                overflow: 'hidden',
-                                cursor: 'pointer',
-                                flex: '1 1 280px',
-                                maxWidth: 360,
-                                boxShadow: 'var(--shadow-sm)',
-                                transition: 'all 0.3s',
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-                            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
-                        >
-                            <div style={{ height: 140, background: b.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 52, opacity: 0.85 }}>{b.emoji}</div>
-                            <div style={{ padding: 22 }}>
-                                <span style={{ background: 'var(--primary-pale)', color: 'var(--primary-d)', borderRadius: 50, padding: '3px 12px', fontSize: 11, fontWeight: 700 }}>{b.cat}</span>
-                                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginTop: 12, lineHeight: 1.4, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{b.title}</div>
-                                <div style={{ marginTop: 14, color: 'var(--primary)', fontWeight: 700, fontSize: 13 }}>Read Article →</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                <div style={{ textAlign: 'center', marginTop: 40 }}>
-                    <button
-                        id="landing-view-all-blogs"
-                        className="lp-btn-outline"
-                        onClick={() => navigate('/blog')}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-                    >
-                        View All Articles →
-                    </button>
-                </div>
-            </section>
+            <BlogPreviewSection />
 
             {/* ── CTA ─────────────────────────── */}
             <section className="lp-section lp-cta">
-                <div ref={ctaRef} className="lp-cta-inner lp-reveal">
+                <div className="lp-cta-inner lp-reveal">
                     <h2 className="lp-cta-title">Ready to Transform<br />Your Business?</h2>
                     <p className="lp-cta-sub">Start your free trial today. No credit card required.</p>
                     <div className="lp-cta-actions">

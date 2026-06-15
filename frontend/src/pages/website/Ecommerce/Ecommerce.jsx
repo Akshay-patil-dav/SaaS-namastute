@@ -1,7 +1,8 @@
-﻿import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
+import BlogPreviewSection from '../../../components/common/BlogPreviewSection/BlogPreviewSection';
 import './Ecommerce.css';
 
 function useReveal() {
@@ -171,6 +172,9 @@ export default function Ecommerce() {
                     </div>
                 </div>
             </section>
+
+            {/* ── Blog Preview ────────────────── */}
+            <BlogPreviewSection />
 
             <WebsiteFooter />
         </div>
