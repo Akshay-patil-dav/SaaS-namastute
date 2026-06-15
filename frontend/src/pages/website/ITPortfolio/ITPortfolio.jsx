@@ -100,7 +100,7 @@ export default function ITPortfolio() {
     ];
     const portfolioContentData = {
         'WordPress UI Dev': {
-            mainImg: '/wpweb11.png',
+            mainImg: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800',
             title: 'WordPress UI Development',
             desc: 'Custom WordPress UI development ensuring scalable and secure websites tailored to your unique business needs, with easy content management.',
             features: [
@@ -108,10 +108,11 @@ export default function ITPortfolio() {
                 { icon: '🛡️', title: 'Enhanced\nSecurity' },
                 { icon: '🎨', title: 'Custom\nDesign' }
             ],
-            innerImg: '/wpweb1.png'
+            innerImg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400',
+            link: '#'
         },
         'Shopify Dev': {
-            mainImg: '/shopify11.png',
+            mainImg: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=800',
             title: 'Shopify Development',
             desc: 'High-converting online stores engineered for maximum sales and seamless checkout experiences.',
             features: [
@@ -119,10 +120,11 @@ export default function ITPortfolio() {
                 { icon: '⭐', title: '100% Customers\nSatisfaction' },
                 { icon: '📈', title: 'Sales\nGrowth' }
             ],
-            innerImg: '/dashboard1.png'
+            innerImg: 'https://images.unsplash.com/photo-1523289333742-be1143f6b766?auto=format&fit=crop&q=80&w=400',
+            link: '#'
         },
         'Custom Software Dev': {
-            mainImg: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
+            mainImg: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800',
             title: 'Custom Software Development',
             desc: 'End-to-end multi-tenant application development with robust backend architecture and scalable solutions.',
             features: [
@@ -130,7 +132,8 @@ export default function ITPortfolio() {
                 { icon: '☁️', title: 'Cloud\nIntegration' },
                 { icon: '🔒', title: 'Secure Data\nPipelines' }
             ],
-            innerImg: '/dashboard1.png'
+            innerImg: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=400',
+            link: '#'
         },
         'Custom Web App': {
             mainImg: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800',
@@ -141,7 +144,8 @@ export default function ITPortfolio() {
                 { icon: '🌐', title: 'Responsive\nDesign' },
                 { icon: '⚡', title: 'Fast\nLoading' }
             ],
-            innerImg: '/dashboard2.png'
+            innerImg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400',
+            link: '#'
         }
     };
     const activeContent = portfolioContentData[activePortfolioTab];
@@ -255,6 +259,12 @@ export default function ITPortfolio() {
                                     </div>
                                 ))}
                             </div>
+
+                            {activeContent.link && (
+                                <a href={activeContent.link} target="_blank" rel="noopener noreferrer" className="portfolio-live-link-btn">
+                                    View Live Project <span>↗</span>
+                                </a>
+                            )}
                             
                             <div className="portfolio-explore-badge">
                                 <div className="portfolio-explore-badge-inner">

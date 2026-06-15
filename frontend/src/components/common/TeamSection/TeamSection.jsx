@@ -12,30 +12,41 @@ const teamMembers = [
     { name: 'Esther Howard', role: 'Support Lead', image: '/team/wade.png' },
 ];
 
+import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+
+const TeamCard = ({ member }) => (
+    <div className="team-card">
+        <div className="team-card-inner">
+            <div className="team-card-front">
+                <div className="card-decoration"></div>
+                <div className="team-image-container">
+                    <img src={member.image} alt={member.name} className="team-image" />
+                </div>
+                <div className="team-info-label">
+                    <h3 className="member-name">{member.name}</h3>
+                    <div className="member-role">{member.role}</div>
+                </div>
+            </div>
+            <div className="team-card-back">
+                <div className="card-decoration"></div>
+                <div className="team-info-back">
+                    <h3 className="member-name-back">{member.name}</h3>
+                    <div className="member-role-back">{member.role}</div>
+                    <p className="member-bio">Passionate professional dedicated to delivering excellence and driving innovation.</p>
+                    <div className="social-links">
+                        <a href="#" className="social-icon"><Facebook size={18} /></a>
+                        <a href="#" className="social-icon"><Twitter size={18} /></a>
+                        <a href="#" className="social-icon"><Linkedin size={18} /></a>
+                        <a href="#" className="social-icon"><Instagram size={18} /></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 const TeamSection = () => {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [isFlipping, setIsFlipping] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
-    const displayCount = 4;
-
-    useEffect(() => {
-        if (isPaused) return;
-
-        const interval = setInterval(() => {
-            setIsFlipping(true);
-            setTimeout(() => {
-                setActiveIndex((prev) => (prev + displayCount) % teamMembers.length);
-                setIsFlipping(false);
-            }, 600); 
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, [activeIndex, isPaused]);
-
-    const visibleMembers = teamMembers.slice(activeIndex, activeIndex + displayCount);
-    if (visibleMembers.length < displayCount) {
-        visibleMembers.push(...teamMembers.slice(0, displayCount - visibleMembers.length));
-    }
+    const isAutoSlide = teamMembers.length > 4;
 
     return (
         <section className="team-section" id="team">
@@ -49,25 +60,33 @@ const TeamSection = () => {
                     <h2 className="team-title">See Our Skilled Expert Team</h2>
                 </div>
 
-                <div 
-                    className="team-flip-grid"
-                    onMouseEnter={() => setIsPaused(true)}
-                    onMouseLeave={() => setIsPaused(false)}
-                >
-                    {visibleMembers.map((member, index) => (
-                        <div key={`${activeIndex}-${index}`} className={`team-flip-wrapper ${isFlipping ? 'flipping' : ''}`}>
-                            <div className="team-card">
-                                <div className="card-decoration"></div>
-                                <div className="team-image-container">
-                                    <img src={member.image} alt={member.name} className="team-image" />
-                                </div>
-                                <div className="team-info-label">
-                                    <h3 className="member-name">{member.name}</h3>
-                                    <div className="member-role">{member.role}</div>
-                                </div>
+                <div className="team-slider-container">
+                    {isAutoSlide ? (
+                        <div className="team-slider-marquee">
+                            <div className="team-track">
+                                {teamMembers.map((member, index) => (
+                                    <div key={`first-${index}`} className="team-flip-wrapper">
+                                        <TeamCard member={member} />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="team-track" aria-hidden="true">
+                                {teamMembers.map((member, index) => (
+                                    <div key={`second-${index}`} className="team-flip-wrapper">
+                                        <TeamCard member={member} />
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    ))}
+                    ) : (
+                        <div className="team-static-grid">
+                            {teamMembers.map((member, index) => (
+                                <div key={`static-${index}`} className="team-flip-wrapper">
+                                    <TeamCard member={member} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
