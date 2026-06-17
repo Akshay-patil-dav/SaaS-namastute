@@ -56,7 +56,9 @@ const Ecommerce          = lazy(() => import('./pages/website/Ecommerce/Ecommerc
 const ContactUs          = lazy(() => import('./pages/website/ContactUs/ContactUs.jsx'));
 const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePreview.jsx'));
 
-
+// Web App
+const Menus              = lazy(() => import('./pages/webapp/Menus/Menus.jsx'));
+const CreateMenu         = lazy(() => import('./pages/webapp/CreateMenu/CreateMenu.jsx'));
 
 
 
@@ -254,7 +256,19 @@ function AppRoutes() {
                     element={<LivePreview />}
                 />
 
-
+                {/* Web App */}
+                <Route
+                    path="/dashboard/menus"
+                    element={<PosPage roles={ADMIN_ROLES}><Menus /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/create-menu"
+                    element={<PosPage roles={ADMIN_ROLES}><CreateMenu /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/edit-menu/:id"
+                    element={<PosPage roles={ADMIN_ROLES}><CreateMenu /></PosPage>}
+                />
 
                 {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
                 <Route
