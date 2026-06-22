@@ -59,7 +59,9 @@ const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePr
 // Web App
 const Menus              = lazy(() => import('./pages/webapp/Menus/Menus.jsx'));
 const CreateMenu         = lazy(() => import('./pages/webapp/CreateMenu/CreateMenu.jsx'));
-
+const BlogPosts          = lazy(() => import('./pages/webapp/BlogPosts/BlogPosts.jsx'));
+const AddBlogPost        = lazy(() => import('./pages/webapp/AddBlogPost/AddBlogPost.jsx'));
+const EditBlogPost       = lazy(() => import('./pages/webapp/EditBlogPost/EditBlogPost.jsx'));
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
@@ -268,6 +270,18 @@ function AppRoutes() {
                 <Route
                     path="/dashboard/edit-menu/:id"
                     element={<PosPage roles={ADMIN_ROLES}><CreateMenu /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/blog-posts"
+                    element={<PosPage roles={ADMIN_ROLES}><BlogPosts /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/add-blog-post"
+                    element={<PosPage roles={ADMIN_ROLES}><AddBlogPost /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/edit-blog-post/:id"
+                    element={<PosPage roles={ADMIN_ROLES}><EditBlogPost /></PosPage>}
                 />
 
                 {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
