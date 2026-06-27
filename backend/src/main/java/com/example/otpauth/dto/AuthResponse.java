@@ -7,12 +7,18 @@ public class AuthResponse {
     private String email;
     private String fullName;
     private List<String> roles;
+    private String plan;
+    private boolean emailVerified;
+    private boolean phoneVerified;
 
-    public AuthResponse(String token, String email, String fullName, List<String> roles) {
+    public AuthResponse(String token, String email, String fullName, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified) {
         this.token = token;
         this.email = email;
         this.fullName = fullName;
         this.roles = roles;
+        this.plan = plan;
+        this.emailVerified = emailVerified;
+        this.phoneVerified = phoneVerified;
     }
 
     public String getToken() { return token; }
@@ -26,4 +32,13 @@ public class AuthResponse {
 
     public List<String> getRoles() { return roles; }
     public void setRoles(List<String> roles) { this.roles = roles; }
+
+    public String getPlan() { return plan; }
+    public void setPlan(String plan) { this.plan = plan; }
+
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public boolean isPhoneVerified() { return phoneVerified; }
+    public void setPhoneVerified(boolean phoneVerified) { this.phoneVerified = phoneVerified; }
 }

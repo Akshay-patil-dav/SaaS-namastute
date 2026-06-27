@@ -8,9 +8,12 @@ import {
 import { API } from '../../../api/config';
 import '../Login/Login.css';
 import '../Login/LoginNew.css';
+import VerificationModal from './VerificationModal';
+import PlanSelectionModal from './PlanSelectionModal';
 
 export default function Register() {
     const [fullName, setFullName]         = useState('');
+    const [phoneNumber, setPhoneNumber]   = useState('');
     const [email, setEmail]               = useState('');
     const [password, setPassword]         = useState('');
     const [confirmPassword, setConfirm]   = useState('');
@@ -19,6 +22,11 @@ export default function Register() {
     const [agreed, setAgreed]             = useState(false);
     const [error, setError]               = useState('');
     const [isLoading, setIsLoading]       = useState(false);
+    
+    // Modal states
+    const [showVerification, setShowVerification] = useState(false);
+    const [showPlanSelection, setShowPlanSelection] = useState(false);
+
     const { register } = useAuth();
     const navigate = useNavigate();
 
@@ -38,20 +46,33 @@ export default function Register() {
         setIsLoading(true);
 
         try {
-            const result = await register({ fullName, email, password });
+            const result = await register({ fullName, email, password, phoneNumber });
             if (!result.success) {
                 setError(result.error);
                 return;
             }
-            // Auto-logged-in after registration → redirect to dashboard
-            navigate('/dashboard');
+            // Registration successful, show verification modal instead of redirecting
+            setShowVerification(true);
         } finally {
             setIsLoading(false);
         }
     };
 
+    const handleVerificationComplete = () => {
+        setShowVerification(false);
+        setShowPlanSelection(true);
+    };
+
+    const handlePlanSelectionComplete = () => {
+        setShowPlanSelection(false);
+        navigate('/dashboard');
+    };
+
     return (
         <div className="login-container">
+            {showVerification && <VerificationModal onComplete={handleVerificationComplete} />}
+            {showPlanSelection && <PlanSelectionModal onComplete={handlePlanSelectionComplete} />}
+            
             {/* ── Left Panel ──────────────────────────────────────── */}
             <div className="login-left">
                 <div className="login-form-wrapper">
@@ -114,6 +135,23 @@ export default function Register() {
                                     onChange={(e) => setFullName(e.target.value)}
                                 />
                                 <User className="login-input-icon" size={16} />
+                            </div>
+                        </div>
+
+                        {/* Phone Number */}
+                        <div className="login-input-group">
+                            <label className="login-label">Phone Number <span>*</span></label>
+                            <div className="login-input-wrapper">
+                                <input
+                                    id="register-phone"
+                                    type="text"
+                                    className="login-input"
+                                    placeholder="+91 9876543210"
+                                    required
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                />
+                                <span className="login-input-icon" style={{ fontSize: '12px', fontWeight: 'bold', padding: '0 4px' }}>☎</span>
                             </div>
                         </div>
 

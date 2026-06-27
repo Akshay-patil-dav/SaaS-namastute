@@ -53,6 +53,7 @@ public class AuthService {
                 passwordEncoder.encode(request.getPassword()),
                 request.getFullName()
         );
+        user.setPhoneNumber(request.getPhoneNumber());
 
         Role defaultRole = roleRepository.findByName(RoleName.CLIENT).orElseGet(() -> {
             Role newRole = new Role(RoleName.CLIENT);
@@ -67,8 +68,8 @@ public class AuthService {
         List<String> roles = user.getRoles().stream()
                 .map(r -> r.getName().name())
                 .collect(Collectors.toList());
-
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles);
+        String planStr = user.getPlan() != null ? user.getPlan().name() : com.example.otpauth.model.SubscriptionPlan.NONE.name();
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -85,7 +86,7 @@ public class AuthService {
         List<String> roles = user.getRoles().stream()
                 .map(r -> r.getName().name())
                 .collect(Collectors.toList());
-
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles);
+        String planStr = user.getPlan() != null ? user.getPlan().name() : com.example.otpauth.model.SubscriptionPlan.NONE.name();
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
     }
 }

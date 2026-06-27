@@ -20,6 +20,19 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
+
+    @Column(name = "phone_verified")
+    private Boolean phoneVerified = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subscription_plan")
+    private SubscriptionPlan plan = SubscriptionPlan.NONE;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
@@ -50,4 +63,16 @@ public class User {
 
     public Set<Role> getRoles() { return roles; }
     public void setRoles(Set<Role> roles) { this.roles = roles; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public Boolean isEmailVerified() { return emailVerified != null && emailVerified; }
+    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public Boolean isPhoneVerified() { return phoneVerified != null && phoneVerified; }
+    public void setPhoneVerified(Boolean phoneVerified) { this.phoneVerified = phoneVerified; }
+
+    public SubscriptionPlan getPlan() { return plan; }
+    public void setPlan(SubscriptionPlan plan) { this.plan = plan; }
 }

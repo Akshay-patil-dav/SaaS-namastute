@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByUserId(Long userId);
+    long countByUserId(Long userId);
     Optional<Product> findByIdAndUserId(Long id, Long userId);
     boolean existsByIdAndUserId(Long id, Long userId);
 

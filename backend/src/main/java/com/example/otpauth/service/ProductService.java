@@ -19,10 +19,12 @@ import java.util.UUID;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final com.example.otpauth.repository.UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, com.example.otpauth.repository.UserRepository userRepository) {
         this.productRepository = productRepository;
+        this.userRepository = userRepository;
     }
 
     /** List all products */
@@ -124,8 +126,20 @@ public class ProductService {
 
     /** Create a new product */
     public Product createProduct(ProductRequest req) {
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        
+        com.example.otpauth.model.User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (com.example.otpauth.model.SubscriptionPlan.STARTER.equals(user.getPlan())) {
+            long currentProductCount = productRepository.countByUserId(userId);
+            if (currentProductCount >= 1000) {
+                throw new RuntimeException("Product limit reached for STARTER plan. Upgrade to add more products.");
+            }
+        }
+
         Product p = new Product();
-        p.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+        p.setUserId(userId);
         mapRequestToProduct(req, p);
 
         // Auto-generate SKU if blank

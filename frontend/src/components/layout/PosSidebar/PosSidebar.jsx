@@ -203,8 +203,11 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 <li className="pos-menu-item"><NavLink to="/units" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Scale className="pos-menu-icon" /><span>Units</span></div></NavLink></li>
                                 {/* <li className="pos-menu-item"><NavLink to="/variant-attributes" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Puzzle className="pos-menu-icon" /><span>Variant Attributes</span></div></NavLink></li> */}
                                 <li className="pos-menu-item"><NavLink to="/warranties" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><ShieldCheck className="pos-menu-icon" /><span>Warranties</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/print-barcode" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Barcode className="pos-menu-icon" /><span>Print Barcode</span></div></NavLink></li>
-
+                                
+                                {/* Hidden for Starter Plan */}
+                                {user?.plan !== 'STARTER' && (
+                                    <li className="pos-menu-item"><NavLink to="/print-barcode" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Barcode className="pos-menu-icon" /><span>Print Barcode</span></div></NavLink></li>
+                                )}
                             </ul>
                         </>
                     )}
@@ -257,11 +260,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
                                     </a>
                                     <ul className={`pos-submenu ${openMenus.sales ? 'show' : ''}`}>
-                                        <li>
-                                            <NavLink to="/dashboard/sales-online" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                                Online Orders
-                                            </NavLink>
-                                        </li>
+                                        {/* Hidden for Starter Plan */}
+                                        {user?.plan !== 'STARTER' && (
+                                            <li>
+                                                <NavLink to="/dashboard/sales-online" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                    Online Orders
+                                                </NavLink>
+                                            </li>
+                                        )}
                                         <li>
                                             <NavLink to="/dashboard/sales-pos" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                 POS Orders

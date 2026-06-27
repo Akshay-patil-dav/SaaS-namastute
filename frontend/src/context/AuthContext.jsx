@@ -49,9 +49,9 @@ export const AuthProvider = ({ children }) => {
      * _persist(token, email, roles)
      * Save to state + localStorage + axios headers.
      */
-    const _persist = (jwtToken, email, roles, fullName) => {
+    const _persist = (jwtToken, email, roles, fullName, plan, emailVerified, phoneVerified) => {
         const role = pickRole(roles);
-        const userData = { email, name: fullName ?? email, role, roles };
+        const userData = { email, name: fullName ?? email, role, roles, plan, emailVerified, phoneVerified };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: jwtToken, user: userData }));
         // No need to set axios.defaults — apiClient interceptor reads from localStorage on every request
@@ -68,8 +68,8 @@ export const AuthProvider = ({ children }) => {
     const login = async ({ email, password }) => {
         try {
             const res = await apiClient.post(`${AUTH_API}/login`, { email, password });
-            const { token: jwt, email: userEmail, roles, fullName } = res.data;
-            const { role } = _persist(jwt, userEmail, roles, fullName);
+            const { token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -84,11 +84,11 @@ export const AuthProvider = ({ children }) => {
      * register({ fullName, email, password })
      * Auto-logs in after registration. Returns { success, role } or { success: false, error }.
      */
-    const register = async ({ fullName, email, password }) => {
+    const register = async ({ fullName, email, password, phoneNumber }) => {
         try {
-            const res = await apiClient.post(`${AUTH_API}/register`, { fullName, email, password });
-            const { token: jwt, email: userEmail, roles } = res.data;
-            const { role } = _persist(jwt, userEmail, roles, fullName);
+            const res = await apiClient.post(`${AUTH_API}/register`, { fullName, email, password, phoneNumber });
+            const { token: jwt, email: userEmail, roles, fullName: returnedFullName, plan, emailVerified, phoneVerified } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, returnedFullName, plan, emailVerified, phoneVerified);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -103,6 +103,22 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem(STORAGE_KEY);
         setToken(null);
         setUser(null);
+    };
+
+    const updatePlanContext = (newPlan) => {
+        if (user) {
+            const updatedUser = { ...user, plan: newPlan };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, user: updatedUser }));
+            setUser(updatedUser);
+        }
+    };
+    
+    const setVerifiedContext = (emailVerified, phoneVerified) => {
+        if (user) {
+            const updatedUser = { ...user, emailVerified, phoneVerified };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, user: updatedUser }));
+            setUser(updatedUser);
+        }
     };
 
     // ── Role helpers ─────────────────────────────────────────────────────────
@@ -130,6 +146,8 @@ export const AuthProvider = ({ children }) => {
                 isClient,
                 isAuthenticated,
                 hasRole,
+                updatePlanContext,
+                setVerifiedContext,
             }}
         >
             {children}

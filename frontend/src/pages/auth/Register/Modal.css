@@ -1,0 +1,212 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.modal-content h2 {
+    margin-bottom: 8px;
+    color: #1a1a1a;
+}
+
+.modal-content p {
+    color: #666;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+.modal-error {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.verify-section {
+    text-align: left;
+    background: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.verify-section h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+}
+
+.verify-section p {
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #e4e4e4;
+}
+
+/* Plan Selection Specific */
+.plan-modal {
+    max-width: 900px;
+}
+
+.plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.plan-card {
+    background: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+}
+
+.plan-card.popular {
+    border-color: #ff6b00;
+    box-shadow: 0 8px 20px rgba(255, 107, 0, 0.1);
+}
+
+.popular-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff6b00;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.plan-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ff6b00;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.plan-price {
+    font-size: 36px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 12px;
+}
+
+.plan-price span {
+    font-size: 14px;
+    color: #666;
+    font-weight: normal;
+}
+
+.plan-desc {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+    line-height: 1.4;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 24px;
+    flex-grow: 1;
+}
+
+.plan-features li {
+    font-size: 13px;
+    color: #444;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.plan-features li:last-child {
+    border-bottom: none;
+}
+
+.feature-check {
+    color: #ff6b00;
+}
+.feature-cross {
+    color: #ccc;
+}
+
+.btn-plan {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    border: 2px solid #ff6b00;
+    background: transparent;
+    color: #ff6b00;
+    transition: all 0.2s;
+}
+
+.btn-plan.primary {
+    background: #ff6b00;
+    color: white;
+}
+
+.btn-plan:hover {
+    opacity: 0.9;
+}
+
+.skip-link {
+    color: #888;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 14px;
+}
+.skip-link:hover {
+    color: #555;
+}
