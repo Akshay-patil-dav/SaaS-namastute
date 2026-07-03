@@ -41,21 +41,7 @@ export default function Login() {
             <div className="login-left">
                 <div className="login-form-wrapper">
                     {/* Back to Home */}
-                    <Link
-                        to="/"
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: '#888',
-                            fontSize: '13px',
-                            textDecoration: 'none',
-                            marginBottom: '28px',
-                            transition: 'color 0.2s',
-                        }}
-                        onMouseEnter={e => e.currentTarget.style.color = '#ff902f'}
-                        onMouseLeave={e => e.currentTarget.style.color = '#888'}
-                    >
+                    <Link to="/" className="back-link">
                         ← Back to Home
                     </Link>
 

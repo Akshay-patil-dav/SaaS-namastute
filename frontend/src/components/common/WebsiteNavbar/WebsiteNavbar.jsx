@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette } from 'lucide-react';
 import logo from '../../../assets/logo.svg';
 import '../../../pages/website/BlogDetail/LandingPage.css';
 
@@ -8,21 +9,8 @@ const productsDropdown = {
     {
       heading: 'Products',
       items: [
-        { icon: '🛒', title: 'Retail SaaS Platform', desc: 'Complete POS & Inventory Management System', color: '#ff902f', link: '/retail-saas-platform' },
-        { icon: '🖼️', title: 'List of Products', desc: 'Browse products with banner images', color: '#2563EB', link: '#' },
-      ],
-    },
-  ],
-};
-
-const projectWorksDropdown = {
-  columns: [
-    {
-      heading: 'Types of work',
-      items: [
-        { icon: '🎨', title: 'Website Design', desc: 'Creative website design solutions', color: '#8B5CF6' },
-        { icon: '📱', title: 'Application Design SS', desc: 'Application design services', color: '#EC4899' },
-        { icon: '⚙️', title: 'Full-Stack Development', desc: 'End-to-end development', color: '#06B6D4' },
+        { icon: <ShoppingCart size={20} />, title: 'Retail SaaS Platform', desc: 'Complete POS & Inventory Management System', color: '#ff902f', link: '/retail-saas-platform' },
+        { icon: <Image size={20} />, title: 'List of Products', desc: 'Browse products with banner images', color: '#2563EB', link: '#' },
       ],
     },
   ],
@@ -33,27 +21,27 @@ const servicesDropdown = {
     {
       heading: 'Development Services',
       items: [
-        { icon: '🌐', title: 'Web Development', desc: 'Shopify & WordPress Development', color: '#2563EB', link: '/services/web-development' },
-        { icon: '💻', title: 'Web Application Development', desc: 'Single, Multiple & Business Use', color: '#8B5CF6', link: '/services/web-application-development' },
-        { icon: '🖥️', title: 'Software Development', desc: 'Custom & Business requirement based', color: '#EC4899', link: '/services/software-development' },
-        { icon: '🛠️', title: 'Custom Development', desc: 'Tailored solutions for your needs', color: '#06B6D4', link: '/services/custom-development' },
+        { icon: <Globe size={20} />, title: 'Web Development', desc: 'Shopify & WordPress Development', color: '#2563EB', link: '/services/web-development' },
+        { icon: <Monitor size={20} />, title: 'Web Application Development', desc: 'Single, Multiple & Business Use', color: '#8B5CF6', link: '/services/web-application-development' },
+        { icon: <Code size={20} />, title: 'Software Development', desc: 'Custom & Business requirement based', color: '#EC4899', link: '/services/software-development' },
+        { icon: <Wrench size={20} />, title: 'Custom Development', desc: 'Tailored solutions for your needs', color: '#06B6D4', link: '/services/custom-development' },
       ],
     },
     {
       heading: 'Platform & E-commerce',
       items: [
-        { icon: '🛒', title: 'E-commerce Platform Development', desc: 'Online stores and marketplaces', color: '#F59E0B', link: '/services/e-commerce-platform-development' },
-        { icon: '🎓', title: 'Education Platform Development', desc: 'Institute, Startup & Market Level', color: '#10B981', link: '/services/education-platform-development' },
-        { icon: '🏢', title: 'Business Website Development', desc: 'Static Service & Landing Sites', color: '#3B82F6', link: '/services/business-website-development' },
-        { icon: '🤖', title: 'AI Automation', desc: 'Voice call & Chatbot automation', color: '#7C3AED', link: '/services/ai-automation' },
+        { icon: <ShoppingBag size={20} />, title: 'E-commerce Platform Development', desc: 'Online stores and marketplaces', color: '#F59E0B', link: '/services/e-commerce-platform-development' },
+        { icon: <GraduationCap size={20} />, title: 'Education Platform Development', desc: 'Institute, Startup & Market Level', color: '#10B981', link: '/services/education-platform-development' },
+        { icon: <Building2 size={20} />, title: 'Business Website Development', desc: 'Static Service & Landing Sites', color: '#3B82F6', link: '/services/business-website-development' },
+        { icon: <Bot size={20} />, title: 'AI Automation', desc: 'Voice call & Chatbot automation', color: '#7C3AED', link: '/services/ai-automation' },
       ],
     },
     {
       heading: 'Design & Templates',
       items: [
-        { icon: '📝', title: 'Form Development', desc: 'Event, Organization & Registration Forms', color: '#10B981', link: '/services/form-development' },
-        { icon: '📄', title: 'Template Development', desc: 'Custom template creation', color: '#EF4444', link: '/services/template-development' },
-        { icon: '🖼️', title: 'Event Banner Design', desc: 'Business, Events, Rentals & Product', color: '#F97316', link: '/services/event-banner-design' },
+        { icon: <FileText size={20} />, title: 'Form Development', desc: 'Event, Organization & Registration Forms', color: '#10B981', link: '/services/form-development' },
+        { icon: <FileCode size={20} />, title: 'Template Development', desc: 'Custom template creation', color: '#EF4444', link: '/services/template-development' },
+        { icon: <Palette size={20} />, title: 'Event Banner Design', desc: 'Business, Events, Rentals & Product', color: '#F97316', link: '/services/event-banner-design' },
       ],
     },
   ],
@@ -61,7 +49,6 @@ const servicesDropdown = {
 
 const dropdownMap = {
     products: productsDropdown,
-    projectWorks: projectWorksDropdown,
     services: servicesDropdown,
 };
 
@@ -180,24 +167,13 @@ const WebsiteNavbar = () => {
                         <button 
                             ref={(el) => (linkRefs.current.products = el)}
                             className={`lp-nav-btn ${activeDropdown === 'products' ? 'active' : ''}`}
+                            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
                         >
-                            Product
+                            <Package size={16} /> Product
                             <svg className={`lp-nav-chevron ${activeDropdown === 'products' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
                         </button>
                     </li>
-                    <li 
-                        className="lp-nav-dropdown-trigger"
-                        onMouseEnter={() => handleMouseEnter('projectWorks')}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        <button 
-                            ref={(el) => (linkRefs.current.projectWorks = el)}
-                            className={`lp-nav-btn ${activeDropdown === 'projectWorks' ? 'active' : ''}`}
-                        >
-                            Project Works
-                            <svg className={`lp-nav-chevron ${activeDropdown === 'projectWorks' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
-                        </button>
-                    </li>
+                    <li><a href="#projectWorks" onClick={() => scrollTo('projectWorks')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={16} /> Project Works</a></li>
                     <li 
                         className="lp-nav-dropdown-trigger"
                         onMouseEnter={() => handleMouseEnter('services')}
@@ -206,15 +182,20 @@ const WebsiteNavbar = () => {
                         <button 
                             ref={(el) => (linkRefs.current.services = el)}
                             className={`lp-nav-btn ${activeDropdown === 'services' ? 'active' : ''}`}
+                            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
                         >
-                            Services
+                            <Layers size={16} /> Services
                             <svg className={`lp-nav-chevron ${activeDropdown === 'services' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
                         </button>
                     </li>
-                    <li><a href="#features" onClick={() => scrollTo('features')}>Features</a></li>
-                    <li><a href="#pricing" onClick={() => scrollTo('pricing')}>Pricing</a></li>
-                    <li><Link to="/blog" style={{ color: 'var(--primary)', fontWeight: 700 }}>Blog</Link></li>
-                    <li><Link to="/contact" style={{ color: 'var(--primary)', fontWeight: 700 }}>Contact</Link></li>
+                    {showCTA && (
+                        <>
+                            <li><a href="#features" onClick={() => scrollTo('features')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Star size={16} /> Features</a></li>
+                            <li><a href="#pricing" onClick={() => scrollTo('pricing')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Tag size={16} /> Pricing</a></li>
+                        </>
+                    )}
+                    <li><Link to="/blog" style={{ color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}><BookOpen size={16} /> Blog</Link></li>
+                    <li><Link to="/contact" style={{ color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}><Phone size={16} /> Contact</Link></li>
                 </ul>
 
                 {showCTA && (
@@ -276,12 +257,16 @@ const WebsiteNavbar = () => {
             <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`}>
                 <div className="lp-mobile-scroll">
                     {renderMobileAccordion('products', 'Product')}
-                    {renderMobileAccordion('projectWorks', 'Project Works')}
+                    <a href="#projectWorks" onClick={() => scrollTo('projectWorks')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={16} /> Project Works</a>
                     {renderMobileAccordion('services', 'Services')}
-                    <a href="#features" onClick={() => scrollTo('features')}>Features</a>
-                    <a href="#pricing" onClick={() => scrollTo('pricing')}>Pricing</a>
-                    <Link to="/blog" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'block', fontSize: 15 }}>Blog</Link>
-                    <Link to="/contact" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'block', fontSize: 15 }}>Contact Us</Link>
+                    {showCTA && (
+                        <>
+                            <a href="#features" onClick={() => scrollTo('features')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Star size={16} /> Features</a>
+                            <a href="#pricing" onClick={() => scrollTo('pricing')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Tag size={16} /> Pricing</a>
+                        </>
+                    )}
+                    <Link to="/blog" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><BookOpen size={16} /> Blog</Link>
+                    <Link to="/contact" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><Phone size={16} /> Contact Us</Link>
                 </div>
                 {showCTA && (
                     <div className="lp-mobile-menu-cta">

@@ -7,12 +7,14 @@
     gap: 8px;
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
-    padding: 12px 16px;
+    color: #ef4444;
+    padding: 14px 16px;
     border-radius: 10px;
-    font-size: 13px;
-    margin-bottom: 20px;
-    animation: shake 0.4s ease;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    animation: shake 0.4s ease, fadeUp 0.3s ease;
+    backdrop-filter: blur(8px);
 }
 
 @keyframes shake {
@@ -30,8 +32,8 @@
 }
 
 .btn-spinner {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: #fff;
     border-radius: 50%;
@@ -44,24 +46,24 @@
 
 /* ── Demo Quick Access section ───────────────────────────────────────────── */
 .demo-section {
-    margin-top: 28px;
+    margin-top: 32px;
     padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--border-color);
 }
 
 .demo-label {
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #64748b;
-    margin-bottom: 12px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
     text-align: center;
 }
 
 .demo-cards {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .demo-card {
@@ -70,115 +72,90 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 9px 8px;
+    padding: 10px 8px;
     border-radius: 8px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     border: 1px solid transparent;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: 'Inter', sans-serif;
 }
 
 .demo-superadmin {
-    background: rgba(250, 204, 21, 0.08);
+    background: rgba(250, 204, 21, 0.1);
     border-color: rgba(250, 204, 21, 0.2);
-    color: #fbbf24;
+    color: #d97706;
 }
 .demo-superadmin:hover {
     background: rgba(250, 204, 21, 0.15);
     border-color: rgba(250, 204, 21, 0.4);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.15);
 }
 
 .demo-admin {
-    background: rgba(99, 102, 241, 0.08);
+    background: rgba(99, 102, 241, 0.1);
     border-color: rgba(99, 102, 241, 0.2);
-    color: #818cf8;
+    color: #4338ca;
 }
 .demo-admin:hover {
     background: rgba(99, 102, 241, 0.15);
     border-color: rgba(99, 102, 241, 0.4);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
 }
 
 .demo-client {
-    background: rgba(34, 197, 94, 0.08);
+    background: rgba(34, 197, 94, 0.1);
     border-color: rgba(34, 197, 94, 0.2);
-    color: #4ade80;
+    color: #15803d;
 }
 .demo-client:hover {
     background: rgba(34, 197, 94, 0.15);
     border-color: rgba(34, 197, 94, 0.4);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
 }
 
-/* ── Login Right Panel extras ─────────────────────────────────────────────── */
-.login-right {
-    position: relative;
-}
-
-.login-right-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(10, 15, 30, 0.7) 0%, rgba(10, 15, 30, 0.3) 100%);
-    display: flex;
-    align-items: flex-end;
-    padding: 60px;
-}
-
-.login-right-content h2 {
-    font-size: 36px;
-    font-weight: 700;
-    color: #fff;
-    line-height: 1.25;
-    margin: 0 0 12px;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
-}
-
-.login-right-content p {
-    font-size: 14px;
-    color: rgba(255,255,255,0.65);
-    margin: 0 0 24px;
-    letter-spacing: 0.04em;
-}
-
-.login-right-badges {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
+/* ── Badges for the Right Panel (Dark Theme) ─────────────────────────────── */
 .badge {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
+    gap: 8px;
+    padding: 8px 16px;
     border-radius: 100px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+.badge:hover {
+    transform: translateY(-2px);
 }
 
 .badge-superadmin {
     background: rgba(250, 204, 21, 0.15);
     border: 1px solid rgba(250, 204, 21, 0.3);
-    color: #fde68a;
+    color: #fef08a;
 }
 
 .badge-admin {
     background: rgba(99, 102, 241, 0.15);
     border: 1px solid rgba(99, 102, 241, 0.3);
-    color: #c7d2fe;
+    color: #e0e7ff;
 }
 
 .badge-client {
     background: rgba(34, 197, 94, 0.15);
     border: 1px solid rgba(34, 197, 94, 0.3);
-    color: #bbf7d0;
+    color: #dcfce7;
 }
 
 /* Input placeholder styling */
 .login-input::placeholder {
-    color: #475569;
+    color: #94a3b8;
+    font-weight: 400;
 }

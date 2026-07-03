@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import LoginPopup from '../LoginPopup/LoginPopup';
+import { Package, Briefcase, Layers, BookOpen, Phone, Info, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette } from 'lucide-react';
 
 /* ─── Dropdown Data ─── */
 const productsDropdown = {
@@ -7,20 +8,7 @@ const productsDropdown = {
     {
       heading: 'Products',
       items: [
-        { icon: '🖼️', title: 'List of Products', desc: 'Browse products with banner images', color: '#2563EB' },
-      ],
-    },
-  ],
-};
-
-const projectWorksDropdown = {
-  columns: [
-    {
-      heading: 'Types of work',
-      items: [
-        { icon: '🎨', title: 'Website Design', desc: 'Creative website design solutions', color: '#8B5CF6' },
-        { icon: '📱', title: 'Application Design SS', desc: 'Application design services', color: '#EC4899' },
-        { icon: '⚙️', title: 'Full-Stack Development', desc: 'End-to-end development', color: '#06B6D4' },
+        { icon: <Image size={20} />, title: 'List of Products', desc: 'Browse products with banner images', color: '#2563EB' },
       ],
     },
   ],
@@ -31,27 +19,27 @@ const servicesDropdown = {
     {
       heading: 'Development Services',
       items: [
-        { icon: '🌐', title: 'Web Development', desc: 'Shopify & WordPress Development', color: '#2563EB' },
-        { icon: '💻', title: 'Web Application Development', desc: 'Single, Multiple & Business Use', color: '#8B5CF6' },
-        { icon: '🖥️', title: 'Software Development', desc: 'Custom & Business requirement based', color: '#EC4899' },
-        { icon: '🛠️', title: 'Custom Development', desc: 'Tailored solutions for your needs', color: '#06B6D4' },
+        { icon: <Globe size={20} />, title: 'Web Development', desc: 'Shopify & WordPress Development', color: '#2563EB' },
+        { icon: <Monitor size={20} />, title: 'Web Application Development', desc: 'Single, Multiple & Business Use', color: '#8B5CF6' },
+        { icon: <Code size={20} />, title: 'Software Development', desc: 'Custom & Business requirement based', color: '#EC4899' },
+        { icon: <Wrench size={20} />, title: 'Custom Development', desc: 'Tailored solutions for your needs', color: '#06B6D4' },
       ],
     },
     {
       heading: 'Platform & E-commerce',
       items: [
-        { icon: '🛒', title: 'E-commerce Platform Development', desc: 'Online stores and marketplaces', color: '#F59E0B' },
-        { icon: '🎓', title: 'Education Platform Development', desc: 'Institute, Startup & Market Level', color: '#10B981' },
-        { icon: '🏢', title: 'Business Website Development', desc: 'Static Service & Landing Sites', color: '#3B82F6' },
-        { icon: '🤖', title: 'AI Automation', desc: 'Voice call & Chatbot automation', color: '#7C3AED' },
+        { icon: <ShoppingBag size={20} />, title: 'E-commerce Platform Development', desc: 'Online stores and marketplaces', color: '#F59E0B' },
+        { icon: <GraduationCap size={20} />, title: 'Education Platform Development', desc: 'Institute, Startup & Market Level', color: '#10B981' },
+        { icon: <Building2 size={20} />, title: 'Business Website Development', desc: 'Static Service & Landing Sites', color: '#3B82F6' },
+        { icon: <Bot size={20} />, title: 'AI Automation', desc: 'Voice call & Chatbot automation', color: '#7C3AED' },
       ],
     },
     {
       heading: 'Design & Templates',
       items: [
-        { icon: '📝', title: 'Form Development', desc: 'Event, Organization & Registration Forms', color: '#10B981' },
-        { icon: '📄', title: 'Template Development', desc: 'Custom template creation', color: '#EF4444' },
-        { icon: '🖼️', title: 'Event Banner Design', desc: 'Business, Events, Rentals & Product', color: '#F97316' },
+        { icon: <FileText size={20} />, title: 'Form Development', desc: 'Event, Organization & Registration Forms', color: '#10B981' },
+        { icon: <FileCode size={20} />, title: 'Template Development', desc: 'Custom template creation', color: '#EF4444' },
+        { icon: <Palette size={20} />, title: 'Event Banner Design', desc: 'Business, Events, Rentals & Product', color: '#F97316' },
       ],
     },
   ],
@@ -109,7 +97,6 @@ const Navbar = () => {
 
   const dropdownMap = {
     products: productsDropdown,
-    projectWorks: projectWorksDropdown,
     services: servicesDropdown,
   };
 
@@ -192,27 +179,15 @@ const Navbar = () => {
               ref={(el) => (linkRefs.current.products = el)}
               className={`navbar__link ${activeDropdown === 'products' ? 'active' : ''}`}
               id="nav-products"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              Product
+              <Package size={16} /> Product
               <svg className={`navbar__chevron-svg ${activeDropdown === 'products' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
             </button>
           </div>
 
           {/* Project Works */}
-          <div
-            className="navbar__link-wrapper"
-            onMouseEnter={() => handleMouseEnter('projectWorks')}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              ref={(el) => (linkRefs.current.projectWorks = el)}
-              className={`navbar__link ${activeDropdown === 'projectWorks' ? 'active' : ''}`}
-              id="nav-projectWorks"
-            >
-              Project Works
-              <svg className={`navbar__chevron-svg ${activeDropdown === 'projectWorks' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
-            </button>
-          </div>
+          <a href="#projectWorks" className="navbar__link" id="nav-projectWorks" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={16} /> Project Works</a>
 
           {/* Services */}
           <div
@@ -224,15 +199,16 @@ const Navbar = () => {
               ref={(el) => (linkRefs.current.services = el)}
               className={`navbar__link ${activeDropdown === 'services' ? 'active' : ''}`}
               id="nav-services"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              Services
+              <Layers size={16} /> Services
               <svg className={`navbar__chevron-svg ${activeDropdown === 'services' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
             </button>
           </div>
 
-          <a href="#blogs" className="navbar__link">Blogs</a>
-          <a href="#contact" className="navbar__link">Contact Us</a>
-          <a href="#about" className="navbar__link">About Us</a>
+          <a href="#blogs" className="navbar__link" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><BookOpen size={16} /> Blogs</a>
+          <a href="#contact" className="navbar__link" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Phone size={16} /> Contact Us</a>
+          <a href="#about" className="navbar__link" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Info size={16} /> About Us</a>
         </div>
 
         {/* CTA Buttons */}
@@ -293,12 +269,12 @@ const Navbar = () => {
       {mobileOpen && (
         <div className="navbar__mobile" id="mobile-menu">
           <div className="navbar__mobile-scroll">
-            {renderMobileAccordion('products', 'Product')}
-            {renderMobileAccordion('projectWorks', 'Project Works')}
-            {renderMobileAccordion('services', 'Services')}
-            <a href="#blogs" className="navbar__mobile-link" onClick={() => setMobileOpen(false)}>Blogs</a>
-            <a href="#contact" className="navbar__mobile-link" onClick={() => setMobileOpen(false)}>Contact Us</a>
-            <a href="#about" className="navbar__mobile-link" onClick={() => setMobileOpen(false)}>About Us</a>
+            {renderMobileAccordion('products', <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Package size={16} /> Product</span>)}
+            <a href="#projectWorks" className="navbar__mobile-link" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={16} /> Project Works</a>
+            {renderMobileAccordion('services', <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Layers size={16} /> Services</span>)}
+            <a href="#blogs" className="navbar__mobile-link" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><BookOpen size={16} /> Blogs</a>
+            <a href="#contact" className="navbar__mobile-link" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Phone size={16} /> Contact Us</a>
+            <a href="#about" className="navbar__mobile-link" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Info size={16} /> About Us</a>
           </div>
           <div className="navbar__mobile-actions">
             <button className="btn btn-secondary" style={{ width: '100%' }} onClick={() => setIsLoginOpen(true)}>Log In</button>
