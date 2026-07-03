@@ -64,6 +64,8 @@ const AddBlogPost        = lazy(() => import('./pages/webapp/AddBlogPost/AddBlog
 const EditBlogPost       = lazy(() => import('./pages/webapp/EditBlogPost/EditBlogPost.jsx'));
 
 
+const ProjectWorks       = lazy(() => import('./pages/website/ProjectWorks/ProjectWorks.jsx'));
+
 // ── Role constants ───────────────────────────────────────────────────────────
 const CLIENT_ADMIN_ROLES = ['ADMIN', 'CLIENT'];
 const ADMIN_ROLES        = ['ADMIN', 'CLIENT'];
@@ -122,6 +124,7 @@ function AppRoutes() {
                 {/* Blog routes – public */}
                 <Route path="/blog"       element={<BlogPage />} />
                 <Route path="/blog/:slug" element={<BlogDetail />} />
+                <Route path="/project-works" element={<ProjectWorks />} />
                 <Route path="/contact"    element={<ContactUs />} />
                 <Route path="/services/web-development" element={<WebDevelopment />} />
                 <Route path="/services/ai-automation" element={<AIAutomation />} />

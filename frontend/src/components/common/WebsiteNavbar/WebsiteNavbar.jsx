@@ -173,7 +173,7 @@ const WebsiteNavbar = () => {
                             <svg className={`lp-nav-chevron ${activeDropdown === 'products' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
                         </button>
                     </li>
-                    <li><a href="#projectWorks" onClick={() => scrollTo('projectWorks')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={16} /> Project Works</a></li>
+                    <li><Link to="/project-works" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'inherit', textDecoration: 'none' }}><Briefcase size={16} /> Project Works</Link></li>
                     <li 
                         className="lp-nav-dropdown-trigger"
                         onMouseEnter={() => handleMouseEnter('services')}
@@ -257,7 +257,7 @@ const WebsiteNavbar = () => {
             <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`}>
                 <div className="lp-mobile-scroll">
                     {renderMobileAccordion('products', 'Product')}
-                    <a href="#projectWorks" onClick={() => scrollTo('projectWorks')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={16} /> Project Works</a>
+                    <Link to="/project-works" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text)', textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', fontWeight: 600, fontSize: 15 }}><Briefcase size={16} /> Project Works</Link>
                     {renderMobileAccordion('services', 'Services')}
                     {showCTA && (
                         <>
