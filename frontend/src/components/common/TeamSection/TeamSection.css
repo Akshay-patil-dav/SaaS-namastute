@@ -16,18 +16,45 @@
 }
 
 .team-badge-wrapper {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
+    background: rgba(255, 95, 31, 0.08);
+    border: 1px solid rgba(255, 95, 31, 0.15);
+    padding: 8px 24px;
+    border-radius: 50px;
     color: var(--primary-d, #ff5f1f);
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 15px;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(255, 95, 31, 0.05);
+    transition: all 0.3s ease;
+}
+
+.team-badge-wrapper:hover {
+    background: rgba(255, 95, 31, 0.12);
+    box-shadow: 0 6px 20px rgba(255, 95, 31, 0.1);
 }
 
 .team-badge-text {
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
+}
+
+.badge-icon {
+    opacity: 0.7;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.team-badge-wrapper:hover .badge-icon-left {
+    transform: translateX(-4px);
+    opacity: 1;
+}
+
+.team-badge-wrapper:hover .badge-icon-right {
+    transform: translateX(4px);
+    opacity: 1;
 }
 
 .team-title {

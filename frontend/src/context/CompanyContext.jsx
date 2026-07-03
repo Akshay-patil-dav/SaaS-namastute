@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import apiClient, { API } from '../api/config';
+import { useAuth } from './AuthContext';
 
 const CompanyContext = createContext(null);
 
@@ -9,9 +10,15 @@ const CompanyContext = createContext(null);
  * subscriber (sidebar, header, AI helper, etc.) to update instantly at runtime.
  */
 export function CompanyProvider({ children }) {
+    const { user } = useAuth();
     const [companyInfo, setCompanyInfo] = useState({ name: '', logo: '' });
 
     const refreshCompany = useCallback(() => {
+        if (!user) {
+            setCompanyInfo({ name: '', logo: '' });
+            return;
+        }
+
         apiClient.get(API.SETTINGS)
             .then(res => {
                 const data = res.data || {};
@@ -31,9 +38,9 @@ export function CompanyProvider({ children }) {
                 setCompanyInfo({ name: '', logo: '' });
             })
             .catch(() => { /* ignore network errors */ });
-    }, []);
+    }, [user]);
 
-    // Fetch once on app start
+    // Fetch once on app start or when user login state changes
     useEffect(() => {
         refreshCompany();
     }, [refreshCompany]);

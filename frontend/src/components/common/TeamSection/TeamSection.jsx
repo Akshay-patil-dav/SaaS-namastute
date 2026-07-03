@@ -12,7 +12,7 @@ const teamMembers = [
     { name: 'Esther Howard', role: 'Support Lead', image: '/team/wade.png' },
 ];
 
-import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, MoveLeft, MoveRight } from 'lucide-react';
 
 const TeamCard = ({ member }) => (
     <div className="team-card">
@@ -53,9 +53,9 @@ const TeamSection = () => {
             <div className="team-container">
                 <div className="team-header">
                     <div className="team-badge-wrapper">
-                        <span className="arrow">←</span>
+                        <MoveLeft className="badge-icon badge-icon-left" size={16} />
                         <span className="team-badge-text">OUR EXPERT</span>
-                        <span className="arrow">→</span>
+                        <MoveRight className="badge-icon badge-icon-right" size={16} />
                     </div>
                     <h2 className="team-title">See Our Skilled Expert Team</h2>
                 </div>

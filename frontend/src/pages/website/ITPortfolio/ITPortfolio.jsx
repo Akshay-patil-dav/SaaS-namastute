@@ -1,17 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Code2, Smartphone, Server, Database, Cloud, ShieldCheck, MonitorPlay, Component } from 'lucide-react';
 import '../BlogDetail/LandingPage.css';
 import './ITPortfolio.css';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
-import NodeFeatures from '../../../components/common/NodeFeatures/NodeFeatures';
+import ExpertiseSection from '../../../components/common/ExpertiseSection/ExpertiseSection';
 import TeamSection from '../../../components/common/TeamSection/TeamSection';
 import BlogPreviewSection from '../../../components/common/BlogPreviewSection/BlogPreviewSection';
 
 
-
 export default function ITPortfolio() {
     const navigate = useNavigate();
+    
+    // Rotating Text State
+    const [wordIndex, setWordIndex] = useState(0);
+    const rotatingWords = ['Excellence', 'Innovation', 'Experiences', 'Solutions'];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setWordIndex((prev) => (prev + 1) % rotatingWords.length);
+        }, 2800);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -96,29 +107,62 @@ export default function ITPortfolio() {
         <div className="portfolio-root">
             <WebsiteNavbar />
 
-            {/* ── Hero Section ──────────────────────── */}
-            <section className="portfolio-hero">
-                <div className="portfolio-hero-bg">
-                    <video 
-                        autoPlay 
-                        loop 
-                        muted 
-                        playsInline
-                        className="portfolio-hero-video"
-                    >
-                        <source src="https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-code-2256-large.mp4" type="video/mp4" />
-                    </video>
-                    <div className="portfolio-glow-orb orb-1"></div>
-                    <div className="portfolio-glow-orb orb-2"></div>
-                    <div className="portfolio-glow-orb orb-3"></div>
+            {/* ── Hero Section (Redesigned) ──────────────────────── */}
+            <section className="portfolio-hero-redesigned">
+                {/* Floating Background Cards */}
+                <div className="hero-floating-background">
+                    {/* Floating Project Images */}
+                    {projects.map((p, index) => (
+                        <div 
+                            key={`img-${index}`} 
+                            className={`floating-project-card floating-card-${index + 1}`}
+                            style={{ backgroundImage: `url(${p.img})` }}
+                        ></div>
+                    ))}
+                    {projects.map((p, index) => (
+                        <div 
+                            key={`dup-${index}`} 
+                            className={`floating-project-card floating-card-dup-${index + 1}`}
+                            style={{ backgroundImage: `url(${p.img})` }}
+                        ></div>
+                    ))}
+
+                    {/* Floating Tech Icons */}
+                    <div className="floating-icon-card floating-icon-1"><Code2 size={36} color="#ff8c42" /></div>
+                    <div className="floating-icon-card floating-icon-2"><Smartphone size={32} color="#3b82f6" /></div>
+                    <div className="floating-icon-card floating-icon-3"><Server size={40} color="#10b981" /></div>
+                    <div className="floating-icon-card floating-icon-4"><Database size={30} color="#f43f5e" /></div>
+                    <div className="floating-icon-card floating-icon-5"><Cloud size={44} color="#8b5cf6" /></div>
+                    <div className="floating-icon-card floating-icon-6"><ShieldCheck size={38} color="#f59e0b" /></div>
+                    <div className="floating-icon-card floating-icon-7"><MonitorPlay size={34} color="#0ea5e9" /></div>
+                    <div className="floating-icon-card floating-icon-8"><Component size={42} color="#ec4899" /></div>
                 </div>
-                <div className="portfolio-hero-content reveal-up">
+
+                <div className="hero-light-overlay"></div>
+
+                <div className="portfolio-hero-content reveal-up" style={{ position: 'relative', zIndex: 2 }}>
                     <div className="portfolio-badge">
                         <span className="portfolio-badge-dot"></span>
                         Premium IT Services & Solutions
                     </div>
                     <h1 className="portfolio-hero-title">
-                        Crafting Digital <span className="portfolio-gradient-text">Excellence</span><br />
+                        Crafting Digital 
+                        <div className="rotating-text-wrapper">
+                            {rotatingWords.map((word, index) => {
+                                const isActive = index === wordIndex;
+                                const isPrevious = index === (wordIndex - 1 + rotatingWords.length) % rotatingWords.length;
+                                
+                                return (
+                                    <span 
+                                        key={index}
+                                        className={`portfolio-gradient-text rotating-text-item ${isActive ? 'active' : ''} ${isPrevious && !isActive ? 'previous' : ''}`}
+                                    >
+                                        {word}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                        <br />
                         For Modern Businesses
                     </h1>
                     <p className="portfolio-hero-subtitle">
@@ -132,41 +176,18 @@ export default function ITPortfolio() {
                             Discuss Your Project
                         </button>
                     </div>
-                    
-                    <div className="portfolio-stats">
-                        <div className="portfolio-stat reveal-up delay-100">
-                            <h3>3</h3>
-                            <p>Projects Delivered</p>
-                        </div>
-                        <div className="portfolio-stat reveal-up delay-200">
-                            <h3>1</h3>
-                            <p>SaaS Solutions</p>
-                        </div>
-                        <div className="portfolio-stat reveal-up delay-300">
-                            <h3>100%</h3>
-                            <p>Client Satisfaction</p>
-                        </div>
-                    </div>
                 </div>
+                
+                {/* Gradient transition to next section */}
+                <div className="hero-bottom-transition"></div>
             </section>
 
-            {/* ── Node Features (Replaces Our Expertise) ──────────────── */}
-            <section id="services">
-                <NodeFeatures 
-                    badgeTitle="Expertise"
-                    title={<>End-to-End IT Services</>}
-                    subtitle="Comprehensive solutions tailored to accelerate your digital growth and streamline operations."
-                    features={services}
-                    centerNode={{
-                        title: "Namustutam",
-                        icon: <img src="/logo.png" alt="Namustutam Logo" style={{ width: '177px', height: '177px', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }} />
-                    }}
-                />
-            </section>
+            {/* ── Expertise Section (SDLC & Architecture) ──────────────── */}
+            <ExpertiseSection />
 
 
             {/* ── Portfolio Section ──────────────────────── */}
-            {/* ── Showcase of Brilliance (Dynamic Carousel) ──────────────────────── */}
+            {/* ── Showcase of Brilliance (Bento Grid) ──────────────────────── */}
             <section className="portfolio-showcase-section" id="portfolio">
                 <div className="portfolio-section-header reveal-up">
                     <div className="portfolio-section-label">Selected Works</div>
@@ -174,36 +195,26 @@ export default function ITPortfolio() {
                     <p className="portfolio-section-subtitle">Explore some of our recent flagship projects and enterprise solutions.</p>
                 </div>
 
-                <div className="portfolio-showcase-carousel">
-                    <div className="portfolio-showcase-row row-left">
-                        {[...projects, ...projects, ...projects].map((p, i) => (
-                            <div key={`left-${i}`} className="portfolio-showcase-card">
-                                <div className="portfolio-showcase-img-wrapper" style={{ background: p.color }}>
-                                    <img src={p.img} alt={p.title} className="portfolio-showcase-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
-                                    <div className="portfolio-showcase-overlay">
-                                        <span className="portfolio-showcase-category">{p.category}</span>
-                                        <h3 className="portfolio-showcase-card-title">{p.title}</h3>
+                <div className="portfolio-bento-grid">
+                    {projects.map((p, i) => (
+                        <div key={`project-${i}`} className={`portfolio-bento-card bento-card-${i} reveal-up`} style={{ transitionDelay: `${i * 100}ms` }}>
+                            <div className="portfolio-bento-img-wrapper">
+                                <img src={p.img} alt={p.title} className="portfolio-bento-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
+                                <div className="portfolio-bento-overlay">
+                                    <div className="portfolio-bento-content">
+                                        <span className="portfolio-bento-category">{p.category}</span>
+                                        <h3 className="portfolio-bento-card-title">{p.title}</h3>
+                                    </div>
+                                    <div className="portfolio-bento-arrow">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                    <div className="portfolio-showcase-row row-right">
-                        {[...projects, ...projects, ...projects].reverse().map((p, i) => (
-                            <div key={`right-${i}`} className="portfolio-showcase-card">
-                                <div className="portfolio-showcase-img-wrapper" style={{ background: p.color }}>
-                                    <img src={p.img} alt={p.title} className="portfolio-showcase-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
-                                    <div className="portfolio-showcase-overlay">
-                                        <span className="portfolio-showcase-category">{p.category}</span>
-                                        <h3 className="portfolio-showcase-card-title">{p.title}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
 
-                <div className="portfolio-btn-wrapper" style={{ marginTop: '60px' }}>
+                <div className="portfolio-btn-wrapper" style={{ marginTop: '40px' }}>
                     <button className="portfolio-btn-outline" onClick={() => navigate('/retail-saas-platform')}>
                         Explore Retail SaaS Demo →
                     </button>
@@ -220,14 +231,14 @@ export default function ITPortfolio() {
                     <div className="portfolio-about-visuals-formal reveal-left">
                         <div className="about-formal-accent"></div>
                         <div className="about-formal-img-main">
-                            <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=800" alt="Technology Consulting Session" />
+                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800" alt="Technology Consulting Session" />
                             <div className="about-formal-experience">
                                 <h3>10+</h3>
                                 <p>Years of Excellence<br/>in IT Solutions</p>
                             </div>
                         </div>
                         <div className="about-formal-img-secondary">
-                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600" alt="Data Analytics Dashboard" />
+                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600" alt="Data Analytics Dashboard" />
                         </div>
                     </div>
 
