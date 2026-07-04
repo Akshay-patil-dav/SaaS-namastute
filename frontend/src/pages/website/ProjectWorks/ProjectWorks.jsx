@@ -1,4 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Eye, Info, X, ChevronLeft, ChevronRight, ShoppingCart, Briefcase, Cloud, Layers } from 'lucide-react';
+import { FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs } from 'react-icons/fa';
+import { SiMongodb, SiTypescript, SiExpress, SiPostgresql } from 'react-icons/si';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
 import '../ITPortfolio/ITPortfolio.css';
@@ -10,44 +13,76 @@ export default function ProjectWorks() {
         document.title = "Namustutam | Project Works";
     }, []);
 
-    const projects = [
+    const [activeFilter, setActiveFilter] = useState('All Projects');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedProject, setSelectedProject] = useState(null);
+
+    const filters = [
+        { name: 'All Projects', icon: <Layers size={18} /> },
+        { name: 'E-Commerce', icon: <ShoppingCart size={18} /> },
+        { name: 'Business Page', icon: <Briefcase size={18} /> },
+        { name: 'SaaS Project', icon: <Cloud size={18} /> }
+    ];
+
+    const projectsData = [
         {
-            title: 'Retail POS Platform',
-            category: 'SaaS Application',
+            title: 'E-Commerce Dashboard',
+            category: 'Live',
+            filter: 'E-Commerce',
             img: '/dashboard1.png', 
-            color: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'
+            techStack: [
+                { name: 'React', icon: <FaReact />, color: '#8b5cf6' },
+                { name: 'Node.js', icon: <FaNodeJs />, color: '#10b981' },
+                { name: 'MongoDB', icon: <SiMongodb />, color: '#10b981' },
+                { name: 'TypeScript', icon: <SiTypescript />, color: '#3b82f6' }
+            ],
+            description: 'A comprehensive e-commerce dashboard with real-time analytics, inventory management, and order tracking capabilities.',
+            liveLink: '#',
+            githubLink: '#'
         },
         {
-            title: 'CA Firm Management System',
-            category: 'Enterprise Dashboard',
-            img: '/dashboard2.png',
-            color: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)'
-        },
-        {
-            title: 'Consultez Corporate Theme',
-            category: 'Web Development',
+            title: 'Portfolio Website',
+            category: 'In Progress',
+            filter: 'Business Page',
             img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
-            color: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+            techStack: [
+                { name: 'HTML', icon: <FaHtml5 />, color: '#3b82f6' },
+                { name: 'CSS', icon: <FaCss3Alt />, color: '#f43f5e' },
+                { name: 'JavaScript', icon: <FaJs />, color: '#f59e0b' }
+            ],
+            description: 'A stunning personal portfolio showcasing creative work with smooth animations and responsive design.',
+            liveLink: '#',
+            githubLink: '#'
         },
         {
-            title: 'Mobile Banking App',
-            category: 'Fintech Solution',
+            title: 'REST API Service',
+            category: 'Live',
+            filter: 'SaaS Project',
             img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800',
-            color: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)'
-        },
-        {
-            title: 'AI Chatbot Integration',
-            category: 'Machine Learning',
-            img: 'https://images.unsplash.com/photo-1531746790731-6c087fecd05a?auto=format&fit=crop&q=80&w=800',
-            color: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)'
-        },
-        {
-            title: 'E-commerce Fashion Store',
-            category: 'Online Retail',
-            img: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800',
-            color: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)'
+            techStack: [
+                { name: 'Node.js', icon: <FaNodeJs />, color: '#10b981' },
+                { name: 'Express', icon: <SiExpress />, color: '#6b7280' },
+                { name: 'PostgreSQL', icon: <SiPostgresql />, color: '#8b5cf6' }
+            ],
+            description: 'A scalable RESTful API with authentication, rate limiting, and comprehensive documentation.',
+            liveLink: '#',
+            githubLink: '#'
         }
     ];
+
+    const filteredProjects = activeFilter === 'All Projects' 
+        ? projectsData 
+        : projectsData.filter(p => p.filter === activeFilter);
+
+    const ITEMS_PER_PAGE = 3;
+    const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
+    const displayedProjects = filteredProjects.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE, 
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    // Generate array of page numbers
+    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
     return (
         <div className="lp-root project-works-root">
@@ -65,26 +100,116 @@ export default function ProjectWorks() {
                 </div>
             </section>
 
-            <main className="project-works-main" style={{ padding: '0 5% 80px' }}>
-                <div className="portfolio-bento-grid">
-                    {projects.map((p, i) => (
-                        <div key={`pw-project-${i}`} className={`portfolio-bento-card bento-card-${i}`}>
-                            <div className="portfolio-bento-img-wrapper">
-                                <img src={p.img} alt={p.title} className="portfolio-bento-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
-                                <div className="portfolio-bento-overlay">
-                                    <div className="portfolio-bento-content">
-                                        <span className="portfolio-bento-category">{p.category}</span>
-                                        <h3 className="portfolio-bento-card-title">{p.title}</h3>
-                                    </div>
-                                    <div className="portfolio-bento-arrow">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                    </div>
+            <main className="project-works-main" style={{ padding: '0 5% 80px', maxWidth: '1400px', margin: '0 auto' }}>
+                {/* Filter Section */}
+                <div className="project-filters">
+                    {filters.map(filter => (
+                        <button 
+                            key={filter.name} 
+                            className={`filter-btn ${activeFilter === filter.name ? 'active' : ''}`}
+                            onClick={() => { setActiveFilter(filter.name); setCurrentPage(1); }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                        >
+                            {filter.icon} <span>{filter.name}</span>
+                        </button>
+                    ))}
+                </div>
+
+                {/* Projects Grid */}
+                <div className="projects-grid">
+                    {displayedProjects.map((project, i) => (
+                        <div key={`project-${i}`} className="project-card">
+                            <div className="project-img-wrapper">
+                                <span className="project-category-badge">{project.category}</span>
+                                <img src={project.img} alt={project.title} className="project-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
+                            </div>
+                            <div className="project-content">
+                                <h3 className="project-title">{project.title}</h3>
+                                <p className="project-description">{project.description}</p>
+                                <div className="project-actions">
+                                    <a href={project.liveLink} className="action-btn live-btn">
+                                        <Eye size={16} /> Live Demo
+                                    </a>
+                                    <button onClick={() => setSelectedProject(project)} className="action-btn info-btn">
+                                        <Info size={16} /> More Info
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="project-pagination">
+                        <button 
+                            className="pagination-btn prev-next" 
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        >
+                            <ChevronLeft size={16} /> Previous
+                        </button>
+                        {pageNumbers.map(page => (
+                            <button 
+                                key={page} 
+                                className={`pagination-btn page-num ${currentPage === page ? 'active' : ''}`}
+                                onClick={() => setCurrentPage(page)}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                        <button 
+                            className="pagination-btn prev-next"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        >
+                            Next <ChevronRight size={16} />
+                        </button>
+                    </div>
+                )}
             </main>
+
+            {/* Project Details Modal */}
+            {selectedProject && (
+                <div className="project-modal-overlay" onClick={() => setSelectedProject(null)}>
+                    <div className="project-modal-content" onClick={e => e.stopPropagation()}>
+                        <button className="project-modal-close" onClick={() => setSelectedProject(null)}>
+                            <X size={24} />
+                        </button>
+                        <div className="project-modal-body">
+                            <div className="project-modal-img-wrapper">
+                                <img src={selectedProject.img} alt={selectedProject.title} className="project-modal-img" />
+                            </div>
+                            <div className="project-modal-details">
+                                <span className="project-modal-badge" style={{ display: 'inline-block', background: 'rgba(255, 155, 41, 0.15)', color: '#ff9b29', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '16px' }}>
+                                    {selectedProject.category}
+                                </span>
+                                <h2 className="project-modal-title" style={{ fontSize: '2rem', fontWeight: '800', color: '#1e293b', marginBottom: '20px' }}>
+                                    {selectedProject.title}
+                                </h2>
+                                <p className="project-modal-desc" style={{ color: '#475569', fontSize: '1.05rem', lineHeight: '1.7', marginBottom: '30px' }}>
+                                    {selectedProject.description}
+                                </p>
+                                
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#1e293b', marginBottom: '12px' }}>Technologies Used</h4>
+                                <div className="project-tech-stack" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '30px' }}>
+                                    {selectedProject.techStack.map(tech => (
+                                        <span key={tech.name} className="tech-badge" style={{ color: tech.color, backgroundColor: `${tech.color}15`, display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600' }}>
+                                            {tech.icon} {tech.name}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                <div className="project-modal-actions" style={{ display: 'flex', gap: '16px', marginTop: 'auto' }}>
+                                    <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="action-btn live-btn" style={{ flex: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '14px', borderRadius: '10px', fontSize: '1rem', fontWeight: '600' }}>
+                                        <Eye size={20} /> Live Project View
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <WebsiteFooter />
         </div>
