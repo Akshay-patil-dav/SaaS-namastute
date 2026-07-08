@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Code2, Smartphone, Server, Database, Cloud, ShieldCheck, MonitorPlay, Component } from 'lucide-react';
 import '../BlogDetail/LandingPage.css';
 import './ITPortfolio.css';
+import '../ProjectWorks/ProjectWorks.css';
+import { projectsData } from '../../../data/projectsData';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
 import ExpertiseSection from '../../../components/common/ExpertiseSection/ExpertiseSection';
@@ -63,45 +65,18 @@ export default function ITPortfolio() {
         { icon: '🛠️', title: 'Dedicated Support', desc: '24/7 technical assistance and post-launch maintenance to keep you running smoothly.' }
     ];
 
-    const projects = [
-        {
-            title: 'Retail POS Platform',
-            category: 'SaaS Application',
-            img: '/dashboard1.png', 
-            color: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'
-        },
-        {
-            title: 'CA Firm Management System',
-            category: 'Enterprise Dashboard',
-            img: '/dashboard2.png',
-            color: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)'
-        },
-        {
-            title: 'Consultez Corporate Theme',
-            category: 'Web Development',
-            img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
-            color: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-        },
-        {
-            title: 'Mobile Banking App',
-            category: 'Fintech Solution',
-            img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800',
-            color: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)'
-        },
-        {
-            title: 'AI Chatbot Integration',
-            category: 'Machine Learning',
-            img: 'https://images.unsplash.com/photo-1531746790731-6c087fecd05a?auto=format&fit=crop&q=80&w=800',
-            color: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)'
-        },
-        {
-            title: 'E-commerce Fashion Store',
-            category: 'Online Retail',
-            img: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800',
-            color: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)'
-        }
-    ];
+    // Using real data from projectsData for the showcase
+    const projects = projectsData.slice(0, 6);
 
+    // Hardcoded images for floating background (using a mix of real data and old placeholders)
+    const floatingImages = [
+        projects[0]?.img || '/dashboard1.png',
+        projects[1]?.img || '/dashboard2.png',
+        projects[2]?.img || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
+        projects[3]?.img || 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800',
+        projects[4]?.img || 'https://images.unsplash.com/photo-1531746790731-6c087fecd05a?auto=format&fit=crop&q=80&w=800',
+        projects[5]?.img || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800'
+    ];
 
     return (
         <div className="portfolio-root">
@@ -112,18 +87,18 @@ export default function ITPortfolio() {
                 {/* Floating Background Cards */}
                 <div className="hero-floating-background">
                     {/* Floating Project Images */}
-                    {projects.map((p, index) => (
+                    {floatingImages.map((imgUrl, index) => (
                         <div 
                             key={`img-${index}`} 
                             className={`floating-project-card floating-card-${index + 1}`}
-                            style={{ backgroundImage: `url(${p.img})` }}
+                            style={{ backgroundImage: `url(${imgUrl})` }}
                         ></div>
                     ))}
-                    {projects.map((p, index) => (
+                    {floatingImages.map((imgUrl, index) => (
                         <div 
                             key={`dup-${index}`} 
                             className={`floating-project-card floating-card-dup-${index + 1}`}
-                            style={{ backgroundImage: `url(${p.img})` }}
+                            style={{ backgroundImage: `url(${imgUrl})` }}
                         ></div>
                     ))}
 
@@ -197,16 +172,27 @@ export default function ITPortfolio() {
 
                 <div className="portfolio-bento-grid">
                     {projects.map((p, i) => (
-                        <div key={`project-${i}`} className={`portfolio-bento-card bento-card-${i} reveal-up`} style={{ transitionDelay: `${i * 100}ms` }}>
-                            <div className="portfolio-bento-img-wrapper">
-                                <img src={p.img} alt={p.title} className="portfolio-bento-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
-                                <div className="portfolio-bento-overlay">
-                                    <div className="portfolio-bento-content">
-                                        <span className="portfolio-bento-category">{p.category}</span>
-                                        <h3 className="portfolio-bento-card-title">{p.title}</h3>
+                        <div 
+                            key={`project-${i}`} 
+                            className={`portfolio-bento-card project-card bento-card-${i} reveal-up`} 
+                            style={{ transitionDelay: `${i * 100}ms`, padding: '12px' }}
+                            onClick={() => navigate('/project-info/' + p.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''))}
+                        >
+                            <div className="project-img-wrapper" style={{ height: 'calc(100% - 75px)' }}>
+                                <span className="project-category-badge">+ {p.category}</span>
+                                <img src={p.img} alt={p.title} className="project-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
+                                <div className="project-hover-overlay">
+                                    <span className="glass-action-btn">View Details</span>
+                                </div>
+                            </div>
+                            <div className="project-footer">
+                                <div className="project-footer-left">
+                                    <div className="project-author-icon">
+                                        {p.title.charAt(0)}
                                     </div>
-                                    <div className="portfolio-bento-arrow">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                    <div className="project-footer-text">
+                                        <h3 className="project-title">{p.title}</h3>
+                                        <p className="project-author">{p.author}</p>
                                     </div>
                                 </div>
                             </div>
@@ -215,8 +201,8 @@ export default function ITPortfolio() {
                 </div>
 
                 <div className="portfolio-btn-wrapper" style={{ marginTop: '40px' }}>
-                    <button className="portfolio-btn-outline" onClick={() => navigate('/retail-saas-platform')}>
-                        Explore Retail SaaS Demo →
+                    <button className="portfolio-btn-outline" onClick={() => navigate('/project-works')}>
+                        See more project work →
                     </button>
                 </div>
             </section>

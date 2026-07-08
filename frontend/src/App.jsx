@@ -15,6 +15,7 @@ const ITPortfolio        = lazy(() => import('./pages/website/ITPortfolio/ITPort
 const AkshayPatil        = lazy(() => import('./pages/website/AkshayPatil/AkshayPatil.jsx'));
 const BlogPage           = lazy(() => import('./pages/website/BlogPage/BlogPage.jsx'));
 const BlogDetail         = lazy(() => import('./pages/website/BlogDetail/BlogDetail.jsx'));
+const ProjectInfo        = lazy(() => import('./pages/website/ProjectInfo/ProjectInfo.jsx'));
 const Unauthorized       = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
 const Dashboard          = lazy(() => import('./pages/dashboard/Dashboard/Dashboard.jsx'));
 const Dashboard2         = lazy(() => import('./pages/dashboard/Dashboard2/Dashboard2.jsx'));
@@ -125,6 +126,7 @@ function AppRoutes() {
                 <Route path="/blog"       element={<BlogPage />} />
                 <Route path="/blog/:slug" element={<BlogDetail />} />
                 <Route path="/project-works" element={<ProjectWorks />} />
+                <Route path="/project-info/:slug" element={<ProjectInfo />} />
                 <Route path="/contact"    element={<ContactUs />} />
                 <Route path="/services/web-development" element={<WebDevelopment />} />
                 <Route path="/services/ai-automation" element={<AIAutomation />} />
