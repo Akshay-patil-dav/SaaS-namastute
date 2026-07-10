@@ -27,6 +27,7 @@ const SuperPackages      = lazy(() => import('./pages/superadmin/SuperPackages/S
 const ManageStock        = lazy(() => import('./pages/inventory/ManageStock/ManageStock.jsx'));
 const StockAdjustment    = lazy(() => import('./pages/inventory/StockAdjustment/StockAdjustment.jsx'));
 const StockTransfer      = lazy(() => import('./pages/inventory/StockTransfer/StockTransfer.jsx'));
+const Orders             = lazy(() => import('./pages/sales/Orders/Orders.jsx'));
 const OnlineOrders       = lazy(() => import('./pages/sales/OnlineOrders/OnlineOrders.jsx'));
 const PosOrders          = lazy(() => import('./pages/sales/PosOrders/PosOrders.jsx'));
 const POS                = lazy(() => import('./pages/sales/POS/POS.jsx'));
@@ -159,6 +160,10 @@ function AppRoutes() {
                 <Route
                     path="/dashboard/stock-transfer"
                     element={<PosPage roles={ADMIN_ROLES}><StockTransfer /></PosPage>}
+                />
+                <Route
+                    path="/dashboard/orders"
+                    element={<PosPage roles={ADMIN_ROLES}><Orders /></PosPage>}
                 />
                 <Route
                     path="/dashboard/sales-online"

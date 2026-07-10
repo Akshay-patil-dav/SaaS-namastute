@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { CalendarRange, Building2, Users, CreditCard, ChevronDown, CheckSquare, Settings } from 'lucide-react';
 import './super-dashboard.css';
 

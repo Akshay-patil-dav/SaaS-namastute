@@ -39,7 +39,8 @@ import {
     DollarSign,
     Users,
     Sparkles,
-    Palette
+    Palette,
+    ShoppingCart
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -300,6 +301,20 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                          </div>
                                      </NavLink>
                                  </li> */}
+                            </ul>
+
+                            {/* Orders Section */}
+                            <div className="pos-menu-divider"></div>
+                            <div className="pos-menu-section">Orders</div>
+                            <ul className="pos-menu-list pb-4">
+                                <li className="pos-menu-item">
+                                    <NavLink to="/dashboard/orders" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <ShoppingCart className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Orders</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
                             </ul>
 
                             {/* Purchases Section */}
