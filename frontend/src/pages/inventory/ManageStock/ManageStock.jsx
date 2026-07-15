@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Search, 
     FileText, 
@@ -31,7 +31,7 @@ export default function ManageStock() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedStock, setSelectedStock] = useState(null);
     const [stocks, setStocks] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [_loading, setLoading] = useState(true);
 
     const fetchStocks = async () => {
         setLoading(true);

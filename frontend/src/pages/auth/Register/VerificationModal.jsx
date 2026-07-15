@@ -23,7 +23,7 @@ export default function VerificationModal({ onComplete }) {
             
             if (type === 'EMAIL') setEmailSent(true);
             if (type === 'PHONE') setPhoneSent(true);
-        } catch (err) {
+        } catch (_err) {
             setError(`Failed to send ${type} OTP`);
         }
     };
@@ -37,7 +37,7 @@ export default function VerificationModal({ onComplete }) {
                 otp: otp
             });
             return true;
-        } catch (err) {
+        } catch (_err) {
             setError(`Invalid ${type} OTP`);
             return false;
         }

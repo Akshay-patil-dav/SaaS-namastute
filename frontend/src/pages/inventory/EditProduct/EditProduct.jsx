@@ -203,7 +203,7 @@ const EditProduct = () => {
                 }
 
                 setLoading(false);
-            } catch (err) {
+            } catch (_err) {
                 showToast('error', 'Failed to load product data.');
                 setLoading(false);
             }

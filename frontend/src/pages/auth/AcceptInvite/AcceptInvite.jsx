@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiClient, { API, ENV } from '@/api/config';
 import { useAuth } from '../../../context/AuthContext';
@@ -7,7 +7,7 @@ import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 export default function AcceptInvite() {
     const { token } = useParams();
     const navigate = useNavigate();
-    const { user, token: authToken } = useAuth();
+    const { user: _user, token: authToken } = useAuth();
     const [status, setStatus] = useState('processing'); // processing, success, error
     const [message, setMessage] = useState('Securing your workspace access...');
 

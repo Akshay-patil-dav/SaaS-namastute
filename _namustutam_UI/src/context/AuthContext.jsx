@@ -1,0 +1,158 @@
+import { createContext, useContext, useState, useEffect } from 'react';
+import apiClient, { API } from '../api/config';
+
+
+const AuthContext = createContext(null);
+
+// AUTH_API is read from frontend/.env → VITE_API_BASE_URL (via api/config.js)
+const AUTH_API = API.AUTH;
+const STORAGE_KEY = 'namustutam_auth';
+
+/**
+ * Decode the primary role from the roles array returned by the backend.
+ * Backend roles: ["SUPER_ADMIN"] | ["ADMIN"] | ["CLIENT"] | ["OTHER"] | ...
+ * Frontend ProtectedRoute expects: 'SUPER_ADMIN' | 'ADMIN' | 'CLIENT'
+ */
+function pickRole(roles = []) {
+    const priority = ['SUPER_ADMIN', 'ADMIN', 'CLIENT', 'OTHER'];
+    for (const r of priority) {
+        if (roles.includes(r)) return r;
+    }
+    return roles[0] ?? 'OTHER';
+}
+
+export const AuthProvider = ({ children }) => {
+    const [user, setUser]       = useState(null);
+    const [token, setToken]     = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // ── Restore session from localStorage on mount ──────────────────────────
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                setUser(parsed.user);
+                setToken(parsed.token);
+
+                // Token is picked up automatically by apiClient's request interceptor
+                // (reads from localStorage on every request — no manual header needed)
+            }
+        } catch {
+            localStorage.removeItem(STORAGE_KEY);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    /**
+     * _persist(token, email, roles)
+     * Save to state + localStorage + axios headers.
+     */
+    const _persist = (jwtToken, email, roles, fullName, plan, emailVerified, phoneVerified) => {
+        const role = pickRole(roles);
+        const userData = { email, name: fullName ?? email, role, roles, plan, emailVerified, phoneVerified };
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: jwtToken, user: userData }));
+        // No need to set axios.defaults — apiClient interceptor reads from localStorage on every request
+        setToken(jwtToken);
+        setUser(userData);
+
+        return { user: userData, role };
+    };
+
+    /**
+     * login({ email, password })
+     * Returns { success, role } on success, { success: false, error } on failure.
+     */
+    const login = async ({ email, password }) => {
+        try {
+            const res = await apiClient.post(`${AUTH_API}/login`, { email, password });
+            const { token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified);
+            return { success: true, role };
+        } catch (err) {
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data ||
+                'Invalid email or password.';
+            return { success: false, error: typeof msg === 'string' ? msg : 'Login failed. Please try again.' };
+        }
+    };
+
+    /**
+     * register({ fullName, email, password })
+     * Auto-logs in after registration. Returns { success, role } or { success: false, error }.
+     */
+    const register = async ({ fullName, email, password, phoneNumber }) => {
+        try {
+            const res = await apiClient.post(`${AUTH_API}/register`, { fullName, email, password, phoneNumber });
+            const { token: jwt, email: userEmail, roles, fullName: returnedFullName, plan, emailVerified, phoneVerified } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, returnedFullName, plan, emailVerified, phoneVerified);
+            return { success: true, role };
+        } catch (err) {
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data ||
+                'Registration failed. Please try again.';
+            return { success: false, error: typeof msg === 'string' ? msg : 'Registration failed.' };
+        }
+    };
+
+    const logout = () => {
+        localStorage.removeItem(STORAGE_KEY);
+        setToken(null);
+        setUser(null);
+    };
+
+    const updatePlanContext = (newPlan) => {
+        if (user) {
+            const updatedUser = { ...user, plan: newPlan };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, user: updatedUser }));
+            setUser(updatedUser);
+        }
+    };
+    
+    const setVerifiedContext = (emailVerified, phoneVerified) => {
+        if (user) {
+            const updatedUser = { ...user, emailVerified, phoneVerified };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, user: updatedUser }));
+            setUser(updatedUser);
+        }
+    };
+
+    // ── Role helpers ─────────────────────────────────────────────────────────
+    const isSuperAdmin   = () => user?.role === 'SUPER_ADMIN';
+    const isAdmin        = () => user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+    const isClient       = () => user?.role === 'CLIENT';
+    const isAuthenticated = () => user !== null;
+
+    const hasRole = (allowedRoles = []) => {
+        if (!user) return false;
+        return allowedRoles.includes(user.role);
+    };
+
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                token,
+                loading,
+                login,
+                register,
+                logout,
+                isSuperAdmin,
+                isAdmin,
+                isClient,
+                isAuthenticated,
+                hasRole,
+                updatePlanContext,
+                setVerifiedContext,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
+};
+
+export const useAuth = () => useContext(AuthContext);

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../Brands/Products.css';
 import '../Brands/inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
@@ -103,7 +103,7 @@ const ExpiredProducts = () => {
             showToast('success', `${selectedIds.length} products deleted successfully.`);
             setSelectedIds([]);
             fetchExpiredProducts();
-        } catch (err) {
+        } catch (_err) {
             showToast('error', 'Failed to delete products.');
         }
     };

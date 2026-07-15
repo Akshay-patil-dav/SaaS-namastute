@@ -15,7 +15,7 @@ export default function PlanSelectionModal({ onComplete }) {
             await apiClient.put('/api/users/current/plan', { plan });
             updatePlanContext(plan);
             onComplete();
-        } catch (err) {
+        } catch (_err) {
             setError(`Failed to select ${plan} plan`);
         } finally {
             setLoading(false);

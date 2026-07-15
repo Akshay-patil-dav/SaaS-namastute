@@ -1,0 +1,482 @@
+/* ═══════════════════════════════════════════════════════════
+   INVOICE MODAL — Self-contained styles (inv- prefix)
+═══════════════════════════════════════════════════════════ */
+
+/* ── Overlay ─────────────────────────────────────────────── */
+.inv-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 3000;
+    padding: 20px 16px;
+    overflow-y: auto;
+}
+
+/* ── Wrapper ─────────────────────────────────────────────── */
+.inv-wrapper {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 40px;
+}
+
+/* ── Top action bar ──────────────────────────────────────── */
+.inv-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.inv-topbar-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1b2850;
+}
+
+.inv-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inv-icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s;
+}
+
+.inv-icon-btn:hover { background: #f8fafc; transform: translateY(-1px); }
+.inv-icon-btn.pdf   { color: #ea5455; border-color: #fecaca; background: #fff1f1; }
+.inv-icon-btn.print { color: #3b82f6; border-color: #93c5fd; background: #eff6ff; }
+
+.inv-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #ff9f43 0%, #f7731c 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    box-shadow: 0 4px 12px rgba(255,159,67,0.35);
+}
+
+.inv-back-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,159,67,0.45); }
+
+/* ── Invoice document ────────────────────────────────────── */
+.inv-doc {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 36px 40px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 13px;
+    color: #374151;
+}
+
+/* ── Invoice head row (logo + invoice meta) ──────────────── */
+.inv-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.inv-logo-area {}
+
+.inv-logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 6px;
+}
+
+.inv-logo-icon {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #ff9f43 0%, #f7731c 100%);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.inv-company-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1b2850;
+    letter-spacing: -0.5px;
+}
+
+.inv-company-addr {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.inv-meta {
+    text-align: right;
+}
+
+.inv-meta-row {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 3px;
+}
+
+.inv-meta-row strong { color: #1b2850; font-weight: 700; }
+
+.inv-number {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ff9f43;
+    margin-bottom: 6px;
+}
+
+/* ── From / To / Payment row ─────────────────────────────── */
+.inv-parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr 160px;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.inv-party-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.inv-party-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1b2850;
+    margin-bottom: 5px;
+}
+
+.inv-party-detail {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.7;
+}
+
+.inv-party-detail a { color: #3b82f6; text-decoration: none; }
+
+.inv-pay-status-area {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.inv-pay-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.inv-pay-paid    { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+.inv-pay-unpaid  { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.inv-pay-overdue { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+
+.inv-qr {
+    width: 72px;
+    height: 72px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.inv-qr img { width: 100%; height: 100%; }
+
+/* ── Invoice for ─────────────────────────────────────────── */
+.inv-for {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+.inv-for strong { color: #1b2850; }
+
+/* ── Products table ──────────────────────────────────────── */
+.inv-table-wrap {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.inv-table thead th {
+    background: #f8fafc;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 11px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.inv-table thead th:last-child { text-align: right; }
+
+.inv-table tbody td {
+    padding: 11px 16px;
+    color: #4b5563;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.inv-table tbody td:last-child { text-align: right; font-weight: 600; color: #1b2850; }
+.inv-table tbody tr:last-child td { border-bottom: none; }
+.inv-table tbody tr:hover { background: #fafbfd; }
+
+.inv-prod-name { font-weight: 600; color: #1b2850; }
+
+/* ── Totals section ──────────────────────────────────────── */
+.inv-totals-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 28px;
+}
+
+.inv-totals-box {
+    width: 320px;
+}
+
+.inv-totals-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    font-size: 13px;
+    color: #64748b;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.inv-totals-line:last-child { border-bottom: none; }
+.inv-totals-line span:last-child { font-weight: 600; color: #1b2850; }
+
+.inv-totals-grand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #1b2850;
+    border-top: 2px solid #1b2850;
+    margin-top: 4px;
+}
+
+.inv-amount-words {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* ── Terms / Signature ───────────────────────────────────── */
+.inv-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    margin-bottom: 28px;
+    gap: 24px;
+}
+
+.inv-terms-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1b2850;
+    margin-bottom: 5px;
+}
+
+.inv-terms-text {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.6;
+    max-width: 380px;
+}
+
+.inv-notes-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1b2850;
+    margin-top: 14px;
+    margin-bottom: 5px;
+}
+
+.inv-sig-area {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.inv-sig-line {
+    width: 120px;
+    border-top: 1.5px solid #374151;
+    margin-bottom: 6px;
+    margin-left: auto;
+}
+
+.inv-sig-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1b2850;
+}
+
+.inv-sig-role {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* ── Invoice footer ──────────────────────────────────────── */
+.inv-footer-strip {
+    text-align: center;
+    padding: 20px 0 8px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.inv-footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-bottom: 8px;
+}
+
+.inv-footer-pay {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.inv-footer-pay a { color: #ff9f43; font-weight: 600; }
+
+.inv-footer-bank {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* ── Action buttons ──────────────────────────────────────── */
+.inv-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    padding-top: 20px;
+}
+
+.inv-btn-print {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #ff9f43 0%, #f7731c 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+    box-shadow: 0 4px 12px rgba(255,159,67,0.35);
+}
+
+.inv-btn-print:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,159,67,0.45); }
+
+.inv-btn-download {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 24px;
+    background: #1b2850;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+}
+
+.inv-btn-download:hover { background: #111c3d; transform: translateY(-1px); }
+
+/* ── Print styles ────────────────────────────────────────── */
+@media print {
+    .inv-overlay {
+        position: static;
+        background: none;
+        backdrop-filter: none;
+        padding: 0;
+    }
+
+    .inv-wrapper { max-width: 100%; padding: 0; gap: 0; }
+    .inv-topbar  { display: none; }
+    .inv-actions { display: none; }
+
+    .inv-doc {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 20px;
+        page-break-inside: avoid;
+    }
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .inv-doc { padding: 20px 16px; }
+    .inv-parties { grid-template-columns: 1fr 1fr; }
+    .inv-pay-status-area { align-items: flex-start; }
+    .inv-totals-box { width: 100%; }
+    .inv-bottom { flex-direction: column; align-items: flex-start; }
+    .inv-sig-area { align-self: flex-end; }
+}

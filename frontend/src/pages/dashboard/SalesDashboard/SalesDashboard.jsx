@@ -38,7 +38,7 @@ export default function SalesDashboard() {
     chartData: []
   });
   
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {

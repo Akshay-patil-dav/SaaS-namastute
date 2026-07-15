@@ -27,7 +27,7 @@ import { useConfirm } from '../../../context/ConfirmContext';
 const API_BASE = `${ENV.API_BASE_URL}/products`;
 
 // ── Fallback mock data (shown when DB is empty or API is offline) ──────────
-const mockData = [];
+const _mockData = [];
 
 // ── Colour mapping for category badges ────────────────────────────────────
 const categoryColors = {
@@ -217,7 +217,7 @@ const Products = () => {
             showToast('success', `${selectedIds.length} products deleted successfully.`);
             setSelectedIds([]);
             fetchProducts();
-        } catch (err) {
+        } catch (_err) {
             showToast('error', 'Failed to delete products.');
         }
     };

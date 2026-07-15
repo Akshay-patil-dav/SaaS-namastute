@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../inventory/Brands/inventory-pages-custom.css';
 
@@ -23,7 +23,7 @@ import DeleteConfirmModal from '../../../components/modals/common/DeleteConfirmM
 import ImportPurchaseModal from '../../../components/modals/purchases/ImportPurchaseModal/ImportPurchaseModal';
 import { useConfirm } from '../../../context/ConfirmContext';
 
-const mockPurchasesData = [
+const _mockPurchasesData = [
     { id: 1, supplier: 'Electro Mart', reference: 'PT001', date: '24 Dec 2024', status: 'Received', total: 1000, paid: 1000, due: 0, paymentStatus: 'Paid' },
     { id: 2, supplier: 'Quantum Gadgets', reference: 'PT002', date: '10 Dec 2024', status: 'Pending', total: 1500, paid: 0, due: 1500, paymentStatus: 'Unpaid' },
     { id: 3, supplier: 'Prime Bazaar', reference: 'PT003', date: '27 Nov 2024', status: 'Received', total: 1500, paid: 1800, due: 0, paymentStatus: 'Paid' },

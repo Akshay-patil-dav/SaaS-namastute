@@ -42,7 +42,7 @@ const EditPurchase = () => {
     
     // DB Products State
     const [dbProducts, setDbProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [_loading, setLoading] = useState(false);
 
     // Order totals
     const [orderTax, setOrderTax] = useState(0);

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useConfirm } from '../../../context/ConfirmContext';
 import {
     Search, FileText, Download, RotateCcw,
@@ -293,7 +293,7 @@ export default function OnlineOrders() {
                                         <td>{item.formattedDate || item.date || '—'}</td>
 
                                         <td>
-                                            <span className={`ss-status-badge ${item.status === 'Completed' ? 'ss-status-active' : item.status === 'Cancelled' ? 'ss-status-inactive' : 'ss-status-pending'}`}>
+                                            <span className={`ss-status-badge ${statusClass(item.status)}`}>
                                                 {item.status}
                                             </span>
                                         </td>

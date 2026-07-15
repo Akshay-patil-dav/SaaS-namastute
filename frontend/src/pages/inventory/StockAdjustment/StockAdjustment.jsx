@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useConfirm } from '../../../context/ConfirmContext';
 import { 
     Search, 
@@ -16,7 +16,7 @@ import {
 import './stock-adjustment.css';
 import '../Brands/inventory-pages-custom.css';
 
-const initialAdjustmentData = [
+const _initialAdjustmentData = [
     { id: 1, warehouse: 'Lavish Warehouse', store: 'Electro Mart', product: 'Lenovo IdeaPad 3', date: '24 Dec 2024', person: 'James Kirwin', qty: 100, productImg: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James' },
     { id: 2, warehouse: 'Quaint Warehouse', store: 'Quantum Gadgets', product: 'Beats Pro', date: '10 Dec 2024', person: 'Francis Chang', qty: 140, productImg: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Francis' },
     { id: 3, warehouse: 'Overflow Warehouse', store: 'Prime Bazaar', product: 'Nike Jordan', date: '25 Jul 2023', person: 'Antonio Engle', qty: 120, productImg: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Antonio' },
@@ -29,7 +29,7 @@ const initialAdjustmentData = [
     { id: 10, warehouse: 'Fulfillment Hub', store: 'Travel Mart', product: 'Borealis Backpack', date: '10 Sep 2024', person: 'Charlotte Klotz', qty: 550, productImg: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=50&h=50&fit=crop', personImg: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlotte' },
 ];
 
-import apiClient, { API, ENV } from '@/api/config';
+import apiClient, { ENV } from '@/api/config';
 import AddAdjustmentModal from '../../../components/modals/inventory/AddAdjustmentModal/AddAdjustmentModal';
 import ViewAdjustmentModal from '../../../components/modals/inventory/ViewAdjustmentModal/ViewAdjustmentModal';
 import DeleteConfirmModal from '../../../components/modals/common/DeleteConfirmModal/DeleteConfirmModal';

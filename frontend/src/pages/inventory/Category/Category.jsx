@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../Brands/inventory-pages-custom.css';
 import { 
@@ -92,7 +92,7 @@ const Category = () => {
             showToast('success', `${selectedIds.length} categories deleted successfully.`);
             setSelectedIds([]);
             fetchCategories();
-        } catch (err) {
+        } catch (_err) {
             showToast('error', 'Failed to delete categories.');
         }
     };

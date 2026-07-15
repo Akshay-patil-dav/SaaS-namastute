@@ -1,0 +1,204 @@
+.node-features-container {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.node-features-header {
+    margin-bottom: 60px;
+}
+
+.node-red-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #EF4444; /* red */
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.node-graph-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 80px; 
+    position: relative;
+}
+
+.node-col {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 40px; 
+    flex: 1;
+    max-width: 380px;
+}
+
+/* Card Styling */
+.node-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: left;
+    position: relative; 
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+    backdrop-filter: var(--glass-blur);
+    transition: transform 0.3s;
+    height: 100%;
+}
+.node-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.node-card-icon {
+    width: 48px;
+    height: 48px;
+    background: #1E293B; 
+    color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.node-card-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.node-card-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+/* CENTER BLOCK */
+.node-center-col {
+    position: relative;
+    z-index: 2;
+}
+
+.node-center-block {
+    background: linear-gradient(135deg, #ffb54b 0%, #DC2626 100%);
+    border-radius: 24px;
+    padding: 40px 30px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 20px 50px -10px rgba(239, 68, 68, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+}
+.node-center-block svg,
+.node-center-block img {
+    margin-bottom: 12px;
+    border-radius: 16px;
+}
+.node-center-text {
+    font-size: 24px;
+    font-weight: 800;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ─── LINES MAGIC ─── */
+.left-line {
+    position: absolute;
+    top: 50%;
+    left: 100%; 
+    width: 40px; 
+    border-color: var(--border-soft); 
+    border-style: solid;
+    border-width: 0;
+    z-index: 0;
+}
+.right-line {
+    position: absolute;
+    top: 50%;
+    right: 100%; 
+    width: 40px; 
+    border-color: var(--border-soft);
+    border-style: solid;
+    border-width: 0;
+    z-index: 0;
+}
+
+/* Card 0 (Top Left) */
+.left-card.top .left-line {
+    border-top-width: 2px;
+    border-right-width: 2px;
+    height: calc(100% + 40px); /* reaches exactly to middle card's center */
+    border-top-right-radius: 16px;
+}
+/* Card 1 (Mid Left) */
+.left-card.mid .left-line {
+    border-top-width: 2px;
+    width: 80px; /* reaches ALL the way to center block */
+}
+/* Card 2 (Bot Left) */
+.left-card.bot .left-line {
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+    height: calc(100% + 40px); 
+    top: auto;
+    bottom: 50%;
+    border-bottom-right-radius: 16px;
+}
+
+/* Card 0 (Top Right) */
+.right-card.top .right-line {
+    border-top-width: 2px;
+    border-left-width: 2px;
+    height: calc(100% + 40px); 
+    border-top-left-radius: 16px;
+}
+/* Card 1 (Mid Right) */
+.right-card.mid .right-line {
+    border-top-width: 2px;
+    width: 80px; 
+    left: -80px; 
+    right: auto;
+}
+/* Card 2 (Bot Right) */
+.right-card.bot .right-line {
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    height: calc(100% + 40px); 
+    top: auto;
+    bottom: 50%;
+    border-bottom-left-radius: 16px;
+}
+
+/* Junction Dots */
+.left-card.mid .left-line::after,
+.right-card.mid .right-line::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--border-soft);
+    border-radius: 50%;
+    top: -5px;
+}
+.left-card.mid .left-line::after { left: 40px; transform: translateX(-50%); } 
+.right-card.mid .right-line::after { right: 40px; transform: translateX(50%); }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .node-graph-wrapper {
+        flex-direction: column;
+        gap: 30px;
+    }
+    .node-line { display: none !important; } 
+    .node-center-col { order: -1; margin-bottom: 20px; }
+}

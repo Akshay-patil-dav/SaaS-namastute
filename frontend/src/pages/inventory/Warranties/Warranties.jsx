@@ -22,7 +22,7 @@ const Warranties = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
     const [data, setData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [_isLoading, setIsLoading] = useState(true);
     const { confirm } = useConfirm();
 
     // Modal State

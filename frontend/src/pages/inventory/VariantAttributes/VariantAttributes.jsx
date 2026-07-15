@@ -202,6 +202,7 @@ const VariantAttributes = () => {
                         )}
                     </tbody>
                 </table>
+                </div>
 
                 {/* Pagination Section */}
                 <div className="ss-pagination-row">

@@ -1,0 +1,30 @@
+import React from 'react';
+import { Trash2 } from 'lucide-react';
+import './delete-confirm-modal.css';
+
+const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, title, message, isDeleting }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="global-delete-overlay" onClick={onClose}>
+            <div className="global-delete-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="global-delete-icon-wrapper">
+                    <Trash2 size={32} />
+                </div>
+                <h4>{title || "Delete"}</h4>
+                <p>{message || "Are you sure you want to delete this item?"}</p>
+                <div className="global-delete-actions">
+                    <button className="btn-cancel-global" onClick={onClose} disabled={isDeleting}>
+                        Cancel
+                    </button>
+                    <button className="btn-confirm-global" onClick={onConfirm} disabled={isDeleting}>
+                        {isDeleting ? 'Deleting…' : 'Yes, Delete'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default DeleteConfirmModal;
+

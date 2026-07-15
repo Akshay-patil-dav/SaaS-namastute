@@ -16,7 +16,7 @@ import './Dashboard.css';
 
 // Dynamic Chart Data State will replace static salesPurchaseData
 
-const salesStatisticsData = [
+const _salesStatisticsData = [
     { name: 'Jan', revenue: 70, returns: -50 },
     { name: 'Feb', revenue: 50, returns: -30 },
     { name: 'Mar', revenue: 65, returns: -45 },
@@ -31,13 +31,13 @@ const salesStatisticsData = [
     { name: 'Dec', revenue: 60, returns: -20 },
 ];
 
-const customerOverviewData = [
+const _customerOverviewData = [
   { name: 'Loss Time', value: 5500, color: '#f97316' },
   { name: 'Return', value: 3500, color: '#0f172a' },
   { name: 'Active', value: 1000, color: '#20c997' }
 ];
 
-const categoryStatisticsData = [
+const _categoryStatisticsData = [
     { name: 'Electronics', value: 40, color: '#f97316' },
     { name: 'Fashion', value: 30, color: '#0f172a' },
     { name: 'Groceries', value: 20, color: '#20c997' },
@@ -58,7 +58,7 @@ export default function Dashboard() {
 
     // Sales summary (all time) — fetched from /api/sales/summary
     const [salesSummary, setSalesSummary] = useState(null);
-    const [loadingSales, setLoadingSales] = useState(true);
+    const [_loadingSales, setLoadingSales] = useState(true);
 
     useEffect(() => {
         let cancelled = false;
@@ -231,7 +231,7 @@ export default function Dashboard() {
 
     const overallIncome = Math.max(0, (salesSummary?.totalAmount ?? 0) - (returnSummary?.totalAmount ?? 0));
     const overallExpenses = Math.max(0, (purchaseSummary?.totalAmount ?? 0) - (purchaseReturnSummary?.totalAmount ?? 0));
-    const overallProfit = overallIncome - overallExpenses;
+    const _overallProfit = overallIncome - overallExpenses;
     const overallReturns = (returnSummary?.totalAmount ?? 0) + (purchaseReturnSummary?.totalAmount ?? 0);
 
     return (

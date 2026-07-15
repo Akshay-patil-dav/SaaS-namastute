@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useConfirm } from '../../../context/ConfirmContext';
 import { 
     Search, 
@@ -26,6 +26,7 @@ import EditTransferModal from '../../../components/modals/inventory/EditTransfer
 import DeleteConfirmModal from '../../../components/modals/common/DeleteConfirmModal/DeleteConfirmModal';
 
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
+const API_BASE = `${ENV.API_BASE_URL}/transfers`;
 
 const StockTransfer = () => {
     const { confirm } = useConfirm();
@@ -52,8 +53,6 @@ const StockTransfer = () => {
     // Edit/View state
     const [editModalData, setEditModalData] = useState(null);
     const [isViewMode, setIsViewMode] = useState(false);
-
-    const API_BASE = `${ENV.API_BASE_URL}/transfers`;
 
     const fetchTransfers = useCallback(async () => {
         setIsRefreshing(true);

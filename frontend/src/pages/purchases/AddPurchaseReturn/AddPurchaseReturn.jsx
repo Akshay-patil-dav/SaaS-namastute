@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../inventory/CreateProduct/CreateProduct.css'; // Reusing common form styles
 import '../AddPurchase/AddPurchase.css';    // Specific styles for Purchase table
 import { 
@@ -41,7 +41,7 @@ const AddPurchaseReturn = () => {
     
     // DB Products State
     const [dbProducts, setDbProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [_loading, setLoading] = useState(false);
 
     // Order totals
     const [orderTax, setOrderTax] = useState(0);
