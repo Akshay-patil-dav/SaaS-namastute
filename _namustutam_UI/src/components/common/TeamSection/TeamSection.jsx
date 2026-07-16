@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './TeamSection.css';
-import im1 from "../../../../dist/team/cp.png";
-import im2 from "../../../../dist/team/akshay.png";
-import im3   from "../../../../dist/team/wagh.png";
 
 const teamMembers = [
-    { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: im2 },
-    { name: 'Chinmay Patil', role: 'Business Developer', image: im1 },
-    { name: 'Amol Wagh', role: 'Developer', image: im3 }
+    { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: '/team/akshay.png' },
+    { name: 'Chinmay Patil', role: 'Business Developer', image: '/team/cp.png' },
+    { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' }
 ];
 
 import { Facebook, Twitter, Linkedin, Instagram, MoveLeft, MoveRight } from 'lucide-react';
