@@ -157,28 +157,7 @@ export default function ITPortfolio() {
                 <div className="hero-bottom-transition"></div>
             </section>
 
-            {/* ── Services Section (New) ──────────────── */}
-            <section className="portfolio-services-section" id="services">
-                <div className="portfolio-section-header reveal-up">
-                    <div className="portfolio-section-label">What We Do</div>
-                    <h2 className="portfolio-section-title">Comprehensive IT Services</h2>
-                    <p className="portfolio-section-subtitle">We offer end-to-end solutions, combining deep technical expertise with industry-leading design to drive your business forward.</p>
-                </div>
-                
-                <div className="portfolio-services-grid reveal-up delay-200">
-                    {services.map((service, index) => (
-                        <div className="portfolio-service-card" key={index} onClick={() => navigate(service.link)}>
-                            <div className="portfolio-service-icon">{service.icon}</div>
-                            <h3 className="portfolio-service-title">{service.title}</h3>
-                            <p className="portfolio-service-desc">{service.desc}</p>
-                            <div className="portfolio-service-link">
-                                <span>Learn more</span>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
+
 
             {/* ── Expertise Section (SDLC & Architecture) ──────────────── */}
             <ExpertiseSection />

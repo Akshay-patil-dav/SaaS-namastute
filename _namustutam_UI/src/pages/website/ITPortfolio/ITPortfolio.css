@@ -464,22 +464,84 @@
   z-index: 5;
 }
 
-.portfolio-services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+.portfolio-services-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 48px;
+  text-align: left;
+}
+
+.portfolio-services-header-text .portfolio-section-subtitle {
+  margin: 0;
+  max-width: 600px;
+}
+
+.portfolio-slider-controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.portfolio-slider-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.8));
+  border: 1px solid var(--primary-pale, #ffedd5);
+  color: var(--primary, #ff5f1f);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 8px 16px rgba(255, 95, 31, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.portfolio-slider-btn:hover {
+  background: var(--primary, #ff5f1f);
+  color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(255, 95, 31, 0.25);
+  border-color: var(--primary, #ff5f1f);
+}
+
+.portfolio-services-slider-container {
+  margin: 0 -20px;
+  padding: 0 20px;
+}
+
+.portfolio-services-slider {
+  display: flex;
   gap: 32px;
-  margin-top: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 40px;
+  scrollbar-width: none;
+}
+
+.portfolio-services-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.portfolio-service-card.slider-card {
+  min-width: 380px;
+  max-width: 380px;
+  scroll-snap-align: start;
+  flex-shrink: 0;
 }
 
 .portfolio-service-card {
-  background: var(--glass-bg, rgba(255, 255, 255, 0.7));
+  background: var(--glass-bg, rgba(255, 255, 255, 0.75));
   border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.05));
   border-radius: 24px;
   padding: 48px 40px;
   transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
   cursor: pointer;
   position: relative;
   overflow: hidden;
