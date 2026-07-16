@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './TeamSection.css';
 
 const teamMembers = [
-    { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: '/team/akshay.png' },
+    { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: '/team/Akshay.png' },
     { name: 'Chinmay Patil', role: 'Business Developer', image: '/team/cp.png' },
     { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' }
 ];
