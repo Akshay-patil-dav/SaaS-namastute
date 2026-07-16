@@ -20,6 +20,7 @@ const TeamCard = ({ member }) => (
                 <div className="team-info-label">
                     <h3 className="member-name">{member.name}</h3>
                     <div className="member-role">{member.role}</div>
+                     <div className="member-role-back">Freelancer</div>
                 </div>
             </div>
             <div className="team-card-back">
@@ -27,6 +28,7 @@ const TeamCard = ({ member }) => (
                 <div className="team-info-back">
                     <h3 className="member-name-back">{member.name}</h3>
                     <div className="member-role-back">{member.role}</div>
+                    <div className="member-role-back">Freelancer</div>
                     <p className="member-bio">Passionate professional dedicated to delivering excellence and driving innovation.</p>
                     <div className="social-links">
                         <a href="#" className="social-icon"><Facebook size={18} /></a>

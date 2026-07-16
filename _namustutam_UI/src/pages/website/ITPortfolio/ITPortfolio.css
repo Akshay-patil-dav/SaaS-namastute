@@ -1,4 +1,24 @@
 /* ── IT Portfolio Root Styles - Matched to Theme ── */
+:root {
+  --bg: #ffffff;
+  --bg2: #f8fafc;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-2: #334155;
+  --primary: #ff5f1f;
+  --primary-d: #e04a0e;
+  --primary-pale: #fff0e6;
+  --gradient: linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-blur: blur(20px);
+  --border-soft: #e2e8f0;
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(255, 95, 31, 0.1);
+  --shadow-xl: 0 25px 50px -12px rgba(255, 95, 31, 0.15);
+}
+
 .portfolio-root {
   background-color: var(--bg);
   color: var(--text);
@@ -435,55 +455,116 @@
   font-weight: 500;
 }
 
-/* ── Services Grid ── */
+/* ── Services Section ── */
+.portfolio-services-section {
+  padding: 120px 20px;
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+}
+
 .portfolio-services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 32px;
+  margin-top: 20px;
 }
 
 .portfolio-service-card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 40px 30px;
-  transition: all 0.3s ease;
-  backdrop-filter: var(--glass-blur);
-  box-shadow: var(--shadow-sm);
+  background: var(--glass-bg, rgba(255, 255, 255, 0.7));
+  border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.05));
+  border-radius: 24px;
+  padding: 48px 40px;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.portfolio-service-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 4px;
+  background: linear-gradient(90deg, #ff8c42, #ff5f1f);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
 }
 
 .portfolio-service-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(255,144,47,0.3);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-10px);
+  border-color: rgba(255, 140, 66, 0.3);
+  box-shadow: 0 25px 50px rgba(255, 140, 66, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
   background: white;
 }
 
+.portfolio-service-card:hover::before {
+  transform: scaleX(1);
+}
+
 .portfolio-service-icon {
-  font-size: 40px;
-  margin-bottom: 24px;
+  font-size: 36px;
+  margin-bottom: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 70px; height: 70px;
-  background: var(--primary-pale);
-  border-radius: 16px;
-  border: 1px solid rgba(255,144,47,0.15);
-  color: var(--primary);
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(255, 95, 31, 0.05));
+  border-radius: 20px;
+  border: 1px solid rgba(255, 140, 66, 0.2);
+  color: #ff5f1f;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.portfolio-service-card:hover .portfolio-service-icon {
+  transform: scale(1.1) rotate(5deg);
+  background: #fff0e6;
 }
 
 .portfolio-service-title {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   color: var(--text);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.5px;
 }
 
 .portfolio-service-desc {
-  color: var(--text-muted);
-  line-height: 1.6;
+  color: var(--text-muted, #64748b);
+  line-height: 1.7;
+  font-size: 16px;
+  margin-bottom: 32px;
+  flex-grow: 1;
+}
+
+.portfolio-service-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff5f1f;
+  font-weight: 700;
   font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.portfolio-service-link svg {
+  transition: transform 0.3s ease;
+}
+
+.portfolio-service-card:hover .portfolio-service-link {
+  color: #e04a0e;
+}
+
+.portfolio-service-card:hover .portfolio-service-link svg {
+  transform: translateX(6px);
 }
 
 /* ── Showcase of Brilliance Bento Grid ── */

@@ -57,12 +57,12 @@ export default function ITPortfolio() {
     };
 
     const services = [
-        { icon: '🌐', title: 'Web Development', desc: 'Custom WordPress & Shopify themes built for performance and scalability.' },
-        { icon: '💻', title: 'SaaS Applications', desc: 'End-to-end multi-tenant application development with React and Spring Boot.' },
-        { icon: '📱', title: 'UI/UX Design', desc: 'Premium, user-centric interfaces with responsive and modern aesthetics.' },
-        { icon: '🛍️', title: 'E-commerce Solutions', desc: 'High-converting online stores engineered for maximum sales and seamless checkout.' },
-        { icon: '🤖', title: 'AI Automation', desc: 'Integrate intelligent chatbots and automated workflows to streamline operations.' },
-        { icon: '🛠️', title: 'Dedicated Support', desc: '24/7 technical assistance and post-launch maintenance to keep you running smoothly.' }
+        { icon: '🌐', title: 'Web Development', desc: 'Custom WordPress & Shopify themes built for performance and scalability.', link: '/services/web-development' },
+        { icon: '💻', title: 'SaaS Applications', desc: 'End-to-end multi-tenant application development with React and Spring Boot.', link: '/services/saas-applications' },
+        { icon: '📱', title: 'UI/UX Design', desc: 'Premium, user-centric interfaces with responsive and modern aesthetics.', link: '/services/ui-ux-design' },
+        { icon: '🛍️', title: 'E-commerce Solutions', desc: 'High-converting online stores engineered for maximum sales and seamless checkout.', link: '/services/e-commerce-platform-development' },
+        { icon: '🤖', title: 'AI Automation', desc: 'Integrate intelligent chatbots and automated workflows to streamline operations.', link: '/services/ai-automation' },
+        { icon: '🛠️', title: 'Dedicated Support', desc: '24/7 technical assistance and post-launch maintenance to keep you running smoothly.', link: '/contact' }
     ];
 
     // Using real data from projectsData for the showcase
@@ -155,6 +155,29 @@ export default function ITPortfolio() {
                 
                 {/* Gradient transition to next section */}
                 <div className="hero-bottom-transition"></div>
+            </section>
+
+            {/* ── Services Section (New) ──────────────── */}
+            <section className="portfolio-services-section" id="services">
+                <div className="portfolio-section-header reveal-up">
+                    <div className="portfolio-section-label">What We Do</div>
+                    <h2 className="portfolio-section-title">Comprehensive IT Services</h2>
+                    <p className="portfolio-section-subtitle">We offer end-to-end solutions, combining deep technical expertise with industry-leading design to drive your business forward.</p>
+                </div>
+                
+                <div className="portfolio-services-grid reveal-up delay-200">
+                    {services.map((service, index) => (
+                        <div className="portfolio-service-card" key={index} onClick={() => navigate(service.link)}>
+                            <div className="portfolio-service-icon">{service.icon}</div>
+                            <h3 className="portfolio-service-title">{service.title}</h3>
+                            <p className="portfolio-service-desc">{service.desc}</p>
+                            <div className="portfolio-service-link">
+                                <span>Learn more</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </section>
 
             {/* ── Expertise Section (SDLC & Architecture) ──────────────── */}
