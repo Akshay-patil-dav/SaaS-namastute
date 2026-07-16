@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { projectsData } from '../../../data/projectsData';
-import { Eye, Info, X, ChevronLeft, ChevronRight, ShoppingCart, Briefcase, Cloud, Layers } from 'lucide-react';
+import { Eye, Info, X, ChevronLeft, ChevronRight, ShoppingCart, Briefcase, Cloud, Layers, ArrowRight } from 'lucide-react';
 import { FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs } from 'react-icons/fa';
 import { SiMongodb, SiTypescript, SiExpress, SiPostgresql } from 'react-icons/si';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
@@ -21,7 +21,7 @@ export default function ProjectWorks() {
         ? projectsData 
         : projectsData.filter(p => p.filter === activeFilter);
 
-    const ITEMS_PER_PAGE = 8;
+    const ITEMS_PER_PAGE = 9;
     const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
     const displayedProjects = filteredProjects.slice(
         (currentPage - 1) * ITEMS_PER_PAGE, 
@@ -39,57 +39,72 @@ export default function ProjectWorks() {
         <div className="lp-root project-works-root">
             <WebsiteNavbar />
             
-            <section className="project-works-hero">
-                <div className="project-works-hero-content">
-                    <div className="lp-section-label" style={{ margin: '0 auto' }}>Our Projects</div>
-                    <h1 className="project-works-hero-title">
-                        Selected <span className="portfolio-gradient-text">Project Works</span>
+            <section className="project-works-hero relative overflow-hidden">
+                <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    className="pw-hero-video-bg"
+                >
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-white-abstract-waves-loop-moving-in-the-background-22634-large.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+                <div className="pw-hero-overlay"></div>
+                
+                <div className="project-works-hero-content relative">
+                    <div className="lp-section-label animate-fade-in-up" style={{ margin: '0 auto', animationDelay: '0.1s' }}>Our Portfolio</div>
+                    <h1 className="project-works-hero-title animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        Crafting Digital <br/> <span className="portfolio-gradient-text">Masterpieces</span>
                     </h1>
-                    <p className="project-works-hero-sub">
-                        Explore our recent implementations, custom web solutions, and robust enterprise applications built by our talented engineers.
+                    <p className="project-works-hero-sub animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+                        Explore our selected works, innovative custom solutions, and enterprise applications engineered for success by our top-tier development team.
                     </p>
                 </div>
             </section>
 
-            <main className="project-works-main" style={{ padding: '0 2% 80px', width: '100%', margin: '0' }}>
-
+            <main className="project-works-main">
                 {/* Filters */}
-                <div className="project-filters-horizontal">
-                    {filterCategories.map(f => (
-                        <button 
-                            key={f}
-                            className={`filter-btn-glass ${activeFilter === f ? 'active' : ''}`}
-                            onClick={() => {
-                                setActiveFilter(f);
-                                setCurrentPage(1);
-                            }}
-                        >
-                            {f}
-                        </button>
-                    ))}
+                <div className="pw-filters-container animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                    <div className="project-filters-wrap">
+                        {filterCategories.map(f => (
+                            <button 
+                                key={f}
+                                className={`filter-btn-glass ${activeFilter === f ? 'active' : ''}`}
+                                onClick={() => {
+                                    setActiveFilter(f);
+                                    setCurrentPage(1);
+                                }}
+                            >
+                                {f}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Projects Grid */}
-                <div className="projects-grid">
+                <div className="pw-projects-grid">
                     {displayedProjects.map((project, i) => (
-                        <div key={`project-${i}`} className="project-card" onClick={() => navigate('/project-info/' + project.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''))}>
-                            <div className="project-img-wrapper">
-                                <span className="project-category-badge">+ {project.category}</span>
-                                <img src={project.img} alt={project.title} className="project-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
-                                <div className="project-hover-overlay">
-                                    <span className="glass-action-btn">View Details</span>
+                        <div key={`project-${i}`} className="pw-project-card animate-fade-in-up" style={{ animationDelay: `${0.2 + (i % 9) * 0.1}s` }} onClick={() => navigate('/project-info/' + project.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''))}>
+                            <div className="pw-project-img-wrapper">
+                                <span className="pw-project-category-badge">{project.category}</span>
+                                <img src={project.img} alt={project.title} className="pw-project-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
+                                <div className="pw-project-hover-overlay">
+                                    <span className="pw-glass-action-btn">
+                                        View Case Study <ArrowRight size={16} />
+                                    </span>
                                 </div>
                             </div>
-                            <div className="project-footer">
-                                <div className="project-footer-left">
-                                    <div className="project-author-icon">
-                                        {project.title.charAt(0)}
-                                    </div>
-                                    <div className="project-footer-text">
-                                        <h3 className="project-title">{project.title}</h3>
-                                        <p className="project-author">{project.author}</p>
+                            <div className="pw-project-info">
+                                <div className="pw-project-header">
+                                    <h3 className="pw-project-title">{project.title}</h3>
+                                    <div className="pw-project-tech">
+                                        <div className="tech-dot"></div>
+                                        <div className="tech-dot"></div>
+                                        <div className="tech-dot"></div>
                                     </div>
                                 </div>
+                                <p className="pw-project-desc">{project.author}</p>
                             </div>
                         </div>
                     ))}
@@ -97,32 +112,49 @@ export default function ProjectWorks() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="project-pagination">
-                        <button 
-                            className="pagination-btn prev-next" 
-                            disabled={currentPage === 1}
-                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                        >
-                            <ChevronLeft size={16} /> Previous
-                        </button>
-                        {pageNumbers.map(page => (
+                    <div className="pw-pagination-wrapper animate-fade-in-up">
+                        <div className="project-pagination">
                             <button 
-                                key={page} 
-                                className={`pagination-btn page-num ${currentPage === page ? 'active' : ''}`}
-                                onClick={() => setCurrentPage(page)}
+                                className="pagination-btn prev-next" 
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                             >
-                                {page}
+                                <ChevronLeft size={16} /> Prev
                             </button>
-                        ))}
-                        <button 
-                            className="pagination-btn prev-next"
-                            disabled={currentPage === totalPages}
-                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                        >
-                            Next <ChevronRight size={16} />
-                        </button>
+                            <div className="pw-page-numbers">
+                                {pageNumbers.map(page => (
+                                    <button 
+                                        key={page} 
+                                        className={`pagination-btn page-num ${currentPage === page ? 'active' : ''}`}
+                                        onClick={() => setCurrentPage(page)}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+                            </div>
+                            <button 
+                                className="pagination-btn prev-next"
+                                disabled={currentPage === totalPages}
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                            >
+                                Next <ChevronRight size={16} />
+                            </button>
+                        </div>
                     </div>
                 )}
+
+                {/* Call to Action Section */}
+                <section className="pw-cta-section animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                    <div className="pw-cta-card">
+                        <div className="pw-cta-content">
+                            <h2>Have a project in mind?</h2>
+                            <p>Let's turn your ideas into a digital reality. Our experts are ready to build your next big thing.</p>
+                        </div>
+                        <button className="pw-cta-btn" onClick={() => navigate('/contact')}>
+                            Start a Project <ArrowRight size={18} />
+                        </button>
+                    </div>
+                </section>
             </main>
 
             <WebsiteFooter />
