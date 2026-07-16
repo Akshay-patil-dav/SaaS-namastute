@@ -50,17 +50,6 @@ const WebsiteFooter = () => {
                             </div>
                         </div>
 
-                        <div className="premium-footer-col">
-                            <h4>PRODUCTS</h4>
-                            <ul>
-                                <li><Link to="/retail-saas-platform">Retail SaaS Platform</Link></li>
-                                <li><Link to="/services/web-development">Web Development</Link></li>
-                                <li><Link to="/services/ai-automation">AI Automation</Link></li>
-                                <li><Link to="/services/e-commerce-platform-development">E-Commerce</Link></li>
-                                <li><Link to="/blog">Our Templates</Link></li>
-                                <li><a href="#pricing">Pricing & Plans</a></li>
-                            </ul>
-                        </div>
 
                         <div className="premium-footer-col">
                             <h4>COMPANY</h4>

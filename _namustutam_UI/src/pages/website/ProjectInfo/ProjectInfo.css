@@ -7,9 +7,8 @@
 .project-info-root {
     background-color: #f8fafc;
     background-image: 
-        radial-gradient(at 0% 0%, hsla(253,16%,7%,0.02) 0, transparent 50%), 
-        radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
-        radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(255, 155, 41, 0.05) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, rgba(255, 120, 0, 0.05) 0, transparent 50%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -108,25 +107,27 @@
 
 .btn-outline {
     background: transparent;
-    border: 1px solid #cbd5e1;
-    color: #334155;
+    border: 1.5px solid #ff9b29;
+    color: #ff9b29;
 }
 
 .btn-outline:hover {
-    background: #f8fafc;
-    border-color: #94a3b8;
+    background: rgba(255, 155, 41, 0.05);
+    border-color: #ff7800;
+    color: #ff7800;
 }
 
 .btn-solid {
-    background: #ff9b29;
-    border: 1px solid #ff9b29;
+    background: linear-gradient(135deg, #ff9b29 0%, #ff7800 100%);
+    border: none;
     color: #ffffff;
+    box-shadow: 0 4px 15px rgba(255, 155, 41, 0.3);
 }
 
 .btn-solid:hover {
-    background: #e07a16;
-    border-color: #e07a16;
-    box-shadow: 0 4px 12px rgba(255, 155, 41, 0.3);
+    background: linear-gradient(135deg, #ff7800 0%, #ff9b29 100%);
+    box-shadow: 0 8px 25px rgba(255, 155, 41, 0.4);
+    transform: translateY(-2px);
 }
 
 .project-info-hero-inner {
@@ -369,7 +370,7 @@
 }
 
 .check-icon {
-    color: #0f62fe;
+    color: #ff9b29;
     flex-shrink: 0;
 }
 
@@ -391,10 +392,10 @@
 }
 
 .share-icons a:hover {
-    background: #0f62fe;
+    background: #ff9b29;
     color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(15, 98, 254, 0.2);
+    box-shadow: 0 4px 12px rgba(255, 155, 41, 0.3);
 }
 
 /* Similar Templates Section */
@@ -430,7 +431,7 @@
 }
 
 .browse-all-link:hover {
-    color: #0f62fe;
+    color: #ff9b29;
 }
 
 .similar-templates-grid {

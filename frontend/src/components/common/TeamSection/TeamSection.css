@@ -67,9 +67,10 @@
 
 /* Static Grid */
 .team-static-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
 }
 
 /* Slider Marquee */
@@ -78,6 +79,9 @@
     width: 100%;
     padding: 40px 0;
     margin: -40px 0;
+}
+
+.team-slider-container.is-sliding {
     -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
     mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
@@ -109,7 +113,9 @@
     flex-shrink: 0;
 }
 .team-static-grid .team-flip-wrapper {
-    width: 100%;
+    width: calc(25% - 22.5px);
+    max-width: 280px;
+    min-width: 250px;
 }
 
 .team-card {
@@ -119,6 +125,7 @@
     perspective: 1500px;
     background: transparent;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
 }
 
 .team-card:hover {
@@ -325,18 +332,28 @@
 
 @media (max-width: 1200px) {
     .team-static-grid {
-        grid-template-columns: repeat(3, 1fr);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .team-static-grid .team-flip-wrapper {
+        width: calc(50% - 15px);
+        max-width: 350px;
     }
 }
 
 @media (max-width: 800px) {
-    .team-static-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .team-static-grid .team-flip-wrapper {
+        width: calc(50% - 15px);
     }
 }
 
 @media (max-width: 500px) {
     .team-static-grid {
-        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .team-static-grid .team-flip-wrapper {
+        width: 100%;
+        max-width: 100%;
     }
 }

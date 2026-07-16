@@ -4,17 +4,6 @@ import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, I
 import logo from '../../../assets/logo.svg';
 import '../../../pages/website/BlogDetail/LandingPage.css';
 
-const productsDropdown = {
-  columns: [
-    {
-      heading: 'Products',
-      items: [
-        { icon: <ShoppingCart size={20} />, title: 'Retail SaaS Platform', desc: 'Complete POS & Inventory Management System', color: '#ff902f', link: '/retail-saas-platform' },
-        { icon: <Image size={20} />, title: 'List of Products', desc: 'Browse products with banner images', color: '#2563EB', link: '#' },
-      ],
-    },
-  ],
-};
 
 const servicesDropdown = {
   columns: [
@@ -48,7 +37,6 @@ const servicesDropdown = {
 };
 
 const dropdownMap = {
-    products: productsDropdown,
     services: servicesDropdown,
 };
 
@@ -159,20 +147,6 @@ const WebsiteNavbar = () => {
                 <NavLogo />
 
                 <ul className="lp-nav-links">
-                    <li 
-                        className="lp-nav-dropdown-trigger"
-                        onMouseEnter={() => handleMouseEnter('products')}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        <button 
-                            ref={(el) => (linkRefs.current.products = el)}
-                            className={`lp-nav-btn ${activeDropdown === 'products' ? 'active' : ''}`}
-                            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-                        >
-                            <Package size={16} /> Product
-                            <svg className={`lp-nav-chevron ${activeDropdown === 'products' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
-                        </button>
-                    </li>
                     <li><Link to="/project-works" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'inherit', textDecoration: 'none' }}><Briefcase size={16} /> Project Works</Link></li>
                     <li 
                         className="lp-nav-dropdown-trigger"
@@ -256,7 +230,6 @@ const WebsiteNavbar = () => {
 
             <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`}>
                 <div className="lp-mobile-scroll">
-                    {renderMobileAccordion('products', 'Product')}
                     <Link to="/project-works" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text)', textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', fontWeight: 600, fontSize: 15 }}><Briefcase size={16} /> Project Works</Link>
                     {renderMobileAccordion('services', 'Services')}
                     {showCTA && (

@@ -1,15 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './TeamSection.css';
 
 const teamMembers = [
-    { name: 'Wade Warren', role: 'Medical Assistant', image: '/team/wade.png' },
-    { name: 'Masirul Islam', role: 'Manager Assistant', image: '/team/wade.png' },
-    { name: 'Jenny Wilson', role: 'Web Designer', image: '/team/wade.png' },
     { name: 'Floyd Miles', role: 'Head Assistant', image: '/team/wade.png' },
     { name: 'Cody Fisher', role: 'UI Designer', image: '/team/wade.png' },
     { name: 'Arlene McCoy', role: 'Developer', image: '/team/wade.png' },
     { name: 'Robert Fox', role: 'Marketing Specialist', image: '/team/wade.png' },
-    { name: 'Esther Howard', role: 'Support Lead', image: '/team/wade.png' },
 ];
 
 import { Facebook, Twitter, Linkedin, Instagram, MoveLeft, MoveRight } from 'lucide-react';
@@ -46,7 +42,18 @@ const TeamCard = ({ member }) => (
 );
 
 const TeamSection = () => {
-    const isAutoSlide = teamMembers.length > 4;
+    const [isAutoSlide, setIsAutoSlide] = useState(teamMembers.length > 4);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsAutoSlide(teamMembers.length > 4 || window.innerWidth <= 1200);
+        };
+        
+        handleResize(); // Initial check
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     return (
         <section className="team-section" id="team">
@@ -60,7 +67,7 @@ const TeamSection = () => {
                     <h2 className="team-title">See Our Skilled Expert Team</h2>
                 </div>
 
-                <div className="team-slider-container">
+                <div className={`team-slider-container ${isAutoSlide ? 'is-sliding' : ''}`}>
                     {isAutoSlide ? (
                         <div className="team-slider-marquee">
                             <div className="team-track">
