@@ -10,20 +10,10 @@ import PosLayout from './components/layout/PosLayout/PosLayout';
 // ── Lazy-loaded Pages (code splitting — each route loads its JS on demand) ──
 const Login              = lazy(() => import('./pages/auth/Login/Login.jsx'));
 const Register           = lazy(() => import('./pages/auth/Register/Register.jsx'));
-const LandingPage        = lazy(() => import('./pages/website/LandingPage/LandingPage.jsx'));
-const ITPortfolio        = lazy(() => import('./pages/website/ITPortfolio/ITPortfolio.jsx'));
-const AkshayPatil        = lazy(() => import('./pages/website/AkshayPatil/AkshayPatil.jsx'));
-const BlogPage           = lazy(() => import('./pages/website/BlogPage/BlogPage.jsx'));
-const BlogDetail         = lazy(() => import('./pages/website/BlogDetail/BlogDetail.jsx'));
-const ProjectInfo        = lazy(() => import('./pages/website/ProjectInfo/ProjectInfo.jsx'));
 const Unauthorized       = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
 const Dashboard          = lazy(() => import('./pages/dashboard/Dashboard/Dashboard.jsx'));
 const Dashboard2         = lazy(() => import('./pages/dashboard/Dashboard2/Dashboard2.jsx'));
 const SalesDashboard     = lazy(() => import('./pages/dashboard/SalesDashboard/SalesDashboard.jsx'));
-const SuperDashboard     = lazy(() => import('./pages/superadmin/SuperDashboard/SuperDashboard.jsx'));
-const SuperCompanies     = lazy(() => import('./pages/superadmin/SuperCompanies/SuperCompanies.jsx'));
-const SuperSubscriptions = lazy(() => import('./pages/superadmin/SuperSubscriptions/SuperSubscriptions.jsx'));
-const SuperPackages      = lazy(() => import('./pages/superadmin/SuperPackages/SuperPackages.jsx'));
 const ManageStock        = lazy(() => import('./pages/inventory/ManageStock/ManageStock.jsx'));
 const StockAdjustment    = lazy(() => import('./pages/inventory/StockAdjustment/StockAdjustment.jsx'));
 const StockTransfer      = lazy(() => import('./pages/inventory/StockTransfer/StockTransfer.jsx'));
@@ -51,22 +41,6 @@ const PurchaseReturn     = lazy(() => import('./pages/purchases/PurchaseReturn/P
 const AddPurchaseReturn  = lazy(() => import('./pages/purchases/AddPurchaseReturn/AddPurchaseReturn.jsx'));
 const EditPurchaseReturn = lazy(() => import('./pages/purchases/EditPurchaseReturn/EditPurchaseReturn.jsx'));
 const Settings           = lazy(() => import('./pages/settings/Settings/Settings.jsx'));
-const ServiceDetail      = lazy(() => import('./pages/website/ServiceDetail/ServiceDetail.jsx'));
-const WebDevelopment     = lazy(() => import('./pages/website/WebDevelopment/WebDevelopment.jsx'));
-const AIAutomation       = lazy(() => import('./pages/website/AIAutomation/AIAutomation.jsx'));
-const Ecommerce          = lazy(() => import('./pages/website/Ecommerce/Ecommerce.jsx'));
-const ContactUs          = lazy(() => import('./pages/website/ContactUs/ContactUs.jsx'));
-const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePreview.jsx'));
-
-// Web App
-const Menus              = lazy(() => import('./pages/webapp/Menus/Menus.jsx'));
-const CreateMenu         = lazy(() => import('./pages/webapp/CreateMenu/CreateMenu.jsx'));
-const BlogPosts          = lazy(() => import('./pages/webapp/BlogPosts/BlogPosts.jsx'));
-const AddBlogPost        = lazy(() => import('./pages/webapp/AddBlogPost/AddBlogPost.jsx'));
-const EditBlogPost       = lazy(() => import('./pages/webapp/EditBlogPost/EditBlogPost.jsx'));
-
-
-const ProjectWorks       = lazy(() => import('./pages/website/ProjectWorks/ProjectWorks.jsx'));
 
 // ── Role constants ───────────────────────────────────────────────────────────
 const CLIENT_ADMIN_ROLES = ['ADMIN', 'CLIENT'];
@@ -117,22 +91,6 @@ function AppRoutes() {
                 <Route path="/login"        element={<GuestRoute><Login /></GuestRoute>} />
                 <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
-
-                {/* Root → IT Portfolio Landing Page */}
-                <Route path="/" element={<ITPortfolio />} />
-                <Route path="/retail-saas-platform" element={<LandingPage />} />
-                <Route path="/Akshay-Patil" element={<AkshayPatil />} />
-
-                {/* Blog routes – public */}
-                <Route path="/blog"       element={<BlogPage />} />
-                <Route path="/blog/:slug" element={<BlogDetail />} />
-                <Route path="/project-works" element={<ProjectWorks />} />
-                <Route path="/project-info/:slug" element={<ProjectInfo />} />
-                <Route path="/contact"    element={<ContactUs />} />
-                <Route path="/services/web-development" element={<WebDevelopment />} />
-                <Route path="/services/ai-automation" element={<AIAutomation />} />
-                <Route path="/services/e-commerce-platform-development" element={<Ecommerce />} />
-                <Route path="/services/:serviceId" element={<ServiceDetail />} />
 
                 {/* ── CLIENT + ADMIN ───────────────────────── */}
                 <Route
@@ -258,58 +216,10 @@ function AppRoutes() {
                     element={<PosPage roles={ADMIN_ROLES}><EditPurchaseReturn /></PosPage>}
                 />
 
-                {/* Settings & Builder */}
+                {/* Settings */}
                 <Route
                     path="/settings/*"
                     element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
-                />
-                <Route
-                    path="/builder-preview"
-                    element={<LivePreview />}
-                />
-
-                {/* Web App */}
-                <Route
-                    path="/dashboard/menus"
-                    element={<PosPage roles={ADMIN_ROLES}><Menus /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/create-menu"
-                    element={<PosPage roles={ADMIN_ROLES}><CreateMenu /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/edit-menu/:id"
-                    element={<PosPage roles={ADMIN_ROLES}><CreateMenu /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/blog-posts"
-                    element={<PosPage roles={ADMIN_ROLES}><BlogPosts /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/add-blog-post"
-                    element={<PosPage roles={ADMIN_ROLES}><AddBlogPost /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/edit-blog-post/:id"
-                    element={<PosPage roles={ADMIN_ROLES}><EditBlogPost /></PosPage>}
-                />
-
-                {/* ── SUPER ADMIN ONLY ────────────────────────────────────── */}
-                <Route
-                    path="/dashboard/super-dashboard"
-                    element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperDashboard /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/super-companies"
-                    element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperCompanies /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/super-subscriptions"
-                    element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperSubscriptions /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/super-packages"
-                    element={<PosPage roles={SUPER_ADMIN_ROLES}><SuperPackages /></PosPage>}
                 />
 
                 {/* Catch-all → login */}
@@ -319,74 +229,12 @@ function AppRoutes() {
     );
 }
 
-const WarningBanner = () => {
-    const text = '⚠️ WARNING: This web application and business is currently under development. ⚠️';
-    
-    return (
-        <div style={{
-            background: 'linear-gradient(135deg, #ff902f 0%, #ff5f1f 100%)',
-            color: '#ffffff',
-            padding: '0',
-            fontWeight: '600',
-            fontSize: '14px',
-            width: '100%',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            zIndex: 999999,
-            display: 'flex',
-            alignItems: 'center',
-            height: '34px'
-        }}>
-            <style>{`
-                body {
-                    padding-top: 34px !important;
-                }
-                .lp-nav {
-                    top: 34px !important;
-                }
-                .pos-sidebar {
-                    top: 34px !important;
-                    height: calc(100vh - 34px) !important;
-                }
-                .pos-header {
-                    top: 34px !important;
-                }
-                .lp-mobile-menu {
-                    top: calc(68px + 34px) !important;
-                }
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .marquee-track {
-                    display: flex;
-                    width: max-content;
-                    animation: marquee 50s linear infinite;
-                }
-                .marquee-item {
-                    padding-right: 60px;
-                    white-space: nowrap;
-                    line-height: 34px;
-                }
-            `}</style>
-            <div className="marquee-track">
-                {Array(20).fill(text).map((t, i) => (
-                    <div key={i} className="marquee-item">{t}</div>
-                ))}
-            </div>
-        </div>
-    );
-};
 
 export default function App() {
     return (
         <AuthProvider>
             <CompanyProvider>
                 <ConfirmProvider>
-                    <WarningBanner />
                     <BrowserRouter>
                         <AppRoutes />
                     </BrowserRouter>

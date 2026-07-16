@@ -86,46 +86,27 @@ export default function ProjectInfo() {
                         {activeTab === 'overview' && (
                             <>
                                 <div className="project-info-description">
-                                    <p><strong>{project.title}</strong> is a premium, beautifully crafted Website template built for modern creative agencies. Perfectly designed to showcase your portfolio, case studies, and services to clients. More than just visuals, we craft design solutions that drive real results.</p>
+                                    <p><strong>{project.title}</strong> is a modern and visually stunning project.</p>
                                     <p>{project.description}</p>
-                                    <p>Here is a premium Webflow template built for creative agencies, digital studios, design teams, and branding consultancies. It combines a sleek, bold digital aesthetic with a minimalistic modern structure, giving your agency the visual authority to attract high-value clients and exactly communicate your core value. Equipped with rich motion topography, visual layout structures, and a robust design system, it has everything you need to outshine your competitors.</p>
                                 </div>
 
-                                <div className="project-info-pages-list">
-                                    <h3>Template pages</h3>
-                                    <p className="page-desc">The {project.title} template is ready to use right away. It comes with 15 fully customizable inner pages.</p>
-                                    
-                                    <div className="pages-section">
-                                        <h4>Main Pages</h4>
-                                        <ul>
-                                            <li>Home</li>
-                                            <li>About</li>
-                                            <li>Services</li>
-                                            <li>Contact</li>
-                                        </ul>
+                                {project.techStack && project.techStack.length > 0 && (
+                                    <div className="project-info-pages-list">
+                                        <h3>Technologies Used</h3>
+                                        <p className="page-desc">The {project.title} project was built using the following modern technologies:</p>
+                                        
+                                        <div className="pages-section">
+                                            <ul>
+                                                {project.techStack.map((tech, idx) => (
+                                                    <li key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <span style={{ color: tech.color, display: 'flex', alignItems: 'center' }}>{tech.icon}</span>
+                                                        {tech.name}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
-
-                                    <div className="pages-section">
-                                        <h4>Other Pages</h4>
-                                        <ul>
-                                            <li>Services details</li>
-                                            <li>Project details</li>
-                                        </ul>
-                                    </div>
-
-                                    <div className="pages-section">
-                                        <h4>Utility & Legal Pages</h4>
-                                        <ul>
-                                            <li>Style Guide</li>
-                                            <li>Licenses</li>
-                                            <li>Changelog</li>
-                                        </ul>
-                                    </div>
-                                    
-                                    <div className="show-more-container">
-                                        <button className="btn-outline show-more-btn">Show more</button>
-                                    </div>
-                                </div>
+                                )}
                             </>
                         )}
 
@@ -199,37 +180,24 @@ export default function ProjectInfo() {
                         </div>
 
                         <div className="project-info-sidebar-section">
-                            <h4>Categories</h4>
+                            <h4>Category</h4>
                             <div className="tags-container">
-                                <span className="tag">Business Page</span>
-                                <span className="tag">Creative Agency</span>
+                                <span className="tag">{project.filter || 'Project'}</span>
                             </div>
                         </div>
 
-                        <div className="project-info-sidebar-section">
-                            <h4>Styles</h4>
-                            <div className="tags-container">
-                                <span className="tag">Light</span>
-                                <span className="tag">Modern</span>
+                        {project.techStack && project.techStack.length > 0 && (
+                            <div className="project-info-sidebar-section">
+                                <h4>Tech Stack</h4>
+                                <ul className="features-checklist">
+                                    {project.techStack.map((tech, idx) => (
+                                        <li key={idx}>
+                                            <Check size={14} className="check-icon" style={{ color: tech.color }} /> {tech.name}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                        </div>
-
-                        <div className="project-info-sidebar-section">
-                            <h4>Features</h4>
-                            <ul className="features-checklist">
-                                <li><Check size={14} className="check-icon" /> 3D transforms</li>
-                                <li><Check size={14} className="check-icon" /> CMS connects</li>
-                                <li><Check size={14} className="check-icon" /> Content management system</li>
-                                <li><Check size={14} className="check-icon" /> Custom 404 page</li>
-                                <li><Check size={14} className="check-icon" /> Forms</li>
-                                <li><Check size={14} className="check-icon" /> GSAP</li>
-                                <li><Check size={14} className="check-icon" /> Interactions</li>
-                                <li><Check size={14} className="check-icon" /> Responsive design</li>
-                                <li><Check size={14} className="check-icon" /> Responsive navigation</li>
-                                <li><Check size={14} className="check-icon" /> Retina ready</li>
-                                <li><Check size={14} className="check-icon" /> Web fonts</li>
-                            </ul>
-                        </div>
+                        )}
 
                         <div className="project-info-sidebar-section">
                             <h4>Share</h4>

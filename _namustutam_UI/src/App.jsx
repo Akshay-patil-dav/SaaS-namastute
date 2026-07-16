@@ -16,6 +16,7 @@ const Ecommerce          = lazy(() => import('./pages/website/Ecommerce/Ecommerc
 const ContactUs          = lazy(() => import('./pages/website/ContactUs/ContactUs.jsx'));
 const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePreview.jsx'));
 const ProjectWorks       = lazy(() => import('./pages/website/ProjectWorks/ProjectWorks.jsx'));
+const ProjectInfo        = lazy(() => import('./pages/website/ProjectInfo/ProjectInfo.jsx'));
 
 // ── Global page loading fallback ─────────────────────────────────────────────
 function PageLoader() {
@@ -59,6 +60,7 @@ function AppRoutes() {
                 <Route path="/blog"       element={<BlogPage />} />
                 <Route path="/blog/:slug" element={<BlogDetail />} />
                 <Route path="/project-works" element={<ProjectWorks />} />
+                <Route path="/project-info/:slug" element={<ProjectInfo />} />
                 <Route path="/contact"    element={<ContactUs />} />
                 <Route path="/services/web-development" element={<WebDevelopment />} />
                 <Route path="/services/ai-automation" element={<AIAutomation />} />
