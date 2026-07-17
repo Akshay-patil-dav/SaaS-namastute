@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { CompanyProvider } from './context/CompanyContext';
 import { ConfirmProvider } from './context/ConfirmContext';
+import ChatBot from './components/ChatBot/ChatBot.jsx';
 
 // ── Lazy-loaded Pages (code splitting — each route loads its JS on demand) ──
 const LandingPage        = lazy(() => import('./pages/website/LandingPage/LandingPage.jsx'));
@@ -139,6 +140,7 @@ export default function App() {
         <CompanyProvider>
             <ConfirmProvider>
                 <WarningBanner />
+                <ChatBot />
                 <BrowserRouter>
                     <AppRoutes />
                 </BrowserRouter>
