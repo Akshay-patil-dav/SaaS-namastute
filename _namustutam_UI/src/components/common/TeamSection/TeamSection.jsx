@@ -33,10 +33,10 @@ const TeamCard = ({ member }) => (
                     <div className="member-role-back">Freelancer</div>
                     <p className="member-bio">Passionate professional dedicated to delivering excellence and driving innovation.</p>
                     <div className="social-links">
-                        <a href="#" className="social-icon"><Facebook size={18} /></a>
-                        <a href="#" className="social-icon"><Twitter size={18} /></a>
-                        <a href="#" className="social-icon"><Linkedin size={18} /></a>
-                        <a href="#" className="social-icon"><Instagram size={18} /></a>
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon"><Facebook size={18} /></a>
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon"><Twitter size={18} /></a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-icon"><Linkedin size={18} /></a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon"><Instagram size={18} /></a>
                     </div>
                 </div>
             </div>
