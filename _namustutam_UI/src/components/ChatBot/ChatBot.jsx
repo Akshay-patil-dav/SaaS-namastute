@@ -31,7 +31,8 @@ const ChatBot = () => {
         setIsLoading(true);
 
         try {
-            const apiKey = import.meta.env.VITE_GEMINI_API_KEY?.trim();
+            // Fallback to hardcoded key for deployment if env var is missing
+            const apiKey = import.meta.env.VITE_GEMINI_API_KEY?.trim() || "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";
             
             if (!apiKey || apiKey === 'YOUR_FREE_GEMINI_API_KEY_HERE') {
                 setMessages(prev => [...prev, { 
@@ -213,16 +214,37 @@ const ChatBot = () => {
                 </div>
 
                 <div className="chatbot-messages">
-                    {messages.map((msg) => (
-                        <div key={msg.id} className={`chat-message ${msg.sender} ${msg.isError ? 'error' : ''}`}>
-                            <div className="message-icon">
-                                {msg.sender === 'bot' ? <Bot size={16} /> : <User size={16} />}
+                    {messages.map((msg) => {
+                        let thinkingText = null;
+                        let mainText = msg.text;
+                        
+                        if (msg.sender === 'bot') {
+                            const thinkMatch = mainText.match(/<think>([\s\S]*?)<\/think>/);
+                            if (thinkMatch) {
+                                thinkingText = thinkMatch[1].trim();
+                                mainText = mainText.replace(/<think>([\s\S]*?)<\/think>/, '').trim();
+                            }
+                        }
+
+                        return (
+                            <div key={msg.id} className={`chat-message ${msg.sender} ${msg.isError ? 'error' : ''}`}>
+                                <div className="message-icon">
+                                    {msg.sender === 'bot' ? <Bot size={16} /> : <User size={16} />}
+                                </div>
+                                <div className="message-content">
+                                    {thinkingText && (
+                                        <details className="chat-thinking-block">
+                                            <summary>🧠 Thought Process</summary>
+                                            <div className="chat-thinking-content">
+                                                {thinkingText}
+                                            </div>
+                                        </details>
+                                    )}
+                                    {renderTextWithLinks(mainText)}
+                                </div>
                             </div>
-                            <div className="message-content">
-                                {renderTextWithLinks(msg.text)}
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                     {isLoading && (
                         <div className="chat-message bot">
                             <div className="message-icon">

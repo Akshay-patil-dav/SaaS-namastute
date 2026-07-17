@@ -1,5 +1,13 @@
 {
   "rewrites": [
+    {
+      "source": "/api/groq/:path*",
+      "destination": "https://api.groq.com/:path*"
+    },
+    {
+      "source": "/api/gemini/:path*",
+      "destination": "https://generativelanguage.googleapis.com/:path*"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
