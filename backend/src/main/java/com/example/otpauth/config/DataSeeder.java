@@ -127,43 +127,43 @@ public class DataSeeder {
             // ── 5. Seed default products for SUPER_ADMIN ───────────
             if (productRepository.count() == 0 && superAdmin != null) {
                 Product p1 = new Product();
-                p1.setName("Airpod 2");
-                p1.setCategory("Headset");
-                p1.setPrice(new BigDecimal("158.00"));
-                p1.setQuantity(20);
-                p1.setSku("APOD-2");
-                p1.setUserId(superAdmin.getId());
-                p1.setImages("https://images.unsplash.com/photo-1588449668365-d15e397f6787?w=500&auto=format&fit=crop&q=60");
+                // p1.setName("Airpod 2");
+                // p1.setCategory("Headset");
+                // p1.setPrice(new BigDecimal("158.00"));
+                // p1.setQuantity(20);
+                // p1.setSku("APOD-2");
+                // p1.setUserId(superAdmin.getId());
+                // p1.setImages("https://images.unsplash.com/photo-1588449668365-d15e397f6787?w=500&auto=format&fit=crop&q=60");
 
-                Product p2 = new Product();
-                p2.setName("MacBook Pro 14");
-                p2.setCategory("Laptops");
-                p2.setPrice(new BigDecimal("1200.00"));
-                p2.setQuantity(5);
-                p2.setSku("MBP-14");
-                p2.setUserId(superAdmin.getId());
-                p2.setImages("https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&auto=format&fit=crop&q=60");
+                // Product p2 = new Product();
+                // p2.setName("MacBook Pro 14");
+                // p2.setCategory("Laptops");
+                // p2.setPrice(new BigDecimal("1200.00"));
+                // p2.setQuantity(5);
+                // p2.setSku("MBP-14");
+                // p2.setUserId(superAdmin.getId());
+                // p2.setImages("https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&auto=format&fit=crop&q=60");
 
-                Product p3 = new Product();
-                p3.setName("Red Nike Angelo");
-                p3.setCategory("Shoes");
-                p3.setPrice(new BigDecimal("120.00"));
-                p3.setQuantity(15);
-                p3.setSku("NKE-ANG-R");
-                p3.setUserId(superAdmin.getId());
-                p3.setImages("https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=60");
+                // Product p3 = new Product();
+                // p3.setName("Red Nike Angelo");
+                // p3.setCategory("Shoes");
+                // p3.setPrice(new BigDecimal("120.00"));
+                // p3.setQuantity(15);
+                // p3.setSku("NKE-ANG-R");
+                // p3.setUserId(superAdmin.getId());
+                // p3.setImages("https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=60");
 
-                Product p4 = new Product();
-                p4.setName("iPhone 14 64GB");
-                p4.setCategory("Mobiles");
-                p4.setPrice(new BigDecimal("800.00"));
-                p4.setQuantity(10);
-                p4.setSku("IPH14-64");
-                p4.setUserId(superAdmin.getId());
-                p4.setImages("https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&auto=format&fit=crop&q=60");
+                // Product p4 = new Product();
+                // p4.setName("iPhone 14 64GB");
+                // p4.setCategory("Mobiles");
+                // p4.setPrice(new BigDecimal("800.00"));
+                // p4.setQuantity(10);
+                // p4.setSku("IPH14-64");
+                // p4.setUserId(superAdmin.getId());
+                // p4.setImages("https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&auto=format&fit=crop&q=60");
 
-                productRepository.saveAll(List.of(p1, p2, p3, p4));
-                System.out.println("DataSeeder: Initial products seeded for Super Admin.");
+                // productRepository.saveAll(List.of(p1, p2, p3, p4));
+                // System.out.println("DataSeeder: Initial products seeded for Super Admin.");
             }
         };
     }

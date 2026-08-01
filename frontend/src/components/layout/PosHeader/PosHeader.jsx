@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
@@ -24,7 +24,29 @@ import {
     DollarSign,
     Calendar,
     Check,
-    X
+    X,
+    LayoutDashboard,
+    ShoppingCart,
+    FileText,
+    RotateCcw,
+    Archive,
+    Users,
+    Briefcase,
+    BarChart2,
+    UserCog,
+    CalendarX,
+    TrendingDown,
+    ListTree,
+    List,
+    Tag,
+    Scale,
+    ShieldCheck,
+    Barcode,
+    Box,
+    SlidersHorizontal,
+    ArrowRightLeft,
+    ShoppingBag,
+    FileUp
 } from 'lucide-react';
 
 const initialNotifications = [
@@ -47,6 +69,67 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const [selectedNotiPopup, setSelectedNotiPopup] = useState(null);
     const [allNotiMaximized, setAllNotiMaximized] = useState(false);
     const [maximizedActiveId, setMaximizedActiveId] = useState(initialNotifications[0]?.id || null);
+
+    // Search States
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchOpen, setSearchOpen] = useState(false);
+    const searchRef = useRef(null);
+    const searchInputRef = useRef(null);
+
+    const searchablePages = [
+        { title: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={14} /> },
+        { title: 'Sales Dashboard', path: '/dashboard/sales', icon: <BarChart2 size={14} /> },
+        { title: 'Super Admin Dashboard', path: '/dashboard/super-dashboard', icon: <UserCog size={14} /> },
+        { title: 'Super Admin Companies', path: '/dashboard/super-companies', icon: <Building size={14} /> },
+        { title: 'Super Admin Subscriptions', path: '/dashboard/super-subscriptions', icon: <DollarSign size={14} /> },
+        { title: 'Super Admin Packages', path: '/dashboard/super-packages', icon: <Package size={14} /> },
+        { title: 'Products', path: '/products', icon: <Package size={14} /> },
+        { title: 'Expired Products', path: '/expired-products', icon: <CalendarX size={14} /> },
+        { title: 'Low Stocks', path: '/low-stocks', icon: <TrendingDown size={14} /> },
+        { title: 'Category', path: '/category', icon: <ListTree size={14} /> },
+        { title: 'Sub Category', path: '/sub-category', icon: <List size={14} /> },
+        { title: 'Brands', path: '/brands', icon: <Tag size={14} /> },
+        { title: 'Units', path: '/units', icon: <Scale size={14} /> },
+        { title: 'Warranties', path: '/warranties', icon: <ShieldCheck size={14} /> },
+        { title: 'Print Barcode', path: '/print-barcode', icon: <Barcode size={14} /> },
+        { title: 'Manage Stock', path: '/dashboard/manage-stock', icon: <Box size={14} /> },
+        { title: 'Stock Adjustment', path: '/dashboard/stock-adjustment', icon: <SlidersHorizontal size={14} /> },
+        { title: 'Stock Transfer', path: '/dashboard/stock-transfer', icon: <ArrowRightLeft size={14} /> },
+        { title: 'Online Orders', path: '/dashboard/sales-online', icon: <ShoppingCart size={14} /> },
+        { title: 'POS Orders', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
+        { title: 'Sales Return', path: '/dashboard/sales-return', icon: <RotateCcw size={14} /> },
+        { title: 'Orders', path: '/dashboard/orders', icon: <ShoppingCart size={14} /> },
+        { title: 'Purchase', path: '/purchases', icon: <ShoppingBag size={14} /> },
+        { title: 'Purchase Return', path: '/purchase-return', icon: <FileUp size={14} /> },
+        { title: 'Web App Menus', path: '/dashboard/menus', icon: <List size={14} /> },
+        { title: 'Blog Posts', path: '/dashboard/blog-posts', icon: <FileText size={14} /> }
+    ];
+
+    const filteredPages = searchablePages.filter(page => 
+        page.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setSearchOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInputRef.current?.focus();
+                setSearchOpen(true);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const handleLogout = () => {
         setProfileOpen(false);
@@ -97,12 +180,71 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <ChevronsLeft size={20} style={{ transform: sidebarOpen ? 'none' : 'rotate(180deg)', transition: 'transform 0.3s' }} />
                 </button>
 
-                <div className="pos-search-bar hide-on-mobile">
+                <div className="pos-search-bar hide-on-mobile" ref={searchRef} style={{ position: 'relative' }}>
                     <Search size={16} color="#888" className="me-2" />
-                    <input type="text" placeholder="Search" />
+                    <input 
+                        type="text" 
+                        placeholder="Search" 
+                        ref={searchInputRef}
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setSearchOpen(true);
+                        }}
+                        onFocus={() => setSearchOpen(true)}
+                    />
                     <div className="pos-search-shortcut">
                         <MonitorDot size={12} /> K
                     </div>
+                    
+                    {/* Search Suggestions Dropdown */}
+                    {searchOpen && (
+                        <div 
+                            className="shadow-lg border rounded-3 bg-white" 
+                            style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                marginTop: '10px',
+                                width: '300px',
+                                zIndex: 1050,
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                animation: 'fadeIn 0.15s ease-out'
+                            }}
+                        >
+                            <div className="p-2 border-bottom text-muted small fw-bold" style={{ fontSize: '11px' }}>
+                                QUICK LINKS
+                            </div>
+                            <div className="d-flex flex-column">
+                                {filteredPages.length > 0 ? (
+                                    filteredPages.map((page, idx) => (
+                                        <div 
+                                            key={idx}
+                                            className="d-flex align-items-center gap-3 p-2 border-bottom cursor-pointer text-decoration-none text-dark notification-feed-item"
+                                            style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+                                            onClick={() => {
+                                                setSearchOpen(false);
+                                                setSearchQuery('');
+                                                navigate(page.path);
+                                            }}
+                                        >
+                                            <div className="p-1 rounded bg-light text-secondary">
+                                                {page.icon}
+                                            </div>
+                                            <span style={{ fontSize: '13px', fontWeight: '500' }}>
+                                                {page.title}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="p-3 text-center text-muted small">
+                                        No matching pages found.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

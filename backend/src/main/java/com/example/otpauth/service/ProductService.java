@@ -29,7 +29,11 @@ public class ProductService {
 
     /** List all products */
     public List<Product> getAllProducts() {
-        return productRepository.findByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            return productRepository.findAll();
+        }
+        return productRepository.findByUserId(userId);
     }
 
     /** List expired products */
@@ -121,7 +125,11 @@ public class ProductService {
 
     /** Get single product */
     public Optional<Product> getProductById(@NonNull Long id) {
-        return productRepository.findByIdAndUserId(Objects.requireNonNull(id), com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            return productRepository.findById(id);
+        }
+        return productRepository.findByIdAndUserId(Objects.requireNonNull(id), userId);
     }
 
     /** Create a new product */

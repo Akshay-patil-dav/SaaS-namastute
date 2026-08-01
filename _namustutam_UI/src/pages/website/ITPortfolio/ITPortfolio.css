@@ -5,18 +5,18 @@
   --text: #0f172a;
   --text-muted: #475569;
   --text-2: #334155;
-  --primary: #ff5f1f;
-  --primary-d: #e04a0e;
-  --primary-pale: #fff0e6;
-  --gradient: linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%);
+  --primary: #ff9b29;
+  --primary-d: #ff7800;
+  --primary-pale: #fff6eb;
+  --gradient: linear-gradient(135deg, #ff9b29 0%, #ff7800 100%);
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(0, 0, 0, 0.05);
   --glass-blur: blur(20px);
   --border-soft: #e2e8f0;
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 20px 25px -5px rgba(255, 95, 31, 0.1);
-  --shadow-xl: 0 25px 50px -12px rgba(255, 95, 31, 0.15);
+  --shadow-lg: 0 20px 25px -5px rgba(255, 155, 41, 0.1);
+  --shadow-xl: 0 25px 50px -12px rgba(255, 155, 41, 0.15);
 }
 
 .portfolio-root {
@@ -328,26 +328,26 @@
   padding: 15px 34px;
   font-size: 16px;
   font-weight: 700;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.25s;
-  box-shadow: 0 8px 28px rgba(255,144,47,0.38), inset 0 1px 0 rgba(255,255,255,0.25);
+  box-shadow: 0 8px 28px rgba(255,155,41,0.38), inset 0 1px 0 rgba(255,255,255,0.25);
   font-family: inherit;
 }
 
 .portfolio-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 40px rgba(255,144,47,0.52);
+  box-shadow: 0 14px 40px rgba(255,155,41,0.52);
 }
 
 .portfolio-btn-outline {
   background: var(--glass-bg);
-  color: var(--text-2);
-  border: 1.5px solid var(--border-soft);
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
   padding: 14px 30px;
   font-size: 15px;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   backdrop-filter: var(--glass-blur);
   transition: all 0.25s;
@@ -356,9 +356,9 @@
 }
 
 .portfolio-btn-outline:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: rgba(255,144,47,0.06);
+  border-color: var(--primary-d);
+  color: var(--primary-d);
+  background: rgba(255,155,41,0.06);
   box-shadow: var(--shadow-md);
 }
 
@@ -1088,11 +1088,11 @@
 }
 
 .about-btn-primary {
-  background: linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%);
+  background: var(--gradient);
   color: white;
   border: none;
   padding: 16px 32px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -1100,7 +1100,7 @@
   align-items: center;
   gap: 10px;
   transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 10px 25px rgba(255, 95, 31, 0.3);
+  box-shadow: 0 10px 25px rgba(255, 155, 41, 0.3);
 }
 
 .about-btn-primary span {
@@ -1110,7 +1110,7 @@
 
 .about-btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 35px rgba(255, 95, 31, 0.4);
+  box-shadow: 0 15px 35px rgba(255, 155, 41, 0.4);
 }
 
 .about-btn-primary:hover span {
@@ -1166,15 +1166,15 @@
   padding: 18px 40px;
   font-size: 18px;
   font-weight: 700;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0 8px 28px rgba(255,144,47,0.38);
+  box-shadow: 0 8px 28px rgba(255, 155, 41, 0.38);
 }
 
 .portfolio-btn-cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 40px rgba(255,144,47,0.52);
+  box-shadow: 0 14px 40px rgba(255, 155, 41, 0.52);
 }
 
 /* ── Responsive ── */

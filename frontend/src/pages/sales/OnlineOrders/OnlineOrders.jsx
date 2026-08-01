@@ -284,7 +284,10 @@ export default function OnlineOrders() {
                                         <td>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                 <img src={avatarSrc(item.customerName)} alt="" style={{ width: '28px', height: '28px', borderRadius: '50%' }} />
-                                                <span className="ss-item-name">{item.customerName || '—'}</span>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span className="ss-item-name">{item.customerName || '—'}</span>
+                                                    {item.userId && <span style={{fontSize: '11px', color: '#6b7280', fontWeight: 'normal', marginTop: '2px'}}>UI ID: {item.userId}</span>}
+                                                </div>
                                             </div>
                                         </td>
 
@@ -306,9 +309,13 @@ export default function OnlineOrders() {
                                         </td>
 
                                         <td>
-                                            <span className={`ss-status-badge ${item.paymentStatus === 'Paid' ? 'ss-status-active' : item.paymentStatus === 'Overdue' ? 'ss-status-inactive' : 'ss-status-pending'}`}>
-                                                {item.paymentStatus}
-                                            </span>
+                                            {item.paymentStatus === 'Paid' ? (
+                                                <span style={{ color: '#059669', fontSize: '11px', fontWeight: '600', backgroundColor: '#d1fae5', padding: '3px 6px', borderRadius: '4px', whiteSpace: 'nowrap' }}>Paid by him on website</span>
+                                            ) : (
+                                                <span className={`ss-status-badge ${item.paymentStatus === 'Paid' ? 'ss-status-active' : item.paymentStatus === 'Overdue' ? 'ss-status-inactive' : 'ss-status-pending'}`}>
+                                                    {item.paymentStatus}
+                                                </span>
+                                            )}
                                         </td>
 
                                         <td>{item.biller || 'Admin'}</td>

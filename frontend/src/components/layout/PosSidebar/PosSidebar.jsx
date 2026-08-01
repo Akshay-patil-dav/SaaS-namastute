@@ -365,6 +365,19 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     </NavLink>
                                 </li>
+                                
+                                <li className="pos-menu-item">
+                                    <NavLink to="/dashboard/app-categories" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M4 6h16"></path>
+                                                <path d="M4 12h16"></path>
+                                                <path d="M4 18h16"></path>
+                                            </svg>
+                                            <span>Categories</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
 
                                 {/* <li className="pos-menu-item">
                                     <NavLink to="/purchase-order" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>

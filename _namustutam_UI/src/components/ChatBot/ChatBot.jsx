@@ -220,10 +220,10 @@ const ChatBot = () => {
                         let mainText = msg.text;
                         
                         if (msg.sender === 'bot') {
-                            const thinkMatch = mainText.match(/<think>([\s\S]*?)<\/think>/);
+                            const thinkMatch = mainText.match(/<think>([\s\S]*?)<\/think>/i);
                             if (thinkMatch) {
                                 thinkingText = thinkMatch[1].trim();
-                                mainText = mainText.replace(/<think>([\s\S]*?)<\/think>/, '').trim();
+                                mainText = mainText.replace(/<think>([\s\S]*?)<\/think>/i, '').trim();
                             }
                         }
 

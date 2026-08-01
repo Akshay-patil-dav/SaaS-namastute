@@ -6,8 +6,16 @@ import ProtectedRoute from './components/auth/ProtectedRoute/ProtectedRoute';
 import GuestRoute from './components/auth/GuestRoute/GuestRoute';
 import { ConfirmProvider } from './context/ConfirmContext';
 import PosLayout from './components/layout/PosLayout/PosLayout';
+import StorefrontLayout from './components/layout/StorefrontLayout/StorefrontLayout.jsx';
 
-// ── Lazy-loaded Pages (code splitting — each route loads its JS on demand) ──
+// ── Lazy-loaded Storefront Pages ──
+const StorefrontHome     = lazy(() => import('./pages/storefront/Home/Home.jsx'));
+const StorefrontShop     = lazy(() => import('./pages/storefront/Shop/Shop.jsx'));
+const StorefrontProduct  = lazy(() => import('./pages/storefront/ProductDetails/ProductDetails.jsx'));
+const StorefrontCart     = lazy(() => import('./pages/storefront/Cart/Cart.jsx'));
+const StorefrontCheckout = lazy(() => import('./pages/storefront/Checkout/Checkout.jsx'));
+
+// ── Lazy-loaded Admin Pages (code splitting — each route loads its JS on demand) ──
 const Login              = lazy(() => import('./pages/auth/Login/Login.jsx'));
 const Register           = lazy(() => import('./pages/auth/Register/Register.jsx'));
 const Unauthorized       = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
@@ -41,6 +49,7 @@ const PurchaseReturn     = lazy(() => import('./pages/purchases/PurchaseReturn/P
 const AddPurchaseReturn  = lazy(() => import('./pages/purchases/AddPurchaseReturn/AddPurchaseReturn.jsx'));
 const EditPurchaseReturn = lazy(() => import('./pages/purchases/EditPurchaseReturn/EditPurchaseReturn.jsx'));
 const Settings           = lazy(() => import('./pages/settings/Settings/Settings.jsx'));
+const WebAppCategories   = lazy(() => import('./pages/webapp/WebAppCategories/WebAppCategories.jsx'));
 
 // ── Role constants ───────────────────────────────────────────────────────────
 const CLIENT_ADMIN_ROLES = ['ADMIN', 'CLIENT'];
@@ -87,6 +96,15 @@ function AppRoutes() {
     return (
         <Suspense fallback={<PageLoader />}>
             <Routes>
+                {/* ── Public Storefront Routes ───────────────────────── */}
+                <Route element={<StorefrontLayout />}>
+                    <Route path="/" element={<StorefrontHome />} />
+                    <Route path="/shop" element={<StorefrontShop />} />
+                    <Route path="/shop/product/:id" element={<StorefrontProduct />} />
+                    <Route path="/cart" element={<StorefrontCart />} />
+                    <Route path="/checkout" element={<StorefrontCheckout />} />
+                </Route>
+
                 {/* Public routes — guests only (logged-in users are redirected to dashboard) */}
                 <Route path="/login"        element={<GuestRoute><Login /></GuestRoute>} />
                 <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
@@ -220,6 +238,12 @@ function AppRoutes() {
                 <Route
                     path="/settings/*"
                     element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
+                />
+
+                {/* Web App */}
+                <Route
+                    path="/dashboard/app-categories"
+                    element={<PosPage roles={ADMIN_ROLES}><WebAppCategories /></PosPage>}
                 />
 
                 {/* Catch-all → login */}

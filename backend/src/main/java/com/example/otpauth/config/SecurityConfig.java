@@ -56,6 +56,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands", "/api/units", "/api/warranties").permitAll()
+                        // Allow public e-commerce storefront access
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/sales").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/sales/*").permitAll()
                         // AI Helper endpoints require a valid JWT — each user can only access their own data
                         .requestMatchers("/api/ai/**").authenticated()
                         .anyRequest().authenticated()
@@ -110,6 +114,7 @@ public class SecurityConfig {
         // both resolve to the same origin, preventing subtle CORS mismatches.
         String primary = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
         origins.add(primary);
+        origins.add("http://localhost:5174"); // Explicitly add ecomm storefront
 
         if (corsExtraOrigins != null && !corsExtraOrigins.isBlank()) {
             for (String o : corsExtraOrigins.split(",")) {

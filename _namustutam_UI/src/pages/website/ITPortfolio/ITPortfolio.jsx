@@ -176,25 +176,19 @@ export default function ITPortfolio() {
                     {projects.map((p, i) => (
                         <div 
                             key={`project-${i}`} 
-                            className={`portfolio-bento-card project-card bento-card-${i} reveal-up`} 
-                            style={{ transitionDelay: `${i * 100}ms`, padding: '12px' }}
+                            className={`portfolio-bento-card bento-card-${i} reveal-up`} 
+                            style={{ transitionDelay: `${i * 100}ms` }}
                             onClick={() => navigate('/project-info/' + p.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''))}
                         >
-                            <div className="project-img-wrapper" style={{ height: 'calc(100% - 75px)' }}>
-                                <span className="project-category-badge">+ {p.category}</span>
-                                <img src={p.img} alt={p.title} className="project-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
-                                <div className="project-hover-overlay">
-                                    <span className="glass-action-btn">View Details</span>
-                                </div>
-                            </div>
-                            <div className="project-footer">
-                                <div className="project-footer-left">
-                                    <div className="project-author-icon">
-                                        {p.title.charAt(0)}
+                            <div className="portfolio-bento-img-wrapper">
+                                <img src={p.img} alt={p.title} className="portfolio-bento-img" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('no-img'); }} />
+                                <div className="portfolio-bento-overlay">
+                                    <div className="portfolio-bento-content">
+                                        <span className="portfolio-bento-category">{p.category}</span>
+                                        <h3 className="portfolio-bento-card-title">{p.title}</h3>
                                     </div>
-                                    <div className="project-footer-text">
-                                        <h3 className="project-title">{p.title}</h3>
-                                        <p className="project-author">{p.author}</p>
+                                    <div className="portfolio-bento-arrow">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                                     </div>
                                 </div>
                             </div>
