@@ -1,5 +1,12 @@
 import { FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs } from 'react-icons/fa';
 import { SiMongodb, SiTypescript, SiExpress, SiPostgresql } from 'react-icons/si';
+import p1 from "../assets/project/p1.png";
+import p2 from "../assets/project/p2.jpg";
+import p3 from "../assets/project/p3.jpg";
+import p4 from "../assets/project/p6.png";
+import p5 from "../assets/project/p5.png";
+import p7 from "../assets/project/p7.png"
+// import p4 from from "./"
 
 export const projectsData = [
     {
@@ -8,7 +15,7 @@ export const projectsData = [
         category: 'NEW',
         filter: 'Business Page',
         price: '$59 USD',
-        img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800', 
+        img: p1, 
         techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
         description: 'Design beyond limits. A sharp visual execution for eye-popping brands.',
         liveLink: '#', githubLink: '#'
@@ -19,7 +26,7 @@ export const projectsData = [
         category: 'NEW',
         filter: 'Business Page',
         price: '$129 USD',
-        img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800',
+        img: p2,
         techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
         description: 'Growth consulting solutions designed to drive results.',
         liveLink: '#', githubLink: '#'
@@ -30,8 +37,8 @@ export const projectsData = [
         category: 'NEW',
         filter: 'SaaS Project',
         price: '$99 USD',
-        img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
-        techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
+        img: p3,
+         techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
         description: 'Explore the best natural places with travelers sharing lovely moments.',
         liveLink: '#', githubLink: '#'
     },
@@ -41,8 +48,8 @@ export const projectsData = [
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$99 USD',
-        img: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800',
-        techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
+        img: p4 ,
+          techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
         description: 'We blend creativity and visuals that are functional.',
         liveLink: '#', githubLink: '#'
     },
@@ -52,8 +59,8 @@ export const projectsData = [
         category: 'NEW',
         filter: 'Business Page',
         price: '$49 USD',
-        img: 'https://images.unsplash.com/photo-1555421689-491a97ff2040?auto=format&fit=crop&q=80&w=800',
-        techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
+        img: p5,
+          techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
         description: 'A modern origin template for futuristic brands.',
         liveLink: '#', githubLink: '#'
     },
@@ -63,7 +70,7 @@ export const projectsData = [
         category: 'NEW',
         filter: 'SaaS Project',
         price: '$89 USD',
-        img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800',
+        img: p7,
         techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
         description: 'Building ideas, shaping identities, and creating meaningful experiences.',
         liveLink: '#', githubLink: '#'

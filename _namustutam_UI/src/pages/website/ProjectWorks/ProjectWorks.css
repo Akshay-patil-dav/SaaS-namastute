@@ -139,9 +139,8 @@
 
 /* Projects Grid */
 .pw-projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 40px;
+    columns: 350px;
+    column-gap: 40px;
     margin-bottom: 80px;
 }
 
@@ -155,6 +154,8 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    break-inside: avoid;
+    margin-bottom: 40px;
 }
 
 .pw-project-card:hover {
@@ -165,7 +166,6 @@
 .pw-project-img-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 4/3;
     overflow: hidden;
     background-color: #f8fafc;
 }
@@ -189,8 +189,8 @@
 
 .pw-project-img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    display: block;
     transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -460,7 +460,7 @@
     }
     
     .pw-projects-grid {
-        grid-template-columns: 1fr;
+        columns: 1;
     }
     
     .pw-cta-card {

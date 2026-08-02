@@ -206,59 +206,38 @@ export default function ITPortfolio() {
             {/* ── Team Section ──────────────────────── */}
             <TeamSection />
 
-            {/* ── Why Choose Us ──────────────────────── */}
-            <section className="portfolio-section portfolio-section-alt" id="why-us" style={{ overflow: 'hidden' }}>
-                <div className="portfolio-about-us-container">
-                    {/* Left Visuals - Formal Layout */}
-                    <div className="portfolio-about-visuals-formal reveal-left">
-                        <div className="about-formal-accent"></div>
-                        <div className="about-formal-img-main">
-                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800" alt="Technology Consulting Session" />
-                            <div className="about-formal-experience">
-                                <h3>10+</h3>
-                                <p>Years of Excellence<br/>in IT Solutions</p>
-                            </div>
-                        </div>
-                        <div className="about-formal-img-secondary">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600" alt="Data Analytics Dashboard" />
-                        </div>
+            {/* ── Progressive Growth Section ──────────────────────── */}
+            <section className="portfolio-progressive-section" id="progressive-growth">
+                <div className="progressive-main-content">
+                    {/* Left Side: Curved Image */}
+                    <div className="progressive-image-wrapper reveal">
+                        <img src="https://images.unsplash.com/photo-1573164574572-cb89e39749b4?auto=format&fit=crop&q=80&w=1200" alt="Team discussing operational challenges" />
                     </div>
 
-                    {/* Right Content - Formal Layout */}
-                    <div className="portfolio-about-content reveal-right">
-                        <div className="about-label-formal">
-                            <span className="label-line"></span>
-                            CORPORATE OVERVIEW
-                        </div>
-                        <h2 className="about-title-formal">Driving Digital Transformation & Enterprise Scalability</h2>
-                        <p className="about-desc-formal">
-                            We partner with forward-thinking organizations to deliver robust, secure, and scalable IT solutions. Our comprehensive approach ensures your technology infrastructure aligns perfectly with your strategic business objectives.
+                    {/* Right Side: Content */}
+                    <div className="progressive-content reveal-right">
+                        <div className="progressive-label">PROGRESSIVE GROWTH</div>
+                        <h2 className="progressive-title">We Helping with<br/>operational challenge</h2>
+                        <p className="progressive-desc">
+                            We dig deep to identify the root of complex problems and focus on delivering tangible results for clients, these are a selection of the operations challenges we regularly work on.
                         </p>
-
-                        <div className="about-features-list-formal">
-                            <div className="about-feature-item-formal">
-                                <div className="feature-icon-wrapper-formal">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 13V8C21 6.89543 20.1046 6 19 6H5C3.89543 6 3 6.89543 3 8V14C3 15.1046 3.89543 16 5 16H8M21 13V15H14V11H21V13ZM21 13H14M11 21H14M14 21H17M14 21V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                </div>
-                                <div className="feature-text-formal">
-                                    <h4>Enterprise Software Engineering</h4>
-                                    <p>Custom, high-performance applications designed to streamline complex corporate workflows.</p>
-                                </div>
-                            </div>
-                            <div className="about-feature-item-formal">
-                                <div className="feature-icon-wrapper-formal">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                </div>
-                                <div className="feature-text-formal">
-                                    <h4>Reliable 24/7 Tech Support</h4>
-                                    <p>Continuous monitoring and dedicated support to guarantee maximum uptime and security.</p>
-                                </div>
-                            </div>
+                        <button className="progressive-btn">GET IN TOUCH</button>
+                        
+                        <div className="progressive-sparkle">
+                            <svg viewBox="0 0 100 100" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M50 0C50 27.6 72.4 50 100 50C72.4 50 50 72.4 50 100C50 72.4 27.6 50 0 50C27.6 50 50 27.6 50 0Z" />
+                            </svg>
                         </div>
-
-                        <div className="about-actions-row">
-                            <button className="about-btn-primary">Schedule a Consultation <span>↗</span></button>
-                        </div>
+                        {/* Little dot as seen in image near the curve */}
+                        <div className="progressive-dot"></div>
+                    </div>
+                </div>
+                
+                {/* Bottom Marquee */}
+                <div className="progressive-marquee-container">
+                    <div className="progressive-marquee">
+                        <span>Creative Agency ✦ Digital Solutions ✦ Creative Agency ✦ Digital Solutions ✦ Creative Agency ✦ Digital Solutions ✦</span>
+                        <span>Creative Agency ✦ Digital Solutions ✦ Creative Agency ✦ Digital Solutions ✦ Creative Agency ✦ Digital Solutions ✦</span>
                     </div>
                 </div>
             </section>
