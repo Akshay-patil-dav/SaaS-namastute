@@ -1,319 +1,411 @@
-/* Base Section Styles - Using Project Theme Variables */
-.journey-section {
-    /* padding: 120px 20px; */
-        padding: 20px 20px;
+/* ════════════════════════════════════════════════════════════════
+   ExpertiseSection — Premium Snake Journey  (ascending 1 → 8)
+   ════════════════════════════════════════════════════════════════ */
 
-    background-color: var(--bg2, #fafafa); /* Matches alternate sections in ITPortfolio */
+/* ── Section ── */
+.sj-section {
+    padding: 90px 24px 112px;
+    background: linear-gradient(150deg, #fffaf6 0%, #fafafa 45%, #fff6ee 100%);
     position: relative;
     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-    color: var(--text, #1a1a1a);
     overflow: hidden;
-    border-top: 1px solid var(--border-soft, rgba(0,0,0,0.05));
-    border-bottom: 1px solid var(--border-soft, rgba(0,0,0,0.05));
+    border-top:    1px solid rgba(249, 115, 22, 0.08);
+    border-bottom: 1px solid rgba(249, 115, 22, 0.08);
 }
 
-.journey-container {
+/* ── Ambient blobs ── */
+.sj-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+}
+.sj-blob--1 {
+    width: 580px; height: 580px;
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.18) 0%, transparent 65%);
+    top: -180px; left: -130px;
+    animation: sjBlob 9s ease-in-out infinite alternate;
+}
+.sj-blob--2 {
+    width: 440px; height: 440px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.13) 0%, transparent 65%);
+    bottom: -110px; right: -90px;
+    animation: sjBlob 11s ease-in-out infinite alternate-reverse;
+}
+@keyframes sjBlob {
+    from { transform: translate(0, 0)       scale(1); }
+    to   { transform: translate(26px, 20px) scale(1.07); }
+}
+
+/* ── Container ── */
+.sj-container {
     max-width: 1200px;
     margin: 0 auto;
     position: relative;
     z-index: 2;
 }
 
-/* Background Effects */
-.journey-section::before {
-    content: '';
-    position: absolute;
-    top: -20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    height: 80%;
-    background: radial-gradient(ellipse at top, rgba(255, 140, 66, 0.08) 0%, rgba(255,255,255,0) 70%);
-    z-index: 0;
-    pointer-events: none;
-}
-
-/* Reveal Animations */
+/* ── Shared scroll-reveal ── */
 .journey-reveal {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(28px);
+    transition:
+        opacity   0.78s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.78s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .journey-reveal.visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
 }
 
-/* Header Styles */
+/* ── Main section header ── */
 .journey-header {
     text-align: center;
     margin-bottom: 80px;
 }
-
 .journey-badge-dot {
     display: inline-block;
-    width: 6px;
-    height: 6px;
-    background-color: #ff5f1f;
+    width: 7px; height: 7px;
+    background: #f97316;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(255, 95, 31, 0.5);
-    margin-right: 6px;
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.6);
+    margin-right: 7px;
+    vertical-align: middle;
 }
 
-/* The Journey Timeline */
-.journey-timeline-wrapper {
-    margin-bottom: 120px;
-}
+/* ── Journey block ── */
+.sj-block { /* wrapper — intentionally bare */ }
 
-.journey-timeline-header,
-.journey-architecture-header {
+/* ── Sub-header ── */
+.sj-subhead {
     text-align: center;
-    margin-bottom: 60px;
+    margin-bottom: 56px;
 }
-
-.journey-timeline-header h3 {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--text, #1a1a1a);
+.sj-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #f97316;
     margin-bottom: 12px;
+}
+.sj-eline {
+    display: block;
+    width: 36px; height: 1.5px;
+    background: linear-gradient(90deg, transparent, #f97316, transparent);
+    border-radius: 2px;
+}
+.sj-subhead h3 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #111827;
     letter-spacing: -0.5px;
+    margin: 0 0 10px;
 }
-
-.journey-timeline-header p {
-    color: var(--text-muted, #64748b);
-    font-size: 1.1rem;
-    font-weight: 500;
-}
-
-/* Timeline Layout */
-.timeline-container {
-    position: relative;
-    max-width: 900px;
+.sj-subhead p {
+    font-size: 1rem;
+    color: #6b7280;
+    font-weight: 450;
+    max-width: 480px;
     margin: 0 auto;
-    padding: 40px 0;
+    line-height: 1.65;
 }
 
-/* The Center Line */
-.timeline-center-line {
+/* ══════════════════════════════════════════════════════════════
+   CSS GRID — 4 columns × 2 rows
+   IMPORTANT: column-gap MUST be 0 for the ±27px connector math.
+══════════════════════════════════════════════════════════════ */
+.sj-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 0;
+    row-gap: 80px;        /* generous gap so the vertical connector sits cleanly */
+    position: relative;   /* anchor for .sj-vconn */
+    overflow: visible;
+    isolation: isolate;   /* new stacking context — keeps z-index: -2 inside the grid */
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VERTICAL TURN CONNECTOR  (Step 4 → Step 5)
+   All geometry is injected via React style prop from JS state.
+══════════════════════════════════════════════════════════════ */
+.sj-vconn {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    background: rgba(255, 140, 66, 0.1); /* Faint orange track */
+    width: 2px;
+    z-index: -2;          /* behind the cards — line goes through the back of the boxes */
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sj-vconn-line {
+    width: 2px;
+    flex: 1;
+    background: linear-gradient(180deg, #f97316 0%, #fb923c 100%);
+    border-radius: 2px;
+    position: relative;
+}
+
+/* Soft glow halo behind the connector line */
+.sj-vconn-line::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: inherit;
+    filter: blur(6px);
+    opacity: 0.35;
     border-radius: 4px;
+    z-index: -1;
+}
+
+/* Arrow tip */
+.sj-vconn-tip {
+    flex-shrink: 0;
+    margin-top: 3px;
+    line-height: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STEP CELL
+══════════════════════════════════════════════════════════════ */
+.sj-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* no horizontal padding → keeps connector ±27px math exact */
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+        opacity   0.52s ease calc(var(--i, 0) * 0.10s),
+        transform 0.52s ease calc(var(--i, 0) * 0.10s);
+}
+.sj-step.visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HORIZONTAL CONNECTORS
+   With column-gap: 0, cells are adjacent. Formula:
+     LTR  left:  calc(50% + 27px)   right edge of this circle
+          right: calc(-50% + 27px)  left  edge of next circle
+     RTL  right: calc(50% + 27px)   left  edge of this circle
+          left:  calc(-50% + 27px)  right edge of prev circle
+══════════════════════════════════════════════════════════════ */
+.sj-hline {
+    position: absolute;
+    top: 27px;          /* vertical centre of 54 px circle */
+    height: 2px;
+    border-radius: 2px;
     z-index: 1;
 }
-
-/* The Animated Progress Line */
-.timeline-progress-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: calc(var(--scroll-progress) * 100%);
-    background: linear-gradient(180deg, #ff8c42, #ff5f1f);
-    border-radius: 4px;
-    box-shadow: 0 0 15px rgba(255, 95, 31, 0.5);
-    transition: height 0.1s ease-out; /* Smooth follow */
+.sj-hline--r {
+    left:  calc(50% + 27px);
+    right: calc(-50% + 27px);
+    background: linear-gradient(90deg, #f97316, #fb923c 50%, #f97316);
+}
+.sj-hline--l {
+    right: calc(50% + 27px);
+    left:  calc(-50% + 27px);
+    background: linear-gradient(270deg, #f97316, #fb923c 50%, #f97316);
 }
 
-/* Timeline Nodes */
-.timeline-node {
+/* ══════════════════════════════════════════════════════════════
+   NUMBERED CIRCLE
+══════════════════════════════════════════════════════════════ */
+.sj-circle {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 60%, #ea6c00 100%);
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    width: 50%;
+    justify-content: center;
     position: relative;
-    margin-bottom: 80px;
-    z-index: 2;
-    opacity: 0.3;
-    filter: grayscale(1);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+    flex-shrink: 0;
+    margin-bottom: 18px;
+    box-shadow:
+        0 4px 20px rgba(249, 115, 22, 0.38),
+        0 0 0 5px  rgba(249, 115, 22, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    transition: transform 0.32s ease, box-shadow 0.32s ease;
+}
+.sj-step:hover .sj-circle {
+    transform: scale(1.12) translateY(-3px);
+    box-shadow:
+        0 10px 30px rgba(249, 115, 22, 0.50),
+        0 0 0 8px  rgba(249, 115, 22, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.30);
 }
 
-.timeline-node:last-child {
-    margin-bottom: 0;
-}
-
-.timeline-node.node-right {
-    align-self: flex-end;
-    margin-left: 50%;
-    justify-content: flex-start;
-}
-
-/* Pop-in animation when active (scrolled to) */
-.timeline-node.active {
-    opacity: 1;
-    filter: grayscale(0);
-}
-
-/* Content Box */
-.timeline-content {
-    background: var(--glass-bg, #ffffff);
-    border: 1px solid var(--border-soft, rgba(0,0,0,0.05));
-    border-radius: 20px;
-    padding: 30px;
-    width: 80%;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-
-.timeline-node.active .timeline-content {
-    box-shadow: 0 20px 40px rgba(255, 140, 66, 0.08);
-}
-
-.timeline-node.active .timeline-content:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 25px 50px rgba(255, 140, 66, 0.12);
-}
-
-.timeline-step-number {
+/* Pulse ring: off until the step enters the viewport */
+.sj-circle-pulse {
     position: absolute;
-    top: -15px;
-    right: 20px;
-    font-size: 3rem;
-    font-weight: 900;
-    color: rgba(255, 140, 66, 0.1);
-    line-height: 1;
+    inset: -7px;
+    border-radius: 50%;
+    border: 2px solid rgba(249, 115, 22, 0.40);
+    opacity: 0;
     pointer-events: none;
 }
-
-.node-right .timeline-step-number {
-    right: auto;
-    left: 20px;
+.sj-step.visible .sj-circle-pulse {
+    opacity: 1;
+    animation: sjPulse 2.8s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * 0.15s);
+}
+@keyframes sjPulse {
+    0%   { transform: scale(1);    opacity: 0.75; }
+    100% { transform: scale(1.55); opacity: 0; }
 }
 
-.timeline-content h4 {
-    font-size: 1.3rem;
+.sj-circle span {
+    font-size: 1.2rem;
     font-weight: 800;
-    color: var(--text, #1a1a1a);
-    margin-bottom: 10px;
-}
-
-.timeline-content p {
-    font-size: 1rem;
-    color: var(--text-muted, #64748b);
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* The Icon in the center */
-.timeline-icon-container {
-    position: absolute;
-    right: -30px; /* half of width */
-    top: 50%;
-    transform: translateY(-50%);
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-}
-
-.node-right .timeline-icon-container {
-    right: auto;
-    left: -30px;
-}
-
-.timeline-icon {
-    width: 100%;
-    height: 100%;
-    background: #ffffff;
-    border: 3px solid #ff8c42;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ff5f1f;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    line-height: 1;
     position: relative;
-    z-index: 2;
-    transition: all 0.4s ease;
-}
-
-.timeline-icon-glow {
-    position: absolute;
-    inset: -5px;
-    background: #ff5f1f;
-    border-radius: 50%;
-    filter: blur(10px);
-    opacity: 0;
-    transition: opacity 0.4s ease;
     z-index: 1;
 }
 
-.timeline-node.active .timeline-icon {
-    background: #ff8c42;
-    border-color: #ff5f1f;
-    color: #fff;
-    transform: scale(1.1);
+/* ══════════════════════════════════════════════════════════════
+   CARD
+══════════════════════════════════════════════════════════════ */
+.sj-card {
+    width: calc(100% - 20px);   /* 10 px breathing room each side */
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 18px;
+    padding: 20px 16px 18px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.04),
+        0 1px 2px rgba(0,0,0,0.03);
+    transition:
+        transform    0.36s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow   0.36s ease,
+        border-color 0.36s ease;
 }
 
-.timeline-node.active .timeline-icon-glow {
-    opacity: 0.5;
-}
-
-/* Connector Line */
-.timeline-connector {
+/* Top-edge orange accent — slides in on hover */
+.sj-card::before {
+    content: '';
     position: absolute;
-    top: 50%;
-    right: 30px;
-    width: calc(20% - 30px);
-    height: 2px;
-    background: rgba(255, 140, 66, 0.2);
-    z-index: 1;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #fb923c, #f97316);
+    border-radius: 18px 18px 0 0;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.36s ease;
+}
+.sj-step:hover .sj-card {
+    transform: translateY(-7px);
+    border-color: rgba(249, 115, 22, 0.22);
+    box-shadow:
+        0 16px 40px rgba(249, 115, 22, 0.13),
+        0 4px 12px  rgba(0, 0, 0, 0.05);
+}
+.sj-step:hover .sj-card::before { transform: scaleX(1); }
+
+/* Icon badge */
+.sj-card-icon {
+    width: 40px; height: 40px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+    border: 1px solid rgba(249, 115, 22, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f97316;
+    margin-bottom: 13px;
+    flex-shrink: 0;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+.sj-step:hover .sj-card-icon {
+    background: linear-gradient(135deg, #fb923c, #f97316);
+    color: #ffffff;
+    transform: scale(1.1) rotate(-6deg);
 }
 
-.node-right .timeline-connector {
-    right: auto;
-    left: 30px;
+.sj-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 7px;
+    letter-spacing: -0.15px;
+}
+.sj-card-desc {
+    font-size: 0.825rem;
+    color: #6b7280;
+    line-height: 1.64;
+    margin: 0 0 13px;
+    font-weight: 400;
+}
+.sj-card-chip {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #f97316;
+    background: rgba(249, 115, 22, 0.08);
+    border: 1px solid rgba(249, 115, 22, 0.16);
+    border-radius: 99px;
+    padding: 3px 10px;
+    transition: background 0.3s ease;
+}
+.sj-step:hover .sj-card-chip {
+    background: rgba(249, 115, 22, 0.15);
 }
 
-.timeline-node.active .timeline-connector {
-    background: linear-gradient(90deg, #ff8c42, transparent);
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 920px) {
+    /*
+     * On tablet/mobile: reset to 2-col auto-flow.
+     * The inline gridColumn/gridRow are neutralised by !important so
+     * DOM order (1→2→3→4→5→6→7→8) renders left-to-right top-to-bottom.
+     */
+    .sj-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: none;
+        row-gap: 28px;
+        column-gap: 16px;
+    }
+    .sj-step {
+        grid-column: unset !important;
+        grid-row:    unset !important;
+    }
+    .sj-hline,
+    .sj-vconn { display: none !important; }
 }
 
-.node-right.active .timeline-connector {
-    background: linear-gradient(-90deg, #ff8c42, transparent);
-}
+@media (max-width: 560px) {
+    .sj-section { padding: 60px 16px 80px; }
+    .sj-subhead h3 { font-size: 1.5rem; }
 
-
-
-
-@media (max-width: 768px) {
-    /* Mobile Timeline Layout - shift center line to left */
-    .timeline-center-line {
-        left: 30px;
-        transform: none;
+    .sj-grid {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 22px;
+        column-gap: 12px;
     }
-    
-    .timeline-node, 
-    .timeline-node.node-right {
-        width: 100%;
-        margin-left: 0;
-        justify-content: flex-start;
-        padding-left: 80px;
-    }
-    
-    .timeline-icon-container,
-    .node-right .timeline-icon-container {
-        left: 0;
-        right: auto;
-    }
-    
-    .timeline-connector,
-    .node-right .timeline-connector {
-        left: 60px;
-        right: auto;
-        width: 20px;
-    }
-    
-    .timeline-content {
-        width: 100%;
-    }
-
+    .sj-circle { width: 46px; height: 46px; margin-bottom: 14px; }
+    .sj-circle span { font-size: 1rem; }
+    .sj-circle-pulse { inset: -5px; }
+    .sj-card { padding: 16px 12px 14px; }
 }

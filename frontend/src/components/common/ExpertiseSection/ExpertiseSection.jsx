@@ -85,7 +85,7 @@ export default function ExpertiseSection() {
             <div className="journey-container">
                 
                 {/* ── HEADER ── */}
-                <div className="journey-header journey-reveal">
+                {/* <div className="journey-header journey-reveal">
                     <div className="portfolio-section-label">
                         <span className="journey-badge-dot"></span>
                         Methodology & Architecture
@@ -96,7 +96,7 @@ export default function ExpertiseSection() {
                     <p className="portfolio-section-subtitle">
                         Our battle-tested software development lifecycle and modern tech stack ensure your enterprise applications are secure, performant, and future-proof.
                     </p>
-                </div>
+                </div> */}
 
                 {/* ── THE JOURNEY (SDLC) ── */}
                 <div className="journey-timeline-wrapper">
