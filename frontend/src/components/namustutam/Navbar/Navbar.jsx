@@ -272,6 +272,7 @@ const Navbar = () => {
             {renderMobileAccordion('products', <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Package size={16} /> Product</span>)}
             <a href="#projectWorks" className="navbar__mobile-link" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={16} /> Project Works</a>
             {renderMobileAccordion('services', <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Layers size={16} /> Services</span>)}
+            
             <a href="#blogs" className="navbar__mobile-link" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><BookOpen size={16} /> Blogs</a>
             <a href="#contact" className="navbar__mobile-link" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Phone size={16} /> Contact Us</a>
             <a href="#about" className="navbar__mobile-link" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Info size={16} /> About Us</a>
