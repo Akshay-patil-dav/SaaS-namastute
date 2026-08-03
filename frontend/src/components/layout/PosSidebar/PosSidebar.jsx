@@ -394,6 +394,17 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     </NavLink>
                                 </li> */}
                                 <li className="pos-menu-item">
+                                    <NavLink 
+                                        to={user?.role === 'CLIENT' ? "/dashboard/my-notes" : "/dashboard/admin-notes"} 
+                                        className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <FileText className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Notes</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
                                     <NavLink to="/dashboard/blog-posts" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                         <div className="pos-menu-link-content">
                                             <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">

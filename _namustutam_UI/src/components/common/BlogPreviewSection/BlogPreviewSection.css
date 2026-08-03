@@ -67,7 +67,7 @@
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--primary, #ff902f);
     border-radius: 28px;
     overflow: hidden;
     cursor: pointer;
@@ -81,7 +81,7 @@
 .bps-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.08), 0 8px 24px -8px rgba(0, 0, 0, 0.04);
-    border-color: rgba(255, 255, 255, 1);
+    border-color: var(--primary, #ff902f);
     background: rgba(255, 255, 255, 0.9);
 }
 
@@ -280,61 +280,3 @@
     transform: translateX(4px);
 }
 
-/* Dark mode generic adaptations */
-@media (prefers-color-scheme: dark) {
-    .bps-background-glow {
-        background: radial-gradient(circle, rgba(255,144,47,0.15) 0%, rgba(255,255,255,0) 70%);
-    }
-    .bps-section-label {
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--primary-l, #ffb570);
-        box-shadow: none;
-    }
-    .bps-card {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.5);
-    }
-    .bps-card:hover {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 144, 47, 0.4);
-    }
-    .bps-cat {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.3);
-        color: #ffffff;
-    }
-    .bps-meta {
-        color: #9ca3af;
-    }
-    .bps-meta-icon {
-        color: #6b7280;
-    }
-    .bps-title {
-        color: #ffffff;
-    }
-    .bps-desc {
-        color: #d1d5db;
-    }
-    .bps-author {
-        color: #f3f4f6;
-    }
-    .bps-author::before {
-        background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-    }
-    .bps-footer-content {
-        border-top-color: rgba(255, 255, 255, 0.1);
-    }
-    .bps-read-more {
-        background: rgba(255, 144, 47, 0.15);
-        color: var(--primary-l, #ffb570);
-    }
-    .bps-card:hover .bps-title {
-        color: var(--primary-l, #ffb570);
-    }
-    .bps-btn-outline:hover {
-        border-color: var(--primary-l, #ffb570);
-        background: rgba(255, 144, 47, 0.1);
-        color: var(--primary-l, #ffb570);
-    }
-}

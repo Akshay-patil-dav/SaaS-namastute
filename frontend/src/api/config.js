@@ -84,6 +84,9 @@ export const API = {
 
   // AI Helper (per-user, JWT-protected)
   AI: `${ENV.API_BASE_URL}/ai`,
+  
+  NOTES: `${ENV.API_BASE_URL}/notes`,
+  USERS: `${ENV.API_BASE_URL}/users`,
 
   // OAuth2 redirect URLs (uses backend root, not /api prefix)
   OAUTH_GOOGLE:   `${ENV.BACKEND_BASE_URL}/oauth2/authorization/google`,

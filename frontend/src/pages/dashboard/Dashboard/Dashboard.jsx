@@ -13,6 +13,7 @@ import {
     PieChart, Pie, Cell, Rectangle
 } from 'recharts';
 import './Dashboard.css';
+import NotesWidget from '../NotesWidget';
 
 // Dynamic Chart Data State will replace static salesPurchaseData
 
@@ -721,13 +722,12 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
-
-                    {/* Four Column Middle Row */}
+                                   {/* Three Column Middle Row */}
                     <div className="row g-3 mb-4">
-                        <div className="col-12 col-xl-6">
+                        <div className="col-12 col-xl-4">
                             <div className="dash-card">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 className="dash-title mb-0"><TrendingUp size={20} className="text-pink-500" color="#ec4899"/> Top Selling Products</h5>
+                                    <h5 className="dash-title mb-0"><TrendingUp size={20} className="text-pink-500" color="#ec4899"/> Top Selling</h5>
                                     <button className="dash-select text-primary bg-light border-0 fw-semibold">View All &gt;</button>
                                 </div>
                                 {loadingAnalytics ? (
@@ -741,7 +741,7 @@ export default function Dashboard() {
                                                 <div className={`item-img bg-${['light-orange', 'dark', 'success', 'secondary', 'primary'][index % 5]}`}></div>
                                                 <div>
                                                     <p className="item-title">{product.name}</p>
-                                                    <p className="item-desc">{product.price} • <span className="text-primary">{product.sales} Sales</span></p>
+                                                    <p className="item-desc">{product.price} ₹ <span className="text-primary">{product.sales} Sales</span></p>
                                                 </div>
                                             </div>
                                             <span className="pill-badge pill-green">+ 10%</span>
@@ -751,10 +751,10 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        <div className="col-12 col-xl-6">
+                        <div className="col-12 col-xl-4">
                             <div className="dash-card">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 className="dash-title mb-0"><Activity size={20} className="text-danger" color="#ef4444"/> Low Stock Products</h5>
+                                    <h5 className="dash-title mb-0"><Activity size={20} className="text-danger" color="#ef4444"/> Low Stock</h5>
                                     <button className="dash-select text-primary bg-light border-0 fw-semibold">View All &gt;</button>
                                 </div>
                                 {loadingAnalytics ? (
@@ -780,6 +780,11 @@ export default function Dashboard() {
                                 )}
                             </div>
                         </div>
+
+                        <div className="col-12 col-xl-4">
+                            <NotesWidget />
+                        </div>
+                    
                     </div>
 
                     {/* Bottom Row 3: Order Statistics (Heatmap) */}

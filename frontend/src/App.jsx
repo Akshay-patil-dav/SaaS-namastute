@@ -50,6 +50,8 @@ const AddPurchaseReturn  = lazy(() => import('./pages/purchases/AddPurchaseRetur
 const EditPurchaseReturn = lazy(() => import('./pages/purchases/EditPurchaseReturn/EditPurchaseReturn.jsx'));
 const Settings           = lazy(() => import('./pages/settings/Settings/Settings.jsx'));
 const WebAppCategories   = lazy(() => import('./pages/webapp/WebAppCategories/WebAppCategories.jsx'));
+const AdminNotes         = lazy(() => import('./pages/dashboard/AdminNotes/AdminNotes.jsx'));
+
 
 // ── Role constants ───────────────────────────────────────────────────────────
 const CLIENT_ADMIN_ROLES = ['ADMIN', 'CLIENT'];
@@ -116,7 +118,12 @@ function AppRoutes() {
                     element={<PosPage roles={CLIENT_ADMIN_ROLES}><Dashboard /></PosPage>}
                 />
 
+
                 {/* ── ADMIN ─────────────────────────────────── */}
+                <Route
+                    path="/dashboard/admin-notes"
+                    element={<PosPage roles={ADMIN_ROLES}><AdminNotes /></PosPage>}
+                />
                 <Route
                     path="/dashboard/admin2"
                     element={<PosPage roles={ADMIN_ROLES}><Dashboard2 /></PosPage>}

@@ -1,0 +1,42 @@
+.form-slide-down {
+    animation: slideDown 0.3s ease-out;
+    transform-origin: top;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.note-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.note-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.1) !important;
+}
+
+.delete-btn {
+    opacity: 0;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.note-card:hover .delete-btn {
+    opacity: 1;
+}

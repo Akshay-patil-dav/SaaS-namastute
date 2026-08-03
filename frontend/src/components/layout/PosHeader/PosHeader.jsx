@@ -256,6 +256,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <ChevronDown size={14} color="#888" />
                 </div>
 
+
+
                 <Link to="/pos" className="pos-btn-orange" style={{ textDecoration: 'none' }}>
                     <MonitorDot size={16} />
                     <span>POS</span>

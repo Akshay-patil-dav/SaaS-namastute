@@ -252,8 +252,11 @@ const ChatBot = () => {
                                 <Bot size={16} />
                             </div>
                             <div className="message-content typing">
-                                <Loader2 size={16} className="spin-anim" />
-                                <span>AI is thinking...</span>
+                                <div className="typing-indicator">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -261,13 +264,15 @@ const ChatBot = () => {
                 </div>
 
                 <form className="chatbot-input-area" onSubmit={handleSend}>
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type your message..."
-                        disabled={isLoading}
-                    />
+                    <div className="input-wrapper">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder="Type your message..."
+                            disabled={isLoading}
+                        />
+                    </div>
                     <button type="submit" disabled={!input.trim() || isLoading} className="send-btn">
                         <Send size={18} />
                     </button>

@@ -216,12 +216,12 @@ export default function ITPortfolio() {
 
                     {/* Right Side: Content */}
                     <div className="progressive-content reveal-right">
-                        <div className="progressive-label">PROGRESSIVE GROWTH</div>
-                        <h2 className="progressive-title">We Helping with<br/>operational challenge</h2>
+                        <div className="progressive-label">SCALABLE INNOVATION</div>
+                        <h2 className="progressive-title">Solving Complex<br/>IT Challenges</h2>
                         <p className="progressive-desc">
-                            We dig deep to identify the root of complex problems and focus on delivering tangible results for clients, these are a selection of the operations challenges we regularly work on.
+                            We dig deep to identify the root of technological bottlenecks and focus on delivering tangible software solutions. Partner with us to modernize your operations and scale seamlessly.
                         </p>
-                        <button className="progressive-btn">GET IN TOUCH</button>
+                        <button className="progressive-btn" onClick={() => navigate('/contact')}>GET IN TOUCH</button>
                         
                         <div className="progressive-sparkle">
                             <svg viewBox="0 0 100 100" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
@@ -236,20 +236,20 @@ export default function ITPortfolio() {
                 {/* Bottom Marquee */}
                 <div className="progressive-marquee-container">
                     <div className="progressive-marquee">
-                        <span>Creative Agency ✦ Digital Solutions ✦ Creative Agency ✦ Digital Solutions ✦ Creative Agency ✦ Digital Solutions ✦</span>
-                        <span>Creative Agency ✦ Digital Solutions ✦ Creative Agency ✦ Digital Solutions ✦ Creative Agency ✦ Digital Solutions ✦</span>
+                        <span>IT Services ✦ SaaS Development ✦ E-commerce Solutions ✦ Digital Transformation ✦ IT Services ✦ SaaS Development ✦</span>
+                        <span>IT Services ✦ SaaS Development ✦ E-commerce Solutions ✦ Digital Transformation ✦ IT Services ✦ SaaS Development ✦</span>
                     </div>
                 </div>
             </section>
 
             {/* ── CTA ──────────────────────── */}
-            <section className="portfolio-cta-section" id="contact">
+            {/* <section className="portfolio-cta-section" id="contact">
                 <div className="portfolio-cta-box reveal-up">
                     <h2>Ready to Build the Future?</h2>
                     <p>Let's collaborate to create software that drives your business forward.</p>
                     <button className="portfolio-btn-cta" onClick={() => navigate('/contact')}>Start a Conversation</button>
                 </div>
-            </section>
+            </section> */}
 
             {/* ── Blog Preview ────────────────── */}
             <BlogPreviewSection />
