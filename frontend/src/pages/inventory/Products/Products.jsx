@@ -23,6 +23,8 @@ import {
     Layers
 } from 'lucide-react';
 import { useConfirm } from '../../../context/ConfirmContext';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 const API_BASE = `${ENV.API_BASE_URL}/products`;
 
@@ -45,6 +47,8 @@ const getInitials = (name) => (name || 'P').split(' ').map(w => w[0]).join('').s
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
 
 const Products = () => {
+    const { currencySymbol } = useCurrency();
+
     const [dbProducts, setDbProducts]   = useState([]);
     const [loading, setLoading]         = useState(true);
     const [apiOnline, setApiOnline]     = useState(true);
@@ -246,7 +250,7 @@ const Products = () => {
     // ── Format price ─────────────────────────────────────────────────────
     const formatPrice = (price) => {
         if (price == null) return '—';
-        return `₹${Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `{currencySymbol}${Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
     // ── Format date ──────────────────────────────────────────────────────

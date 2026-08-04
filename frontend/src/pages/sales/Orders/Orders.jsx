@@ -23,10 +23,14 @@ import ViewSalesModal   from '../../../components/modals/sales/ViewSalesModal/Vi
 import DeleteConfirmModal from '../../../components/modals/common/DeleteConfirmModal/DeleteConfirmModal';
 import InvoiceModal     from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
 import './orders.css';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 const BASE_URL = ENV.API_BASE_URL;
 
 export default function Orders() {
+    const { currencySymbol } = useCurrency();
+
     const { confirm } = useConfirm();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -143,7 +147,7 @@ export default function Orders() {
         );
     };
 
-    const money = v => { const n = parseFloat(v); return isNaN(n) ? '₹0.00' : `₹${n.toFixed(2)}`; };
+    const money = v => { const n = parseFloat(v); return isNaN(n) ? '{currencySymbol}0.00' : `{currencySymbol}${n.toFixed(2)}`; };
 
     const filteredOrders = orders.filter(order => {
         if (activeTab !== 'All' && order.status !== activeTab) return false;
@@ -222,7 +226,7 @@ export default function Orders() {
                     <div className="shop-kpi-item">
                         <div className="kpi-label">Returns</div>
                         <div className="kpi-value">
-                            ₹0 <span className="kpi-dash">—</span>
+                            {currencySymbol}0 <span className="kpi-dash">—</span>
                         </div>
                         <div className="kpi-sparkline kpi-sparkline-flat"></div>
                     </div>

@@ -71,8 +71,8 @@ body {
 .modal-overlay textarea:focus,
 .stock-modal-overlay input:focus,
 .stock-modal-overlay select:focus {
-    border-color: #ff9b29 !important;
-    box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.15) !important;
+    border-color: #ffb38a !important;
+    box-shadow: 0 0 0 3px rgba(255, 179, 138, 0.15) !important;
     outline: none !important;
 }
 

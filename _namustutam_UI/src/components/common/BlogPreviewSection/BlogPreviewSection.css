@@ -15,7 +15,7 @@
     transform: translateX(-50%);
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, var(--primary-glow, rgba(255,144,47,0.12)) 0%, rgba(255,255,255,0) 70%);
+    background: radial-gradient(circle, var(--primary-glow, rgba(255, 179, 138,0.12)) 0%, rgba(255,255,255,0) 70%);
     z-index: -1;
     pointer-events: none;
 }
@@ -27,8 +27,8 @@
 
 .bps-section-label {
     display: inline-block;
-    color: var(--primary, #ff902f);
-    background: var(--primary-pale, rgba(255,144,47,0.1));
+    color: var(--primary, #ffb38a);
+    background: var(--primary-pale, rgba(255, 179, 138,0.1));
     padding: 8px 18px;
     border-radius: 50px;
     font-size: 13px;
@@ -67,7 +67,7 @@
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--primary, #ff902f);
+    border: 1px solid var(--primary, #ffb38a);
     border-radius: 28px;
     overflow: hidden;
     cursor: pointer;
@@ -81,7 +81,7 @@
 .bps-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.08), 0 8px 24px -8px rgba(0, 0, 0, 0.04);
-    border-color: var(--primary, #ff902f);
+    border-color: var(--primary, #ffb38a);
     background: rgba(255, 255, 255, 0.9);
 }
 
@@ -183,7 +183,7 @@
 }
 
 .bps-card:hover .bps-title {
-    color: var(--primary, #ff902f);
+    color: var(--primary, #ffb38a);
 }
 
 .bps-desc {
@@ -224,17 +224,17 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    color: var(--primary, #ff902f);
+    color: var(--primary, #ffb38a);
     font-weight: 700;
     font-size: 14px;
     padding: 8px 16px;
     border-radius: 50px;
-    background: var(--primary-pale, rgba(255,144,47,0.1));
+    background: var(--primary-pale, rgba(255, 179, 138,0.1));
     transition: all 0.3s ease;
 }
 
 .bps-card:hover .bps-read-more {
-    background: var(--gradient, linear-gradient(135deg, #ff902f 0%, #ff5f1f 100%));
+    background: var(--gradient, linear-gradient(135deg, #ffb38a 0%, #ff9666 100%));
     color: #ffffff;
 }
 
@@ -271,9 +271,9 @@
 }
 
 .bps-btn-outline:hover {
-    border-color: var(--primary, #ff902f);
-    background: var(--primary-pale, rgba(255,144,47,0.05));
-    color: var(--primary, #ff902f);
+    border-color: var(--primary, #ffb38a);
+    background: var(--primary-pale, rgba(255, 179, 138,0.05));
+    color: var(--primary, #ffb38a);
 }
 
 .bps-btn-outline:hover .bps-btn-icon {

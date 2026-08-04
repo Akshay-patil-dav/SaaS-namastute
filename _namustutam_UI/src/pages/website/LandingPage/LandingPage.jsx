@@ -5,11 +5,15 @@ import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavba
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
 import NodeFeatures from '../../../components/common/NodeFeatures/NodeFeatures';
 import BlogPreviewSection from '../../../components/common/BlogPreviewSection/BlogPreviewSection';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 
 
 /* ── Feature Card ───────────────────────────────────────────────────────── */
 function FeatureCard({ icon, title, desc, delay = 0 }) {
+    const { currencySymbol } = useCurrency();
+
     return (
         <div
             className="lp-feature-card lp-reveal"
@@ -30,7 +34,7 @@ function PricingCard({ plan, price, desc, features, popular, cta }) {
             {popular && <div className="lp-pricing-badge">Most Popular</div>}
             <div className="lp-pricing-plan">{plan}</div>
             <div className="lp-pricing-price">
-                <span className="lp-currency">₹</span>
+                <span className="lp-currency">{currencySymbol}</span>
                 <span className="lp-amount">{price}</span>
                 <span className="lp-period">/mo</span>
             </div>
@@ -287,7 +291,7 @@ export default function LandingPage() {
                         </div>
                         <div className="lp-stat-divider" />
                         <div className="lp-stat">
-                            <div className="lp-stat-num">₹0<span>+</span></div>
+                            <div className="lp-stat-num">{currencySymbol}0<span>+</span></div>
                             <div className="lp-stat-label">Transactions Processed</div>
                         </div>
                         <div className="lp-stat-divider" />

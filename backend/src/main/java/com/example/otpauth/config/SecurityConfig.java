@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands", "/api/units", "/api/warranties").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/verification/**", "/oauth2/**", "/login/**", "/api/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands", "/api/units", "/api/warranties").permitAll()
                         // Allow public e-commerce storefront access
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/sales").permitAll()

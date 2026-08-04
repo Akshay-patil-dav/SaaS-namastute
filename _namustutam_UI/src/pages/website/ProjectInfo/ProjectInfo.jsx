@@ -35,7 +35,7 @@ export default function ProjectInfo() {
                 <WebsiteNavbar />
                 <div style={{ padding: '150px 0', textAlign: 'center', minHeight: '60vh' }}>
                     <h1>Project Not Found</h1>
-                    <Link to="/project-works" style={{ color: '#ff9b29', textDecoration: 'underline', marginTop: '20px', display: 'inline-block' }}>
+                    <Link to="/project-works" style={{ color: '#ffb38a', textDecoration: 'underline', marginTop: '20px', display: 'inline-block' }}>
                         Return to Projects
                     </Link>
                 </div>

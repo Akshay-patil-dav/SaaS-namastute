@@ -80,8 +80,8 @@
 }
 .blog-search-input::placeholder { color: var(--text-muted); }
 .blog-search-input:focus {
-  border-color: rgba(255,144,47,0.5);
-  box-shadow: 0 0 0 4px rgba(255,144,47,0.08), var(--shadow-md);
+  border-color: rgba(255, 179, 138,0.5);
+  box-shadow: 0 0 0 4px rgba(255, 179, 138,0.08), var(--shadow-md);
 }
 
 .blog-search-clear {
@@ -145,7 +145,7 @@
   background: var(--gradient);
   border-color: transparent;
   color: white;
-  box-shadow: 0 4px 14px rgba(255,144,47,0.30);
+  box-shadow: 0 4px 14px rgba(255, 179, 138,0.30);
 }
 .blog-filter-count {
   background: rgba(255,255,255,0.25);
@@ -284,7 +284,7 @@
 .blog-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.9);
-  border-color: rgba(255,144,47,0.3);
+  border-color: rgba(255, 179, 138,0.3);
 }
 .blog-card:focus { outline: 3px solid var(--primary); outline-offset: 3px; }
 
@@ -393,7 +393,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(255,144,47,0.3);
+  box-shadow: 0 2px 8px rgba(255, 179, 138,0.3);
 }
 
 .blog-card-author-name {
@@ -461,7 +461,7 @@
   background: var(--gradient);
   border-color: transparent;
   color: white;
-  box-shadow: 0 4px 14px rgba(255,144,47,0.30);
+  box-shadow: 0 4px 14px rgba(255, 179, 138,0.30);
 }
 .blog-page-btn:disabled {
   opacity: 0.35;
@@ -644,7 +644,7 @@
   font-size: 16px;
   font-weight: 700;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 3px 10px rgba(255,144,47,0.3);
+  box-shadow: 0 3px 10px rgba(255, 179, 138,0.3);
 }
 .blog-detail-author-name { font-size: 14px; font-weight: 700; color: var(--text); }
 .blog-detail-author-role { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
@@ -697,7 +697,7 @@
 .blog-detail-tag {
   background: var(--primary-pale);
   color: var(--primary-d);
-  border: 1px solid rgba(255,144,47,0.2);
+  border: 1px solid rgba(255, 179, 138,0.2);
   border-radius: 50px;
   padding: 5px 14px;
   font-size: 12px;
@@ -901,7 +901,7 @@
 .blog-form-select:focus,
 .blog-form-textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255,144,47,0.10);
+  box-shadow: 0 0 0 3px rgba(255, 179, 138,0.10);
 }
 .blog-form-textarea { resize: vertical; min-height: 200px; }
 .blog-form-hint { font-size: 11px; color: var(--text-muted); }
@@ -925,7 +925,7 @@
 .blog-form-emoji-btn.selected {
   background: var(--gradient);
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(255,144,47,0.3);
+  box-shadow: 0 4px 12px rgba(255, 179, 138,0.3);
 }
 
 .blog-form-color-grid {
@@ -940,7 +940,7 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-.blog-form-color-btn.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,144,47,0.25); }
+.blog-form-color-btn.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 179, 138,0.25); }
 
 .blog-modal-footer {
   padding: 20px 32px 28px;
@@ -982,7 +982,7 @@
   font-size: 13.5px;
 }
 .admin-blog-table tr:last-child td { border-bottom: none; }
-.admin-blog-table tr:hover td { background: rgba(255,144,47,0.02); }
+.admin-blog-table tr:hover td { background: rgba(255, 179, 138,0.02); }
 
 .admin-blog-row-cover {
   width: 44px; height: 44px;
@@ -1013,11 +1013,11 @@
 }
 .admin-blog-action-btn.edit:hover { background: rgba(99,102,241,0.15); }
 .admin-blog-action-btn.view {
-  background: rgba(255,144,47,0.08);
+  background: rgba(255, 179, 138,0.08);
   color: var(--primary-d);
-  border-color: rgba(255,144,47,0.2);
+  border-color: rgba(255, 179, 138,0.2);
 }
-.admin-blog-action-btn.view:hover { background: rgba(255,144,47,0.15); }
+.admin-blog-action-btn.view:hover { background: rgba(255, 179, 138,0.15); }
 .admin-blog-action-btn.delete {
   background: rgba(239,68,68,0.08);
   color: #ef4444;

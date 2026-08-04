@@ -8,6 +8,8 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer 
 } from 'recharts';
 import './Dashboard2.css';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 const chartData = [
   { name: 'Jan', sales: 130, purchase: -150 },
@@ -22,10 +24,10 @@ const chartData = [
 ];
 
 const recentProducts = [
-    { id: 1, name: 'Lenovo 3rd Generation', price: '₹12500', color: 'bg-primary' },
-    { id: 2, name: 'Bold V3.2', price: '₹1600', color: 'bg-danger' },
-    { id: 3, name: 'Nike Jordan', price: '₹2000', color: 'bg-dark' },
-    { id: 4, name: 'Apple Series 5 Watch', price: '₹800', color: 'bg-secondary' },
+    { id: 1, name: 'Lenovo 3rd Generation', price: '{currencySymbol}12500', color: 'bg-primary' },
+    { id: 2, name: 'Bold V3.2', price: '{currencySymbol}1600', color: 'bg-danger' },
+    { id: 3, name: 'Nike Jordan', price: '{currencySymbol}2000', color: 'bg-dark' },
+    { id: 4, name: 'Apple Series 5 Watch', price: '{currencySymbol}800', color: 'bg-secondary' },
 ];
 
 const expiredProducts = [
@@ -36,6 +38,8 @@ const expiredProducts = [
 ];
 
 export default function Dashboard2() {
+    const { currencySymbol } = useCurrency();
+
     return (
         <div className="dash2-wrapper">
             
@@ -47,7 +51,7 @@ export default function Dashboard2() {
                             <ShoppingBag size={20} />
                         </div>
                         <div>
-                            <p className="dash2-val">₹307144</p>
+                            <p className="dash2-val">{currencySymbol}307144</p>
                             <p className="dash2-label mb-0">Total Purchase Due</p>
                         </div>
                     </div>
@@ -58,7 +62,7 @@ export default function Dashboard2() {
                             <DollarSign size={20} />
                         </div>
                         <div>
-                            <p className="dash2-val">₹4385</p>
+                            <p className="dash2-val">{currencySymbol}4385</p>
                             <p className="dash2-label mb-0">Total Sales Due</p>
                         </div>
                     </div>
@@ -69,7 +73,7 @@ export default function Dashboard2() {
                             <ArrowDown size={20} />
                         </div>
                         <div>
-                            <p className="dash2-val">₹385656.5</p>
+                            <p className="dash2-val">{currencySymbol}385656.5</p>
                             <p className="dash2-label mb-0">Total Sale Amount</p>
                         </div>
                     </div>
@@ -80,7 +84,7 @@ export default function Dashboard2() {
                             <ArrowUp size={20} />
                         </div>
                         <div>
-                            <p className="dash2-val">₹40000</p>
+                            <p className="dash2-val">{currencySymbol}40000</p>
                             <p className="dash2-label mb-0">Total Expense Amount</p>
                         </div>
                     </div>

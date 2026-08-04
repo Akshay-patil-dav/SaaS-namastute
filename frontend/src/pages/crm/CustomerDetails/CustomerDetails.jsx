@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { User, Phone, Mail, MapPin, Activity, Bot } from 'lucide-react';
 import apiClient, { API } from '../../../api/config';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 export default function CustomerDetails() {
+    const { currencySymbol } = useCurrency();
+
   const { id } = useParams();
   const [customer, setCustomer] = useState(null);
   const [interactions, setInteractions] = useState([]);
@@ -77,7 +81,7 @@ export default function CustomerDetails() {
               <div className="d-flex justify-content-around mt-4">
                 <div className="text-center">
                   <h6 className="text-muted mb-1">LTV</h6>
-                  <h5>₹{customer.lifetimeValue}</h5>
+                  <h5>{currencySymbol}{customer.lifetimeValue}</h5>
                 </div>
                 <div className="text-center">
                   <h6 className="text-muted mb-1">Tier</h6>

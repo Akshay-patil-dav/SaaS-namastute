@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { projectsData } from '../../../data/projectsData';
 import './WebDevelopment.css';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 /* ── Service Cards Data ──────────────────── */
 const SERVICES = [
@@ -19,7 +21,7 @@ const SERVICES = [
         title: 'Business Websites',
         desc: 'Stunning, high-converting corporate websites and landing pages that are your 24/7 digital sales engine.',
         badge: 'Most Popular',
-        gradient: 'linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%)',
+        gradient: 'linear-gradient(135deg, #ff8c42 0%, #ff9666 100%)',
     },
     {
         icon: <ShoppingCart size={26} />,
@@ -86,6 +88,8 @@ const TESTIMONIALS = [
 ];
 
 export default function WebDevelopment() {
+    const { currencySymbol } = useCurrency();
+
     const navigate = useNavigate();
     const sliderRef = useRef(null);
     const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -190,7 +194,7 @@ export default function WebDevelopment() {
                                         </div>
                                         <div className="wd-hc-metrics">
                                             <div className="wd-hc-metric">
-                                                <span className="wd-metric-val">₹2.4L</span>
+                                                <span className="wd-metric-val">{currencySymbol}2.4L</span>
                                                 <span className="wd-metric-lbl">Revenue</span>
                                             </div>
                                             <div className="wd-hc-metric">
@@ -304,7 +308,7 @@ export default function WebDevelopment() {
                                 <p>Perfect for local businesses &amp; startups needing a professional online presence fast.</p>
                             </div>
                             <div className="wd-plan-price">
-                                <span className="wd-price-amt">₹8,000</span>
+                                <span className="wd-price-amt">{currencySymbol}8,000</span>
                                 <span className="wd-price-note">one-time</span>
                             </div>
                             <ul className="wd-plan-features">
@@ -329,7 +333,7 @@ export default function WebDevelopment() {
                                 <p>For businesses needing dynamic features, client messages, and operational capabilities.</p>
                             </div>
                             <div className="wd-plan-price">
-                                <span className="wd-price-amt">₹15,000</span>
+                                <span className="wd-price-amt">{currencySymbol}15,000</span>
                                 <span className="wd-price-note">one-time</span>
                             </div>
                             <ul className="wd-plan-features">

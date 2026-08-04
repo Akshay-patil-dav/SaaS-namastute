@@ -11,9 +11,9 @@
     --glass-shadow:    0 8px 32px rgba(255, 140, 66, 0.08), 0 1.5px 0 rgba(255,255,255,0.9) inset;
     --glass-blur:      blur(18px);
 
-    --accent:          #ff7a2f;
-    --accent-soft:     rgba(255, 122, 47, 0.12);
-    --accent-border:   rgba(255, 122, 47, 0.25);
+    --accent:          #ffb38a;
+    --accent-soft:     rgba(255, 179, 138, 0.12);
+    --accent-border:   rgba(255, 179, 138, 0.25);
 
     --text-dark:       #1e293b;
     --text-mid:        #64748b;
@@ -41,7 +41,7 @@
    REUSABLE HELPERS
    ============================================================ */
 .wd-gradient-text {
-    background: linear-gradient(135deg, #ff8c42 0%, #ff5f1f 60%, #f43f5e 100%);
+    background: linear-gradient(135deg, #ff8c42 0%, #ff9666 60%, #f43f5e 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -62,7 +62,7 @@
 .wd-section-tag {
     display: inline-block;
     padding: 6px 18px;
-    background: rgba(255, 122, 47, 0.10);
+    background: rgba(255, 179, 138, 0.10);
     color: #e8580a;
     border-radius: 9999px;
     font-size: 0.8rem;
@@ -70,7 +70,7 @@
     letter-spacing: 0.07em;
     text-transform: uppercase;
     margin-bottom: 20px;
-    border: 1px solid rgba(255, 122, 47, 0.22);
+    border: 1px solid rgba(255, 179, 138, 0.22);
     backdrop-filter: blur(8px);
 }
 
@@ -107,14 +107,14 @@
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    box-shadow: 0 6px 20px -4px rgba(255, 95, 31, 0.35), 0 1px 0 rgba(255,255,255,0.2) inset;
+    box-shadow: 0 6px 20px -4px rgba(255, 150, 102, 0.35), 0 1px 0 rgba(255,255,255,0.2) inset;
     backdrop-filter: blur(8px);
     white-space: nowrap;
 }
 
 .wd-btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 14px 28px -6px rgba(255, 95, 31, 0.45);
+    box-shadow: 0 14px 28px -6px rgba(255, 150, 102, 0.45);
 }
 
 .wd-btn-primary.large {
@@ -142,7 +142,7 @@
 .wd-btn-secondary:hover {
     border-color: var(--accent-border);
     color: var(--accent);
-    background: rgba(255, 122, 47, 0.07);
+    background: rgba(255, 179, 138, 0.07);
     transform: translateY(-2px);
 }
 
@@ -660,7 +660,7 @@
 
 .wd-why-card:hover {
     border-color: var(--accent-border);
-    box-shadow: 0 12px 32px rgba(255, 122, 47, 0.12), 0 1px 0 rgba(255,255,255,0.95) inset;
+    box-shadow: 0 12px 32px rgba(255, 179, 138, 0.12), 0 1px 0 rgba(255,255,255,0.95) inset;
     transform: translateY(-4px);
     background: rgba(255,255,255,0.80);
 }
@@ -673,7 +673,7 @@
     color: white;
     margin-bottom: 12px;
     position: relative; z-index: 1;
-    box-shadow: 0 3px 12px rgba(255,95,31,0.25);
+    box-shadow: 0 3px 12px rgba(255, 150, 102,0.25);
 }
 
 .wd-why-card h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; position: relative; z-index: 1; }
@@ -708,7 +708,7 @@
     font-size: 1rem; font-weight: 900;
     color: var(--accent);
     position: relative; z-index: 2;
-    box-shadow: 0 4px 20px rgba(255, 122, 47, 0.15), 0 1px 0 rgba(255,255,255,0.9) inset;
+    box-shadow: 0 4px 20px rgba(255, 179, 138, 0.15), 0 1px 0 rgba(255,255,255,0.9) inset;
     backdrop-filter: blur(12px);
 }
 
@@ -776,8 +776,8 @@
 /* Popular card gets orange tinted glass */
 .wd-plan.popular {
     background: rgba(255, 248, 242, 0.75);
-    border-color: rgba(255, 122, 47, 0.40);
-    box-shadow: 0 12px 40px rgba(255, 122, 47, 0.16), 0 1px 0 rgba(255,255,255,0.9) inset;
+    border-color: rgba(255, 179, 138, 0.40);
+    box-shadow: 0 12px 40px rgba(255, 179, 138, 0.16), 0 1px 0 rgba(255,255,255,0.9) inset;
     transform: scale(1.03);
 }
 
@@ -794,7 +794,7 @@
     padding: 6px 18px;
     border-radius: 9999px;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(255, 95, 31, 0.30);
+    box-shadow: 0 4px 12px rgba(255, 150, 102, 0.30);
     letter-spacing: 0.05em;
     text-transform: uppercase;
 }
@@ -856,12 +856,12 @@
     background: linear-gradient(135deg, rgba(255,140,66,0.95), rgba(255,80,31,0.95));
     color: white;
     border: none;
-    box-shadow: 0 6px 20px rgba(255, 95, 31, 0.35);
+    box-shadow: 0 6px 20px rgba(255, 150, 102, 0.35);
 }
 
 .wd-btn-plan.fill:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(255, 95, 31, 0.45);
+    box-shadow: 0 12px 28px rgba(255, 150, 102, 0.45);
 }
 
 .wd-btn-plan.outline {
@@ -874,7 +874,7 @@
 .wd-btn-plan.outline:hover {
     border-color: var(--accent-border);
     color: var(--accent);
-    background: rgba(255, 122, 47, 0.07);
+    background: rgba(255, 179, 138, 0.07);
 }
 
 /* ============================================================
@@ -920,7 +920,7 @@
     background: var(--accent);
     color: white;
     border-color: var(--accent);
-    box-shadow: 0 8px 20px rgba(255, 95, 31, 0.35);
+    box-shadow: 0 8px 20px rgba(255, 150, 102, 0.35);
     transform: scale(1.05);
 }
 
@@ -955,7 +955,7 @@
 
 .wd-project-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 48px rgba(255, 122, 47, 0.13), 0 1px 0 rgba(255,255,255,0.95) inset;
+    box-shadow: 0 20px 48px rgba(255, 179, 138, 0.13), 0 1px 0 rgba(255,255,255,0.95) inset;
     border-color: var(--accent-border);
     background: rgba(255,255,255,0.72);
 }
@@ -1049,7 +1049,7 @@
 }
 
 .wd-testimonials .wd-section-tag {
-    background: rgba(255, 122, 47, 0.18);
+    background: rgba(255, 179, 138, 0.18);
     color: #ffb280;
     border-color: rgba(255, 140, 66, 0.28);
 }
@@ -1099,7 +1099,7 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 1.2rem; font-weight: 800;
     color: white; flex-shrink: 0;
-    box-shadow: 0 4px 14px rgba(255,95,31,0.30);
+    box-shadow: 0 4px 14px rgba(255, 150, 102,0.30);
 }
 
 .wd-testimonial-name { font-weight: 800; font-size: 0.95rem; color: #ffffff; }

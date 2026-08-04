@@ -23,8 +23,7 @@ public class VerificationController {
         try {
             String otp = verificationService.generateAndSendOtp(request.getEmail(), request.getType());
             Map<String, String> response = new HashMap<>();
-            response.put("message", "OTP sent successfully");
-            response.put("otp", otp); // Including OTP for testing/dev purposes only
+            response.put("message", "OTP sent successfully to " + request.getEmail());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Failed to send OTP: " + e.getMessage());

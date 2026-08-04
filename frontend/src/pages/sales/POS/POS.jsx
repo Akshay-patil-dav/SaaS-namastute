@@ -11,6 +11,8 @@ import {
     LayoutGrid, List
 } from 'lucide-react';
 import './POS.css';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 const BASE_URL = ENV.API_BASE_URL;
 
@@ -103,6 +105,8 @@ const CATEGORIES = [
 const DEFAULT_CUSTOMER = { id: 'c-1', name: 'Walk-in Customer', bonus: 0, loyalty: 0 };
 
 export default function POS() {
+    const { currencySymbol } = useCurrency();
+
     const navigate = useNavigate();
     const { user } = useAuth();
     const currentDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -322,7 +326,7 @@ export default function POS() {
 
     const handleApplyCustomerBonus = () => {
         // Mock Applying Loyalty
-        alert(`Successfully applied ₹${selectedCustomer.loyalty || 0} Loyalty Balance as coupon discount!`);
+        alert(`Successfully applied {currencySymbol}${selectedCustomer.loyalty || 0} Loyalty Balance as coupon discount!`);
         setCoupon(prev => prev + (selectedCustomer.loyalty || 0));
         setShowCustomerCard(false);
     };
@@ -347,7 +351,7 @@ export default function POS() {
     // --- CALCULATIONS ---
     const cartSubtotal = cart.reduce((sum, item) => sum + (item.price * item.cartQty), 0);
     
-    // Apply 5% discount if banner is active and subtotal > ₹20
+    // Apply 5% discount if banner is active and subtotal > {currencySymbol}20
     const autoDiscountValue = (discountApplied && cartSubtotal >= 20) ? (cartSubtotal * 0.05) : 0;
     
     const grandTotal = Math.max(0, cartSubtotal + shipping + tax - coupon - autoDiscountValue);
@@ -448,7 +452,7 @@ export default function POS() {
 
     const handleConfirmPayment = () => {
         if (parseFloat(amountPaid) < grandTotal) {
-            setOrderError(`Paid amount must be at least ₹${grandTotal.toFixed(2)}`);
+            setOrderError(`Paid amount must be at least {currencySymbol}${grandTotal.toFixed(2)}`);
             return;
         }
         submitOrderToBackend('Completed', 'Paid');
@@ -970,7 +974,7 @@ export default function POS() {
                                     </div>
                                     <div className="coupon-text">
                                         <h5>Discount 5%</h5>
-                                        <p>For ₹20 Minimum Purchase, all Items</p>
+                                        <p>For {currencySymbol}20 Minimum Purchase, all Items</p>
                                     </div>
                                 </div>
                                 <button className="coupon-remove-btn" onClick={() => setDiscountApplied(false)}>
@@ -1062,7 +1066,7 @@ export default function POS() {
                         </div>
                         <div className="pos-modal-body">
                             <div className="pos-input-group">
-                                <label>Enter value in USD (₹)</label>
+                                <label>Enter value in USD ({currencySymbol})</label>
                                 <input 
                                     type="number" 
                                     step="0.01" 
@@ -1172,7 +1176,7 @@ export default function POS() {
                                         <div className="payment-amount-input-block">
                                             <label>Enter Amount Received</label>
                                             <div className="pay-amount-field-wrap">
-                                                <span className="currency-prefix">₹</span>
+                                                <span className="currency-prefix">{currencySymbol}</span>
                                                 <input 
                                                     type="number" 
                                                     step="0.01" 
@@ -1203,7 +1207,7 @@ export default function POS() {
                                             onClick={handleConfirmPayment}
                                             disabled={submittingOrder}
                                         >
-                                            {submittingOrder ? 'Processing...' : `Confirm Paid ₹${grandTotal.toFixed(2)}`}
+                                            {submittingOrder ? 'Processing...' : `Confirm Paid {currencySymbol}${grandTotal.toFixed(2)}`}
                                         </button>
                                     </div>
                                 </div>

@@ -19,7 +19,8 @@ body {
 .sp-modal-overlay,
 .sc-modal-overlay,
 .wb-modal-overlay,
-.pos-modal-overlay {
+.pos-modal-overlay,
+.wa-modal-overlay {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -49,7 +50,8 @@ body {
 .sp-modal-overlay .sp-modal-content,
 .sc-modal-overlay .sc-modal-content,
 .global-delete-modal,
-.add-variant-modal {
+.add-variant-modal,
+.wa-modal-overlay .wa-modal-content {
     background: #ffffff !important;
     border-radius: 16px !important;
     border: 1px solid rgba(226, 232, 240, 0.8) !important;
@@ -70,7 +72,10 @@ body {
 .modal-overlay select:focus,
 .modal-overlay textarea:focus,
 .stock-modal-overlay input:focus,
-.stock-modal-overlay select:focus {
+.stock-modal-overlay select:focus,
+.wa-modal-overlay input:focus,
+.wa-modal-overlay select:focus,
+.wa-modal-overlay textarea:focus {
     border-color: #ff9b29 !important;
     box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.15) !important;
     outline: none !important;

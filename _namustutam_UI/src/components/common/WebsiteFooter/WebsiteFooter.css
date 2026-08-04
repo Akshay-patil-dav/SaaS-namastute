@@ -68,7 +68,7 @@
 .premium-footer-brand .logo-icon {
   width: 32px;
   height: 32px;
-  background: var(--gradient, linear-gradient(135deg, #ff902f 0%, #ff5f1f 100%));
+  background: var(--gradient, linear-gradient(135deg, #ffb38a 0%, #ff9666 100%));
   border-radius: 8px;
 }
 
@@ -141,7 +141,7 @@
 }
 
 .premium-footer-col ul li a:hover {
-  color: var(--primary, #ff902f);
+  color: var(--primary, #ffb38a);
 }
 
 .status-link {
@@ -175,7 +175,7 @@
 }
 
 .social-icon:hover {
-  color: var(--primary, #ff902f);
+  color: var(--primary, #ffb38a);
   transform: scale(1.1);
 }
 

@@ -4,6 +4,8 @@ import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavba
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
 import BlogPreviewSection from '../../../components/common/BlogPreviewSection/BlogPreviewSection';
 import './Ecommerce.css';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 function useReveal() {
     const ref = useRef(null);
@@ -26,6 +28,8 @@ function useReveal() {
 }
 
 export default function Ecommerce() {
+    const { currencySymbol } = useCurrency();
+
     const navigate = useNavigate();
     const heroRef = useReveal();
     const featuresRef = useReveal();
@@ -77,7 +81,7 @@ export default function Ecommerce() {
                             <div className="ec-card-img"></div>
                             <div className="ec-card-info">
                                 <h4>Premium Headphones</h4>
-                                <div className="ec-price">₹299.00</div>
+                                <div className="ec-price">{currencySymbol}299.00</div>
                                 <button className="ec-btn-add">Add to Cart</button>
                             </div>
                         </div>
@@ -85,14 +89,14 @@ export default function Ecommerce() {
                             <div className="ec-card-img alt-1"></div>
                             <div className="ec-card-info">
                                 <h4>Smart Watch</h4>
-                                <div className="ec-price">₹199.00</div>
+                                <div className="ec-price">{currencySymbol}199.00</div>
                             </div>
                         </div>
                         <div className="ec-product-card card-side-2">
                             <div className="ec-card-img alt-2"></div>
                             <div className="ec-card-info">
                                 <h4>Minimalist Desk</h4>
-                                <div className="ec-price">₹450.00</div>
+                                <div className="ec-price">{currencySymbol}450.00</div>
                             </div>
                         </div>
                     </div>

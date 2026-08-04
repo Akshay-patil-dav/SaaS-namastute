@@ -13,8 +13,12 @@ import {
 } from 'lucide-react';
 import { useConfirm } from '../../../context/ConfirmContext';
 import apiClient, { API, ENV } from '@/api/config';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 export default function WebAppCategories() {
+    const { currencySymbol } = useCurrency();
+
     const [categories, setCategories] = useState([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -269,7 +273,7 @@ export default function WebAppCategories() {
                                                 </div>
                                                 <div className="wa-product-item-info">
                                                     <h4>{p.name}</h4>
-                                                    <p>SKU: {p.sku || 'N/A'} | ₹{p.price}</p>
+                                                    <p>SKU: {p.sku || 'N/A'} | {currencySymbol}{p.price}</p>
                                                 </div>
                                                 <div className="wa-product-item-action">
                                                     {isSelected ? (

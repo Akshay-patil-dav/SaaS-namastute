@@ -27,7 +27,7 @@ const CATEGORY_COLORS = {
     Software:    { bg: 'rgba(99,102,241,0.1)',  color: '#6366f1' },
     Development: { bg: 'rgba(16,185,129,0.10)', color: '#059669' },
     Business:    { bg: 'rgba(245,158,11,0.10)', color: '#d97706' },
-    Updates:     { bg: 'rgba(255,144,47,0.10)', color: '#ff6b1a' },
+    Updates:     { bg: 'rgba(255, 179, 138,0.10)', color: '#ff6b1a' },
     Tutorial:    { bg: 'rgba(236,72,153,0.10)', color: '#db2777' },
     All:         { bg: 'rgba(100,116,139,0.10)',color: '#475569' },
 };

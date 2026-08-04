@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Plus, Search } from 'lucide-react';
 import apiClient, { API } from '../../../api/config';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 export default function Customers() {
+    const { currencySymbol } = useCurrency();
+
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,7 +68,7 @@ export default function Customers() {
                           {c.loyaltyTier}
                         </span>
                       </td>
-                      <td>₹{c.lifetimeValue}</td>
+                      <td>{currencySymbol}{c.lifetimeValue}</td>
                       <td>
                         <Link to={`/crm/customers/${c.id}`} className="btn btn-sm btn-outline-primary">
                           View Details

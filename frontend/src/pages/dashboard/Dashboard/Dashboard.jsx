@@ -14,6 +14,8 @@ import {
 } from 'recharts';
 import './Dashboard.css';
 import NotesWidget from '../NotesWidget';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 // Dynamic Chart Data State will replace static salesPurchaseData
 
@@ -46,6 +48,8 @@ const _categoryStatisticsData = [
 ];
 
 export default function Dashboard() {
+    const { currencySymbol } = useCurrency();
+
     const { user } = useAuth();
     const name = user?.identifier?.split('@')[0] || 'Admin';
 
@@ -226,8 +230,8 @@ export default function Dashboard() {
 
     const fmt = (n) => {
         const num = Number(n);
-        if (isNaN(num)) return '₹0.00';
-        return '₹' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (isNaN(num)) return '{currencySymbol}0.00';
+        return '{currencySymbol}' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
     const overallIncome = Math.max(0, (salesSummary?.totalAmount ?? 0) - (returnSummary?.totalAmount ?? 0));
@@ -704,14 +708,14 @@ export default function Dashboard() {
                                     </div>
                                     <div>
                                         <div className="mb-3">
-                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.lossTime || 0).replace('₹', '')}</h5>
+                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.lossTime || 0).replace('{currencySymbol}', '')}</h5>
                                             <div className="d-flex align-items-center gap-2">
                                                 <span className="small text-muted"><span className="text-orange">●</span> Loss Time</span>
                                                 <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-2">+{dashboardAnalytics?.customerOverview?.lossTimePercentage?.toFixed(0) || 0}%</span>
                                             </div>
                                         </div>
                                         <div>
-                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.returns || 0).replace('₹', '')}</h5>
+                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.returns || 0).replace('{currencySymbol}', '')}</h5>
                                             <div className="d-flex align-items-center gap-2">
                                                 <span className="small text-muted"><span className="text-dark">●</span> Return</span>
                                                 <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-2">+{dashboardAnalytics?.customerOverview?.returnPercentage?.toFixed(0) || 0}%</span>
@@ -741,7 +745,7 @@ export default function Dashboard() {
                                                 <div className={`item-img bg-${['light-orange', 'dark', 'success', 'secondary', 'primary'][index % 5]}`}></div>
                                                 <div>
                                                     <p className="item-title">{product.name}</p>
-                                                    <p className="item-desc">{product.price} ₹ <span className="text-primary">{product.sales} Sales</span></p>
+                                                    <p className="item-desc">{product.price} {currencySymbol} <span className="text-primary">{product.sales} Sales</span></p>
                                                 </div>
                                             </div>
                                             <span className="pill-badge pill-green">+ 10%</span>

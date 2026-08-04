@@ -55,7 +55,7 @@
 }
 .ec-blob-2 {
     width: 400px; height: 400px;
-    background: rgba(255, 95, 31, 0.05); /* very light orange tint */
+    background: rgba(255, 150, 102, 0.05); /* very light orange tint */
     bottom: -5%; right: -5%;
     animation-delay: -3s;
 }
@@ -188,7 +188,7 @@
 .ec-card-img {
     width: 100%;
     height: 180px;
-    background: linear-gradient(135deg, rgba(255,144,47,0.1), rgba(255,95,31,0.05));
+    background: linear-gradient(135deg, rgba(255, 179, 138,0.1), rgba(255, 150, 102,0.05));
     border-radius: 16px;
     margin-bottom: 16px;
 }
@@ -299,7 +299,7 @@
     background: #ffffff;
 }
 .ec-cta-content {
-    background: linear-gradient(135deg, rgba(255,144,47,0.1), rgba(255,95,31,0.05));
+    background: linear-gradient(135deg, rgba(255, 179, 138,0.1), rgba(255, 150, 102,0.05));
     border-radius: 40px;
     padding: 100px 40px;
     text-align: center;

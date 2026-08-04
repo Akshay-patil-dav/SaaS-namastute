@@ -39,11 +39,21 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
+    private static final java.util.Set<String> DISPOSABLE_DOMAINS = java.util.Set.of(
+            "oineprovi.com", "yopmail.com", "mailinator.com", "guerrillamail.com", 
+            "10minutemail.com", "temp-mail.org", "throwawaymail.com", "maildrop.cc",
+            "trashmail.com", "sharklasers.com", "dispostable.com"
+    );
+
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (!request.getEmail().endsWith("@gmail.com")) {
-            throw new RuntimeException("Only @gmail.com accounts are permitted.");
+        String email = request.getEmail().toLowerCase();
+        String domain = email.substring(email.indexOf("@") + 1);
+
+        if (DISPOSABLE_DOMAINS.contains(domain)) {
+            throw new RuntimeException("Disposable emails are not permitted. Please use a valid business or personal email.");
         }
+        
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email is already registered");
         }

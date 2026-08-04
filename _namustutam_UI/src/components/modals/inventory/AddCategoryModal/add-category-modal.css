@@ -82,12 +82,12 @@ input:checked + .slider:before {
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
-    background: #ff9b29;
+    background: #ffb38a;
     color: #fff;
     border: none;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(255, 155, 41, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 179, 138, 0.3);
 }
 
 .btn-add-category:hover {

@@ -1,11 +1,13 @@
 ﻿import React, { useRef } from 'react';
 import { X, Printer, Download, ArrowLeft, FileText } from 'lucide-react';
 import './invoice-modal.css';
+import { useCurrency } from '../../../../hooks/useCurrency';
+
 
 /* ── helpers ─────────────────────────────────────────────── */
 const fmtMoney = v => {
     const n = parseFloat(v);
-    return isNaN(n) ? '₹0.00' : `₹${n.toFixed(2)}`;
+    return isNaN(n) ? '{currencySymbol}0.00' : `{currencySymbol}${n.toFixed(2)}`;
 };
 
 const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
@@ -14,6 +16,8 @@ const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'
 const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
 function numToWords(num) {
+    const { currencySymbol } = useCurrency();
+
     if (!num || isNaN(num)) return 'Zero Dollars';
     const n = Math.floor(parseFloat(num));
     if (n === 0) return 'Zero Dollars';

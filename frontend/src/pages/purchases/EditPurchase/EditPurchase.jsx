@@ -27,8 +27,12 @@ import {
 
 import { useParams, useNavigate } from 'react-router-dom';
 import apiClient, { API, ENV } from '@/api/config';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 const EditPurchase = () => {
+    const { currencySymbol } = useCurrency();
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [supplier, setSupplier] = useState('');
@@ -386,13 +390,13 @@ const EditPurchase = () => {
                                     <tr>
                                         <th style={{ background: '#f8fafc' }}>Product Name</th>
                                         <th style={{ background: '#f8fafc', textAlign: 'center' }}>QTY</th>
-                                        <th style={{ background: '#f8fafc' }}>Purchase Price(₹)</th>
-                                        <th style={{ background: '#f8fafc' }}>Selling Price(₹)</th>
-                                        <th style={{ background: '#f8fafc' }}>Discount(₹)</th>
+                                        <th style={{ background: '#f8fafc' }}>Purchase Price({currencySymbol})</th>
+                                        <th style={{ background: '#f8fafc' }}>Selling Price({currencySymbol})</th>
+                                        <th style={{ background: '#f8fafc' }}>Discount({currencySymbol})</th>
                                         <th style={{ background: '#f8fafc' }}>Tax %</th>
-                                        <th style={{ background: '#f8fafc' }}>Tax Amount(₹)</th>
-                                        <th style={{ background: '#f8fafc' }}>Unit Cost(₹)</th>
-                                        <th style={{ background: '#f8fafc' }}>Total Cost (₹)</th>
+                                        <th style={{ background: '#f8fafc' }}>Tax Amount({currencySymbol})</th>
+                                        <th style={{ background: '#f8fafc' }}>Unit Cost({currencySymbol})</th>
+                                        <th style={{ background: '#f8fafc' }}>Total Cost ({currencySymbol})</th>
                                         <th style={{ background: '#f8fafc', textAlign: 'center' }}>Action</th>
                                     </tr>
                                 </thead>
@@ -472,15 +476,15 @@ const EditPurchase = () => {
                     <div className="cp-card-body">
                         <div className="row">
                             <div className="col-md-3 cp-form-group">
-                                <label className="cp-label">Order Tax (₹)</label>
+                                <label className="cp-label">Order Tax ({currencySymbol})</label>
                                 <input type="number" className="cp-input" value={orderTax} onChange={(e) => setOrderTax(e.target.value)} />
                             </div>
                             <div className="col-md-3 cp-form-group">
-                                <label className="cp-label">Discount (₹)</label>
+                                <label className="cp-label">Discount ({currencySymbol})</label>
                                 <input type="number" className="cp-input" value={orderDiscount} onChange={(e) => setOrderDiscount(e.target.value)} />
                             </div>
                             <div className="col-md-3 cp-form-group">
-                                <label className="cp-label">Shipping (₹)</label>
+                                <label className="cp-label">Shipping ({currencySymbol})</label>
                                 <input type="number" className="cp-input" value={shipping} onChange={(e) => setShipping(e.target.value)} />
                             </div>
                             <div className="col-md-3 cp-form-group">

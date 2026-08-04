@@ -4,8 +4,12 @@ import { Star, ShoppingBag, Filter, Loader } from 'lucide-react';
 import apiClient, { ENV } from '@/api/config';
 import { useCartStore } from '../../../store/cartStore';
 import './Shop.css';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 const Shop = () => {
+    const { currencySymbol } = useCurrency();
+
     const addToCart = useCartStore(state => state.addToCart);
     const [selectedCategoryId, setSelectedCategoryId] = useState('ALL');
     const [sortBy, setSortBy] = useState('featured');
@@ -183,7 +187,7 @@ const Shop = () => {
                                                 <span>{product.rating || 5.0}</span>
                                                 <span className="review-count">({product.reviews || 0})</span>
                                             </div>
-                                            <span className="shop-product-price">₹{(product.price || 0).toFixed(2)}</span>
+                                            <span className="shop-product-price">{currencySymbol}{(product.price || 0).toFixed(2)}</span>
                                         </div>
                                     </div>
                                 </Link>

@@ -178,14 +178,14 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             }}>
                                 <div className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                     <span className="fw-bold text-dark d-flex align-items-center gap-1.5" style={{ fontSize: '13.5px' }}>
-                                        <span style={{ width: '4px', height: '12px', background: '#ff9b29', borderRadius: '2px' }} />
+                                        <span style={{ width: '4px', height: '12px', background: '#ffb38a', borderRadius: '2px' }} />
                                         Corporate Alerts
                                     </span>
                                     <div className="d-flex align-items-center gap-2">
                                         {unreadCount > 0 && (
                                             <button 
                                                 className="btn p-0 text-decoration-none font-semibold border-0" 
-                                                style={{ color: '#ff9b29', background: 'none', fontSize: '11px' }}
+                                                style={{ color: '#ffb38a', background: 'none', fontSize: '11px' }}
                                                 onClick={handleMarkAllRead}
                                             >
                                                 Mark all read
@@ -193,7 +193,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                         )}
                                         <button
                                             className="btn p-0 text-decoration-none border-0 d-flex align-items-center justify-content-center"
-                                            style={{ color: '#ff9b29', background: 'none', opacity: 0.8 }}
+                                            style={{ color: '#ffb38a', background: 'none', opacity: 0.8 }}
                                             onClick={() => {
                                                 setAllNotiMaximized(true);
                                                 setNotiOpen(false);
@@ -219,8 +219,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                                     onClick={() => handleNotiClick(n)}
                                                     className="p-2.5 rounded-2 d-flex gap-2.5 align-items-start border-bottom cursor-pointer transition-all notification-feed-item"
                                                     style={{ 
-                                                        borderLeft: n.unread ? '3.5px solid #ff9b29' : '3.5px solid transparent',
-                                                        background: n.unread ? 'rgba(255, 155, 41, 0.03)' : 'transparent',
+                                                        borderLeft: n.unread ? '3.5px solid #ffb38a' : '3.5px solid transparent',
+                                                        background: n.unread ? 'rgba(255, 179, 138, 0.03)' : 'transparent',
                                                         cursor: 'pointer',
                                                         position: 'relative',
                                                         paddingRight: '25px'
@@ -235,7 +235,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                                         <div className="small text-muted" style={{ fontSize: '9px', marginTop: '2px' }}>{n.date}</div>
                                                     </div>
                                                     <div className="position-absolute end-0 top-50 translate-middle-y me-2 show-on-hover" style={{
-                                                        color: '#ff9b29'
+                                                        color: '#ffb38a'
                                                     }}>
                                                         <Maximize size={12} />
                                                     </div>
@@ -377,7 +377,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         maxWidth: '460px',
                         width: '90%',
                         animation: 'fadeIn 0.2s ease-in-out',
-                        borderLeft: '5px solid #ff9b29',
+                        borderLeft: '5px solid #ffb38a',
                         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
                     }}>
                         <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style={{ borderBottomColor: '#f1f5f9' }}>
@@ -406,7 +406,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         <div className="d-flex gap-2">
                             <button className="btn btn-secondary w-100" onClick={() => setSelectedNotiPopup(null)}>Close Details</button>
                             <button className="btn text-white w-100 fw-semibold" 
-                                    style={{ background: '#ff9b29', border: 'none' }}
+                                    style={{ background: '#ffb38a', border: 'none' }}
                                     onClick={() => {
                                         setSelectedNotiPopup(null);
                                         // Auto route depending on category
@@ -445,13 +445,13 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         flexDirection: 'column',
                         animation: 'fadeIn 0.25s ease-out',
                         overflow: 'hidden',
-                        borderLeft: '6px solid #ff9b29',
+                        borderLeft: '6px solid #ffb38a',
                         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
                     }}>
                         {/* Modal Header */}
                         <div className="d-flex justify-content-between align-items-center p-3 border-bottom" style={{ background: '#fafafa' }}>
                             <div className="d-flex align-items-center gap-2">
-                                <Bell size={18} color="#ff9b29" />
+                                <Bell size={18} color="#ffb38a" />
                                 <span className="fw-bold text-dark" style={{ fontSize: '15px' }}>Corporate Alerts Console</span>
                                 <span className="badge rounded-pill bg-danger" style={{ fontSize: '10px' }}>
                                     {unreadCount} Unread
@@ -461,7 +461,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 {unreadCount > 0 && (
                                     <button 
                                         className="btn btn-sm btn-outline-warning fw-semibold" 
-                                        style={{ fontSize: '11px', color: '#ff9b29', borderColor: '#ff9b29', background: 'none' }}
+                                        style={{ fontSize: '11px', color: '#ffb38a', borderColor: '#ffb38a', background: 'none' }}
                                         onClick={handleMarkAllRead}
                                     >
                                         Mark all read
@@ -494,7 +494,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                             className="p-3 border-bottom cursor-pointer transition-all"
                                             style={{
                                                 background: isActive ? '#ffffff' : 'transparent',
-                                                borderLeft: isActive ? '4px solid #ff9b29' : '4px solid transparent',
+                                                borderLeft: isActive ? '4px solid #ffb38a' : '4px solid transparent',
                                                 cursor: 'pointer'
                                             }}
                                         >
@@ -552,7 +552,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                                             <hr style={{ borderStyle: 'dashed', color: '#eaedf0' }} />
 
-                                            <div className="flex-grow-1 p-3 rounded mb-4" style={{ background: '#f8fafc', borderLeft: '4px solid #ff9b29', minHeight: '120px' }}>
+                                            <div className="flex-grow-1 p-3 rounded mb-4" style={{ background: '#f8fafc', borderLeft: '4px solid #ffb38a', minHeight: '120px' }}>
                                                 <h6 className="fw-bold text-dark mb-2" style={{ fontSize: '12.5px' }}>Detailed Feed Record</h6>
                                                 <p className="text-secondary mb-0" style={{ fontSize: '13.5px', lineHeight: '1.6' }}>
                                                     {activeNoti.message}
@@ -563,7 +563,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                                 <button className="btn btn-light border flex-grow-1" onClick={() => setAllNotiMaximized(false)}>Close Console</button>
                                                 <button 
                                                     className="btn text-white fw-semibold" 
-                                                    style={{ background: '#ff9b29', border: 'none', flexGrow: 2 }}
+                                                    style={{ background: '#ffb38a', border: 'none', flexGrow: 2 }}
                                                     onClick={() => {
                                                         setAllNotiMaximized(false);
                                                         if (activeNoti.type === 'Leave' || activeNoti.type === 'Payroll') {

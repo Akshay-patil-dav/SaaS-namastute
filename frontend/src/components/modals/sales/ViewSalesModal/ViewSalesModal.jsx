@@ -1,6 +1,8 @@
 ﻿import React from 'react';
 import { X, User, Calendar, Tag, CreditCard, FileText, Package } from 'lucide-react';
 import '../AddPosModal/add-sales-modal.css';
+import { useCurrency } from '../../../../hooks/useCurrency';
+
 
 const statusStyle = s => s==='Completed'
     ? { background:'#dcfce7', color:'#16a34a' }
@@ -15,12 +17,14 @@ const payStyle = p => p==='Paid'
     : { background:'#fee2e2', color:'#dc2626' };
 
 const ViewSalesModal = ({ isOpen, order, onClose }) => {
+    const { currencySymbol } = useCurrency();
+
     if (!isOpen || !order) return null;
 
     let prods = [];
     try { prods = JSON.parse(order.productsJson || '[]'); } catch {}
 
-    const fmtMoney = v => `₹${parseFloat(v||0).toFixed(2)}`;
+    const fmtMoney = v => `{currencySymbol}${parseFloat(v||0).toFixed(2)}`;
 
     return (
         <div className="sm-overlay" onClick={e => e.target===e.currentTarget && onClose()}>

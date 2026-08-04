@@ -13,6 +13,8 @@ import EditSalesModal   from '../../../components/modals/sales/EditSalesModal/Ed
 import ViewSalesModal   from '../../../components/modals/sales/ViewSalesModal/ViewSalesModal';
 import DeleteConfirmModal from '../../../components/modals/common/DeleteConfirmModal/DeleteConfirmModal';
 import InvoiceModal     from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 const BASE_URL    = ENV.API_BASE_URL;
 const ROWS_OPTIONS = [10, 25, 50];
@@ -20,6 +22,8 @@ const STATUSES    = ['Completed', 'Pending', 'Cancelled'];
 const PAYMENTS    = ['Paid', 'Unpaid', 'Overdue'];
 
 export default function OnlineOrders() {
+    const { currencySymbol } = useCurrency();
+
     const { confirm } = useConfirm();
 
     /* ── data ────────────────────────────────────────────── */
@@ -151,7 +155,7 @@ export default function OnlineOrders() {
     };
 
     /* ── helpers ─────────────────────────────────────────── */
-    const money = v => { const n = parseFloat(v); return isNaN(n) ? '₹0.00' : `₹${n.toFixed(2)}`; };
+    const money = v => { const n = parseFloat(v); return isNaN(n) ? '{currencySymbol}0.00' : `{currencySymbol}${n.toFixed(2)}`; };
 
     const avatarSrc = name =>
         `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name||'U')}&backgroundColor=e2e8f0&textColor=374151&fontSize=40`;

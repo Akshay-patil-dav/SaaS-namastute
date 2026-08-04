@@ -14,6 +14,7 @@ const ServiceDetail      = lazy(() => import('./pages/website/ServiceDetail/Serv
 const WebDevelopment     = lazy(() => import('./pages/website/WebDevelopment/WebDevelopment.jsx'));
 const AIAutomation       = lazy(() => import('./pages/website/AIAutomation/AIAutomation.jsx'));
 const Ecommerce          = lazy(() => import('./pages/website/Ecommerce/Ecommerce.jsx'));
+const WebApplicationDevelopment = lazy(() => import('./pages/website/WebApplicationDevelopment/WebApplicationDevelopment.jsx'));
 const ContactUs          = lazy(() => import('./pages/website/ContactUs/ContactUs.jsx'));
 const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePreview.jsx'));
 const ProjectWorks       = lazy(() => import('./pages/website/ProjectWorks/ProjectWorks.jsx'));
@@ -66,6 +67,7 @@ function AppRoutes() {
                 <Route path="/services/web-development" element={<WebDevelopment />} />
                 <Route path="/services/ai-automation" element={<AIAutomation />} />
                 <Route path="/services/e-commerce-platform-development" element={<Ecommerce />} />
+                <Route path="/services/web-application-development" element={<WebApplicationDevelopment />} />
                 <Route path="/services/:serviceId" element={<ServiceDetail />} />
                 <Route path="/live-preview" element={<LivePreview />} />
             </Routes>
@@ -78,7 +80,7 @@ const WarningBanner = () => {
     
     return (
         <div style={{
-            background: 'linear-gradient(135deg, #ff902f 0%, #ff5f1f 100%)',
+            background: 'linear-gradient(135deg, #ffb38a 0%, #ff9666 100%)',
             color: '#ffffff',
             padding: '0',
             fontWeight: '600',

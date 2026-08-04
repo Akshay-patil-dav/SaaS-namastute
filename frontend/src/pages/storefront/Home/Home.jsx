@@ -4,8 +4,12 @@ import { ArrowRight, Star, ShoppingBag, ShieldCheck, Zap, Loader } from 'lucide-
 import apiClient, { ENV } from '@/api/config';
 import { useCartStore } from '../../../store/cartStore';
 import './Home.css';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 const Home = () => {
+    const { currencySymbol } = useCurrency();
+
     const navigate = useNavigate();
     const addToCart = useCartStore(state => state.addToCart);
     const [trendingProducts, setTrendingProducts] = useState([]);
@@ -130,7 +134,7 @@ const Home = () => {
                                                 <span>{product.rating || 5.0}</span>
                                                 <span className="review-count">({product.reviews || 0})</span>
                                             </div>
-                                            <span className="product-price">₹{(product.price || 0).toFixed(2)}</span>
+                                            <span className="product-price">{currencySymbol}{(product.price || 0).toFixed(2)}</span>
                                         </div>
                                     </div>
                                 </Link>

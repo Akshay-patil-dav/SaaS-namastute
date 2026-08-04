@@ -5,8 +5,8 @@
     --bg-tertiary: #e2e8f0;
     --text-primary: #0f172a;
     --text-secondary: #64748b;
-    --accent: #ff9b29; /* Namustutam brand accent color */
-    --accent-glow: rgba(255, 155, 41, 0.15);
+    --accent: #ffb38a; /* Namustutam brand accent color */
+    --accent-glow: rgba(255, 179, 138, 0.15);
     
     background-color: var(--bg-primary);
     color: var(--text-primary);

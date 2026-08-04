@@ -2,10 +2,14 @@
 import { X, Search, Trash2, AlertTriangle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../AddPosModal/add-sales-modal.css';
+import { useCurrency } from '../../../../hooks/useCurrency';
+
 
 const BASE_URL = ENV.API_BASE_URL;
 
 const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
+    const { currencySymbol } = useCurrency();
+
     const [form, setForm]           = useState({});
     const [products, setProducts]   = useState([]);
     const [searchQ, setSearchQ]     = useState('');
@@ -136,8 +140,8 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
                     <div className="sm-body">
                         {products.length > 0 && (
                             <div className="sm-prod-header">
-                                <span>Product</span><span>Qty</span><span>Unit Price (₹)</span>
-                                <span>Discount (₹)</span><span>Tax (%)</span><span>Total (₹)</span><span></span>
+                                <span>Product</span><span>Qty</span><span>Unit Price ({currencySymbol})</span>
+                                <span>Discount ({currencySymbol})</span><span>Tax (%)</span><span>Total ({currencySymbol})</span><span></span>
                             </div>
                         )}
                         {products.length > 0 && (
@@ -212,10 +216,10 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
                         </div>
 
                         <div className="sm-form-grid-4">
-                            <div className="sm-form-group"><label>Order Tax (₹)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.orderTax||0} onChange={e=>setForm(f=>({...f,orderTax:e.target.value}))}/></div>
-                            <div className="sm-form-group"><label>Discount (₹)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.discount||0} onChange={e=>setForm(f=>({...f,discount:e.target.value}))}/></div>
-                            <div className="sm-form-group"><label>Shipping (₹)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.shipping||0} onChange={e=>setForm(f=>({...f,shipping:e.target.value}))}/></div>
-                            <div className="sm-form-group"><label>Paid Amount (₹)</label><input className="sm-input" type="number" min="0" step="0.01" value={form.paidAmount||0} onChange={e=>setForm(f=>({...f,paidAmount:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Order Tax ({currencySymbol})</label><input className="sm-input" type="number" min="0" step="0.01" value={form.orderTax||0} onChange={e=>setForm(f=>({...f,orderTax:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Discount ({currencySymbol})</label><input className="sm-input" type="number" min="0" step="0.01" value={form.discount||0} onChange={e=>setForm(f=>({...f,discount:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Shipping ({currencySymbol})</label><input className="sm-input" type="number" min="0" step="0.01" value={form.shipping||0} onChange={e=>setForm(f=>({...f,shipping:e.target.value}))}/></div>
+                            <div className="sm-form-group"><label>Paid Amount ({currencySymbol})</label><input className="sm-input" type="number" min="0" step="0.01" value={form.paidAmount||0} onChange={e=>setForm(f=>({...f,paidAmount:e.target.value}))}/></div>
                         </div>
 
                         <div className="sm-form-grid-3">

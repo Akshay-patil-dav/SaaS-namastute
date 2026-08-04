@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import apiClient from '../../../api/config';
 import './Modal.css';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 export default function PlanSelectionModal({ onComplete }) {
+    const { currencySymbol } = useCurrency();
+
     const { updatePlanContext } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -36,7 +40,7 @@ export default function PlanSelectionModal({ onComplete }) {
                     {/* Starter Plan */}
                     <div className="plan-card">
                         <div className="plan-name">Starter</div>
-                        <div className="plan-price">₹499<span>/mo</span></div>
+                        <div className="plan-price">{currencySymbol}499<span>/mo</span></div>
                         <p className="plan-desc">Essential features for single-store retailers.</p>
                         
                         <ul className="plan-features">
@@ -62,7 +66,7 @@ export default function PlanSelectionModal({ onComplete }) {
                     <div className="plan-card popular">
                         <div className="popular-badge">Most Popular</div>
                         <div className="plan-name">Growth</div>
-                        <div className="plan-price">₹999<span>/mo</span></div>
+                        <div className="plan-price">{currencySymbol}999<span>/mo</span></div>
                         <p className="plan-desc">Advanced tools for growing businesses.</p>
                         
                         <ul className="plan-features">
@@ -87,7 +91,7 @@ export default function PlanSelectionModal({ onComplete }) {
                     {/* Premium Plan */}
                     <div className="plan-card">
                         <div className="plan-name">Premium</div>
-                        <div className="plan-price">₹1,999<span>/mo</span></div>
+                        <div className="plan-price">{currencySymbol}1,999<span>/mo</span></div>
                         <p className="plan-desc">Complete control for multi-store chains.</p>
                         
                         <ul className="plan-features">

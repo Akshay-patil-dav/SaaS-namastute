@@ -1,8 +1,12 @@
 import React from 'react';
 import { User, Plus, MapPin, EyeOff, Shield, Phone, CheckCircle2, Mail, Key, Activity, Ban, Trash2 } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
+import { useCurrency } from '../../../hooks/useCurrency';
+
 
 export const ProfileSettings = () => {
+    const { currencySymbol } = useCurrency();
+
     const { settings, loading, saving, handleChange, saveSettings } = useSettings();
 
     if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
@@ -73,6 +77,21 @@ export const ProfileSettings = () => {
                             value={settings.profileEmail || ''}
                             onChange={(e) => handleChange('profileEmail', e.target.value)}
                         />
+                    </div>
+                </div>
+
+                <div className="settings-form-row">
+                    <div className="settings-form-group" style={{ flex: 1 }}>
+                        <label>Preferred Currency <span className="required">*</span></label>
+                        <select
+                            value={settings.currency || 'INR'}
+                            onChange={(e) => handleChange('currency', e.target.value)}
+                        >
+                            <option value="INR">INR ({currencySymbol})</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
                     </div>
                 </div>
 
@@ -150,7 +169,7 @@ export const ProfileSettings = () => {
                         onClick={() => saveSettings([
                             'profileFirstName', 'profileLastName', 'profileUserName', 
                             'profilePhone', 'profileEmail', 'profileAddress', 
-                            'profileCountry', 'profileState', 'profileCity', 'profilePostalCode'
+                            'profileCountry', 'profileState', 'profileCity', 'profilePostalCode', 'currency'
                         ])}
                         disabled={saving}
                     >

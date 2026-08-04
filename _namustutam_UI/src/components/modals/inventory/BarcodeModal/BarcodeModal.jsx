@@ -2,6 +2,8 @@
 import { X, Printer } from 'lucide-react';
 import './barcode-modal.css';
 import '../../sales/AddPosModal/add-sales-modal.css'; // Reuse modal-overlay
+import { useCurrency } from '../../../../hooks/useCurrency';
+
 
 const BarcodeModal = ({ 
     isOpen, 
@@ -16,8 +18,8 @@ const BarcodeModal = ({
 
     // Use default products if none provided (matching the user image for demonstration)
     const displayProducts = products.length > 0 ? products : [
-        { name: 'Nike Jordan', price: '₹400', sku: 'HG3FKH8', count: 3 },
-        { name: 'Apple Series 5 Watch', price: '₹300', sku: 'TEUIU10', count: 1 }
+        { name: 'Nike Jordan', price: '{currencySymbol}400', sku: 'HG3FKH8', count: 3 },
+        { name: 'Apple Series 5 Watch', price: '{currencySymbol}300', sku: 'TEUIU10', count: 1 }
     ];
 
     return (

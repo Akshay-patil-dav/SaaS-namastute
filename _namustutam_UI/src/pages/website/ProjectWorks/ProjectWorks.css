@@ -73,7 +73,7 @@
 }
 
 .portfolio-gradient-text {
-    background: linear-gradient(135deg, #ff9b29 0%, #f97316 100%);
+    background: linear-gradient(135deg, #ffb38a 0%, #f97316 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
@@ -132,9 +132,9 @@
 }
 
 .filter-btn-glass.active {
-    background: #ff9b29;
+    background: #ffb38a;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(255, 155, 41, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 179, 138, 0.3);
 }
 
 /* Projects Grid */
@@ -215,7 +215,7 @@
 }
 
 .pw-glass-action-btn {
-    background: #ff9b29;
+    background: #ffb38a;
     color: #ffffff;
     padding: 12px 28px;
     border-radius: 100px;
@@ -345,9 +345,9 @@
 }
 
 .pagination-btn.active {
-    background: #ff9b29;
+    background: #ffb38a;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(255, 155, 41, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 179, 138, 0.3);
 }
 
 .pagination-btn:disabled {
@@ -380,7 +380,7 @@
     right: -10%;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(255, 155, 41, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+    background: radial-gradient(circle, rgba(255, 179, 138, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
     border-radius: 50%;
     pointer-events: none;
 }
@@ -405,7 +405,7 @@
 }
 
 .pw-cta-btn {
-    background: #ff9b29;
+    background: #ffb38a;
     color: #ffffff;
     padding: 18px 40px;
     border-radius: 100px;

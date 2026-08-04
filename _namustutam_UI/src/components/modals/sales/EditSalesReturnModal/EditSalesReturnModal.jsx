@@ -2,10 +2,14 @@
 import { X, Calendar, Barcode, Trash2 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../AddSalesReturnModal/add-sales-return-modal.css';
+import { useCurrency } from '../../../../hooks/useCurrency';
+
 
 const BASE_URL = ENV.API_BASE_URL;
 
 const EditSalesReturnModal = ({ isOpen, order, onClose, onSuccess }) => {
+    const { currencySymbol } = useCurrency();
+
     const [form, setForm]             = useState({});
     const [products, setProducts]     = useState([]);
     const [searchQ, setSearchQ]       = useState('');
@@ -223,12 +227,12 @@ const EditSalesReturnModal = ({ isOpen, order, onClose, onSuccess }) => {
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Net Unit Price(₹)</th>
+                                    <th>Net Unit Price({currencySymbol})</th>
                                     <th>Stock</th>
                                     <th>QTY</th>
-                                    <th>Discount(₹)</th>
+                                    <th>Discount({currencySymbol})</th>
                                     <th>Tax %</th>
-                                    <th>Subtotal (₹)</th>
+                                    <th>Subtotal ({currencySymbol})</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -261,10 +265,10 @@ const EditSalesReturnModal = ({ isOpen, order, onClose, onSuccess }) => {
                         <div className="srm-summary-table-wrap">
                             <table className="srm-summary-table">
                                 <tbody>
-                                    <tr><td>Order Tax</td>  <td>₹ {(+form.orderTax).toFixed(2)}</td></tr>
-                                    <tr><td>Discount</td>   <td>₹ {(+form.discount).toFixed(2)}</td></tr>
-                                    <tr><td>Shipping</td>   <td>₹ {(+form.shipping).toFixed(2)}</td></tr>
-                                    <tr className="srm-summary-grand"><td>Grand Total</td><td>₹ {grandTotal.toFixed(2)}</td></tr>
+                                    <tr><td>Order Tax</td>  <td>{currencySymbol} {(+form.orderTax).toFixed(2)}</td></tr>
+                                    <tr><td>Discount</td>   <td>{currencySymbol} {(+form.discount).toFixed(2)}</td></tr>
+                                    <tr><td>Shipping</td>   <td>{currencySymbol} {(+form.shipping).toFixed(2)}</td></tr>
+                                    <tr className="srm-summary-grand"><td>Grand Total</td><td>{currencySymbol} {grandTotal.toFixed(2)}</td></tr>
                                 </tbody>
                             </table>
                         </div>

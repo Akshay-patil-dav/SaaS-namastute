@@ -18,6 +18,7 @@ const StorefrontCheckout = lazy(() => import('./pages/storefront/Checkout/Checko
 // ── Lazy-loaded Admin Pages (code splitting — each route loads its JS on demand) ──
 const Login              = lazy(() => import('./pages/auth/Login/Login.jsx'));
 const Register           = lazy(() => import('./pages/auth/Register/Register.jsx'));
+const Verify             = lazy(() => import('./pages/auth/Verify/Verify.jsx'));
 const Unauthorized       = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
 const Dashboard          = lazy(() => import('./pages/dashboard/Dashboard/Dashboard.jsx'));
 const Dashboard2         = lazy(() => import('./pages/dashboard/Dashboard2/Dashboard2.jsx'));
@@ -110,6 +111,7 @@ function AppRoutes() {
                 {/* Public routes — guests only (logged-in users are redirected to dashboard) */}
                 <Route path="/login"        element={<GuestRoute><Login /></GuestRoute>} />
                 <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
+                <Route path="/verify" element={<Verify />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
 
                 {/* ── CLIENT + ADMIN ───────────────────────── */}

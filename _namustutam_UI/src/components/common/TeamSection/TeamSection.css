@@ -20,22 +20,22 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: rgba(255, 95, 31, 0.08);
-    border: 1px solid rgba(255, 95, 31, 0.15);
+    background: rgba(255, 150, 102, 0.08);
+    border: 1px solid rgba(255, 150, 102, 0.15);
     padding: 8px 24px;
     border-radius: 50px;
-    color: var(--primary-d, #ff5f1f);
+    color: var(--primary-d, #ff9666);
     font-size: 13px;
     font-weight: 800;
     margin-bottom: 24px;
     text-transform: uppercase;
-    box-shadow: 0 4px 15px rgba(255, 95, 31, 0.05);
+    box-shadow: 0 4px 15px rgba(255, 150, 102, 0.05);
     transition: all 0.3s ease;
 }
 
 .team-badge-wrapper:hover {
-    background: rgba(255, 95, 31, 0.12);
-    box-shadow: 0 6px 20px rgba(255, 95, 31, 0.1);
+    background: rgba(255, 150, 102, 0.12);
+    box-shadow: 0 6px 20px rgba(255, 150, 102, 0.1);
 }
 
 .team-badge-text {
@@ -156,7 +156,7 @@
 }
 
 .team-card-front {
-    background: var(--gradient, #ff902f);
+    background: var(--gradient, #ffb38a);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -280,11 +280,11 @@
 
 /* Back of card styles */
 .team-card-back .card-decoration {
-    border-color: rgba(255, 95, 31, 0.1);
+    border-color: rgba(255, 150, 102, 0.1);
 }
 .team-card-back .card-decoration::before,
 .team-card-back .card-decoration::after {
-    border-color: rgba(255, 95, 31, 0.1);
+    border-color: rgba(255, 150, 102, 0.1);
 }
 
 .team-info-back {
@@ -302,7 +302,7 @@
 }
 
 .member-role-back {
-    color: var(--primary-d, #ff5f1f);
+    color: var(--primary-d, #ff9666);
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 15px;
@@ -329,15 +329,15 @@
     height: 42px;
     border-radius: 50%;
     background: #fff0eb;
-    color: var(--primary-d, #ff5f1f);
+    color: var(--primary-d, #ff9666);
     transition: all 0.3s ease;
 }
 
 .social-icon:hover {
-    background: var(--primary-d, #ff5f1f);
+    background: var(--primary-d, #ff9666);
     color: white;
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(255, 95, 31, 0.3);
+    box-shadow: 0 5px 15px rgba(255, 150, 102, 0.3);
 }
 
 @media (max-width: 1200px) {

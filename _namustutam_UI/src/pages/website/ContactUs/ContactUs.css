@@ -32,7 +32,7 @@
     font-weight: 700;
     letter-spacing: 1px;
     margin-bottom: 24px;
-    border: 1px solid rgba(255,144,47,0.3);
+    border: 1px solid rgba(255, 179, 138,0.3);
 }
 .contact-title {
     font-size: 56px;
@@ -214,11 +214,11 @@
     font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
-    box-shadow: 0 10px 20px rgba(255,144,47,0.2);
+    box-shadow: 0 10px 20px rgba(255, 179, 138,0.2);
 }
 .contact-submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 25px rgba(255,144,47,0.3);
+    box-shadow: 0 15px 25px rgba(255, 179, 138,0.3);
 }
 .contact-submit-btn:disabled {
     opacity: 0.7;
