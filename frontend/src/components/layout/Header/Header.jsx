@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Moon, Bell, Grid, Maximize, Settings, ChevronDown, Menu, Check, X, Folder, Clock, Users, User, LogOut, Zap, Building } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useWorkspace } from '../../../context/WorkspaceContext';
+import { useSettings } from '../../../hooks/useSettings';
 import { useNavigate } from 'react-router-dom';
 import apiClient, { API, ENV } from '@/api/config';
 
 export default function Header({ onMenuClick }) {
     const { user } = useAuth();
+    const { settings } = useSettings();
     const navigate = useNavigate();
     const { triggerRefresh } = useWorkspace() || {};
 
@@ -302,14 +304,24 @@ export default function Header({ onMenuClick }) {
                         className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-gray-100/80 transition-all duration-200" 
                         onClick={() => setProfileOpen(o => !o)}
                     >
-                        <img
-                            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.identifier || 'user'}`}
-                            alt="User Avatar"
-                            className="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm group-hover/profile:border-indigo-200 transition-colors"
-                        />
+                        {settings?.profileImage ? (
+                            <img
+                                src={settings.profileImage.startsWith('http') ? settings.profileImage : `${ENV.BACKEND_BASE_URL}${settings.profileImage}`}
+                                alt="User Avatar"
+                                className="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm group-hover/profile:border-indigo-200 transition-colors"
+                            />
+                        ) : (
+                            <img
+                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${settings?.profileFirstName || user?.identifier || 'user'}`}
+                                alt="User Avatar"
+                                className="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm group-hover/profile:border-indigo-200 transition-colors"
+                            />
+                        )}
                         <div className="hidden sm:block">
                             <div className="text-sm font-bold text-gray-800 leading-tight group-hover/profile:text-indigo-600 transition-colors">
-                                {user?.identifier?.split('@')[0] || 'David Dev'}
+                                {settings?.profileFirstName 
+                                    ? `${settings.profileFirstName} ${settings.profileLastName || ''}`.trim()
+                                    : (user?.name || user?.identifier?.split('@')[0] || 'David Dev')}
                             </div>
                             <div className="text-xs text-gray-500 font-medium">
                                 {isClientOrAdmin ? 'Client' : 'Admin'}
@@ -322,7 +334,11 @@ export default function Header({ onMenuClick }) {
                         <div className="absolute right-0 top-full mt-3 w-60 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[210] py-2.5 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                             {/* User Info Header in Dropdown */}
                             <div className="px-5 py-3 border-b border-gray-50 sm:hidden bg-gray-50/50">
-                                <p className="text-sm font-bold text-gray-800 truncate">{user?.identifier || 'User'}</p>
+                                <p className="text-sm font-bold text-gray-800 truncate">
+                                    {settings?.profileFirstName 
+                                        ? `${settings.profileFirstName} ${settings.profileLastName || ''}`.trim()
+                                        : (user?.name || user?.identifier || 'User')}
+                                </p>
                                 <p className="text-xs text-gray-500">{isClientOrAdmin ? 'Client' : 'Admin'}</p>
                             </div>
 

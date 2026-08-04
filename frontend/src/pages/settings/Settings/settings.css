@@ -512,3 +512,313 @@ input:checked + .toggle-slider:before {
         margin-bottom: 16px;
     }
 }
+
+/* ==========================================================================
+   Premium Profile Settings Styles
+   ========================================================================== */
+
+.profile-settings-wrapper {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+.premium-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    background: linear-gradient(to right, #ffffff, #f8fafc);
+}
+
+.premium-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.02em;
+}
+
+.settings-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.btn-save-premium {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+.btn-save-premium:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+}
+
+.btn-save-premium.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.spin-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+.premium-body-padding {
+    padding: 32px;
+    background: #fafbfc;
+}
+
+.settings-card-group {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.settings-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.settings-section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #ffffff;
+}
+
+.icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-indigo-light { background: #e0e7ff; }
+.text-indigo { color: #4f46e5; }
+.bg-orange-light { background: #ffedd5; }
+.text-orange { color: #ea580c; }
+
+.section-title-wrapper h4 {
+    margin: 0 0 2px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.section-title-wrapper p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #64748b;
+}
+
+.settings-section-content {
+    padding: 24px;
+}
+
+.profile-upload-premium {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.profile-avatar-large {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 100%);
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(79, 70, 229, 0.2);
+}
+
+.avatar-edit-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    background: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4f46e5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.avatar-edit-badge:hover {
+    transform: scale(1.1);
+}
+
+.profile-upload-info h5 {
+    margin: 0 0 4px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.profile-upload-info p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #64748b;
+}
+
+.btn-outline-premium {
+    padding: 6px 14px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline-premium:hover {
+    border-color: #4f46e5;
+    color: #4f46e5;
+    background: #f8fafc;
+}
+
+.btn-text-danger {
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #ef4444;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-text-danger:hover {
+    background: #fef2f2;
+}
+
+/* Grid Layouts */
+.premium-grid-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.premium-grid-form.three-cols {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.form-group-premium {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group-premium.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group-premium label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.form-group-premium label .required {
+    color: #ef4444;
+}
+
+.form-group-premium input,
+.form-group-premium select {
+    width: 100%;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #1e293b;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-group-premium input:hover,
+.form-group-premium select:hover {
+    border-color: #cbd5e1;
+}
+
+.form-group-premium input:focus,
+.form-group-premium select:focus {
+    background: #ffffff;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon .input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.input-with-icon input {
+    padding-left: 38px;
+}
+
+.settings-divider-premium {
+    height: 1px;
+    background: transparent;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .premium-grid-form, .premium-grid-form.three-cols {
+        grid-template-columns: 1fr;
+    }
+    
+    .premium-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}

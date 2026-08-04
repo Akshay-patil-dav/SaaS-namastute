@@ -4,6 +4,8 @@ import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCurrency } from '../../../hooks/useCurrency';
+import { useSettings } from '../../../hooks/useSettings';
+import { ENV } from '@/api/config';
 import { 
     ChevronsLeft, 
     Search, 
@@ -61,6 +63,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const { user, logout } = useAuth();
+    const { settings } = useSettings();
     const { companyInfo } = useCompany();
     const navigate = useNavigate();
 
@@ -139,9 +142,11 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     };
 
     // Build initials for avatar
-    const initials = user?.name
-        ? user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
-        : '??';
+    const nameToUse = settings?.profileFirstName
+        ? `${settings.profileFirstName} ${settings.profileLastName || ''}`.trim()
+        : (user?.name || user?.identifier?.split('@')[0] || 'User');
+        
+    const initials = nameToUse.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
     const roleColor = user?.role === 'SUPER_ADMIN' ? '#f59e0b'
         : user?.role === 'ADMIN' ? '#6366f1'
@@ -410,7 +415,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             width: '34px',
                             height: '34px',
                             borderRadius: '50%',
-                            background: roleColor,
+                            background: settings?.profileImage ? 'transparent' : roleColor,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -421,10 +426,17 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             userSelect: 'none',
                             border: `2px solid ${roleColor}44`,
                             flexShrink: 0,
+                            overflow: 'hidden'
                         }}
-                        title={user?.name || 'User'}
+                        title={nameToUse}
                     >
-                        {initials}
+                        {settings?.profileImage ? (
+                            <img
+                                src={settings.profileImage.startsWith('http') ? settings.profileImage : `${ENV.BACKEND_BASE_URL}${settings.profileImage}`}
+                                alt="User Avatar"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                        ) : initials}
                     </div>
 
                     {profileOpen && (
@@ -450,7 +462,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             }}>
                                 {/* User info header */}
                                 <div style={{ padding: '14px 16px', borderBottom: '1px solid #eaedf0', background: '#fafafa' }}>
-                                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>{user?.name || 'User'}</div>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>{nameToUse}</div>
                                     <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{user?.email}</div>
                                     <span style={{
                                         display: 'inline-block',

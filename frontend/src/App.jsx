@@ -5,6 +5,7 @@ import { CompanyProvider } from './context/CompanyContext';
 import ProtectedRoute from './components/auth/ProtectedRoute/ProtectedRoute';
 import GuestRoute from './components/auth/GuestRoute/GuestRoute';
 import { ConfirmProvider } from './context/ConfirmContext';
+import { SettingsProvider } from './context/SettingsContext';
 import PosLayout from './components/layout/PosLayout/PosLayout';
 import StorefrontLayout from './components/layout/StorefrontLayout/StorefrontLayout.jsx';
 
@@ -266,13 +267,15 @@ function AppRoutes() {
 export default function App() {
     return (
         <AuthProvider>
-            <CompanyProvider>
-                <ConfirmProvider>
-                    <BrowserRouter>
-                        <AppRoutes />
-                    </BrowserRouter>
-                </ConfirmProvider>
-            </CompanyProvider>
+            <SettingsProvider>
+                <CompanyProvider>
+                    <ConfirmProvider>
+                        <BrowserRouter>
+                            <AppRoutes />
+                        </BrowserRouter>
+                    </ConfirmProvider>
+                </CompanyProvider>
+            </SettingsProvider>
         </AuthProvider>
     );
 }
