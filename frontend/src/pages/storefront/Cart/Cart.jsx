@@ -1,10 +1,13 @@
 import React from 'react';
+import { useCurrency } from '../../../hooks/useCurrency';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, Minus, Plus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCartStore } from '../../../store/cartStore';
 import './Cart.css';
 
 const Cart = () => {
+    const { currencySymbol } = useCurrency();
+
     const navigate = useNavigate();
     const cart = useCartStore(state => state.cart);
     const updateQuantity = useCartStore(state => state.updateQuantity);
@@ -62,8 +65,8 @@ const Cart = () => {
                                     </div>
                                 </div>
                                 <div className="cart-item-price-section">
-                                    <span className="cart-item-price">${(item.price * item.quantity).toFixed(2)}</span>
-                                    <span className="cart-item-unit-price">${item.price.toFixed(2)} each</span>
+                                    <span className="cart-item-price">{currencySymbol}{(item.price * item.quantity).toFixed(2)}</span>
+                                    <span className="cart-item-unit-price">{currencySymbol}{item.price.toFixed(2)} each</span>
                                 </div>
                                 <div className="cart-item-actions-desktop">
                                     <div className="cart-qty-controls">
@@ -86,7 +89,7 @@ const Cart = () => {
                         
                         <div className="summary-row">
                             <span>Subtotal</span>
-                            <span>${subtotal.toFixed(2)}</span>
+                            <span>{currencySymbol}{subtotal.toFixed(2)}</span>
                         </div>
                         
                         <div className="summary-row">
@@ -96,14 +99,14 @@ const Cart = () => {
                         
                         <div className="summary-row">
                             <span>Estimated Tax</span>
-                            <span>${tax.toFixed(2)}</span>
+                            <span>{currencySymbol}{tax.toFixed(2)}</span>
                         </div>
                         
                         <div className="summary-divider"></div>
                         
                         <div className="summary-row total">
                             <span>Total</span>
-                            <span>${total.toFixed(2)}</span>
+                            <span>{currencySymbol}{total.toFixed(2)}</span>
                         </div>
                         
                         <button className="btn-checkout" onClick={() => navigate('/checkout')}>

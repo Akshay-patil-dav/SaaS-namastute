@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useCurrency } from '../../../hooks/useCurrency';
 import {
   Bot, X, Send, Minimize2, Maximize2,
   Wrench, Sparkles, AlertCircle, ChevronRight,
@@ -36,6 +37,8 @@ function formatTime(ts) {
 
 // ── Single message bubble ─────────────────────────────────────────────────────
 function MessageBubble({ msg }) {
+    const { currencySymbol } = useCurrency();
+
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -297,7 +300,7 @@ export default function AIHelper() {
                     <>
                       <span className={`ai-panel__status-dot ${canChat ? '' : 'ai-panel__status-dot--off'}`} />
                       {canChat
-                        ? `${aiConfig.provider?.toUpperCase() || 'AI'} · ${aiConfig.model || 'default'}`
+                        ? `${aiConfig.provider?.toUpperCase() || 'AI'} · {currencySymbol}{aiConfig.model || 'default'}`
                         : 'Setup required'}
                     </>
                   ) : (

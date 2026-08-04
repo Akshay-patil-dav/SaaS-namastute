@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useCurrency } from '../../../hooks/useCurrency';
 import BarcodeModal from '../../../components/modals/inventory/BarcodeModal/BarcodeModal';
 import QRCodeModal from '../../../components/modals/inventory/QRCodeModal/QRCodeModal';
 import apiClient, { API, ENV } from '@/api/config';
 
 
 import '../Brands/Products.css';
-import { 
+import {
     RefreshCw, 
     ChevronUp,
     Trash2,
@@ -20,6 +21,8 @@ import {
 } from 'lucide-react';
 
 const PrintBarcode = () => {
+    const { currencySymbol } = useCurrency();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isQRModalOpen, setIsQRModalOpen] = useState(false);
     const [pageSize, setPageSize] = useState('36mm (1.4 inch)');
@@ -267,7 +270,7 @@ const PrintBarcode = () => {
                                                         <div className="suggestion-details">
                                                             <span>SKU: {product.sku}</span>
                                                             <span className="separator">•</span>
-                                                            <span>Price: ${product.price}</span>
+                                                            <span>Price: {currencySymbol}{product.price}</span>
                                                         </div>
                                                     </div>
                                                     

@@ -4,41 +4,6 @@ import './invoice-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
 
 
-/* ── helpers ─────────────────────────────────────────────── */
-const fmtMoney = v => {
-    const n = parseFloat(v);
-    return isNaN(n) ? '{currencySymbol}0.00' : `{currencySymbol}${n.toFixed(2)}`;
-};
-
-const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
-    'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen',
-    'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-function numToWords(num) {
-    const { currencySymbol } = useCurrency();
-
-    if (!num || isNaN(num)) return 'Zero Dollars';
-    const n = Math.floor(parseFloat(num));
-    if (n === 0) return 'Zero Dollars';
-    const toWords = x => {
-        if (x === 0) return '';
-        if (x < 20) return ones[x] + ' ';
-        if (x < 100) return tens[Math.floor(x / 10)] + (x % 10 ? ' ' + ones[x % 10] : '') + ' ';
-        return ones[Math.floor(x / 100)] + ' Hundred ' + toWords(x % 100);
-    };
-    const billions  = Math.floor(n / 1_000_000_000);
-    const millions  = Math.floor((n % 1_000_000_000) / 1_000_000);
-    const thousands = Math.floor((n % 1_000_000) / 1_000);
-    const remainder = n % 1_000;
-    let result = '';
-    if (billions)  result += toWords(billions)  + 'Billion ';
-    if (millions)  result += toWords(millions)  + 'Million ';
-    if (thousands) result += toWords(thousands) + 'Thousand ';
-    if (remainder) result += toWords(remainder);
-    return result.trim() + ' Dollars';
-}
-
 function payBadgeClass(status) {
     if (status === 'Paid')    return 'inv-pay-badge inv-pay-paid';
     if (status === 'Overdue') return 'inv-pay-badge inv-pay-overdue';

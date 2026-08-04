@@ -83,7 +83,7 @@ const AddPurchaseReturn = () => {
                                         mapped.push({
                                             ...p,
                                             id: p.id,
-                                            name: `${p.name} (${v.value})`,
+                                            name: `${p.name} ({currencySymbol}{v.value})`,
                                             sku: v.sku || `TMP-${p.id}-${v.value}`,
                                             barcode: v.barcode || v.sku || '',
                                             image: v.image || (p.images ? p.images.split(',')[0] : 'https://images.unsplash.com/photo-1586769852044-692d6e67741e?w=100&h=100&fit=crop'),
@@ -367,7 +367,7 @@ const AddPurchaseReturn = () => {
                                                 <span className="suggestion-name">{p.name}</span>
                                                 <span className="suggestion-barcode">{p.barcode}</span>
                                             </div>
-                                            <span className="suggestion-price">${p.price}</span>
+                                            <span className="suggestion-price">{currencySymbol}{p.price}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -519,7 +519,7 @@ const AddPurchaseReturn = () => {
                 <div className="d-flex justify-content-between align-items-center mb-5">
                     <div className="grand-total-display">
                         <span className="text-muted">Grand Total:</span>
-                        <span className="ms-2 fw-bold text-dark h4 mb-0">${calculateGrandTotal().toFixed(2)}</span>
+                        <span className="ms-2 fw-bold text-dark h4 mb-0">{currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
                     </div>
                     <div className="cp-footer mb-0">
                         <button type="button" className="btn-dark-blue px-4 py-2" onClick={() => navigate('/purchase-return')}>Cancel</button>

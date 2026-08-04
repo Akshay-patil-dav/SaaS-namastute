@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCurrency } from '../../../hooks/useCurrency';
 import {
   Bot, Key, Eye, EyeOff, Save, Trash2,
   CheckCircle2, AlertCircle, ExternalLink,
@@ -137,6 +138,8 @@ const PROVIDERS = [
 ];
 
 export const AiHelperSettings = () => {
+    const { currencySymbol } = useCurrency();
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
@@ -289,7 +292,7 @@ export const AiHelperSettings = () => {
             </div>
             <div style={{ fontSize: '12px', color: hasKey ? '#059669' : '#b45309', marginTop: '2px' }}>
               {hasKey
-                ? `Key: ${maskedKey} · ${selectedProvider.badge || selectedProvider.name} (${selectedProvider.name}) · ${model}`
+                ? `Key: {currencySymbol}{maskedKey} · {currencySymbol}{selectedProvider.badge || selectedProvider.name} ({currencySymbol}{selectedProvider.name}) · {currencySymbol}{model}`
                 : 'Add your API key below to enable the floating AI chatbot.'}
             </div>
           </div>
@@ -472,8 +475,8 @@ export const AiHelperSettings = () => {
             <input
               type={showKey ? 'text' : 'password'}
               placeholder={hasKey
-                ? `Enter new key to replace current (${selectedProvider.keyPrefix})`
-                : `Paste your API key here (${selectedProvider.keyPrefix})`}
+                ? `Enter new key to replace current ({currencySymbol}{selectedProvider.keyPrefix})`
+                : `Paste your API key here ({currencySymbol}{selectedProvider.keyPrefix})`}
               value={apiKey}
               onChange={e => setApiKey(sanitizeKey(e.target.value))}
               style={{

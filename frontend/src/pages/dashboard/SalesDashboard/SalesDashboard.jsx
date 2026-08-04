@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCurrency } from '../../../hooks/useCurrency';
 import './SalesDashboard.css';
 import { 
     Calendar, 
@@ -15,7 +16,7 @@ import {
     Speaker,
     ChevronDown
 } from 'lucide-react';
-import { 
+import {
     AreaChart, 
     Area, 
     XAxis, 
@@ -26,6 +27,8 @@ import {
 } from 'recharts';
 
 export default function SalesDashboard() {
+    const { currencySymbol } = useCurrency();
+
   const [dateRange] = useState("Last 7 Days");
   
   const [dashboardData, setDashboardData] = useState({
@@ -85,7 +88,7 @@ export default function SalesDashboard() {
         <div className="col-lg-6 col-md-12 mb-3 mb-lg-0">
           <div className="sd-stat-card sd-stat-card-white">
             <div className="sd-stat-title text-warning">Weekly Earning</div>
-            <div className="sd-stat-value">${typeof weeklyEarnings === 'number' ? weeklyEarnings.toFixed(2) : weeklyEarnings}</div>
+            <div className="sd-stat-value">{currencySymbol}{typeof weeklyEarnings === 'number' ? weeklyEarnings.toFixed(2) : weeklyEarnings}</div>
             <div className="sd-stat-subtitle text-success">
               <ChevronUp size={14} /> {percentageIncrease.toFixed(1)}% increase compare to last week
             </div>

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { 
     ShoppingBag, DollarSign, ArrowDown, ArrowUp, 
     User, UserCheck, Receipt, FileText, 
@@ -23,12 +23,7 @@ const chartData = [
   { name: 'Sep', sales: 100, purchase: -100 },
 ];
 
-const recentProducts = [
-    { id: 1, name: 'Lenovo 3rd Generation', price: '{currencySymbol}12500', color: 'bg-primary' },
-    { id: 2, name: 'Bold V3.2', price: '{currencySymbol}1600', color: 'bg-danger' },
-    { id: 3, name: 'Nike Jordan', price: '{currencySymbol}2000', color: 'bg-dark' },
-    { id: 4, name: 'Apple Series 5 Watch', price: '{currencySymbol}800', color: 'bg-secondary' },
-];
+
 
 const expiredProducts = [
     { id: 1, name: 'Red Premium Handy', sku: 'PT006', mfg: '17 Jan 2023', exp: '29 Mar 2023', color: 'bg-danger' },
@@ -39,6 +34,13 @@ const expiredProducts = [
 
 export default function Dashboard2() {
     const { currencySymbol } = useCurrency();
+
+    const recentProducts = [
+        { id: 1, name: 'Lenovo 3rd Generation', price: `${currencySymbol}12500`, color: 'bg-primary' },
+        { id: 2, name: 'Bold V3.2', price: `${currencySymbol}1600`, color: 'bg-danger' },
+        { id: 3, name: 'Nike Jordan', price: `${currencySymbol}2000`, color: 'bg-dark' },
+        { id: 4, name: 'Apple Series 5 Watch', price: `${currencySymbol}800`, color: 'bg-secondary' },
+    ];
 
     return (
         <div className="dash2-wrapper">

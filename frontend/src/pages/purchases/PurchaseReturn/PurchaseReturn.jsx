@@ -22,8 +22,10 @@ import ViewPurchaseModal from '../../../components/modals/purchases/ViewPurchase
 import DeleteConfirmModal from '../../../components/modals/common/DeleteConfirmModal/DeleteConfirmModal';
 import ImportPurchaseModal from '../../../components/modals/purchases/ImportPurchaseModal/ImportPurchaseModal';
 import { useConfirm } from '../../../context/ConfirmContext';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 const PurchaseReturn = () => {
+    const { currencySymbol } = useCurrency();
     const navigate = useNavigate();
     const [purchaseReturns, setPurchaseReturns] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -349,9 +351,9 @@ const PurchaseReturn = () => {
                                                 {item.status}
                                             </span>
                                         </td>
-                                        <td style={{ fontWeight: '600' }}>${item.total}</td>
-                                        <td style={{ fontWeight: '600' }}>${item.paid}</td>
-                                        <td style={{ fontWeight: '600' }}>${item.due}</td>
+                                        <td style={{ fontWeight: '600' }}>{currencySymbol}{item.total}</td>
+                                        <td style={{ fontWeight: '600' }}>{currencySymbol}{item.paid}</td>
+                                        <td style={{ fontWeight: '600' }}>{currencySymbol}{item.due}</td>
                                         <td>
                                             <span className={getPaymentBadgeClass(item.paymentStatus)}>
                                                 <span className="dot"></span>

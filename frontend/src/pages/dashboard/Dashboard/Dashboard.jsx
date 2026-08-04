@@ -230,8 +230,8 @@ export default function Dashboard() {
 
     const fmt = (n) => {
         const num = Number(n);
-        if (isNaN(num)) return '{currencySymbol}0.00';
-        return '{currencySymbol}' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (isNaN(num)) return `${currencySymbol}0.00`;
+        return `${currencySymbol}` + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
     const overallIncome = Math.max(0, (salesSummary?.totalAmount ?? 0) - (returnSummary?.totalAmount ?? 0));
@@ -708,14 +708,14 @@ export default function Dashboard() {
                                     </div>
                                     <div>
                                         <div className="mb-3">
-                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.lossTime || 0).replace('{currencySymbol}', '')}</h5>
+                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.lossTime || 0).replace(`${currencySymbol}`, '')}</h5>
                                             <div className="d-flex align-items-center gap-2">
                                                 <span className="small text-muted"><span className="text-orange">●</span> Loss Time</span>
                                                 <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-2">+{dashboardAnalytics?.customerOverview?.lossTimePercentage?.toFixed(0) || 0}%</span>
                                             </div>
                                         </div>
                                         <div>
-                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.returns || 0).replace('{currencySymbol}', '')}</h5>
+                                            <h5 className="fw-bold mb-1">{fmt(dashboardAnalytics?.customerOverview?.returns || 0).replace(`${currencySymbol}`, '')}</h5>
                                             <div className="d-flex align-items-center gap-2">
                                                 <span className="small text-muted"><span className="text-dark">●</span> Return</span>
                                                 <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-2">+{dashboardAnalytics?.customerOverview?.returnPercentage?.toFixed(0) || 0}%</span>

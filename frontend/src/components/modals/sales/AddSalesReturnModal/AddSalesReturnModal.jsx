@@ -235,7 +235,7 @@ const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
                                                 </div>
                                                 <div>
                                                     <div className="srm-sug-name">{r.name}</div>
-                                                    <div className="srm-sug-meta">SKU: {r.sku} · ${r.price}</div>
+                                                    <div className="srm-sug-meta">SKU: {r.sku} · {currencySymbol}{r.price}</div>
                                                 </div>
                                             </li>
                                         ))}
@@ -307,7 +307,7 @@ const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
                                                 onChange={e => updateRow(idx, 'taxPercent', e.target.value)}
                                             />
                                         </td>
-                                        <td style={{ fontWeight: 600 }}>${lineSubtotal(p).toFixed(2)}</td>
+                                        <td style={{ fontWeight: 600 }}>{currencySymbol}{lineSubtotal(p).toFixed(2)}</td>
                                         <td>
                                             <button className="srm-table-remove" onClick={() => removeRow(idx)}>
                                                 <Trash2 size={14} />

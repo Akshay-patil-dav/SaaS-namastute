@@ -162,7 +162,7 @@ export default function POS() {
             const hrs = String(now.getHours()).padStart(2, '0');
             const mins = String(now.getMinutes()).padStart(2, '0');
             const secs = String(now.getSeconds()).padStart(2, '0');
-            setTimeString(`${hrs}:${mins}:${secs}`);
+            setTimeString(`${hrs}: {currencySymbol}{mins}: {currencySymbol}{secs}`);
         };
         updateClock();
         const id = setInterval(updateClock, 1000);
@@ -326,7 +326,7 @@ export default function POS() {
 
     const handleApplyCustomerBonus = () => {
         // Mock Applying Loyalty
-        alert(`Successfully applied {currencySymbol}${selectedCustomer.loyalty || 0} Loyalty Balance as coupon discount!`);
+        alert(`Successfully applied ${currencySymbol}${selectedCustomer.loyalty || 0} Loyalty Balance as coupon discount!`);
         setCoupon(prev => prev + (selectedCustomer.loyalty || 0));
         setShowCustomerCard(false);
     };
@@ -452,7 +452,7 @@ export default function POS() {
 
     const handleConfirmPayment = () => {
         if (parseFloat(amountPaid) < grandTotal) {
-            setOrderError(`Paid amount must be at least {currencySymbol}${grandTotal.toFixed(2)}`);
+            setOrderError(`Paid amount must be at least ${currencySymbol}${grandTotal.toFixed(2)}`);
             return;
         }
         submitOrderToBackend('Completed', 'Paid');
@@ -754,8 +754,7 @@ export default function POS() {
                                                     <td>
                                                         <span className="pos-table-category">{p.category}</span>
                                                     </td>
-                                                    <td className="pos-table-price">
-                                                        ${p.price.toLocaleString()}
+                                                    <td className="pos-table-price">{currencySymbol}{p.price.toLocaleString()}
                                                     </td>
                                                     <td>
                                                         <span className={`pos-table-stock-badge ${isOutOfStock ? 'out-of-stock' : p.quantity < 10 ? 'low-stock' : 'in-stock'}`}>
@@ -824,7 +823,7 @@ export default function POS() {
                                                 <h4 className="pos-card-title">{p.name}</h4>
                                                 
                                                 <div className="pos-card-footer">
-                                                    <span className="pos-card-price">${p.price.toLocaleString()}</span>
+                                                    <span className="pos-card-price">{currencySymbol}{p.price.toLocaleString()}</span>
                                                     
                                                     {inCart ? (
                                                         <div className="pos-card-qty-controls" onClick={(e) => e.stopPropagation()}>
@@ -900,7 +899,7 @@ export default function POS() {
                                             Bonus: <span className="bonus-val">{selectedCustomer?.bonus || 0}</span>
                                         </span>
                                         <span className="pos-loyalty-badge loyalty">
-                                            Loyalty: <span className="loyalty-val">${selectedCustomer?.loyalty || 0}</span>
+                                            Loyalty: <span className="loyalty-val">{currencySymbol}{selectedCustomer?.loyalty || 0}</span>
                                         </span>
                                     </div>
                                 </div>
@@ -958,7 +957,7 @@ export default function POS() {
                                         </div>
 
                                         <div className="pos-cart-item-cost-cell">
-                                            <span className="pos-cart-item-cost">${(item.price * item.cartQty).toLocaleString()}</span>
+                                            <span className="pos-cart-item-cost">{currencySymbol}{(item.price * item.cartQty).toLocaleString()}</span>
                                         </div>
                                     </div>
                                 ))
@@ -989,7 +988,7 @@ export default function POS() {
                         <div className="pos-summary-row">
                             <span className="summary-label">Shipping</span>
                             <div className="summary-val-wrap" onClick={() => setShowSummaryEdit({ type: 'shipping', value: shipping })}>
-                                <span className="summary-val">${shipping.toFixed(2)}</span>
+                                <span className="summary-val">{currencySymbol}{shipping.toFixed(2)}</span>
                                 <Edit3 size={12} className="edit-summary-icon" />
                             </div>
                         </div>
@@ -997,7 +996,7 @@ export default function POS() {
                         <div className="pos-summary-row">
                             <span className="summary-label">Tax</span>
                             <div className="summary-val-wrap" onClick={() => setShowSummaryEdit({ type: 'tax', value: tax })}>
-                                <span className="summary-val">${tax.toFixed(2)}</span>
+                                <span className="summary-val">{currencySymbol}{tax.toFixed(2)}</span>
                                 <Edit3 size={12} className="edit-summary-icon" />
                             </div>
                         </div>
@@ -1005,14 +1004,14 @@ export default function POS() {
                         {autoDiscountValue > 0 && (
                             <div className="pos-summary-row promo-discount">
                                 <span className="summary-label">Promo Discount (5%)</span>
-                                <span className="summary-val">-${autoDiscountValue.toFixed(2)}</span>
+                                <span className="summary-val">-{currencySymbol}{autoDiscountValue.toFixed(2)}</span>
                             </div>
                         )}
 
                         <div className="pos-summary-row">
                             <span className="summary-label">Coupon</span>
                             <div className="summary-val-wrap" onClick={() => setShowSummaryEdit({ type: 'coupon', value: coupon })}>
-                                <span className="summary-val">-${coupon.toFixed(2)}</span>
+                                <span className="summary-val">-{currencySymbol}{coupon.toFixed(2)}</span>
                                 <Edit3 size={12} className="edit-summary-icon" />
                             </div>
                         </div>
@@ -1021,7 +1020,7 @@ export default function POS() {
 
                         <div className="pos-summary-grand-total">
                             <span>Total Due</span>
-                            <span className="grand-price">${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span className="grand-price">{currencySymbol}{grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                     </div>
                 </aside>
@@ -1109,24 +1108,24 @@ export default function POS() {
                                     <div className="payment-summary-bill">
                                         <div className="bill-row">
                                             <span>Subtotal</span>
-                                            <span>${cartSubtotal.toFixed(2)}</span>
+                                            <span>{currencySymbol}{cartSubtotal.toFixed(2)}</span>
                                         </div>
                                         <div className="bill-row">
                                             <span>Shipping</span>
-                                            <span>${shipping.toFixed(2)}</span>
+                                            <span>{currencySymbol}{shipping.toFixed(2)}</span>
                                         </div>
                                         <div className="bill-row">
                                             <span>Tax</span>
-                                            <span>${tax.toFixed(2)}</span>
+                                            <span>{currencySymbol}{tax.toFixed(2)}</span>
                                         </div>
                                         <div className="bill-row promo">
                                             <span>Discount Coupon</span>
-                                            <span>-${(coupon + autoDiscountValue).toFixed(2)}</span>
+                                            <span>-{currencySymbol}{(coupon + autoDiscountValue).toFixed(2)}</span>
                                         </div>
                                         <div className="bill-divider"></div>
                                         <div className="bill-grand-total">
                                             <span>Grand Total</span>
-                                            <span>${grandTotal.toFixed(2)}</span>
+                                            <span>{currencySymbol}{grandTotal.toFixed(2)}</span>
                                         </div>
                                     </div>
 
@@ -1170,7 +1169,7 @@ export default function POS() {
                                         <div className="payment-qr-mockup">
                                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NamustutePOS" alt="QR payment" />
                                             <p>Scan QR code with any UPI app to pay</p>
-                                            <h4>${grandTotal.toFixed(2)}</h4>
+                                            <h4>{currencySymbol}{grandTotal.toFixed(2)}</h4>
                                         </div>
                                     ) : (
                                         <div className="payment-amount-input-block">
@@ -1188,7 +1187,7 @@ export default function POS() {
                                             {parseFloat(amountPaid) >= grandTotal && (
                                                 <div className="payment-change-indicator">
                                                     <span>Change Due:</span>
-                                                    <span className="change-val">${(parseFloat(amountPaid) - grandTotal).toFixed(2)}</span>
+                                                    <span className="change-val">{currencySymbol}{(parseFloat(amountPaid) - grandTotal).toFixed(2)}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -1207,7 +1206,7 @@ export default function POS() {
                                             onClick={handleConfirmPayment}
                                             disabled={submittingOrder}
                                         >
-                                            {submittingOrder ? 'Processing...' : `Confirm Paid {currencySymbol}${grandTotal.toFixed(2)}`}
+                                            {submittingOrder ? 'Processing...' : `Confirm Paid ${currencySymbol}${grandTotal.toFixed(2)}`}
                                         </button>
                                     </div>
                                 </div>
@@ -1228,11 +1227,11 @@ export default function POS() {
                                     </div>
                                     <div className="detail-row">
                                         <span>Total Paid</span>
-                                        <span>${recentOrderDetails?.grandTotal?.toFixed(2)}</span>
+                                        <span>{currencySymbol}{recentOrderDetails?.grandTotal?.toFixed(2)}</span>
                                     </div>
                                     <div className="detail-row">
                                         <span>Change Due</span>
-                                        <span>${recentOrderDetails?.changeDue?.toFixed(2)}</span>
+                                        <span>{currencySymbol}{recentOrderDetails?.changeDue?.toFixed(2)}</span>
                                     </div>
                                     <div className="detail-row">
                                         <span>Payment Mode</span>
@@ -1304,8 +1303,8 @@ export default function POS() {
                                         <tr key={i}>
                                             <td>{item.name}</td>
                                             <td>{item.cartQty}</td>
-                                            <td>${item.price.toFixed(2)}</td>
-                                            <td style={{ textAlign: 'right' }}>${(item.price * item.cartQty).toFixed(2)}</td>
+                                            <td>{currencySymbol}{item.price.toFixed(2)}</td>
+                                            <td style={{ textAlign: 'right' }}>{currencySymbol}{(item.price * item.cartQty).toFixed(2)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -1316,32 +1315,32 @@ export default function POS() {
                             <div className="invoice-pricing-breakdown">
                                 <div className="price-row">
                                     <span>Subtotal</span>
-                                    <span>${recentOrderDetails.subtotal.toFixed(2)}</span>
+                                    <span>{currencySymbol}{recentOrderDetails.subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="price-row">
                                     <span>Shipping</span>
-                                    <span>${shipping.toFixed(2)}</span>
+                                    <span>{currencySymbol}{shipping.toFixed(2)}</span>
                                 </div>
                                 <div className="price-row">
                                     <span>Tax</span>
-                                    <span>${tax.toFixed(2)}</span>
+                                    <span>{currencySymbol}{tax.toFixed(2)}</span>
                                 </div>
                                 <div className="price-row discount">
                                     <span>Discount Applied</span>
-                                    <span>-${(coupon + autoDiscountValue).toFixed(2)}</span>
+                                    <span>-{currencySymbol}{(coupon + autoDiscountValue).toFixed(2)}</span>
                                 </div>
                                 <div className="price-divider"></div>
                                 <div className="price-row grand-total">
                                     <span>Grand Total</span>
-                                    <span>${recentOrderDetails.grandTotal.toFixed(2)}</span>
+                                    <span>{currencySymbol}{recentOrderDetails.grandTotal.toFixed(2)}</span>
                                 </div>
                                 <div className="price-row">
                                     <span>Paid Amount</span>
-                                    <span>${recentOrderDetails.paidAmount.toFixed(2)}</span>
+                                    <span>{currencySymbol}{recentOrderDetails.paidAmount.toFixed(2)}</span>
                                 </div>
                                 <div className="price-row change">
                                     <span>Change Due</span>
-                                    <span>${recentOrderDetails.changeDue.toFixed(2)}</span>
+                                    <span>{currencySymbol}{recentOrderDetails.changeDue.toFixed(2)}</span>
                                 </div>
                             </div>
 
@@ -1416,7 +1415,7 @@ export default function POS() {
                                             <div className="held-order-card-body">
                                                 <p><b>Customer:</b> {order.customer.name}</p>
                                                 <p><b>Items count:</b> {order.cart.reduce((s, i) => s + i.cartQty, 0)}</p>
-                                                <p><b>Total Due:</b> ${order.grandTotal.toFixed(2)}</p>
+                                                <p><b>Total Due:</b>{currencySymbol}{order.grandTotal.toFixed(2)}</p>
                                             </div>
                                             <button className="held-restore-btn" onClick={() => handleRestoreHeldOrder(order)}>
                                                 Retrieve Order to Cart

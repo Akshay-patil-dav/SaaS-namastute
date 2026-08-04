@@ -45,11 +45,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Unverified user → go to verify (unless they are already on /verify)
-    // Protected routes are only for verified users
-    if (user && !user.emailVerified) {
-        return <Navigate to="/verify" replace />;
-    }
+
 
     // Logged in but wrong role → go to unauthorized
     if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {

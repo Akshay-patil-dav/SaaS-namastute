@@ -88,7 +88,7 @@ export const ProfileSettings = () => {
                             onChange={(e) => handleChange('currency', e.target.value)}
                         >
                             <option value="INR">INR ({currencySymbol})</option>
-                            <option value="USD">USD ($)</option>
+                            <option value="USD">USD ({currencySymbol})</option>
                             <option value="EUR">EUR (€)</option>
                             <option value="GBP">GBP (£)</option>
                         </select>

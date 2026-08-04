@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useCurrency } from '../../../hooks/useCurrency';
 import { useNavigate, Link } from 'react-router-dom';
 import { CreditCard, Truck, CheckCircle } from 'lucide-react';
 import { useCartStore } from '../../../store/cartStore';
 import './Checkout.css';
 
 const Checkout = () => {
+    const { currencySymbol } = useCurrency();
+
     const navigate = useNavigate();
     const cart = useCartStore(state => state.cart);
     const clearCart = useCartStore(state => state.clearCart);
@@ -115,7 +118,7 @@ const Checkout = () => {
                         </div>
 
                         <button type="submit" className="btn-place-order">
-                            Place Order (${total.toFixed(2)})
+                            Place Order ({currencySymbol}{total.toFixed(2)})
                         </button>
                     </form>
                 </div>
@@ -133,7 +136,7 @@ const Checkout = () => {
                                     </div>
                                     <div className="checkout-item-info">
                                         <span className="checkout-item-name">{item.name}</span>
-                                        <span className="checkout-item-price">${(item.price * item.quantity).toFixed(2)}</span>
+                                        <span className="checkout-item-price">{currencySymbol}{(item.price * item.quantity).toFixed(2)}</span>
                                     </div>
                                 </div>
                             ))}
@@ -143,7 +146,7 @@ const Checkout = () => {
                         
                         <div className="summary-row">
                             <span>Subtotal</span>
-                            <span>${subtotal.toFixed(2)}</span>
+                            <span>{currencySymbol}{subtotal.toFixed(2)}</span>
                         </div>
                         
                         <div className="summary-row">
@@ -153,14 +156,14 @@ const Checkout = () => {
                         
                         <div className="summary-row">
                             <span>Estimated Tax</span>
-                            <span>${tax.toFixed(2)}</span>
+                            <span>{currencySymbol}{tax.toFixed(2)}</span>
                         </div>
                         
                         <div className="summary-divider"></div>
                         
                         <div className="summary-row total">
                             <span>Total</span>
-                            <span>${total.toFixed(2)}</span>
+                            <span>{currencySymbol}{total.toFixed(2)}</span>
                         </div>
                         
                         <Link to="/cart" className="return-to-cart">Return to Cart</Link>

@@ -154,7 +154,7 @@ export default function PosOrders() {
     };
 
     /* ── helpers ─────────────────────────────────────────── */
-    const money = v => { const n = parseFloat(v); return isNaN(n) ? '{currencySymbol}0.00' : `{currencySymbol}${n.toFixed(2)}`; };
+    const money = v => { const n = parseFloat(v); return isNaN(n) ? `${currencySymbol}0.00` : `${currencySymbol}${n.toFixed(2)}`; };
 
     const avatarSrc = name =>
         `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name||'U')}&backgroundColor=e2e8f0&textColor=374151&fontSize=40`;

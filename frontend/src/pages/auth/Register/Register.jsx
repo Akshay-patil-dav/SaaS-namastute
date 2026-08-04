@@ -8,7 +8,7 @@ import {
 import { API } from '../../../api/config';
 import '../Login/Login.css';
 import '../Login/LoginNew.css';
-import VerificationModal from './VerificationModal';
+
 import PlanSelectionModal from './PlanSelectionModal';
 
 export default function Register() {
@@ -24,7 +24,7 @@ export default function Register() {
     const [isLoading, setIsLoading]       = useState(false);
     
     // Modal states
-    const [showVerification, setShowVerification] = useState(false);
+
     const [showPlanSelection, setShowPlanSelection] = useState(false);
 
     const { register } = useAuth();
@@ -51,16 +51,11 @@ export default function Register() {
                 setError(result.error);
                 return;
             }
-            // Registration successful, show verification modal instead of redirecting
-            setShowVerification(true);
+            // Registration successful, show plan selection directly instead of verification
+            setShowPlanSelection(true);
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const handleVerificationComplete = () => {
-        setShowVerification(false);
-        setShowPlanSelection(true);
     };
 
     const handlePlanSelectionComplete = () => {
@@ -70,7 +65,7 @@ export default function Register() {
 
     return (
         <div className="login-container">
-            {showVerification && <VerificationModal onComplete={handleVerificationComplete} />}
+
             {showPlanSelection && <PlanSelectionModal onComplete={handlePlanSelectionComplete} />}
             
             {/* ── Left Panel ──────────────────────────────────────── */}

@@ -136,7 +136,7 @@ const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
                                         <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.unitPrice} onChange={e=>updateField(idx,'unitPrice',e.target.value)}/>
                                         <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.discount} onChange={e=>updateField(idx,'discount',e.target.value)}/>
                                         <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.taxPercent} onChange={e=>updateField(idx,'taxPercent',e.target.value)}/>
-                                        <div className="sm-prod-total">${lineTotal(p).toFixed(2)}</div>
+                                        <div className="sm-prod-total">{currencySymbol}{lineTotal(p).toFixed(2)}</div>
                                         <button className="sm-prod-remove" onClick={()=>setProducts(prev=>prev.filter((_,i)=>i!==idx))}><Trash2 size={13}/></button>
                                     </div>
                                 ))}
@@ -174,7 +174,7 @@ const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
                                                         <div className="sm-sug-img-wrap">
                                                             {r.images&&r.images.split(',')[0]?.trim() ? <img src={r.images.split(',')[0].trim()} alt=""/> : <div className="sm-sug-placeholder">{r.name.charAt(0)}</div>}
                                                         </div>
-                                                        <div><div className="sm-sug-name">{r.name}</div><div className="sm-sug-meta">SKU: {r.sku} · ${r.price}</div></div>
+                                                        <div><div className="sm-sug-name">{r.name}</div><div className="sm-sug-meta">SKU: {r.sku} · {currencySymbol}{r.price}</div></div>
                                                     </li>
                                                 ))}
                                             </ul>
@@ -187,13 +187,13 @@ const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
                         <div className="sm-summary-row">
                             <div className="sm-summary-box">
                                 <table className="sm-summary-table"><tbody>
-                                    <tr><td>Sub Total</td><td>${subtotal.toFixed(2)}</td></tr>
-                                    <tr><td>Order Tax</td><td>${(+form.orderTax).toFixed(2)}</td></tr>
-                                    <tr><td>Discount</td><td>${(+form.discount).toFixed(2)}</td></tr>
-                                    <tr><td>Shipping</td><td>${(+form.shipping).toFixed(2)}</td></tr>
-                                    <tr className="sm-summary-grand"><td>Grand Total</td><td>${grandTotal.toFixed(2)}</td></tr>
-                                    <tr><td>Paid</td><td>${(+form.paidAmount).toFixed(2)}</td></tr>
-                                    <tr className={due>0?'sm-summary-due-pos':'sm-summary-due-zero'}><td>Due</td><td>${due.toFixed(2)}</td></tr>
+                                    <tr><td>Sub Total</td><td>{currencySymbol}{subtotal.toFixed(2)}</td></tr>
+                                    <tr><td>Order Tax</td><td>{currencySymbol}{(+form.orderTax).toFixed(2)}</td></tr>
+                                    <tr><td>Discount</td><td>{currencySymbol}{(+form.discount).toFixed(2)}</td></tr>
+                                    <tr><td>Shipping</td><td>{currencySymbol}{(+form.shipping).toFixed(2)}</td></tr>
+                                    <tr className="sm-summary-grand"><td>Grand Total</td><td>{currencySymbol}{grandTotal.toFixed(2)}</td></tr>
+                                    <tr><td>Paid</td><td>{currencySymbol}{(+form.paidAmount).toFixed(2)}</td></tr>
+                                    <tr className={due>0?'sm-summary-due-pos':'sm-summary-due-zero'}><td>Due</td><td>{currencySymbol}{due.toFixed(2)}</td></tr>
                                 </tbody></table>
                             </div>
                         </div>

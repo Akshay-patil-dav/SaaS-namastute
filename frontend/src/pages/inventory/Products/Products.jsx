@@ -250,7 +250,7 @@ const Products = () => {
     // ── Format price ─────────────────────────────────────────────────────
     const formatPrice = (price) => {
         if (price == null) return '—';
-        return `{currencySymbol}${Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `${currencySymbol}${Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
     // ── Format date ──────────────────────────────────────────────────────

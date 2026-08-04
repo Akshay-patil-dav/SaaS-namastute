@@ -211,7 +211,7 @@ const EditSalesReturnModal = ({ isOpen, order, onClose, onSuccess }) => {
                                                 </div>
                                                 <div>
                                                     <div className="srm-sug-name">{r.name}</div>
-                                                    <div className="srm-sug-meta">SKU: {r.sku} · ${r.price}</div>
+                                                    <div className="srm-sug-meta">SKU: {r.sku} · {currencySymbol}{r.price}</div>
                                                 </div>
                                             </li>
                                         ))}
@@ -250,7 +250,7 @@ const EditSalesReturnModal = ({ isOpen, order, onClose, onSuccess }) => {
                                         <td><input className="srm-table-input" type="number" min="1" value={p.quantity} onChange={e => updateRow(idx, 'quantity', e.target.value)} /></td>
                                         <td><input className="srm-table-input" type="number" min="0" step="0.01" value={p.discount} onChange={e => updateRow(idx, 'discount', e.target.value)} /></td>
                                         <td><input className="srm-table-input" type="number" min="0" step="0.01" value={p.taxPercent} onChange={e => updateRow(idx, 'taxPercent', e.target.value)} /></td>
-                                        <td style={{ fontWeight: 600 }}>${lineSubtotal(p).toFixed(2)}</td>
+                                        <td style={{ fontWeight: 600 }}>{currencySymbol}{lineSubtotal(p).toFixed(2)}</td>
                                         <td><button className="srm-table-remove" onClick={() => removeRow(idx)}><Trash2 size={14} /></button></td>
                                     </tr>
                                 )) : (

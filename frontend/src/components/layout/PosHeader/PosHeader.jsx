@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { useCurrency } from '../../../hooks/useCurrency';
 import { 
     ChevronsLeft, 
     Search, 

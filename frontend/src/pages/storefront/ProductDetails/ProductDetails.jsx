@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCurrency } from '../../../hooks/useCurrency';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Star, ShieldCheck, Truck, RotateCcw, Minus, Plus, ShoppingCart, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
@@ -6,6 +7,8 @@ import { useCartStore } from '../../../store/cartStore';
 import './ProductDetails.css';
 
 const ProductDetails = () => {
+    const { currencySymbol } = useCurrency();
+
     const { id } = useParams();
     const navigate = useNavigate();
     const addToCart = useCartStore(state => state.addToCart);
@@ -109,8 +112,7 @@ const ProductDetails = () => {
                             <span className="review-count">({product.reviews || 0} Reviews)</span>
                         </div>
 
-                        <div className="product-price-large">
-                            ${(product.price || 0).toFixed(2)}
+                        <div className="product-price-large">{currencySymbol}{(product.price || 0).toFixed(2)}
                         </div>
 
                         <p className="product-description">
@@ -145,7 +147,7 @@ const ProductDetails = () => {
                                 <Truck size={20} className="feature-icon-small" />
                                 <div>
                                     <strong>Free Shipping</strong>
-                                    <p>On orders over $50.00</p>
+                                    <p>On orders over {currencySymbol}50.00</p>
                                 </div>
                             </div>
                             <div className="feature-item">

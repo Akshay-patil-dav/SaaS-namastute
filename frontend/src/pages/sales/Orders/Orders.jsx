@@ -147,7 +147,7 @@ export default function Orders() {
         );
     };
 
-    const money = v => { const n = parseFloat(v); return isNaN(n) ? '{currencySymbol}0.00' : `{currencySymbol}${n.toFixed(2)}`; };
+    const money = v => { const n = parseFloat(v); return isNaN(n) ? `${currencySymbol}0.00` : `${currencySymbol}${n.toFixed(2)}`; };
 
     const filteredOrders = orders.filter(order => {
         if (activeTab !== 'All' && order.status !== activeTab) return false;

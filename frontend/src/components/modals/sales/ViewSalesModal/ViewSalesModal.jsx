@@ -24,7 +24,7 @@ const ViewSalesModal = ({ isOpen, order, onClose }) => {
     let prods = [];
     try { prods = JSON.parse(order.productsJson || '[]'); } catch {}
 
-    const fmtMoney = v => `{currencySymbol}${parseFloat(v||0).toFixed(2)}`;
+    const fmtMoney = v => `${currencySymbol}${parseFloat(v||0).toFixed(2)}`;
 
     return (
         <div className="sm-overlay" onClick={e => e.target===e.currentTarget && onClose()}>
