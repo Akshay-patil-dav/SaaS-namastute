@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Moon, Bell, Grid, Maximize, Settings, ChevronDown, Menu, Check, X, Folder, Clock, Users, User, LogOut, Zap, Building } from 'lucide-react';
+import { Search, Moon, Bell, Maximize, Settings, ChevronDown, Menu, Check, X, Folder, Clock, Users, User, LogOut, Zap, Building } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useWorkspace } from '../../../context/WorkspaceContext';
 import { useNavigate } from 'react-router-dom';
@@ -278,9 +278,7 @@ export default function Header({ onMenuClick }) {
                     </div>
                 )}
 
-                <button className="text-gray-400 hover:text-gray-600 transition-colors hidden sm:block">
-                    <Grid size={20} />
-                </button>
+
                 <button className="text-gray-400 hover:text-gray-600 transition-colors hidden sm:block">
                     <Maximize size={20} />
                 </button>

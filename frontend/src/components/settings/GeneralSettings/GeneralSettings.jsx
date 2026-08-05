@@ -60,239 +60,222 @@ export const ProfileSettings = () => {
     );
 
     return (
-        <div className="profile-settings-wrapper animate-fade-in">
-            <div className="settings-content-header premium-header">
+        <>
+            <div className="settings-content-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                     <h3>Profile Information</h3>
-                    <p className="settings-subtitle">Update your personal details and public profile.</p>
+                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b' }}>Update your personal details and public profile.</p>
                 </div>
-                <div className="settings-header-actions">
-                    <button 
-                        className={`btn-save-premium ${saving ? 'loading' : ''}`}
-                        onClick={() => saveSettings([
-                            'profileFirstName', 'profileLastName', 'profileUserName', 
-                            'profilePhone', 'profileEmail', 'profileAddress', 
-                            'profileCountry', 'profileState', 'profileCity', 'profilePostalCode', 'currency'
-                        ])}
-                        disabled={saving}
-                    >
-                        {saving ? (
-                            <><Activity size={16} className="spin-icon" /> Saving...</>
-                        ) : (
-                            <><CheckCircle2 size={16} /> Save Changes</>
-                        )}
-                    </button>
-                </div>
+                <button 
+                    className="btn-save"
+                    onClick={() => saveSettings([
+                        'profileFirstName', 'profileLastName', 'profileUserName', 
+                        'profilePhone', 'profileEmail', 'profileAddress', 
+                        'profileCountry', 'profileState', 'profileCity', 'profilePostalCode', 'currency'
+                    ])}
+                    disabled={saving}
+                >
+                    {saving ? 'Saving...' : 'Save Changes'}
+                </button>
             </div>
 
-            <div className="settings-content-body premium-body-padding">
-                <div className="settings-card-group">
-                    {/* Basic Information Section */}
-                    <div className="settings-section">
-                        <div className="settings-section-header">
-                            <div className="icon-wrapper bg-indigo-light">
-                                <User size={20} className="text-indigo" />
+            <div className="settings-content-body">
+                {/* Profile Image */}
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>Profile Picture</label>
+                        <div className="profile-upload-section">
+                            <div 
+                                className="profile-upload-box" 
+                                style={settings.profileImage ? {
+                                    backgroundImage: `url(${settings.profileImage.startsWith('http') ? settings.profileImage : ENV.BACKEND_BASE_URL + settings.profileImage})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    border: 'none'
+                                } : {}}
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                {!settings.profileImage && (
+                                    <>
+                                        <Plus size={24} />
+                                        <span>Upload</span>
+                                    </>
+                                )}
                             </div>
-                            <div className="section-title-wrapper">
-                                <h4>Basic Information</h4>
-                                <p>Your personal information and contact details.</p>
-                            </div>
-                        </div>
-                        
-                        <div className="settings-section-content">
-                            <div className="profile-upload-premium">
-                                <div 
-                                    className="profile-avatar-large" 
-                                    style={settings.profileImage ? {
-                                        backgroundImage: `url(${settings.profileImage.startsWith('http') ? settings.profileImage : ENV.BACKEND_BASE_URL + settings.profileImage})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center',
-                                        color: 'transparent'
-                                    } : {}}
-                                >
-                                    {!settings.profileImage && (settings.profileFirstName ? settings.profileFirstName.charAt(0).toUpperCase() : 'U')}
-                                    <div className="avatar-edit-badge" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
-                                        <Plus size={14} />
-                                    </div>
-                                </div>
-                                <div className="profile-upload-info">
-                                    <h5>Profile Picture</h5>
-                                    <p>Upload a high-res image below 2 MB (JPG, PNG)</p>
-                                    <div className="d-flex gap-2 mt-2">
-                                        <input 
-                                            type="file" 
-                                            accept="image/png, image/jpeg, image/jpg" 
-                                            ref={fileInputRef} 
-                                            style={{ display: 'none' }}
-                                            onChange={handleFileUpload}
-                                        />
-                                        <button 
-                                            className="btn-outline-premium" 
-                                            onClick={() => fileInputRef.current?.click()}
-                                            disabled={isUploading}
-                                        >
-                                            {isUploading ? 'Uploading...' : 'Upload New'}
-                                        </button>
-                                        {settings.profileImage && (
-                                            <button 
-                                                className="btn-text-danger" 
-                                                onClick={handleRemoveImage}
-                                            >
-                                                Remove
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="premium-grid-form">
-                                <div className="form-group-premium">
-                                    <label>First Name <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="e.g. John"
-                                        value={settings.profileFirstName || ''}
-                                        onChange={(e) => handleChange('profileFirstName', e.target.value)}
-                                    />
-                                </div>
-                                <div className="form-group-premium">
-                                    <label>Last Name <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="e.g. Doe"
-                                        value={settings.profileLastName || ''}
-                                        onChange={(e) => handleChange('profileLastName', e.target.value)}
-                                    />
-                                </div>
-                                <div className="form-group-premium">
-                                    <label>User Name <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="e.g. johndoe"
-                                        value={settings.profileUserName || ''}
-                                        onChange={(e) => handleChange('profileUserName', e.target.value)}
-                                    />
-                                </div>
-                                <div className="form-group-premium">
-                                    <label>Preferred Currency <span className="required">*</span></label>
-                                    <select
-                                        value={settings.currency || 'INR'}
-                                        onChange={(e) => handleChange('currency', e.target.value)}
-                                    >
-                                        <option value="INR">INR ({currencySymbol})</option>
-                                        <option value="USD">USD ({currencySymbol})</option>
-                                        <option value="EUR">EUR (€)</option>
-                                        <option value="GBP">GBP (£)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="premium-grid-form two-cols mt-4">
-                                <div className="form-group-premium">
-                                    <label>Phone Number <span className="required">*</span></label>
-                                    <div className="input-with-icon">
-                                        <Phone size={16} className="input-icon" />
-                                        <input 
-                                            type="text" 
-                                            placeholder="+1 (555) 000-0000"
-                                            value={settings.profilePhone || ''}
-                                            onChange={(e) => handleChange('profilePhone', e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="form-group-premium">
-                                    <label>Email Address <span className="required">*</span></label>
-                                    <div className="input-with-icon">
-                                        <Mail size={16} className="input-icon" />
-                                        <input 
-                                            type="email" 
-                                            placeholder="john@example.com"
-                                            value={settings.profileEmail || ''}
-                                            onChange={(e) => handleChange('profileEmail', e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="settings-divider-premium"></div>
-
-                    {/* Address Information Section */}
-                    <div className="settings-section">
-                        <div className="settings-section-header">
-                            <div className="icon-wrapper bg-orange-light">
-                                <MapPin size={20} className="text-orange" />
-                            </div>
-                            <div className="section-title-wrapper">
-                                <h4>Location Information</h4>
-                                <p>Your primary address for billing and correspondence.</p>
-                            </div>
-                        </div>
-
-                        <div className="settings-section-content">
-                            <div className="form-group-premium full-width mb-4">
-                                <label>Street Address <span className="required">*</span></label>
+                            <div className="profile-upload-actions">
                                 <input 
-                                    type="text" 
-                                    placeholder="123 Main St, Apt 4B"
-                                    value={settings.profileAddress || ''}
-                                    onChange={(e) => handleChange('profileAddress', e.target.value)}
+                                    type="file" 
+                                    accept="image/png, image/jpeg, image/jpg" 
+                                    ref={fileInputRef} 
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileUpload}
                                 />
-                            </div>
-
-                            <div className="premium-grid-form three-cols">
-                                <div className="form-group-premium">
-                                    <label>Country <span className="required">*</span></label>
-                                    <select
-                                        value={settings.profileCountry || 'Select'}
-                                        onChange={(e) => handleChange('profileCountry', e.target.value)}
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button 
+                                        className="btn-upload" 
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={isUploading}
                                     >
-                                        <option value="Select">Select Country</option>
-                                        <option value="USA">USA</option>
-                                        <option value="UK">UK</option>
-                                        <option value="India">India</option>
-                                    </select>
+                                        {isUploading ? 'Uploading...' : 'Upload New'}
+                                    </button>
+                                    {settings.profileImage && (
+                                        <button 
+                                            className="btn-cancel" 
+                                            onClick={handleRemoveImage}
+                                            style={{ background: '#ef4444', color: '#fff', border: 'none' }}
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
                                 </div>
-                                <div className="form-group-premium">
-                                    <label>State / Province <span className="required">*</span></label>
-                                    <select
-                                        value={settings.profileState || 'Select'}
-                                        onChange={(e) => handleChange('profileState', e.target.value)}
-                                    >
-                                        <option value="Select">Select State</option>
-                                        <option value="NY">NY</option>
-                                        <option value="CA">CA</option>
-                                        <option value="MH">MH</option>
-                                    </select>
-                                </div>
-                                <div className="form-group-premium">
-                                    <label>City <span className="required">*</span></label>
-                                    <select
-                                        value={settings.profileCity || 'Select'}
-                                        onChange={(e) => handleChange('profileCity', e.target.value)}
-                                    >
-                                        <option value="Select">Select City</option>
-                                        <option value="New York">New York</option>
-                                        <option value="Los Angeles">Los Angeles</option>
-                                        <option value="Mumbai">Mumbai</option>
-                                    </select>
-                                </div>
-                                <div className="form-group-premium">
-                                    <label>Postal / Zip Code <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="10001"
-                                        value={settings.profilePostalCode || ''}
-                                        onChange={(e) => handleChange('profilePostalCode', e.target.value)}
-                                    />
-                                </div>
+                                <p>Upload a high-res image below 2 MB (JPG, PNG)</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div className="settings-section-title mt-4">
+                    <User size={18} />
+                    <span>Basic Information</span>
+                </div>
+
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>First Name <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            placeholder="e.g. John"
+                            value={settings.profileFirstName || ''}
+                            onChange={(e) => handleChange('profileFirstName', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Last Name <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            placeholder="e.g. Doe"
+                            value={settings.profileLastName || ''}
+                            onChange={(e) => handleChange('profileLastName', e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>User Name <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            placeholder="e.g. johndoe"
+                            value={settings.profileUserName || ''}
+                            onChange={(e) => handleChange('profileUserName', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Preferred Currency <span className="required">*</span></label>
+                        <select
+                            value={settings.currency || 'INR'}
+                            onChange={(e) => handleChange('currency', e.target.value)}
+                        >
+                            <option value="INR">INR ({currencySymbol})</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>Phone Number <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            placeholder="+1 (555) 000-0000"
+                            value={settings.profilePhone || ''}
+                            onChange={(e) => handleChange('profilePhone', e.target.value)}
+                        />
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Email Address <span className="required">*</span></label>
+                        <input 
+                            type="email" 
+                            placeholder="john@example.com"
+                            value={settings.profileEmail || ''}
+                            onChange={(e) => handleChange('profileEmail', e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <div className="settings-divider"></div>
+
+                <div className="settings-section-title">
+                    <MapPin size={18} />
+                    <span>Location Information</span>
+                </div>
+
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>Street Address <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            placeholder="123 Main St, Apt 4B"
+                            value={settings.profileAddress || ''}
+                            onChange={(e) => handleChange('profileAddress', e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>Country <span className="required">*</span></label>
+                        <select
+                            value={settings.profileCountry || 'Select'}
+                            onChange={(e) => handleChange('profileCountry', e.target.value)}
+                        >
+                            <option value="Select">Select Country</option>
+                            <option value="USA">USA</option>
+                            <option value="UK">UK</option>
+                            <option value="India">India</option>
+                        </select>
+                    </div>
+                    <div className="settings-form-group">
+                        <label>State / Province <span className="required">*</span></label>
+                        <select
+                            value={settings.profileState || 'Select'}
+                            onChange={(e) => handleChange('profileState', e.target.value)}
+                        >
+                            <option value="Select">Select State</option>
+                            <option value="NY">NY</option>
+                            <option value="CA">CA</option>
+                            <option value="MH">MH</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="settings-form-row">
+                    <div className="settings-form-group">
+                        <label>City <span className="required">*</span></label>
+                        <select
+                            value={settings.profileCity || 'Select'}
+                            onChange={(e) => handleChange('profileCity', e.target.value)}
+                        >
+                            <option value="Select">Select City</option>
+                            <option value="New York">New York</option>
+                            <option value="Los Angeles">Los Angeles</option>
+                            <option value="Mumbai">Mumbai</option>
+                        </select>
+                    </div>
+                    <div className="settings-form-group">
+                        <label>Postal / Zip Code <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            placeholder="10001"
+                            value={settings.profilePostalCode || ''}
+                            onChange={(e) => handleChange('profilePostalCode', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
