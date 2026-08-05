@@ -1,96 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient, { API, ENV } from '@/api/config';
+import apiClient, { ENV } from '@/api/config';
 import { useAuth } from '@/context/AuthContext';
 import {
     Search, Plus, Minus, Trash2, UserPlus, ChevronDown, Check,
-    Clock, ArrowLeft, CreditCard, Smartphone, Shield, AlertTriangle,
-    X, Sparkles, Percent, Truck, RefreshCw, Layers, ShoppingBag,
-    FileText, CheckCircle2, User, HelpCircle, Eye, Printer, Edit3,
-    Volume2, Maximize, Headphones, Laptop, ClipboardList, Globe,
-    LayoutGrid, List
+    Clock, Maximize, RefreshCw, ShoppingBag, Edit3,
+    AlertTriangle, X, Percent, CheckCircle2, Printer, 
+    Smartphone, Headphones, Laptop, Globe, Volume2, ClipboardList,
+    LayoutGrid, List, Store, Monitor
 } from 'lucide-react';
 import './POS.css';
 import { useCurrency } from '../../../hooks/useCurrency';
-
+import Header from '../../../components/layout/Header/Header';
 
 const BASE_URL = ENV.API_BASE_URL;
-
-// --- FALLBACK MOCK DATA ---
-const MOCK_PRODUCTS = [
-    {
-        id: 'mock-1',
-        name: 'iPhone 14 64GB',
-        category: 'Mobiles',
-        price: 15800,
-        sku: 'IPH14-64',
-        images: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&auto=format&fit=crop&q=60',
-        quantity: 12
-    },
-    {
-        id: 'mock-2',
-        name: 'MacBook Pro',
-        category: 'Laptops',
-        price: 1000,
-        sku: 'MBP-14',
-        images: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&auto=format&fit=crop&q=60',
-        quantity: 8
-    },
-    {
-        id: 'mock-3',
-        name: 'Rolex Tribute V3',
-        category: 'Watches',
-        price: 6800,
-        sku: 'RLX-V3',
-        images: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=500&auto=format&fit=crop&q=60',
-        quantity: 5
-    },
-    {
-        id: 'mock-4',
-        name: 'Red Nike Angelo',
-        category: 'Shoes',
-        price: 7800,
-        sku: 'NKE-ANG-R',
-        images: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=60',
-        quantity: 15
-    },
-    {
-        id: 'mock-5',
-        name: 'Airpod 2',
-        category: 'Headset',
-        price: 1580,
-        sku: 'APOD-2',
-        images: 'https://images.unsplash.com/photo-1588449668365-d15e397f6787?w=500&auto=format&fit=crop&q=60',
-        quantity: 20
-    },
-    {
-        id: 'mock-6',
-        name: 'Blue White OGR',
-        category: 'Shoes',
-        price: 350,
-        sku: 'OGR-BW',
-        images: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&auto=format&fit=crop&q=60',
-        quantity: 32
-    },
-    {
-        id: 'mock-7',
-        name: 'IdeaPad Slim 5 Gen 7',
-        category: 'Laptops',
-        price: 3000,
-        sku: 'IP-SL5',
-        images: 'https://images.unsplash.com/photo-1496181130204-755241544e3f?w=500&auto=format&fit=crop&q=60',
-        quantity: 10
-    },
-    {
-        id: 'mock-8',
-        name: 'SWAGME Headset',
-        category: 'Headset',
-        price: 398,
-        sku: 'SWM-HS',
-        images: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=60',
-        quantity: 25
-    }
-];
 
 const CATEGORIES = [
     { name: 'All', icon: 'Layers' },
@@ -106,34 +29,32 @@ const DEFAULT_CUSTOMER = { id: 'c-1', name: 'Walk-in Customer', bonus: 0, loyalt
 
 export default function POS() {
     const { currencySymbol } = useCurrency();
-
     const navigate = useNavigate();
     const { user } = useAuth();
     const currentDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-    // --- STATE ---
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [categories, setCategories] = useState(CATEGORIES);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
     const [loadingProducts, setLoadingProducts] = useState(true);
-    const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
+    const [viewMode, setViewMode] = useState('grid');
 
-    // Cart & Order Information
     const [cart, setCart] = useState([]);
     const [customersList, setCustomersList] = useState([DEFAULT_CUSTOMER]);
     const [selectedCustomer, setSelectedCustomer] = useState(DEFAULT_CUSTOMER);
     const [showCustomerCard, setShowCustomerCard] = useState(false);
     
-    // Summary Calculations (Default values from the image)
+    // Feature: Order Type
+    const [orderType, setOrderType] = useState('POS'); // 'POS' or 'Online'
+
     const [shipping, setShipping] = useState(0.00);
     const [tax, setTax] = useState(0.00);
     const [coupon, setCoupon] = useState(0.00);
-    const [discountApplied, setDiscountApplied] = useState(false); // 5% discount banner
+    const [discountApplied, setDiscountApplied] = useState(false);
     const [showSummaryEdit, setShowSummaryEdit] = useState({ type: null, value: '' });
 
-    // Modals
     const [paymentModalOpen, setPaymentModalOpen] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
@@ -142,39 +63,31 @@ export default function POS() {
     const [heldOrdersModalOpen, setHeldOrdersModalOpen] = useState(false);
     const [heldOrders, setHeldOrders] = useState([]);
 
-    // Live clock widget
     const [timeString, setTimeString] = useState('');
-
-    // Payment Form state
     const [paymentType, setPaymentType] = useState('Cash');
     const [amountPaid, setAmountPaid] = useState('');
     const [submittingOrder, setSubmittingOrder] = useState(false);
     const [orderError, setOrderError] = useState('');
     const [recentOrderDetails, setRecentOrderDetails] = useState(null);
-
-    // Responsive Mobile Views ('grid', 'cart', 'categories')
     const [mobileActiveTab, setMobileActiveTab] = useState('grid');
 
-    // --- TIMEFUNCTION ---
     useEffect(() => {
         const updateClock = () => {
             const now = new Date();
             const hrs = String(now.getHours()).padStart(2, '0');
             const mins = String(now.getMinutes()).padStart(2, '0');
             const secs = String(now.getSeconds()).padStart(2, '0');
-            setTimeString(`${hrs}: {currencySymbol}{mins}: {currencySymbol}{secs}`);
+            setTimeString(`${hrs}:${mins}:${secs}`);
         };
         updateClock();
         const id = setInterval(updateClock, 1000);
         return () => clearInterval(id);
     }, []);
 
-    // --- FETCH PRODUCTS, CATEGORIES & CUSTOMERS ---
     useEffect(() => {
         const fetchAllData = async () => {
             setLoadingProducts(true);
             try {
-                // Fetch customers
                 const custRes = await apiClient.get(`${BASE_URL}/customers`);
                 let dbCusts = Array.isArray(custRes.data) ? custRes.data : [];
                 if (dbCusts.length > 0) {
@@ -185,7 +98,6 @@ export default function POS() {
                     setSelectedCustomer(DEFAULT_CUSTOMER);
                 }
 
-                // Fetch products from API
                 const prodRes = await apiClient.get(`${BASE_URL}/products`);
                 let dbProds = Array.isArray(prodRes.data) ? prodRes.data : [];
                 let mappedDb = [];
@@ -195,7 +107,7 @@ export default function POS() {
                             if (Array.isArray(variantType.values)) {
                                 variantType.values.forEach((variant, valIdx) => {
                                     mappedDb.push({
-                                        id: p.id, // Must use parent id to link order items properly
+                                        id: p.id,
                                         cartKey: `${p.id}-var-${typeIdx}-${valIdx}`,
                                         name: `${p.name} - ${variant.value}`,
                                         category: p.category || 'Appliance',
@@ -227,14 +139,10 @@ export default function POS() {
                     }
                 });
                 
-                // Always use database products, no more offline fallback
                 const finalProducts = mappedDb;
                 setProducts(finalProducts);
                 setFilteredProducts(finalProducts);
 
-                // No prefilling of cart. Empty by default!
-
-                // Dynamically build category list if database has new ones
                 const dbCats = ['All', ...new Set(dbProds.map(p => p.category).filter(Boolean))];
                 const cleanCats = dbCats.map(cat => {
                     const existing = CATEGORIES.find(c => c.name.toLowerCase() === cat.toLowerCase());
@@ -254,23 +162,17 @@ export default function POS() {
         };
         fetchAllData();
 
-        // Load held orders from localStorage
         const savedHeld = localStorage.getItem('pos_held_orders');
         if (savedHeld) {
             setHeldOrders(JSON.parse(savedHeld));
         }
     }, []);
 
-    // --- SEARCH & CATEGORY FILTERING ---
     useEffect(() => {
         let result = products;
-        
-        // Category Filter
         if (selectedCategory !== 'All') {
             result = result.filter(p => p.category?.toLowerCase() === selectedCategory.toLowerCase());
         }
-
-        // Search Filter
         if (searchTerm.trim() !== '') {
             const query = searchTerm.toLowerCase();
             result = result.filter(p => 
@@ -279,11 +181,9 @@ export default function POS() {
                 p.itemBarcode?.toLowerCase().includes(query)
             );
         }
-
         setFilteredProducts(result);
     }, [selectedCategory, searchTerm, products]);
 
-    // --- CART ACTIONS ---
     const addToCart = (product) => {
         const exist = cart.find(item => item.cartKey === product.cartKey);
         if (exist) {
@@ -314,18 +214,16 @@ export default function POS() {
         setCart([]);
     };
 
-    // --- CUSTOMER ACTIONS ---
     const handleSelectCustomer = (e) => {
         const custId = e.target.value;
         const found = customersList.find(c => String(c.id) === String(custId));
         if (found) {
             setSelectedCustomer(found);
-            setShowCustomerCard(String(found.id) !== 'c-1'); // hide info card for Walk-in Customer
+            setShowCustomerCard(String(found.id) !== 'c-1');
         }
     };
 
     const handleApplyCustomerBonus = () => {
-        // Mock Applying Loyalty
         alert(`Successfully applied ${currencySymbol}${selectedCustomer.loyalty || 0} Loyalty Balance as coupon discount!`);
         setCoupon(prev => prev + (selectedCustomer.loyalty || 0));
         setShowCustomerCard(false);
@@ -348,15 +246,10 @@ export default function POS() {
         }
     };
 
-    // --- CALCULATIONS ---
     const cartSubtotal = cart.reduce((sum, item) => sum + (item.price * item.cartQty), 0);
-    
-    // Apply 5% discount if banner is active and subtotal > {currencySymbol}20
     const autoDiscountValue = (discountApplied && cartSubtotal >= 20) ? (cartSubtotal * 0.05) : 0;
-    
     const grandTotal = Math.max(0, cartSubtotal + shipping + tax - coupon - autoDiscountValue);
 
-    // --- HELD ORDERS ---
     const handleHoldOrder = () => {
         if (cart.length === 0) return alert('Cannot hold an empty order.');
         const held = {
@@ -369,7 +262,8 @@ export default function POS() {
             tax,
             coupon,
             subtotal: cartSubtotal,
-            grandTotal
+            grandTotal,
+            orderType
         };
         const newList = [held, ...heldOrders];
         setHeldOrders(newList);
@@ -385,14 +279,13 @@ export default function POS() {
         setShipping(order.shipping);
         setTax(order.tax);
         setCoupon(order.coupon);
+        if(order.orderType) setOrderType(order.orderType);
         setHeldOrdersModalOpen(false);
-        // Remove from held orders list
         const newList = heldOrders.filter(o => o.id !== order.id);
         setHeldOrders(newList);
         localStorage.setItem('pos_held_orders', JSON.stringify(newList));
     };
 
-    // --- TRANSACTION / PAYMENT ACTIONS ---
     const handleOpenPayment = () => {
         if (cart.length === 0) return alert('Order details are empty. Please add items to order list.');
         setAmountPaid(grandTotal.toFixed(2));
@@ -404,7 +297,6 @@ export default function POS() {
         setSubmittingOrder(true);
         setOrderError('');
         try {
-            // Map products list format for the Spring Boot endpoint
             const formattedProducts = cart.map(item => ({
                 productId: item.id,
                 name: item.name,
@@ -425,11 +317,13 @@ export default function POS() {
                 shipping: shipping,
                 paidAmount: finalPaymentStatus === 'Paid' ? grandTotal : 0,
                 biller: user?.name || 'Admin',
-                notes: 'Order created via new premium POS terminal screen.',
+                notes: `Order created via POS terminal. Type: ${orderType}`,
                 products: formattedProducts
             };
 
-            const res = await apiClient.post(`${BASE_URL}/pos-sales`, payload);
+            const endpoint = orderType === 'Online' ? `${BASE_URL}/sales` : `${BASE_URL}/pos-sales`;
+            const res = await apiClient.post(endpoint, payload);
+            
             setRecentOrderDetails({
                 ...res.data,
                 referenceNo: res.data.referenceNo || `ORD-${Math.floor(100000 + Math.random() * 900000)}`,
@@ -438,13 +332,14 @@ export default function POS() {
                 grandTotal,
                 paidAmount: finalPaymentStatus === 'Paid' ? grandTotal : 0,
                 changeDue: finalPaymentStatus === 'Paid' ? Math.max(0, parseFloat(amountPaid) - grandTotal) : 0,
-                paymentType
+                paymentType,
+                orderType
             });
 
             setPaymentSuccess(true);
         } catch (err) {
             console.error("Failed to post order to backend", err);
-            setOrderError("Failed to connect to actual backend. Order not submitted.");
+            setOrderError("Failed to submit order. Please try again.");
         } finally {
             setSubmittingOrder(false);
         }
@@ -459,7 +354,6 @@ export default function POS() {
     };
 
     const handleTransaction = () => {
-        // Quick complete transaction directly
         if (cart.length === 0) return alert('Please add items to cart first.');
         setPaymentType('Cash');
         setAmountPaid(grandTotal.toFixed(2));
@@ -484,6 +378,7 @@ export default function POS() {
             setDiscountApplied(false);
             setSearchTerm('');
             setSelectedCategory('All');
+            setOrderType('POS');
         }
     };
 
@@ -494,140 +389,47 @@ export default function POS() {
         setInvoiceModalOpen(false);
     };
 
-    // Render appropriate Lucide Icon dynamically
     const renderCategoryIcon = (iconName) => {
         switch (iconName) {
-            case 'Headphones': 
-                return <Headphones size={20} color="#1e293b" strokeWidth={2} />;
-            case 'Sneakers': 
-                return (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 18h18V9.5c0-1.5-1-2.5-2.5-2.5H12L7 12H3v6z"/>
-                        <path d="M7 12V8a2 2 0 0 1 2-2h1"/>
-                        <path d="M12 18v-2"/>
-                        <path d="M16 18v-2"/>
-                    </svg>
-                );
-            case 'Smartphone': 
-                return <Smartphone size={20} color="#28c76f" strokeWidth={2} />;
-            case 'Watch': 
-                return <Clock size={20} color="#64748b" strokeWidth={2} />;
-            case 'Laptop': 
-                return <Laptop size={20} color="#0f172a" strokeWidth={2} />;
-            case 'WashingMachine': 
-                return (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="4" y="4" width="16" height="16" rx="2"/>
-                        <circle cx="12" cy="12" r="4"/>
-                        <circle cx="16" cy="7" r="1"/>
-                    </svg>
-                );
-            default: 
-                return (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="5" y="3" width="14" height="18" rx="2"/>
-                        <line x1="9" y1="8" x2="15" y2="8"/>
-                        <line x1="9" y1="12" x2="15" y2="12"/>
-                        <line x1="9" y1="16" x2="13" y2="16"/>
-                    </svg>
-                );
+            case 'Headphones': return <Headphones size={22} strokeWidth={1.5} />;
+            case 'Sneakers': return (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 18h18V9.5c0-1.5-1-2.5-2.5-2.5H12L7 12H3v6z"/><path d="M7 12V8a2 2 0 0 1 2-2h1"/><path d="M12 18v-2"/><path d="M16 18v-2"/>
+                </svg>
+            );
+            case 'Smartphone': return <Smartphone size={22} strokeWidth={1.5} />;
+            case 'Watch': return <Clock size={22} strokeWidth={1.5} />;
+            case 'Laptop': return <Laptop size={22} strokeWidth={1.5} />;
+            case 'WashingMachine': return (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="4"/><circle cx="16" cy="7" r="1"/>
+                </svg>
+            );
+            default: return (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+                </svg>
+            );
         }
     };
 
     return (
         <div className="pos-terminal-wrapper">
             
-            {/* --- TOP BRAND HEADER --- */}
-            <header className="pos-terminal-header">
-                <div className="pos-header-left">
-                    <div className="pos-brand-container" onClick={() => navigate('/dashboard')} style={{ gap: '10px' }}>
-                        <ShoppingBag color="#ff9b29" size={28} />
-                        <span style={{ color: '#1c2b36', fontWeight: '800', fontSize: '24px', letterSpacing: '-0.5px' }}>Namustute</span>
-                    </div>
-                    <div className="pos-clock-widget">
-                        <Clock size={15} />
-                        <span>{timeString || "09:25:32"}</span>
-                    </div>
-                </div>
+            {/* Header */}
+            <Header onMenuClick={() => {}} />
 
-                <div className="pos-header-right">
-                    <button className="pos-dashboard-btn" onClick={() => navigate('/dashboard')}>
-                        <span>Dashboard</span>
-                    </button>
-
-                    <div className="pos-freshmart-dropdown">
-                        <select defaultValue="Freshmart">
-                            <option>Freshmart</option>
-                            <option>HyperStore</option>
-                            <option>Main Warehouse</option>
-                        </select>
-                    </div>
-
-                    <div className="pos-header-actions">
-                        <button className="pos-icon-btn orange-square-accent" title="Calendar" onClick={() => setCustomerModalOpen(true)}>
-                            <UserPlus size={16} color="#fff" />
-                        </button>
-                        <button className="pos-icon-btn" title="Full Screen" onClick={() => {
-                            if (!document.fullscreenElement) {
-                                document.documentElement.requestFullscreen();
-                            } else {
-                                document.exitFullscreen();
-                            }
-                        }}>
-                            <Maximize size={16} />
-                        </button>
-                        <button className="pos-icon-btn" title="Suspend/Copy" onClick={() => setHeldOrdersModalOpen(true)}>
-                            <ClipboardList size={16} />
-                        </button>
-                        <button className="pos-icon-btn" title="Print POS Receipt" onClick={() => window.print()}>
-                            <Printer size={16} />
-                        </button>
-                        <button className="pos-icon-btn" title="Reset Filters" onClick={() => {
-                            setSelectedCategory('All');
-                            setSearchTerm('');
-                        }}>
-                            <RefreshCw size={16} />
-                        </button>
-                        <button className="pos-icon-btn" title="Sound Control">
-                            <Volume2 size={16} />
-                        </button>
-                        <button className="pos-icon-btn" title="Language/Globe">
-                            <Globe size={16} />
-                        </button>
-                        
-                        <div className="pos-user-profile">
-                            <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.name || 'Admin'}`} alt="User Avatar" />
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            {/* --- RESPONSIVE MOBILE NAVIGATION TABS --- */}
+            {/* Mobile Tabs */}
             <div className="pos-mobile-tabs">
-                <button 
-                    className={mobileActiveTab === 'grid' ? 'active' : ''} 
-                    onClick={() => setMobileActiveTab('grid')}
-                >
-                    🛍️ Products Grid
-                </button>
-                <button 
-                    className={mobileActiveTab === 'cart' ? 'active' : ''} 
-                    onClick={() => setMobileActiveTab('cart')}
-                >
-                    🛒 Cart ({cart.reduce((sum, i) => sum + i.cartQty, 0)})
-                </button>
-                <button 
-                    className={mobileActiveTab === 'categories' ? 'active' : ''} 
-                    onClick={() => setMobileActiveTab('categories')}
-                >
-                    🏷️ Categories
-                </button>
+                <button className={mobileActiveTab === 'grid' ? 'active' : ''} onClick={() => setMobileActiveTab('grid')}>🛍️ Grid</button>
+                <button className={mobileActiveTab === 'cart' ? 'active' : ''} onClick={() => setMobileActiveTab('cart')}>🛒 Cart ({cart.reduce((s, i) => s + i.cartQty, 0)})</button>
+                <button className={mobileActiveTab === 'categories' ? 'active' : ''} onClick={() => setMobileActiveTab('categories')}>🏷️ Categories</button>
             </div>
 
-            {/* --- THREE COLUMN POS BODY --- */}
+            {/* Body */}
             <div className="pos-terminal-body">
                 
-                {/* 1. LEFT COLUMN: CATEGORIES SIDEBAR */}
+                {/* 1. Categories Sidebar */}
                 <aside className={`pos-sidebar-categories ${mobileActiveTab === 'categories' ? 'mobile-visible' : ''}`}>
                     {categories.map((cat, idx) => (
                         <button
@@ -635,7 +437,7 @@ export default function POS() {
                             className={`pos-category-card ${selectedCategory === cat.name ? 'active' : ''}`}
                             onClick={() => {
                                 setSelectedCategory(cat.name);
-                                setMobileActiveTab('grid'); // switch back to product grid on mobile select
+                                setMobileActiveTab('grid');
                             }}
                         >
                             <div className="pos-category-icon-wrapper">
@@ -646,22 +448,20 @@ export default function POS() {
                     ))}
                 </aside>
 
-                {/* 2. MIDDLE COLUMN: PRODUCT SEARCH & GRID */}
+                {/* 2. Products Grid */}
                 <section className={`pos-main-products-view ${mobileActiveTab === 'grid' ? 'mobile-visible' : ''}`}>
-                    
-                    {/* Welcome & Search Bar Header */}
                     <div className="pos-search-header-row">
                         <div className="pos-welcome-banner">
-                            <h2>Welcome, {user?.name || 'Admin'}</h2>
+                            <h2>Welcome back, {user?.name || 'Admin'}</h2>
                             <p>{currentDate}</p>
                         </div>
 
                         <div className="pos-search-controls">
                             <div className="pos-search-bar-wrap">
-                                <Search size={16} />
+                                <Search size={16} className="text-muted" />
                                 <input
                                     type="text"
-                                    placeholder="Search Product"
+                                    placeholder="Search Product, SKU, Barcode"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -676,46 +476,29 @@ export default function POS() {
                                 View All Brands
                             </button>
                             
-                            <button className="pos-featured-btn">
-                                <span className="star-icon">⭐</span>
-                                Featured
-                            </button>
-
                             <div className="pos-view-toggle-wrap">
-                                <button 
-                                    className={`pos-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('grid')}
-                                    title="Grid View"
-                                >
+                                <button className={`pos-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')}>
                                     <LayoutGrid size={16} />
                                 </button>
-                                <button 
-                                    className={`pos-toggle-btn ${viewMode === 'table' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('table')}
-                                    title="Table View"
-                                >
+                                <button className={`pos-toggle-btn ${viewMode === 'table' ? 'active' : ''}`} onClick={() => setViewMode('table')}>
                                     <List size={16} />
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    {/* Products Content */}
-                    <div className="pos-products-grid-scroll">
+                    <div className="pos-products-scroll-area">
                         {loadingProducts ? (
                             <div className="pos-loading-state">
                                 <div className="pos-loading-spinner"></div>
-                                <p>Loading terminal inventory...</p>
+                                <p>Loading premium inventory...</p>
                             </div>
                         ) : filteredProducts.length === 0 ? (
                             <div className="pos-empty-grid-state">
-                                <ShoppingBag size={48} strokeWidth={1} />
+                                <ShoppingBag size={56} strokeWidth={1} color="#cbd5e1" />
                                 <h3>No items found</h3>
                                 <p>Try clearing search queries or checking other category filters.</p>
-                                <button className="pos-reset-filters-inline" onClick={() => {
-                                    setSearchTerm('');
-                                    setSelectedCategory('All');
-                                }}>
+                                <button className="pos-reset-filters-btn" onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}>
                                     Reset Filters
                                 </button>
                             </div>
@@ -729,7 +512,7 @@ export default function POS() {
                                             <th>Category</th>
                                             <th>Price</th>
                                             <th>Stock</th>
-                                            <th style={{ textAlign: 'center' }}>Action</th>
+                                            <th className="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -737,52 +520,33 @@ export default function POS() {
                                             const cartItem = cart.find(x => x.sku === p.sku);
                                             const inCart = !!cartItem;
                                             const isOutOfStock = p.quantity <= 0;
-                                            
                                             return (
-                                                <tr key={p.sku} className={inCart ? 'row-selected-in-cart' : ''}>
+                                                <tr key={p.sku} className={inCart ? 'selected-row' : ''}>
                                                     <td>
                                                         <div className="pos-table-prod-info">
-                                                            <img src={p.images} alt={p.name} className="pos-table-prod-img" onError={(e) => {
-                                                                e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500';
-                                                            }} />
-                                                            <span className="pos-table-prod-name">{p.name}</span>
+                                                            <div className="table-img-wrap"><img src={p.images} alt={p.name} /></div>
+                                                            <span className="table-prod-name">{p.name}</span>
                                                         </div>
                                                     </td>
+                                                    <td>{p.sku || '---'}</td>
+                                                    <td><span className="table-category-badge">{p.category}</span></td>
+                                                    <td className="table-price">{currencySymbol}{p.price.toLocaleString()}</td>
                                                     <td>
-                                                        <span className="pos-table-sku">{p.sku || '---'}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span className="pos-table-category">{p.category}</span>
-                                                    </td>
-                                                    <td className="pos-table-price">{currencySymbol}{p.price.toLocaleString()}
-                                                    </td>
-                                                    <td>
-                                                        <span className={`pos-table-stock-badge ${isOutOfStock ? 'out-of-stock' : p.quantity < 10 ? 'low-stock' : 'in-stock'}`}>
-                                                            {p.quantity} left
+                                                        <span className={`table-stock-badge ${isOutOfStock ? 'out' : p.quantity < 10 ? 'low' : 'in'}`}>
+                                                            {p.quantity} in stock
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <div className="table-action-cell">
                                                             {inCart ? (
-                                                                    <div className="pos-table-qty-controls" onClick={(e) => e.stopPropagation()}>
-                                                                        <button onClick={() => updateCartQty(p.sku, -1)} className="pos-table-qty-btn">
-                                                                            <Minus size={12} />
-                                                                        </button>
-                                                                        <span className="pos-table-qty-val">{cartItem.cartQty}</span>
-                                                                        <button onClick={() => updateCartQty(p.sku, 1)} className="pos-table-qty-btn">
-                                                                            <Plus size={12} />
-                                                                        </button>
-                                                                    </div>
+                                                                <div className="pos-card-qty-controls">
+                                                                    <button onClick={() => updateCartQty(p.sku, -1)}><Minus size={14} /></button>
+                                                                    <span>{cartItem.cartQty}</span>
+                                                                    <button onClick={() => updateCartQty(p.sku, 1)}><Plus size={14} /></button>
+                                                                </div>
                                                             ) : (
-                                                                <button 
-                                                                    className="pos-table-add-btn" 
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        addToCart(p);
-                                                                    }}
-                                                                    disabled={isOutOfStock}
-                                                                >
-                                                                    {isOutOfStock ? 'Out of Stock' : '+ Add'}
+                                                                <button className="table-add-btn" onClick={() => addToCart(p)} disabled={isOutOfStock}>
+                                                                    {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                                                                 </button>
                                                             )}
                                                         </div>
@@ -798,24 +562,23 @@ export default function POS() {
                                 {filteredProducts.map(p => {
                                     const cartItem = cart.find(x => x.sku === p.sku);
                                     const inCart = !!cartItem;
-                                    const hasHighlight = inCart;
+                                    const isOutOfStock = p.quantity <= 0;
 
                                     return (
                                         <div 
                                             key={p.sku} 
-                                            className={`pos-product-card ${hasHighlight ? 'selected-in-cart' : ''}`}
-                                            onClick={() => !inCart && addToCart(p)}
+                                            className={`pos-product-card ${inCart ? 'selected' : ''} ${isOutOfStock ? 'out-of-stock' : ''}`}
+                                            onClick={() => !inCart && !isOutOfStock && addToCart(p)}
                                         >
-                                            {hasHighlight && (
-                                                <div className="pos-card-checkmark-badge">
-                                                    <Check size={12} color="#fff" strokeWidth={3} />
+                                            {inCart && (
+                                                <div className="pos-card-checkmark-badge animate-pop">
+                                                    <Check size={14} color="#fff" strokeWidth={3} />
                                                 </div>
                                             )}
                                             
                                             <div className="pos-card-img-wrapper">
-                                                <img src={p.images} alt={p.name} onError={(e) => {
-                                                    e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500';
-                                                }} />
+                                                <img src={p.images} alt={p.name} />
+                                                {isOutOfStock && <div className="pos-out-stock-overlay">Out of Stock</div>}
                                             </div>
 
                                             <div className="pos-card-details">
@@ -827,23 +590,17 @@ export default function POS() {
                                                     
                                                     {inCart ? (
                                                         <div className="pos-card-qty-controls" onClick={(e) => e.stopPropagation()}>
-                                                            <button onClick={() => updateCartQty(p.sku, -1)} className="pos-card-qty-btn">
-                                                                <Minus size={12} />
-                                                            </button>
-                                                            <span className="pos-card-qty-val">{cartItem.cartQty}</span>
-                                                            <button onClick={() => updateCartQty(p.sku, 1)} className="pos-card-qty-btn">
-                                                                <Plus size={12} />
-                                                            </button>
+                                                            <button onClick={() => updateCartQty(p.sku, -1)}><Minus size={14} /></button>
+                                                            <span>{cartItem.cartQty}</span>
+                                                            <button onClick={() => updateCartQty(p.sku, 1)}><Plus size={14} /></button>
                                                         </div>
                                                     ) : (
                                                         <button 
                                                             className="pos-card-add-btn" 
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                addToCart(p);
-                                                            }}
+                                                            disabled={isOutOfStock}
+                                                            onClick={(e) => { e.stopPropagation(); addToCart(p); }}
                                                         >
-                                                            + Add
+                                                            <Plus size={16} /> Add
                                                         </button>
                                                     )}
                                                 </div>
@@ -856,206 +613,140 @@ export default function POS() {
                     </div>
                 </section>
 
-                {/* 3. RIGHT COLUMN: CART / ORDER LIST */}
+                {/* 3. Right Cart Panel */}
                 <aside className={`pos-right-order-pane ${mobileActiveTab === 'cart' ? 'mobile-visible' : ''}`}>
                     <div className="pos-order-pane-header">
-                        <h3>Order List</h3>
+                        <h3>Current Order</h3>
                         <div className="pos-order-pane-actions">
-                            <span className="pos-order-id-tag">#ORD123</span>
-                            <button className="pos-delete-order-btn" title="Void current sale" onClick={handleVoid}>
-                                <Trash2 size={15} />
+                            <button className="pos-clear-all-btn" onClick={clearCart}>
+                                <Trash2 size={14} /> Clear
                             </button>
                         </div>
                     </div>
 
-                    {/* Customer Selection Block */}
+                    <div className="pos-order-type-selector">
+                        <label>Order Target:</label>
+                        <div className="order-type-tabs">
+                            <button 
+                                className={orderType === 'POS' ? 'active pos-type' : ''} 
+                                onClick={() => setOrderType('POS')}
+                            >
+                                <Store size={14} /> POS Sell
+                            </button>
+                            <button 
+                                className={orderType === 'Online' ? 'active online-type' : ''} 
+                                onClick={() => setOrderType('Online')}
+                            >
+                                <Monitor size={14} /> Online Sell
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="pos-customer-selection-card">
                         <div className="pos-customer-input-row">
                             <div className="pos-customer-select-wrapper">
                                 <select value={selectedCustomer?.id || ''} onChange={handleSelectCustomer}>
-                                    {customersList.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
+                                    {customersList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                                 <ChevronDown size={14} className="pos-dropdown-chevron" />
                             </div>
-
                             <button className="pos-add-customer-btn" onClick={() => setCustomerModalOpen(true)}>
-                                <UserPlus size={15} />
-                            </button>
-                            <button className="pos-settings-customer-btn">
-                                <span>⚙️</span>
+                                <UserPlus size={16} />
                             </button>
                         </div>
 
-                        {/* Customer Loyalty Bonus Card */}
                         {showCustomerCard && (
                             <div className="pos-loyalty-bonus-card animate-pop">
-                                <button className="pos-loyalty-close" onClick={() => setShowCustomerCard(false)}>×</button>
-                                <div className="pos-loyalty-info">
+                                <div>
                                     <h4>{selectedCustomer?.name}</h4>
-                                    <div className="pos-loyalty-badges">
-                                        <span className="pos-loyalty-badge bonus">
-                                            Bonus: <span className="bonus-val">{selectedCustomer?.bonus || 0}</span>
-                                        </span>
-                                        <span className="pos-loyalty-badge loyalty">
-                                            Loyalty: <span className="loyalty-val">{currencySymbol}{selectedCustomer?.loyalty || 0}</span>
-                                        </span>
-                                    </div>
+                                    <span className="loyalty-badge">Loyalty: {currencySymbol}{selectedCustomer?.loyalty || 0}</span>
                                 </div>
-                                <button className="pos-loyalty-apply-btn" onClick={handleApplyCustomerBonus}>
-                                    Apply
-                                </button>
+                                <button className="pos-loyalty-apply-btn" onClick={handleApplyCustomerBonus}>Apply</button>
                             </div>
                         )}
                     </div>
 
-                    {/* Order Details list */}
-                    <div className="pos-order-details-wrapper">
-                        <div className="pos-order-details-header">
-                            <div className="order-details-title-row">
-                                <h4>Order Details</h4>
-                                <span className="pos-items-count-badge">Items : {cart.reduce((sum, item) => sum + item.cartQty, 0)}</span>
+                    <div className="pos-order-items-list">
+                        {cart.length === 0 ? (
+                            <div className="pos-cart-empty-placeholder">
+                                <ShoppingBag size={48} strokeWidth={1} color="#cbd5e1" />
+                                <p>Cart is empty</p>
+                                <span>Scan or add items to ring up a sale.</span>
                             </div>
-                            <button className="pos-clear-all-btn" onClick={clearCart}>
-                                Clear all
-                            </button>
-                        </div>
-
-                        {cart.length > 0 && (
-                            <div className="pos-order-table-header">
-                                <span className="th-item">Item</span>
-                                <span className="th-qty">QTY</span>
-                                <span className="th-cost">Cost</span>
-                            </div>
-                        )}
-
-                        <div className="pos-order-items-list">
-                            {cart.length === 0 ? (
-                                <div className="pos-cart-empty-placeholder">
-                                    <p>🛒 Cart is empty</p>
-                                    <span>Select items from middle product grid to ring up a new sale.</span>
-                                </div>
-                            ) : (
-                                cart.map(item => (
-                                    <div className="pos-cart-item-row" key={item.cartKey}>
-                                        <div className="pos-cart-item-info">
-                                            <span className="pos-cart-item-bullet">📦</span>
-                                            <span className="pos-cart-item-name" title={item.name}>{item.name}</span>
-                                        </div>
-
-                                        <div className="pos-cart-qty-spinner-cell">
-                                            <div className="pos-cart-qty-spinner">
-                                                <button onClick={() => updateCartQty(item.cartKey, -1)} className="spinner-btn">
-                                                    <Minus size={11} />
-                                                </button>
-                                                <span className="spinner-val">{item.cartQty}</span>
-                                                <button onClick={() => updateCartQty(item.cartKey, 1)} className="spinner-btn">
-                                                    <Plus size={11} />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="pos-cart-item-cost-cell">
-                                            <span className="pos-cart-item-cost">{currencySymbol}{(item.price * item.cartQty).toLocaleString()}</span>
-                                        </div>
+                        ) : (
+                            cart.map(item => (
+                                <div className="pos-cart-item-row" key={item.cartKey}>
+                                    <div className="cart-item-image">
+                                        <img src={item.images} alt={item.name} />
                                     </div>
-                                ))
-                            )}
-                        </div>
-
-                        {/* Interactive Coupon Box */}
-                        {discountApplied && cartSubtotal >= 20 && (
-                            <div className="pos-coupon-discount-box">
-                                <div className="coupon-left">
-                                    <div className="coupon-circle-icon">
-                                        <Percent size={14} color="#6366f1" />
+                                    <div className="cart-item-info">
+                                        <span className="cart-item-name">{item.name}</span>
+                                        <span className="cart-item-price">{currencySymbol}{item.price.toLocaleString()}</span>
                                     </div>
-                                    <div className="coupon-text">
-                                        <h5>Discount 5%</h5>
-                                        <p>For {currencySymbol}20 Minimum Purchase, all Items</p>
+                                    <div className="cart-item-qty">
+                                        <button onClick={() => updateCartQty(item.cartKey, -1)}><Minus size={12} /></button>
+                                        <span>{item.cartQty}</span>
+                                        <button onClick={() => updateCartQty(item.cartKey, 1)}><Plus size={12} /></button>
+                                    </div>
+                                    <div className="cart-item-total">
+                                        {currencySymbol}{(item.price * item.cartQty).toLocaleString()}
                                     </div>
                                 </div>
-                                <button className="coupon-remove-btn" onClick={() => setDiscountApplied(false)}>
-                                    <Trash2 size={13} />
-                                </button>
-                            </div>
+                            ))
                         )}
                     </div>
 
-                    {/* Payment Summary */}
                     <div className="pos-payment-summary-block">
-                        <div className="pos-summary-row">
-                            <span className="summary-label">Shipping</span>
-                            <div className="summary-val-wrap" onClick={() => setShowSummaryEdit({ type: 'shipping', value: shipping })}>
-                                <span className="summary-val">{currencySymbol}{shipping.toFixed(2)}</span>
-                                <Edit3 size={12} className="edit-summary-icon" />
-                            </div>
+                        <div className="pos-summary-row" onClick={() => setShowSummaryEdit({ type: 'shipping', value: shipping })}>
+                            <span>Shipping <Edit3 size={10} className="edit-icon"/></span>
+                            <span>{currencySymbol}{shipping.toFixed(2)}</span>
                         </div>
-
-                        <div className="pos-summary-row">
-                            <span className="summary-label">Tax</span>
-                            <div className="summary-val-wrap" onClick={() => setShowSummaryEdit({ type: 'tax', value: tax })}>
-                                <span className="summary-val">{currencySymbol}{tax.toFixed(2)}</span>
-                                <Edit3 size={12} className="edit-summary-icon" />
-                            </div>
+                        <div className="pos-summary-row" onClick={() => setShowSummaryEdit({ type: 'tax', value: tax })}>
+                            <span>Tax <Edit3 size={10} className="edit-icon"/></span>
+                            <span>{currencySymbol}{tax.toFixed(2)}</span>
                         </div>
-
+                        <div className="pos-summary-row discount" onClick={() => setShowSummaryEdit({ type: 'coupon', value: coupon })}>
+                            <span>Discount <Edit3 size={10} className="edit-icon"/></span>
+                            <span>-{currencySymbol}{coupon.toFixed(2)}</span>
+                        </div>
                         {autoDiscountValue > 0 && (
-                            <div className="pos-summary-row promo-discount">
-                                <span className="summary-label">Promo Discount (5%)</span>
-                                <span className="summary-val">-{currencySymbol}{autoDiscountValue.toFixed(2)}</span>
+                            <div className="pos-summary-row promo">
+                                <span>Promo (5%)</span>
+                                <span>-{currencySymbol}{autoDiscountValue.toFixed(2)}</span>
                             </div>
                         )}
-
-                        <div className="pos-summary-row">
-                            <span className="summary-label">Coupon</span>
-                            <div className="summary-val-wrap" onClick={() => setShowSummaryEdit({ type: 'coupon', value: coupon })}>
-                                <span className="summary-val">-{currencySymbol}{coupon.toFixed(2)}</span>
-                                <Edit3 size={12} className="edit-summary-icon" />
-                            </div>
-                        </div>
-
                         <div className="pos-summary-divider"></div>
-
                         <div className="pos-summary-grand-total">
                             <span>Total Due</span>
-                            <span className="grand-price">{currencySymbol}{grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span className="grand-price">{currencySymbol}{grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                         </div>
                     </div>
                 </aside>
-
             </div>
 
-            {/* --- BOTTOM GRID CONTROL BAR --- */}
+            {/* Bottom Control Bar */}
             <footer className="pos-terminal-bottom-bar">
                 <button className="pos-action-btn hold-btn" onClick={handleHoldOrder}>
-                    <span className="btn-icon">⏸️</span>
-                    <span>Hold</span>
+                    <span>⏸️</span> Hold
                 </button>
                 <button className="pos-action-btn void-btn" onClick={handleVoid}>
-                    <span className="btn-icon">🗑️</span>
-                    <span>Void</span>
+                    <span>🗑️</span> Void
                 </button>
                 <button className="pos-action-btn payment-btn" onClick={handleOpenPayment}>
-                    <span className="btn-icon">💵</span>
-                    <span>Payment</span>
+                    <span>💵</span> Payment
                 </button>
-                <button className="pos-action-btn view-btn" onClick={() => navigate('/dashboard/sales-pos')}>
-                    <span className="btn-icon">👁️</span>
-                    <span>View Orders</span>
+                <button className="pos-action-btn view-btn" onClick={() => navigate(orderType === 'Online' ? '/dashboard/sales-online' : '/dashboard/sales-pos')}>
+                    <span>👁️</span> View Orders
                 </button>
                 <button className="pos-action-btn reset-btn" onClick={handleReset}>
-                    <span className="btn-icon">🔄</span>
-                    <span>Reset</span>
+                    <span>🔄</span> Reset
                 </button>
                 <button className="pos-action-btn transaction-btn" onClick={handleTransaction}>
-                    <span className="btn-icon">🚀</span>
-                    <span>Transaction</span>
+                    <span>🚀</span> Transaction
                 </button>
             </footer>
 
-            {/* --- MODAL: EDIT SHIPPING / TAX / COUPON --- */}
+            {/* Modals... */}
             {showSummaryEdit.type && (
                 <div className="pos-modal-overlay">
                     <div className="pos-modal-card mini animate-pop">
@@ -1083,18 +774,17 @@ export default function POS() {
                                 if (showSummaryEdit.type === 'tax') setTax(val);
                                 if (showSummaryEdit.type === 'coupon') setCoupon(val);
                                 setShowSummaryEdit({ type: null, value: '' });
-                            }}>Save Value</button>
+                            }}>Save</button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* --- MODAL: PAYMENT TERMINAL PROCESS --- */}
             {paymentModalOpen && (
                 <div className="pos-modal-overlay">
                     <div className="pos-modal-card payment-process animate-pop">
                         <div className="pos-modal-header">
-                            <h3>🛒 POS Register Terminal</h3>
+                            <h3>🛒 Secure Checkout - {orderType}</h3>
                             <button className="pos-modal-close" onClick={() => setPaymentModalOpen(false)} disabled={submittingOrder}>
                                 <X size={18} />
                             </button>
@@ -1102,88 +792,43 @@ export default function POS() {
 
                         {!paymentSuccess ? (
                             <div className="pos-modal-body split-payment">
-                                {/* Left Section: Summary breakdown */}
                                 <div className="payment-summary-column">
                                     <h4>Order Summary</h4>
                                     <div className="payment-summary-bill">
-                                        <div className="bill-row">
-                                            <span>Subtotal</span>
-                                            <span>{currencySymbol}{cartSubtotal.toFixed(2)}</span>
-                                        </div>
-                                        <div className="bill-row">
-                                            <span>Shipping</span>
-                                            <span>{currencySymbol}{shipping.toFixed(2)}</span>
-                                        </div>
-                                        <div className="bill-row">
-                                            <span>Tax</span>
-                                            <span>{currencySymbol}{tax.toFixed(2)}</span>
-                                        </div>
-                                        <div className="bill-row promo">
-                                            <span>Discount Coupon</span>
-                                            <span>-{currencySymbol}{(coupon + autoDiscountValue).toFixed(2)}</span>
-                                        </div>
+                                        <div className="bill-row"><span>Subtotal</span><span>{currencySymbol}{cartSubtotal.toFixed(2)}</span></div>
+                                        <div className="bill-row"><span>Shipping</span><span>{currencySymbol}{shipping.toFixed(2)}</span></div>
+                                        <div className="bill-row"><span>Tax</span><span>{currencySymbol}{tax.toFixed(2)}</span></div>
+                                        <div className="bill-row promo"><span>Discounts</span><span>-{currencySymbol}{(coupon + autoDiscountValue).toFixed(2)}</span></div>
                                         <div className="bill-divider"></div>
-                                        <div className="bill-grand-total">
-                                            <span>Grand Total</span>
-                                            <span>{currencySymbol}{grandTotal.toFixed(2)}</span>
-                                        </div>
+                                        <div className="bill-grand-total"><span>Grand Total</span><span>{currencySymbol}{grandTotal.toFixed(2)}</span></div>
                                     </div>
-
                                     {orderError && (
                                         <div className="payment-error-alert animate-pop">
-                                            <AlertTriangle size={15} />
-                                            <span>{orderError}</span>
+                                            <AlertTriangle size={15} /><span>{orderError}</span>
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Right Section: Method & Amount Input */}
                                 <div className="payment-methods-column">
                                     <h4>Payment Mode</h4>
-                                    
                                     <div className="payment-type-selector">
-                                        <button 
-                                            className={`payment-type-card ${paymentType === 'Cash' ? 'active' : ''}`}
-                                            onClick={() => setPaymentType('Cash')}
-                                        >
-                                            <span className="pay-icon">💵</span>
-                                            <span>Cash</span>
-                                        </button>
-                                        <button 
-                                            className={`payment-type-card ${paymentType === 'Card' ? 'active' : ''}`}
-                                            onClick={() => setPaymentType('Card')}
-                                        >
-                                            <span className="pay-icon">💳</span>
-                                            <span>Card / UPI</span>
-                                        </button>
-                                        <button 
-                                            className={`payment-type-card ${paymentType === 'QR' ? 'active' : ''}`}
-                                            onClick={() => setPaymentType('QR')}
-                                        >
-                                            <span className="pay-icon">📱</span>
-                                            <span>QR Code</span>
-                                        </button>
+                                        <button className={`payment-type-card ${paymentType === 'Cash' ? 'active' : ''}`} onClick={() => setPaymentType('Cash')}>💵 Cash</button>
+                                        <button className={`payment-type-card ${paymentType === 'Card' ? 'active' : ''}`} onClick={() => setPaymentType('Card')}>💳 Card / UPI</button>
+                                        <button className={`payment-type-card ${paymentType === 'QR' ? 'active' : ''}`} onClick={() => setPaymentType('QR')}>📱 QR Code</button>
                                     </div>
 
                                     {paymentType === 'QR' ? (
                                         <div className="payment-qr-mockup">
-                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NamustutePOS" alt="QR payment" />
-                                            <p>Scan QR code with any UPI app to pay</p>
-                                            <h4>{currencySymbol}{grandTotal.toFixed(2)}</h4>
+                                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NamustutePOS-${grandTotal}`} alt="QR payment" />
+                                            <p>Scan to Pay {currencySymbol}{grandTotal.toFixed(2)}</p>
                                         </div>
                                     ) : (
                                         <div className="payment-amount-input-block">
-                                            <label>Enter Amount Received</label>
+                                            <label>Amount Received</label>
                                             <div className="pay-amount-field-wrap">
                                                 <span className="currency-prefix">{currencySymbol}</span>
-                                                <input 
-                                                    type="number" 
-                                                    step="0.01" 
-                                                    value={amountPaid}
-                                                    onChange={(e) => setAmountPaid(e.target.value)}
-                                                />
+                                                <input type="number" step="0.01" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)} />
                                             </div>
-
                                             {parseFloat(amountPaid) >= grandTotal && (
                                                 <div className="payment-change-indicator">
                                                     <span>Change Due:</span>
@@ -1194,58 +839,28 @@ export default function POS() {
                                     )}
 
                                     <div className="payment-confirm-actions">
-                                        <button 
-                                            className="btn-pay-cancel" 
-                                            onClick={() => setPaymentModalOpen(false)}
-                                            disabled={submittingOrder}
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button 
-                                            className="btn-pay-submit" 
-                                            onClick={handleConfirmPayment}
-                                            disabled={submittingOrder}
-                                        >
+                                        <button className="btn-pay-cancel" onClick={() => setPaymentModalOpen(false)} disabled={submittingOrder}>Cancel</button>
+                                        <button className="btn-pay-submit" onClick={handleConfirmPayment} disabled={submittingOrder}>
                                             {submittingOrder ? 'Processing...' : `Confirm Paid ${currencySymbol}${grandTotal.toFixed(2)}`}
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         ) : (
-                            // SUCCESS SCREEN AFTER SUBMISSION
                             <div className="payment-success-card animate-pop">
-                                <div className="success-lottie-badge">
-                                    <CheckCircle2 size={48} color="#28c76f" />
-                                </div>
+                                <div className="success-lottie-badge"><CheckCircle2 size={56} /></div>
                                 <h2>Payment Successful!</h2>
-                                <p>Transaction reference: <b>{recentOrderDetails?.referenceNo}</b></p>
+                                <p>Reference: <b>{recentOrderDetails?.referenceNo}</b> | Saved to: <b>{orderType}</b></p>
                                 
                                 <div className="success-transaction-details">
-                                    <div className="detail-row">
-                                        <span>Customer</span>
-                                        <span>{recentOrderDetails?.customerName}</span>
-                                    </div>
-                                    <div className="detail-row">
-                                        <span>Total Paid</span>
-                                        <span>{currencySymbol}{recentOrderDetails?.grandTotal?.toFixed(2)}</span>
-                                    </div>
-                                    <div className="detail-row">
-                                        <span>Change Due</span>
-                                        <span>{currencySymbol}{recentOrderDetails?.changeDue?.toFixed(2)}</span>
-                                    </div>
-                                    <div className="detail-row">
-                                        <span>Payment Mode</span>
-                                        <span>{recentOrderDetails?.paymentType}</span>
-                                    </div>
+                                    <div className="detail-row"><span>Total</span><span>{currencySymbol}{recentOrderDetails?.grandTotal?.toFixed(2)}</span></div>
+                                    <div className="detail-row"><span>Change</span><span>{currencySymbol}{recentOrderDetails?.changeDue?.toFixed(2)}</span></div>
+                                    <div className="detail-row"><span>Mode</span><span>{recentOrderDetails?.paymentType}</span></div>
                                 </div>
 
                                 <div className="success-action-btns">
-                                    <button className="btn-print-receipt" onClick={() => setInvoiceModalOpen(true)}>
-                                        <Printer size={16} /> Print Receipt / Invoice
-                                    </button>
-                                    <button className="btn-success-complete" onClick={completeOrderFlow}>
-                                        Done & New Sale
-                                    </button>
+                                    <button className="btn-print-receipt" onClick={() => setInvoiceModalOpen(true)}><Printer size={16} /> Print Receipt</button>
+                                    <button className="btn-success-complete" onClick={completeOrderFlow}>New Sale</button>
                                 </div>
                             </div>
                         )}
@@ -1253,110 +868,60 @@ export default function POS() {
                 </div>
             )}
 
-            {/* --- MODAL: VIEW / PRINT INVOICE --- */}
             {invoiceModalOpen && recentOrderDetails && (
                 <div className="pos-modal-overlay invoice-print-overlay">
                     <div className="pos-invoice-card animate-pop">
                         <div className="pos-invoice-header no-print">
-                            <h4>POS Invoice Reciept</h4>
+                            <h4>Receipt ({orderType})</h4>
                             <div className="header-actions">
-                                <button className="btn-print" onClick={() => window.print()}>
-                                    <Printer size={14} /> Print
-                                </button>
-                                <button className="btn-close" onClick={completeOrderFlow}>
-                                    <X size={16} />
-                                </button>
+                                <button className="btn-print" onClick={() => window.print()}><Printer size={14} /> Print</button>
+                                <button className="btn-close" onClick={completeOrderFlow}><X size={16} /></button>
                             </div>
                         </div>
 
                         <div className="pos-invoice-paper" id="printable-receipt">
                             <div className="invoice-header-branding">
-                                <h2>Preadmin POS</h2>
-                                <p>Namustute Retail Platform Inc.</p>
-                                <p>123 Business Way, Sector 4, Silicon Plaza</p>
+                                <h2>Namustute Retail</h2>
+                                <p>123 Business Way, Silicon Plaza</p>
                                 <p>Phone: +1 555-019-2831</p>
                             </div>
-
                             <div className="invoice-divider"></div>
-
                             <div className="invoice-meta-details">
-                                <p><b>Invoice No:</b> {recentOrderDetails.referenceNo}</p>
-                                <p><b>Date:</b> {recentOrderDetails.date || new Date().toLocaleString()}</p>
-                                <p><b>Biller:</b> {user?.name || 'Admin'}</p>
+                                <p><b>No:</b> {recentOrderDetails.referenceNo}</p>
+                                <p><b>Date:</b> {recentOrderDetails.date}</p>
                                 <p><b>Customer:</b> {recentOrderDetails.customerName}</p>
-                                <p><b>Payment Status:</b> Paid ({recentOrderDetails.paymentType})</p>
+                                <p><b>Type:</b> {orderType} Sale</p>
                             </div>
-
                             <div className="invoice-divider"></div>
-
                             <table className="invoice-items-table">
                                 <thead>
-                                    <tr>
-                                        <th>Item</th>
-                                        <th>Qty</th>
-                                        <th>Price</th>
-                                        <th style={{ textAlign: 'right' }}>Total</th>
-                                    </tr>
+                                    <tr><th>Item</th><th>Qty</th><th style={{textAlign:'right'}}>Total</th></tr>
                                 </thead>
                                 <tbody>
                                     {recentOrderDetails.cart.map((item, i) => (
                                         <tr key={i}>
                                             <td>{item.name}</td>
                                             <td>{item.cartQty}</td>
-                                            <td>{currencySymbol}{item.price.toFixed(2)}</td>
-                                            <td style={{ textAlign: 'right' }}>{currencySymbol}{(item.price * item.cartQty).toFixed(2)}</td>
+                                            <td style={{textAlign:'right'}}>{currencySymbol}{(item.price * item.cartQty).toFixed(2)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
-
                             <div className="invoice-divider"></div>
-
                             <div className="invoice-pricing-breakdown">
-                                <div className="price-row">
-                                    <span>Subtotal</span>
-                                    <span>{currencySymbol}{recentOrderDetails.subtotal.toFixed(2)}</span>
-                                </div>
-                                <div className="price-row">
-                                    <span>Shipping</span>
-                                    <span>{currencySymbol}{shipping.toFixed(2)}</span>
-                                </div>
-                                <div className="price-row">
-                                    <span>Tax</span>
-                                    <span>{currencySymbol}{tax.toFixed(2)}</span>
-                                </div>
-                                <div className="price-row discount">
-                                    <span>Discount Applied</span>
-                                    <span>-{currencySymbol}{(coupon + autoDiscountValue).toFixed(2)}</span>
-                                </div>
-                                <div className="price-divider"></div>
                                 <div className="price-row grand-total">
                                     <span>Grand Total</span>
                                     <span>{currencySymbol}{recentOrderDetails.grandTotal.toFixed(2)}</span>
                                 </div>
-                                <div className="price-row">
-                                    <span>Paid Amount</span>
-                                    <span>{currencySymbol}{recentOrderDetails.paidAmount.toFixed(2)}</span>
-                                </div>
-                                <div className="price-row change">
-                                    <span>Change Due</span>
-                                    <span>{currencySymbol}{recentOrderDetails.changeDue.toFixed(2)}</span>
-                                </div>
                             </div>
-
-                            <div className="invoice-divider"></div>
-
                             <div className="invoice-footer-notes">
                                 <p>Thank you for shopping with us!</p>
-                                <p>Powerd by <b>Namustute SaaS Engine</b></p>
-                                <div className="barcode-mockup">|||| | ||||| | || |||| | | ||||</div>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* --- MODAL: CREATE CUSTOMER --- */}
             {customerModalOpen && (
                 <div className="pos-modal-overlay">
                     <div className="pos-modal-card mini animate-pop">
@@ -1366,60 +931,46 @@ export default function POS() {
                         </div>
                         <div className="pos-modal-body">
                             <div className="pos-input-group">
-                                <label>Customer Full Name</label>
-                                <input 
-                                    type="text" 
-                                    autoFocus
-                                    placeholder="E.g. Clara Oswald"
-                                    value={newCustomerName}
-                                    onChange={(e) => setNewCustomerName(e.target.value)}
-                                />
+                                <label>Customer Name</label>
+                                <input type="text" autoFocus value={newCustomerName} onChange={(e) => setNewCustomerName(e.target.value)} />
                             </div>
                         </div>
                         <div className="pos-modal-footer">
                             <button className="pos-btn-cancel" onClick={() => setCustomerModalOpen(false)}>Cancel</button>
-                            <button className="pos-btn-submit" onClick={handleCreateCustomer} disabled={!newCustomerName.trim()}>Add Customer</button>
+                            <button className="pos-btn-submit" onClick={handleCreateCustomer} disabled={!newCustomerName.trim()}>Save Customer</button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* --- MODAL: HELD ORDERS LIST --- */}
             {heldOrdersModalOpen && (
                 <div className="pos-modal-overlay">
                     <div className="pos-modal-card animate-pop">
                         <div className="pos-modal-header">
-                            <h4>⏸️ Suspended / Held Orders</h4>
+                            <h4>⏸️ Suspended Orders</h4>
                             <button className="pos-modal-close" onClick={() => setHeldOrdersModalOpen(false)}><X size={18} /></button>
                         </div>
                         <div className="pos-modal-body held-orders-list-body">
                             {heldOrders.length === 0 ? (
-                                <div className="no-held-orders">
-                                    <p>No sales currently suspended.</p>
-                                    <span>To put an active cart on hold, click the "Hold" button at the bottom of the screen.</span>
-                                </div>
+                                <p className="text-muted text-center p-4">No suspended sales.</p>
                             ) : (
                                 <div className="held-orders-grid">
                                     {heldOrders.map((order) => (
                                         <div className="held-order-card" key={order.id}>
                                             <div className="held-order-card-header">
-                                                <span className="held-order-time">{order.date} @ {order.time}</span>
-                                                <button className="held-delete-card" onClick={() => {
+                                                <span>{order.date} @ {order.time}</span>
+                                                <button onClick={() => {
                                                     const newList = heldOrders.filter(o => o.id !== order.id);
                                                     setHeldOrders(newList);
                                                     localStorage.setItem('pos_held_orders', JSON.stringify(newList));
-                                                }}>
-                                                    Remove
-                                                </button>
+                                                }}>Remove</button>
                                             </div>
                                             <div className="held-order-card-body">
                                                 <p><b>Customer:</b> {order.customer.name}</p>
-                                                <p><b>Items count:</b> {order.cart.reduce((s, i) => s + i.cartQty, 0)}</p>
-                                                <p><b>Total Due:</b>{currencySymbol}{order.grandTotal.toFixed(2)}</p>
+                                                <p><b>Total Due:</b> {currencySymbol}{order.grandTotal.toFixed(2)}</p>
+                                                <p><b>Type:</b> {order.orderType || 'POS'}</p>
                                             </div>
-                                            <button className="held-restore-btn" onClick={() => handleRestoreHeldOrder(order)}>
-                                                Retrieve Order to Cart
-                                            </button>
+                                            <button className="held-restore-btn" onClick={() => handleRestoreHeldOrder(order)}>Restore to Cart</button>
                                         </div>
                                     ))}
                                 </div>

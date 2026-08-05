@@ -7,11 +7,12 @@ import { useCurrency } from '../../../../hooks/useCurrency';
 
 const BASE_URL = ENV.API_BASE_URL;
 const EMPTY = { customerName:'', date: new Date().toISOString().split('T')[0], status:'Pending', paymentStatus:'Unpaid', orderTax:0, discount:0, shipping:0, paidAmount:0, biller:'Admin', notes:'' };
+const genCustName = () => '#' + Math.floor(10000000 + Math.random() * 90000000);
 
 const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
     const { currencySymbol } = useCurrency();
 
-    const [form, setForm]           = useState(EMPTY);
+    const [form, setForm]           = useState({ ...EMPTY, customerName: genCustName() });
     const [products, setProducts]   = useState([]);
     const [searchQ, setSearchQ]     = useState('');
     const [results, setResults]     = useState([]);
@@ -23,7 +24,7 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
     const [warningProducts, setWarningProducts] = useState([]);
     const searchRef = useRef(null);
 
-    useEffect(() => { if (isOpen) { setForm(EMPTY); setProducts([]); setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]); } }, [isOpen]);
+    useEffect(() => { if (isOpen) { setForm({ ...EMPTY, customerName: genCustName() }); setProducts([]); setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]); } }, [isOpen]);
 
     useEffect(() => {
         const h = e => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowDrop(false); };
