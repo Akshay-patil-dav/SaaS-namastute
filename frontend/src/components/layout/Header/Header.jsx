@@ -137,6 +137,13 @@ export default function Header({ onMenuClick }) {
                     />
                 </div>
                 <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
+                    <div 
+                        onClick={() => navigate('/dashboard/sales-pos')}
+                        className="flex items-center gap-1.5 cursor-pointer hover:text-indigo-600 transition-colors font-semibold text-gray-700"
+                    >
+                        <span>Sales</span>
+                        <ChevronDown size={14} className="text-gray-400" />
+                    </div>
                     <div className="flex items-center gap-1.5 cursor-pointer hover:text-gray-900 transition-colors">
                         Mega Menu <ChevronDown size={14} className="text-gray-400" />
                     </div>

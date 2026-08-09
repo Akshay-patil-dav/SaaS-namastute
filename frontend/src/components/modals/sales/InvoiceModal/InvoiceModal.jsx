@@ -1,4 +1,4 @@
-﻿import React, { useRef } from 'react';
+import React, { useRef } from 'react';
 import { X, Printer, Download, ArrowLeft, FileText } from 'lucide-react';
 import './invoice-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
@@ -8,6 +8,25 @@ function payBadgeClass(status) {
     if (status === 'Paid')    return 'inv-pay-badge inv-pay-paid';
     if (status === 'Overdue') return 'inv-pay-badge inv-pay-overdue';
     return 'inv-pay-badge inv-pay-unpaid';
+}
+
+function numToWords(amount) {
+    const num = Math.floor(parseFloat(amount) || 0);
+    if (num === 0) return 'Zero';
+    
+    const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 
+        'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+    const convert = (n) => {
+        if (n < 20) return units[n];
+        if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? ' ' + units[n % 10] : '');
+        if (n < 1000) return units[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
+        if (n < 1000000) return convert(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
+        return convert(Math.floor(n / 1000000)) + ' Million' + (n % 1000000 ? ' ' + convert(n % 1000000) : '');
+    };
+
+    return convert(num);
 }
 
 /* ── Simple SVG QR placeholder ───────────────────────────── */
@@ -33,13 +52,23 @@ function QRPlaceholder({ value }) {
    InvoiceModal
 ════════════════════════════════════════════════════════════ */
 const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
+    const { currencySymbol } = useCurrency();
     const printRef = useRef(null);
 
     if (!isOpen || !order) return null;
 
+    const fmtMoney = (val) => {
+        const num = parseFloat(val);
+        return isNaN(num) ? `${currencySymbol || '$'}0.00` : `${currencySymbol || '$'}${num.toFixed(2)}`;
+    };
+
     /* parse products */
     let products = [];
-    try { products = JSON.parse(order.productsJson || '[]'); } catch {}
+    if (Array.isArray(order.products)) {
+        products = order.products;
+    } else if (order.productsJson) {
+        try { products = JSON.parse(order.productsJson || '[]'); } catch {}
+    }
 
     /* totals */
     const subtotal   = products.reduce((s, p) => {

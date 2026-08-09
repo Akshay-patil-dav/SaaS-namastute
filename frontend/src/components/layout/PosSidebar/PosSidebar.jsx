@@ -14,7 +14,7 @@ import {
     FilePlus,
     CalendarX,
     TrendingDown,
-    ListTree,
+    Folder,
     List,
     Tag,
     Scale,
@@ -26,7 +26,6 @@ import {
     ArrowRightLeft,
     ChevronRight,
     ShoppingBag,
-    LayoutGrid,
     FileText,
     RotateCcw,
     Copy,
@@ -133,13 +132,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                 Dashboard
                                             </NavLink>
                                         </li>
-                                        {isClientOrAdmin && (
-                                            <li>
-                                                <NavLink to="/dashboard/sales" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                                    <BarChart2 size={16} className="me-2" /> Sales Dashboard
-                                                </NavLink>
-                                            </li>
-                                        )}
+
                                     </ul>
                                 </li>
                             </ul>
@@ -198,7 +191,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 {/* <li className="pos-menu-item"><NavLink to="/create-product" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><FilePlus className="pos-menu-icon" /><span>Create Product</span></div></NavLink></li> */}
                                 <li className="pos-menu-item"><NavLink to="/expired-products" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><CalendarX className="pos-menu-icon" /><span>Expired Products</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/low-stocks" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><TrendingDown className="pos-menu-icon" /><span>Low Stocks</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/category" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><ListTree className="pos-menu-icon" /><span>Category</span></div></NavLink></li>
+                                <li className="pos-menu-item"><NavLink to="/category" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Folder className="pos-menu-icon" /><span>Category</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/sub-category" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><List className="pos-menu-icon" /><span>Sub Category</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/brands" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Tag className="pos-menu-icon" /><span>Brands</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/units" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Scale className="pos-menu-icon" /><span>Units</span></div></NavLink></li>
@@ -255,7 +248,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         onClick={() => toggleMenu('sales')}
                                     >
                                         <div className="pos-menu-link-content">
-                                            <LayoutGrid className="pos-menu-icon" strokeWidth={1.5} />
+                                            <ShoppingCart className="pos-menu-icon" strokeWidth={1.5} />
                                             <span>Sales</span>
                                         </div>
                                         <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
@@ -303,19 +296,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                  </li> */}
                             </ul>
 
-                            {/* Orders Section */}
-                            <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Orders</div>
-                            <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/orders" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <ShoppingCart className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Orders</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                            </ul>
+
 
                             {/* Purchases Section */}
                             <div className="pos-menu-divider"></div>
@@ -349,75 +330,6 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
 
 
-                              {/* Website Setting  Section */}
-                            <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Web App</div>
-                            <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/menus" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                                <line x1="3" y1="9" x2="21" y2="9"></line>
-                                                <line x1="9" y1="21" x2="9" y2="9"></line>
-                                            </svg>
-                                            <span>Menus</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                                
-                                <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/app-categories" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M4 6h16"></path>
-                                                <path d="M4 12h16"></path>
-                                                <path d="M4 18h16"></path>
-                                            </svg>
-                                            <span>Categories</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-
-                                {/* <li className="pos-menu-item">
-                                    <NavLink to="/purchase-order" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                                <polyline points="14 2 14 8 20 8"></polyline>
-                                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                                <polyline points="10 9 9 9 8 9"></polyline>
-                                            </svg>
-                                            <span>Purchase Order</span>
-                                        </div>
-                                    </NavLink>
-                                </li> */}
-                                <li className="pos-menu-item">
-                                    <NavLink 
-                                        to={user?.role === 'CLIENT' ? "/dashboard/my-notes" : "/dashboard/admin-notes"} 
-                                        className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}
-                                    >
-                                        <div className="pos-menu-link-content">
-                                            <FileText className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Notes</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                                <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/blog-posts" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                                <polyline points="14 2 14 8 20 8"></polyline>
-                                                <polyline points="12 18 12 12 9 15"></polyline>
-                                                <polyline points="15 15 12 12"></polyline>
-                                            </svg>
-                                            <span>Blog posts</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                            </ul>
 
                         </>
                     )}

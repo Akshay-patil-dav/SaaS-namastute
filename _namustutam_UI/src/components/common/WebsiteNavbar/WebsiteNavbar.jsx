@@ -50,7 +50,7 @@ export const NavLogo = () => (
 const WebsiteNavbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const showCTA = location.pathname === '/retail-saas-platform';
+    const showCTA = false;
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);

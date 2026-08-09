@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../Brands/Products.css';
 import '../Brands/inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
@@ -173,9 +173,6 @@ const LowStocks = () => {
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <button className="ss-btn-orange" style={{ background: '#5b6670', borderColor: '#5b6670' }}>
-                        <Mail size={16} /> Send Email
-                    </button>
                 </div>
             </div>
 

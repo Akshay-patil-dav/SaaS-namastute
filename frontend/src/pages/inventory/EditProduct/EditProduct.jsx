@@ -824,7 +824,7 @@ const EditProduct = () => {
                                     min="0"
                                     value={form.productType === 'Variable Product' ? totalVariantQuantity : form.quantity}
                                     onChange={handleChange}
-                                    readOnly={form.productType === 'Variable Product'}
+                                    readOnly={form.productType === 'Variable Product'} disabled
                                 />
                             </div>
                             <div className="col-md-4 cp-form-group mb-1">

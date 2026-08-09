@@ -39,7 +39,7 @@ import {
     UserCog,
     CalendarX,
     TrendingDown,
-    ListTree,
+    Folder,
     List,
     Tag,
     Scale,
@@ -80,6 +80,10 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const searchRef = useRef(null);
     const searchInputRef = useRef(null);
 
+    // Sales Dropdown State
+    const [salesOpen, setSalesOpen] = useState(false);
+    const salesRef = useRef(null);
+
     const searchablePages = [
         { title: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={14} /> },
         { title: 'Sales Dashboard', path: '/dashboard/sales', icon: <BarChart2 size={14} /> },
@@ -90,7 +94,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
         { title: 'Products', path: '/products', icon: <Package size={14} /> },
         { title: 'Expired Products', path: '/expired-products', icon: <CalendarX size={14} /> },
         { title: 'Low Stocks', path: '/low-stocks', icon: <TrendingDown size={14} /> },
-        { title: 'Category', path: '/category', icon: <ListTree size={14} /> },
+        { title: 'Category', path: '/category', icon: <Folder size={14} /> },
         { title: 'Sub Category', path: '/sub-category', icon: <List size={14} /> },
         { title: 'Brands', path: '/brands', icon: <Tag size={14} /> },
         { title: 'Units', path: '/units', icon: <Scale size={14} /> },
@@ -101,6 +105,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
         { title: 'Stock Transfer', path: '/dashboard/stock-transfer', icon: <ArrowRightLeft size={14} /> },
         { title: 'Online Orders', path: '/dashboard/sales-online', icon: <ShoppingCart size={14} /> },
         { title: 'POS Orders', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
+        { title: 'POS Page', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
         { title: 'Sales Return', path: '/dashboard/sales-return', icon: <RotateCcw size={14} /> },
         { title: 'Orders', path: '/dashboard/orders', icon: <ShoppingCart size={14} /> },
         { title: 'Purchase', path: '/purchases', icon: <ShoppingBag size={14} /> },
@@ -117,6 +122,9 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setSearchOpen(false);
+            }
+            if (salesRef.current && !salesRef.current.contains(event.target)) {
+                setSalesOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -252,6 +260,91 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         </div>
                     )}
                 </div>
+
+                {/* Sales Navbar Dropdown */}
+                <div className="d-none d-md-flex align-items-center ms-2" ref={salesRef} style={{ position: 'relative' }}>
+                    <button 
+                        onClick={() => setSalesOpen(!salesOpen)}
+                        className="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill border-0"
+                        style={{
+                            cursor: 'pointer',
+                            fontSize: '13.5px',
+                            fontWeight: '600',
+                            backgroundColor: salesOpen ? 'rgba(255, 155, 41, 0.12)' : '#f4f5f9',
+                            color: salesOpen ? '#ff9b29' : '#4b5563',
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
+                        <ShoppingCart size={16} style={{ color: '#ff9b29' }} />
+                        <span>Sales</span>
+                        <ChevronDown size={14} style={{ transform: salesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                    </button>
+
+                    {/* Sales Dropdown Menu */}
+                    {salesOpen && (
+                        <div 
+                            className="shadow-lg border rounded-3 bg-white py-2" 
+                            style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                marginTop: '8px',
+                                width: '220px',
+                                zIndex: 1050,
+                                animation: 'fadeIn 0.15s ease-out'
+                            }}
+                        >
+                            <div className="px-3 py-1.5 text-muted small fw-bold border-bottom" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>
+                                SALES & POS
+                            </div>
+
+                            <Link 
+                                to="/dashboard/sales-pos" 
+                                className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
+                                style={{ fontSize: '13px', fontWeight: '500' }}
+                                onClick={() => setSalesOpen(false)}
+                            >
+                                <div className="p-1.5 rounded" style={{ background: 'rgba(255, 155, 41, 0.12)', color: '#ff9b29' }}>
+                                    <MonitorDot size={15} />
+                                </div>
+                                <div>
+                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>POS Page</div>
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>POS Terminal & Orders</div>
+                                </div>
+                            </Link>
+
+                            <Link 
+                                to="/dashboard/sales-online" 
+                                className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
+                                style={{ fontSize: '13px', fontWeight: '500' }}
+                                onClick={() => setSalesOpen(false)}
+                            >
+                                <div className="p-1.5 rounded" style={{ background: 'rgba(99, 102, 241, 0.12)', color: '#6366f1' }}>
+                                    <ShoppingCart size={15} />
+                                </div>
+                                <div>
+                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>Online Orders</div>
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>E-commerce sales</div>
+                                </div>
+                            </Link>
+
+                            <Link 
+                                to="/dashboard/sales-return" 
+                                className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
+                                style={{ fontSize: '13px', fontWeight: '500' }}
+                                onClick={() => setSalesOpen(false)}
+                            >
+                                <div className="p-1.5 rounded" style={{ background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444' }}>
+                                    <RotateCcw size={15} />
+                                </div>
+                                <div>
+                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>Sales Return</div>
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>Returns & refunds</div>
+                                </div>
+                            </Link>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Right side */}
@@ -262,14 +355,21 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <ChevronDown size={14} color="#888" />
                 </div>
 
-
-
-                <Link to="/pos" className="pos-btn-orange" style={{ textDecoration: 'none' }}>
+                {/* Quick POS Page Action Button */}
+                <Link 
+                    to="/dashboard/sales-pos" 
+                    className="pos-btn-orange text-decoration-none hide-on-mobile"
+                    style={{
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        boxShadow: '0 2px 4px rgba(255, 155, 41, 0.2)'
+                    }}
+                >
                     <MonitorDot size={16} />
-                    <span>POS</span>
+                    <span>POS Page</span>
                 </Link>
-
-                {/* Icons */}
                 <button className="pos-icon-btn hide-on-mobile">
                     <Globe size={18} />
                 </button>

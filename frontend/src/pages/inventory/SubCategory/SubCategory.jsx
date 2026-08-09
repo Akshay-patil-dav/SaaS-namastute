@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../Brands/inventory-pages-custom.css';
 import { 
@@ -16,9 +16,8 @@ import {
     X,
     Loader,
     Layers,
-    ListTree,
-    TrendingUp,
-    LayoutGrid
+    Folder,
+    TrendingUp
 } from 'lucide-react';
 import AddSubCategoryModal from '../../../components/modals/inventory/AddSubCategoryModal/AddSubCategoryModal';
 import { useConfirm } from '../../../context/ConfirmContext';
@@ -189,7 +188,7 @@ const SubCategory = () => {
                             <p>{totalCount}</p>
                         </div>
                         <div className="ss-btn-icon-square icon-blue">
-                            <ListTree size={20} />
+                            <Folder size={20} />
                         </div>
                     </div>
                     <div className="ss-stat-bottom">
@@ -318,7 +317,7 @@ const SubCategory = () => {
                                                 <img src={item.image} alt={item.name} className="ss-table-img" />
                                             ) : (
                                                 <div className="ss-table-img-placeholder">
-                                                    <LayoutGrid size={16} />
+                                                    <Folder size={16} />
                                                 </div>
                                             )}
                                         </div>
@@ -356,7 +355,7 @@ const SubCategory = () => {
                                 <tr>
                                     <td colSpan="8" style={{ textAlign: 'center', padding: '40px' }}>
                                         <div style={{ color: '#94a3b8' }}>
-                                            <LayoutGrid size={40} strokeWidth={1} style={{ marginBottom: '12px', opacity: 0.5 }} />
+                                            <Folder size={40} strokeWidth={1} style={{ marginBottom: '12px', opacity: 0.5 }} />
                                             <p>No sub categories available</p>
                                         </div>
                                     </td>

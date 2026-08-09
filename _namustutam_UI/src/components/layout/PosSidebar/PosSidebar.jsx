@@ -14,7 +14,7 @@ import {
     FilePlus,
     CalendarX,
     TrendingDown,
-    ListTree,
+    Folder,
     List,
     Tag,
     Scale,
@@ -26,7 +26,6 @@ import {
     ArrowRightLeft,
     ChevronRight,
     ShoppingBag,
-    LayoutGrid,
     FileText,
     RotateCcw,
     Copy,
@@ -198,7 +197,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 {/* <li className="pos-menu-item"><NavLink to="/create-product" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><FilePlus className="pos-menu-icon" /><span>Create Product</span></div></NavLink></li> */}
                                 <li className="pos-menu-item"><NavLink to="/expired-products" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><CalendarX className="pos-menu-icon" /><span>Expired Products</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/low-stocks" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><TrendingDown className="pos-menu-icon" /><span>Low Stocks</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/category" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><ListTree className="pos-menu-icon" /><span>Category</span></div></NavLink></li>
+                                <li className="pos-menu-item"><NavLink to="/category" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Folder className="pos-menu-icon" /><span>Category</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/sub-category" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><List className="pos-menu-icon" /><span>Sub Category</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/brands" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Tag className="pos-menu-icon" /><span>Brands</span></div></NavLink></li>
                                 <li className="pos-menu-item"><NavLink to="/units" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Scale className="pos-menu-icon" /><span>Units</span></div></NavLink></li>
@@ -255,7 +254,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         onClick={() => toggleMenu('sales')}
                                     >
                                         <div className="pos-menu-link-content">
-                                            <LayoutGrid className="pos-menu-icon" strokeWidth={1.5} />
+                                            <ShoppingCart className="pos-menu-icon" strokeWidth={1.5} />
                                             <span>Sales</span>
                                         </div>
                                         <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />

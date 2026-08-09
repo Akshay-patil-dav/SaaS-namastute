@@ -4,8 +4,6 @@ import { CompanyProvider } from './context/CompanyContext';
 import { ConfirmProvider } from './context/ConfirmContext';
 import ChatBot from './components/ChatBot/ChatBot.jsx';
 
-// ── Lazy-loaded Pages (code splitting — each route loads its JS on demand) ──
-const LandingPage        = lazy(() => import('./pages/website/LandingPage/LandingPage.jsx'));
 const ITPortfolio        = lazy(() => import('./pages/website/ITPortfolio/ITPortfolio.jsx'));
 const AkshayPatil        = lazy(() => import('./pages/website/AkshayPatil/AkshayPatil.jsx'));
 const BlogPage           = lazy(() => import('./pages/website/BlogPage/BlogPage.jsx'));
@@ -55,7 +53,6 @@ function AppRoutes() {
             <Routes>
                 {/* Root → IT Portfolio Landing Page */}
                 <Route path="/" element={<ITPortfolio />} />
-                <Route path="/retail-saas-platform" element={<LandingPage />} />
                 <Route path="/Akshay-Patil" element={<AkshayPatil />} />
 
                 {/* Blog routes – public */}

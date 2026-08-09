@@ -7,15 +7,6 @@ import GuestRoute from './components/auth/GuestRoute/GuestRoute';
 import { ConfirmProvider } from './context/ConfirmContext';
 import { SettingsProvider } from './context/SettingsContext';
 import PosLayout from './components/layout/PosLayout/PosLayout';
-import StorefrontLayout from './components/layout/StorefrontLayout/StorefrontLayout.jsx';
-
-// ── Lazy-loaded Storefront Pages ──
-const StorefrontHome     = lazy(() => import('./pages/storefront/Home/Home.jsx'));
-const StorefrontShop     = lazy(() => import('./pages/storefront/Shop/Shop.jsx'));
-const StorefrontProduct  = lazy(() => import('./pages/storefront/ProductDetails/ProductDetails.jsx'));
-const StorefrontCart     = lazy(() => import('./pages/storefront/Cart/Cart.jsx'));
-const StorefrontCheckout = lazy(() => import('./pages/storefront/Checkout/Checkout.jsx'));
-
 // ── Lazy-loaded Admin Pages (code splitting — each route loads its JS on demand) ──
 const Login              = lazy(() => import('./pages/auth/Login/Login.jsx'));
 const Register           = lazy(() => import('./pages/auth/Register/Register.jsx'));
@@ -23,14 +14,13 @@ const Register           = lazy(() => import('./pages/auth/Register/Register.jsx
 const Unauthorized       = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
 const Dashboard          = lazy(() => import('./pages/dashboard/Dashboard/Dashboard.jsx'));
 const Dashboard2         = lazy(() => import('./pages/dashboard/Dashboard2/Dashboard2.jsx'));
-const SalesDashboard     = lazy(() => import('./pages/dashboard/SalesDashboard/SalesDashboard.jsx'));
 const ManageStock        = lazy(() => import('./pages/inventory/ManageStock/ManageStock.jsx'));
 const StockAdjustment    = lazy(() => import('./pages/inventory/StockAdjustment/StockAdjustment.jsx'));
 const StockTransfer      = lazy(() => import('./pages/inventory/StockTransfer/StockTransfer.jsx'));
-const Orders             = lazy(() => import('./pages/sales/Orders/Orders.jsx'));
 const OnlineOrders       = lazy(() => import('./pages/sales/OnlineOrders/OnlineOrders.jsx'));
 const PosOrders          = lazy(() => import('./pages/sales/PosOrders/PosOrders.jsx'));
-const POS                = lazy(() => import('./pages/sales/POS/POS.jsx'));
+const PosTerminal        = lazy(() => import('./pages/sales/PosTerminal/PosTerminal.jsx'));
+
 const SalesReturn        = lazy(() => import('./pages/sales/SalesReturn/SalesReturn.jsx'));
 const Products           = lazy(() => import('./pages/inventory/Products/Products.jsx'));
 const CreateProduct      = lazy(() => import('./pages/inventory/CreateProduct/CreateProduct.jsx'));
@@ -51,8 +41,6 @@ const PurchaseReturn     = lazy(() => import('./pages/purchases/PurchaseReturn/P
 const AddPurchaseReturn  = lazy(() => import('./pages/purchases/AddPurchaseReturn/AddPurchaseReturn.jsx'));
 const EditPurchaseReturn = lazy(() => import('./pages/purchases/EditPurchaseReturn/EditPurchaseReturn.jsx'));
 const Settings           = lazy(() => import('./pages/settings/Settings/Settings.jsx'));
-const WebAppCategories   = lazy(() => import('./pages/webapp/WebAppCategories/WebAppCategories.jsx'));
-const AdminNotes         = lazy(() => import('./pages/dashboard/AdminNotes/AdminNotes.jsx'));
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
@@ -100,16 +88,8 @@ function AppRoutes() {
     return (
         <Suspense fallback={<PageLoader />}>
             <Routes>
-                {/* ── Public Storefront Routes ───────────────────────── */}
-                <Route element={<StorefrontLayout />}>
-                    <Route path="/" element={<StorefrontHome />} />
-                    <Route path="/shop" element={<StorefrontShop />} />
-                    <Route path="/shop/product/:id" element={<StorefrontProduct />} />
-                    <Route path="/cart" element={<StorefrontCart />} />
-                    <Route path="/checkout" element={<StorefrontCheckout />} />
-                </Route>
-
                 {/* Public routes — guests only (logged-in users are redirected to dashboard) */}
+                <Route path="/"             element={<Navigate to="/login" replace />} />
                 <Route path="/login"        element={<GuestRoute><Login /></GuestRoute>} />
                 <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
 
@@ -124,16 +104,8 @@ function AppRoutes() {
 
                 {/* ── ADMIN ─────────────────────────────────── */}
                 <Route
-                    path="/dashboard/admin-notes"
-                    element={<PosPage roles={ADMIN_ROLES}><AdminNotes /></PosPage>}
-                />
-                <Route
                     path="/dashboard/admin2"
                     element={<PosPage roles={ADMIN_ROLES}><Dashboard2 /></PosPage>}
-                />
-                <Route
-                    path="/dashboard/sales"
-                    element={<PosPage roles={ADMIN_ROLES}><SalesDashboard /></PosPage>}
                 />
                 <Route
                     path="/dashboard/manage-stock"
@@ -148,21 +120,18 @@ function AppRoutes() {
                     element={<PosPage roles={ADMIN_ROLES}><StockTransfer /></PosPage>}
                 />
                 <Route
-                    path="/dashboard/orders"
-                    element={<PosPage roles={ADMIN_ROLES}><Orders /></PosPage>}
-                />
-                <Route
                     path="/dashboard/sales-online"
                     element={<PosPage roles={ADMIN_ROLES}><OnlineOrders /></PosPage>}
                 />
                 <Route
                     path="/dashboard/sales-pos"
-                    element={<PosPage roles={ADMIN_ROLES}><PosOrders /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES}><PosTerminal /></PosPage>}
                 />
                 <Route
                     path="/pos"
-                    element={<ProtectedRoute allowedRoles={CLIENT_ADMIN_ROLES}><POS /></ProtectedRoute>}
+                    element={<PosPage roles={ADMIN_ROLES}><PosTerminal /></PosPage>}
                 />
+
                 <Route
                     path="/dashboard/sales-return"
                     element={<PosPage roles={ADMIN_ROLES}><SalesReturn /></PosPage>}
@@ -250,11 +219,6 @@ function AppRoutes() {
                     element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
                 />
 
-                {/* Web App */}
-                <Route
-                    path="/dashboard/app-categories"
-                    element={<PosPage roles={ADMIN_ROLES}><WebAppCategories /></PosPage>}
-                />
 
                 {/* Catch-all → login */}
                 <Route path="*" element={<Navigate to="/login" replace />} />

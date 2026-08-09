@@ -17,7 +17,7 @@ import {
     Loader,
     Layers,
     TrendingUp,
-    LayoutGrid,
+    Folder,
     Tag
 } from 'lucide-react';
 import AddCategoryModal from '../../../components/modals/inventory/AddCategoryModal/AddCategoryModal';
@@ -328,7 +328,7 @@ const Category = () => {
                                 <tr>
                                     <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
                                         <div style={{ color: '#94a3b8' }}>
-                                            <LayoutGrid size={40} strokeWidth={1} style={{ marginBottom: '12px', opacity: 0.5 }} />
+                                            <Folder size={40} strokeWidth={1} style={{ marginBottom: '12px', opacity: 0.5 }} />
                                             <p>No categories available</p>
                                         </div>
                                     </td>

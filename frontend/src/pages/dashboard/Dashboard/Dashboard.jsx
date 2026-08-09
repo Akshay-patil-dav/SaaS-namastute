@@ -282,8 +282,13 @@ export default function Dashboard() {
                                         </h3>
                                         <h6 className="text-white-50"><b>Total Sales : </b>{totalCount}</h6>
                                     </div>
-                                    <div className="icon-rounded-sm bg-white text-orange">
-                                        <Wallet size={18} color="#ea580c" />
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(255, 255, 255, 0.95)', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}>
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.2" d="M3 7C3 5.34315 4.34315 4 6 4H18C19.6569 4 21 5.34315 21 7V17C21 18.6569 19.6569 20 18 20H6C4.34315 20 3 18.6569 3 17V7Z" fill="#ea580c"/>
+                                            <path d="M15 12C15 13.1046 14.1046 14 13 14C11.8954 14 11 13.1046 11 12C11 10.8954 11.8954 10 13 10C14.1046 10 15 10.8954 15 12Z" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M3 9H21" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M3 7C3 5.34315 4.34315 4 6 4H18C19.6569 4 21 5.34315 21 7V17C21 18.6569 19.6569 20 18 20H6C4.34315 20 3 18.6569 3 17V7Z" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
                                     </div>
                                 </div>
                                 {/* Mini breakdown inside the card */}
@@ -297,10 +302,10 @@ export default function Dashboard() {
                                         POS: <span className="text-white fw-bold ms-1">{loadingCount ? '…' : posCount}</span>
                                     </div>
                                 </div>
-                                <div className="d-flex align-items-center gap-2">
+                                {/* <div className="d-flex align-items-center gap-2">
                                     <span className="pill-badge bg-white text-orange small"><ArrowUpRight size={12}/> Live</span>
                                     <span className="text-white-50" style={{fontSize:'11px'}}>Auto-refresh 60s</span>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-3">
@@ -315,8 +320,12 @@ export default function Dashboard() {
                                         </h3>
                                         <h6 className="text-white-50"><b>Total Returns : </b>{loadingReturn ? '…' : (returnSummary?.totalCount ?? 0)}</h6>
                                     </div>
-                                    <div className="icon-rounded-sm bg-white text-navy">
-                                        <RefreshCcw size={18} color="#0f172a" />
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(255, 255, 255, 0.95)', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}>
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.2" d="M20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" fill="#0f172a"/>
+                                            <path d="M8 12L12 8M8 12L12 16M8 12H16" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <circle cx="12" cy="12" r="10" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
                                     </div>
                                 </div>
                                 {/* Mini breakdown: Paid vs Due */}
@@ -330,10 +339,10 @@ export default function Dashboard() {
                                         Due: <span className="text-white fw-bold ms-1">{loadingReturn ? '…' : fmt(returnSummary?.totalDue ?? 0)}</span>
                                     </div>
                                 </div>
-                                <div className="d-flex align-items-center gap-2">
+                                {/* <div className="d-flex align-items-center gap-2">
                                     <span className="pill-badge bg-white text-dark small"><ArrowUpRight size={12}/> Live</span>
                                     <span className="text-white-50" style={{fontSize:'11px'}}>Auto-refresh 60s</span>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-3">
@@ -353,14 +362,18 @@ export default function Dashboard() {
                                             Gross: {loadingPurchase ? '…' : fmt(purchaseSummary?.totalAmount ?? 0)}
                                         </h6>
                                     </div>
-                                    <div className="icon-rounded-sm bg-white text-teal">
-                                        <ShoppingBag size={18} color="#0d9488" />
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(255, 255, 255, 0.95)', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}>
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.2" d="M5 8L6.5 19C6.63807 19.5523 7.12781 20 7.69736 20H16.3026C16.8722 20 17.3619 19.5523 17.5 19L19 8H5Z" fill="#0d9488"/>
+                                            <path d="M9 11V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V11" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M5 8H19L17.5 19C17.3619 19.5523 16.8722 20 16.3026 20H7.69736C7.12781 20 6.63807 19.5523 6.5 19L5 8Z" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
                                     </div>
                                 </div>
-                                <div className="d-flex align-items-center gap-2">
+                                {/* <div className="d-flex align-items-center gap-2">
                                     <span className="pill-badge bg-white text-dark small"><ArrowUpRight size={12}/> Live</span>
                                     <span className="text-white-50" style={{fontSize:'11px'}}>Auto-refresh 60s</span>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-3">
@@ -377,14 +390,19 @@ export default function Dashboard() {
                                             <b>Total Returns : </b>{loadingPurchaseReturn ? '…' : (purchaseReturnSummary?.totalCount ?? 0)}
                                         </h6>
                                     </div>
-                                    <div className="icon-rounded-sm bg-white text-blue">
-                                        <Box size={18} color="#2563eb" />
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(255, 255, 255, 0.95)', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}>
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.2" d="M12 3L4 7V17L12 21L20 17V7L12 3Z" fill="#2563eb"/>
+                                            <path d="M12 3L4 7V17L12 21L20 17V7L12 3Z" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M4 7L12 11M20 7L12 11M12 11V21" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M15 4.5L9 8" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
                                     </div>
                                 </div>
-                                <div className="d-flex align-items-center gap-2">
+                                {/* <div className="d-flex align-items-center gap-2">
                                     <span className="pill-badge bg-white text-dark small"><ArrowUpRight size={12}/> Live</span>
                                     <span className="text-white-50" style={{fontSize:'11px'}}>Auto-refresh 60s</span>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>
@@ -791,57 +809,7 @@ export default function Dashboard() {
                     
                     </div>
 
-                    {/* Bottom Row 3: Order Statistics (Heatmap) */}
-                    <div className="row g-3">
-                        <div className="col-12">
-                            <div className="dash-card">
-                                <div className="d-flex justify-content-between align-items-center mb-4">
-                                    <h5 className="dash-title mb-0"><Activity size={20} className="text-purple-600" color="#9333ea"/> Order Statistics</h5>
-                                    <select className="dash-select"><option>Weekly</option></select>
-                                </div>
-                                
-                                <div className="d-flex w-100 overflow-auto pb-2">
-                                    <div className="heatmap-row-labels me-2 pb-4">
-                                        <span>12 PM</span>
-                                        <span>10 PM</span>
-                                        <span>8 PM</span>
-                                        <span>6 PM</span>
-                                        <span>4 PM</span>
-                                        <span>2 PM</span>
-                                        <span>12 AM</span>
-                                        <span>10 AM</span>
-                                        <span>8 AM</span>
-                                        <span>6 AM</span>
-                                    </div>
-                                    
-                                    <div className="flex-grow-1">
-                                        <div className="heatmap-container mb-2">
-                                            {Array.from({length: 10}).map((_, rowIndex) => (
-                                                <React.Fragment key={rowIndex}>
-                                                    <div className="heatmap-cell"></div>
-                                                    <div className="heatmap-cell"></div>
-                                                    <div className={`heatmap-cell ${rowIndex === 3 || rowIndex === 8 ? 'active-mid' : ''}`}></div>
-                                                    <div className={`heatmap-cell ${rowIndex === 3 || rowIndex === 8 ? 'active-mid' : rowIndex === 0 || rowIndex === 1 ? 'active-low' : ''}`}></div>
-                                                    <div className={`heatmap-cell ${rowIndex === 9 || rowIndex === 8 ? 'active-mid' : rowIndex === 0 ? 'active-low' : ''}`}></div>
-                                                    <div className={`heatmap-cell ${rowIndex > 5 && rowIndex < 9 ? 'active-high' : ''}`}></div>
-                                                    <div className={`heatmap-cell ${rowIndex > 5 && rowIndex < 9 ? 'active-high' : ''}`}></div>
-                                                </React.Fragment>
-                                            ))}
-                                        </div>
-                                        <div className="heatmap-col-labels">
-                                            <span>Mon</span>
-                                            <span>Tue</span>
-                                            <span>Wed</span>
-                                            <span>Thu</span>
-                                            <span>Fri</span>
-                                            <span>Sat</span>
-                                            <span>Sun</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
         </div>
     );
 }
