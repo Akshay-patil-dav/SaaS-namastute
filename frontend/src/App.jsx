@@ -41,6 +41,10 @@ const PurchaseReturn     = lazy(() => import('./pages/purchases/PurchaseReturn/P
 const AddPurchaseReturn  = lazy(() => import('./pages/purchases/AddPurchaseReturn/AddPurchaseReturn.jsx'));
 const EditPurchaseReturn = lazy(() => import('./pages/purchases/EditPurchaseReturn/EditPurchaseReturn.jsx'));
 const Settings           = lazy(() => import('./pages/settings/Settings/Settings.jsx'));
+const BillOfMaterials    = lazy(() => import('./pages/manufacturing/BillOfMaterials/BillOfMaterials.jsx'));
+const WorkOrders         = lazy(() => import('./pages/manufacturing/WorkOrders/WorkOrders.jsx'));
+const WorkCenters        = lazy(() => import('./pages/manufacturing/WorkCenters/WorkCenters.jsx'));
+const Invoices           = lazy(() => import('./pages/sales/Invoices/Invoices.jsx'));
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
@@ -136,6 +140,10 @@ function AppRoutes() {
                     path="/dashboard/sales-return"
                     element={<PosPage roles={ADMIN_ROLES}><SalesReturn /></PosPage>}
                 />
+                <Route
+                    path="/dashboard/invoices"
+                    element={<PosPage roles={ADMIN_ROLES}><Invoices /></PosPage>}
+                />
 
                 {/* Products */}
                 <Route
@@ -211,6 +219,20 @@ function AppRoutes() {
                 <Route
                     path="/edit-purchase-return/:id"
                     element={<PosPage roles={ADMIN_ROLES}><EditPurchaseReturn /></PosPage>}
+                />
+
+                {/* Manufacturing */}
+                <Route
+                    path="/manufacturing/bom"
+                    element={<PosPage roles={ADMIN_ROLES}><BillOfMaterials /></PosPage>}
+                />
+                <Route
+                    path="/manufacturing/work-orders"
+                    element={<PosPage roles={ADMIN_ROLES}><WorkOrders /></PosPage>}
+                />
+                <Route
+                    path="/manufacturing/work-centers"
+                    element={<PosPage roles={ADMIN_ROLES}><WorkCenters /></PosPage>}
                 />
 
                 {/* Settings */}

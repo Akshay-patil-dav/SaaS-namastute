@@ -28,14 +28,19 @@ public class WorkOrderController {
     private UserRepository userRepository;
 
     private Long getUserIdFromToken(String token) {
-        String jwt = token.substring(7);
-        String email = jwtUtil.extractUsername(jwt);
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        return userOpt.map(User::getId).orElse(null);
+        if (token != null && token.startsWith("Bearer ")) {
+            try {
+                String jwt = token.substring(7);
+                String email = jwtUtil.extractUsername(jwt);
+                Optional<User> userOpt = userRepository.findByEmail(email);
+                if (userOpt.isPresent()) return userOpt.get().getId();
+            } catch (Exception ignored) {}
+        }
+        return com.example.otpauth.util.SecurityUtils.getCurrentUserId();
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllWorkOrders(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getAllWorkOrders(@RequestHeader(value = "Authorization", required = false) String token) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -48,7 +53,7 @@ public class WorkOrderController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createWorkOrder(@RequestHeader("Authorization") String token, @RequestBody WorkOrderDTO dto) {
+    public ResponseEntity<?> createWorkOrder(@RequestHeader(value = "Authorization", required = false) String token, @RequestBody WorkOrderDTO dto) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -60,8 +65,8 @@ public class WorkOrderController {
         }
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody Map<String, String> payload) {
+    @RequestMapping(value = "/{id}/status", method = {RequestMethod.PATCH, RequestMethod.PUT})
+    public ResponseEntity<?> updateStatus(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable Long id, @RequestBody Map<String, String> payload) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -77,7 +82,7 @@ public class WorkOrderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteWorkOrder(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    public ResponseEntity<?> deleteWorkOrder(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable Long id) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");

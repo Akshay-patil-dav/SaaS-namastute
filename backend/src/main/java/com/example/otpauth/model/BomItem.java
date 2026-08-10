@@ -20,7 +20,7 @@ public class BomItem {
     private BillOfMaterial billOfMaterial;
 
     // The raw material / ingredient
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ingredient_product_id", nullable = false)
     private Product ingredient;
 

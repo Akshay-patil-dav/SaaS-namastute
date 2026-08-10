@@ -64,6 +64,7 @@ public class Product {
     private BigDecimal price = BigDecimal.ZERO;
 
     private String productType;   // SINGLE | VARIABLE
+    private String itemType = "STANDARD_ITEM"; // RAW_MATERIAL | FINISHED_GOOD | STANDARD_ITEM
     private String taxType;
     private String tax;
     private String discountType;
@@ -153,6 +154,8 @@ public class Product {
     public void setPrice(BigDecimal price) { this.price = price; }
     public String getProductType() { return productType; }
     public void setProductType(String productType) { this.productType = productType; }
+    public String getItemType() { return itemType; }
+    public void setItemType(String itemType) { this.itemType = itemType; }
     public String getTaxType() { return taxType; }
     public void setTaxType(String taxType) { this.taxType = taxType; }
     public String getTax() { return tax; }

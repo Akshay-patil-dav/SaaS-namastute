@@ -21,6 +21,7 @@ public class ProductRequest {
     private BigDecimal purchasePrice;
     private BigDecimal price;
     private String productType;
+    private String itemType;
     private String taxType;
     private String tax;
     private String discountType;
@@ -68,6 +69,8 @@ public class ProductRequest {
     public void setPrice(BigDecimal price) { this.price = price; }
     public String getProductType() { return productType; }
     public void setProductType(String productType) { this.productType = productType; }
+    public String getItemType() { return itemType; }
+    public void setItemType(String itemType) { this.itemType = itemType; }
     public String getTaxType() { return taxType; }
     public void setTaxType(String taxType) { this.taxType = taxType; }
     public String getTax() { return tax; }

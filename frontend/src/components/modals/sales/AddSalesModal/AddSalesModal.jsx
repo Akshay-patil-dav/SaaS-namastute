@@ -150,8 +150,15 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
                                                             {r.images&&r.images.split(',')[0]?.trim() ? <img src={r.images.split(',')[0].trim()} alt=""/> : <div className="sm-sug-placeholder">{r.name.charAt(0)}</div>}
                                                         </div>
                                                         <div>
-                                                            <div className="sm-sug-name">{r.name}</div>
-                                                            <div className="sm-sug-meta">SKU: {r.sku} · {currencySymbol}{r.price}</div>
+                                                            <div className="sm-sug-name d-flex align-items-center gap-1">
+                                                                {r.name}
+                                                                {r.itemType === 'FINISHED_GOOD' && (
+                                                                    <span className="badge bg-warning bg-opacity-25 text-dark border border-warning" style={{ fontSize: '10px', padding: '2px 5px' }}>
+                                                                        Manufactured
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="sm-sug-meta">SKU: {r.sku} · {currencySymbol}{r.price} · Stock: {r.quantity ?? 0}</div>
                                                         </div>
                                                     </li>
                                                 ))}

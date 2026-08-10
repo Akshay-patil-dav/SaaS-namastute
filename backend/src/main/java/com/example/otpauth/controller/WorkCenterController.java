@@ -26,14 +26,19 @@ public class WorkCenterController {
     private UserRepository userRepository;
 
     private Long getUserIdFromToken(String token) {
-        String jwt = token.substring(7);
-        String email = jwtUtil.extractUsername(jwt);
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        return userOpt.map(User::getId).orElse(null);
+        if (token != null && token.startsWith("Bearer ")) {
+            try {
+                String jwt = token.substring(7);
+                String email = jwtUtil.extractUsername(jwt);
+                Optional<User> userOpt = userRepository.findByEmail(email);
+                if (userOpt.isPresent()) return userOpt.get().getId();
+            } catch (Exception ignored) {}
+        }
+        return com.example.otpauth.util.SecurityUtils.getCurrentUserId();
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllWorkCenters(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getAllWorkCenters(@RequestHeader(value = "Authorization", required = false) String token) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -46,7 +51,7 @@ public class WorkCenterController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createWorkCenter(@RequestHeader("Authorization") String token, @RequestBody WorkCenter center) {
+    public ResponseEntity<?> createWorkCenter(@RequestHeader(value = "Authorization", required = false) String token, @RequestBody WorkCenter center) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -59,7 +64,7 @@ public class WorkCenterController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateWorkCenter(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody WorkCenter center) {
+    public ResponseEntity<?> updateWorkCenter(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable Long id, @RequestBody WorkCenter center) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -72,7 +77,7 @@ public class WorkCenterController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteWorkCenter(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    public ResponseEntity<?> deleteWorkCenter(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable Long id) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");

@@ -20,11 +20,11 @@ public class WorkOrder {
     @Column(nullable = false, unique = true, length = 100)
     private String orderNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bom_id", nullable = false)
     private BillOfMaterial billOfMaterial;
 

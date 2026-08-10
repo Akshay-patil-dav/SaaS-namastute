@@ -22,7 +22,8 @@ import {
     Wand2,
     Layers,
     Trash2,
-    Upload
+    Upload,
+    Factory
 } from 'lucide-react';
 import AddCategoryModal from '../../../components/modals/inventory/AddCategoryModal/AddCategoryModal';
 
@@ -44,6 +45,7 @@ const initialForm = {
     itemBarcode: '',
     description: '',
     productType: 'Single Product',
+    itemType: 'STANDARD_ITEM',
     quantity: '',
     purchasePrice: '',
     price: '',
@@ -130,6 +132,7 @@ const EditProduct = () => {
                     itemBarcode: p.itemBarcode || '',
                     description: p.description || '',
                     productType: p.productType || 'Single Product',
+                    itemType: p.itemType || 'STANDARD_ITEM',
                     quantity: p.quantity != null ? String(p.quantity) : '',
                     purchasePrice: p.purchasePrice != null ? String(p.purchasePrice) : '',
                     price: p.price != null ? String(p.price) : '',
@@ -434,6 +437,7 @@ const EditProduct = () => {
                                       }, 0)
                                     : (parseFloat(form.price) || 0),
                 productType:      form.productType,
+                itemType:         form.itemType || 'STANDARD_ITEM',
                 taxType:          form.taxType,
                 tax:              form.tax,
                 discountType:     form.discountType,
@@ -647,6 +651,14 @@ const EditProduct = () => {
                                     {units.filter(u => u.status !== false).map(u => (
                                         <option key={u.id} value={u.name}>{u.name}</option>
                                     ))}
+                                </select>
+                            </div>
+                            <div className="col-md-6 cp-form-group">
+                                <label className="cp-label">Manufacturing Item Type</label>
+                                <select name="itemType" className="cp-input text-muted" value={form.itemType} onChange={handleChange}>
+                                    <option value="STANDARD_ITEM">Standard Item (Bought & Sold)</option>
+                                    <option value="RAW_MATERIAL">Raw Material (Purchased for Production)</option>
+                                    <option value="FINISHED_GOOD">Finished Good (Manufactured via BOM)</option>
                                 </select>
                             </div>
                             <div className="col-md-6 cp-form-group">
@@ -1094,6 +1106,79 @@ const EditProduct = () => {
                                             )}
                                         </div>
                                     ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Manufacturing & Production Settings Card */}
+                {(form.itemType === 'FINISHED_GOOD' || form.itemType === 'RAW_MATERIAL') && (
+                    <div className="cp-card border border-warning shadow-sm">
+                        <div className="cp-card-header bg-warning bg-opacity-10">
+                            <div className="cp-card-title text-dark fw-bold d-flex align-items-center gap-2">
+                                <Factory size={18} className="text-warning" /> Manufacturing &amp; Production Configuration
+                            </div>
+                            <span className="badge bg-warning text-dark fw-semibold">
+                                {form.itemType === 'FINISHED_GOOD' ? 'Finished Manufactured Product' : 'Raw Material Ingredient'}
+                            </span>
+                        </div>
+                        <div className="cp-card-body">
+                            <div className="row g-3">
+                                <div className="col-md-6 cp-form-group">
+                                    <label className="cp-label">Manufacturer / Factory Workshop</label>
+                                    <input
+                                        type="text"
+                                        name="manufacturer"
+                                        className="cp-input"
+                                        placeholder="e.g. Factory Assembly Line 1 / Workshop A"
+                                        value={form.manufacturer}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="col-md-6 cp-form-group">
+                                    <label className="cp-label">Manufactured / Batch Production Date</label>
+                                    <input
+                                        type="date"
+                                        name="manufacturedDate"
+                                        className="cp-input"
+                                        value={form.manufacturedDate}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="col-md-6 cp-form-group">
+                                    <label className="cp-label">Expiry / Shelf Life Date</label>
+                                    <input
+                                        type="date"
+                                        name="expiryDate"
+                                        className="cp-input"
+                                        value={form.expiryDate}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="col-md-6 cp-form-group">
+                                    <label className="cp-label">Raw Material / Stock Alert Threshold</label>
+                                    <input
+                                        type="number"
+                                        name="quantityAlert"
+                                        className="cp-input"
+                                        placeholder="Alert when stock falls below"
+                                        min="0"
+                                        value={form.quantityAlert}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+
+                            {form.itemType === 'FINISHED_GOOD' && (
+                                <div className="mt-3 p-3 bg-light rounded border d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div className="fw-bold text-dark mb-1">📋 Bill of Materials (BOM Recipe)</div>
+                                        <div className="small text-muted">Finished goods can be linked to raw material ingredients via BOM recipes for batch manufacturing.</div>
+                                    </div>
+                                    <Link to="/manufacturing/bom" className="btn btn-sm btn-outline-dark fw-semibold d-flex align-items-center gap-1">
+                                        <PlusCircle size={14} /> Setup BOM Recipes
+                                    </Link>
                                 </div>
                             )}
                         </div>

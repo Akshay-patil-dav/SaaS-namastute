@@ -27,14 +27,19 @@ public class BomController {
     private UserRepository userRepository;
 
     private Long getUserIdFromToken(String token) {
-        String jwt = token.substring(7);
-        String email = jwtUtil.extractUsername(jwt);
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        return userOpt.map(User::getId).orElse(null);
+        if (token != null && token.startsWith("Bearer ")) {
+            try {
+                String jwt = token.substring(7);
+                String email = jwtUtil.extractUsername(jwt);
+                Optional<User> userOpt = userRepository.findByEmail(email);
+                if (userOpt.isPresent()) return userOpt.get().getId();
+            } catch (Exception ignored) {}
+        }
+        return com.example.otpauth.util.SecurityUtils.getCurrentUserId();
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllBoms(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getAllBoms(@RequestHeader(value = "Authorization", required = false) String token) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -47,7 +52,7 @@ public class BomController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createBom(@RequestHeader("Authorization") String token, @RequestBody BillOfMaterialDTO dto) {
+    public ResponseEntity<?> createBom(@RequestHeader(value = "Authorization", required = false) String token, @RequestBody BillOfMaterialDTO dto) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -60,7 +65,7 @@ public class BomController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBom(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    public ResponseEntity<?> deleteBom(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable Long id) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");
@@ -73,7 +78,7 @@ public class BomController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBom(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody BillOfMaterialDTO dto) {
+    public ResponseEntity<?> updateBom(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable Long id, @RequestBody BillOfMaterialDTO dto) {
         try {
             Long userId = getUserIdFromToken(token);
             if (userId == null) return ResponseEntity.badRequest().body("User not found");

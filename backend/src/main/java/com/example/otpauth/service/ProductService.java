@@ -335,6 +335,7 @@ public class ProductService {
         if (req.getPurchasePrice()    != null) p.setPurchasePrice(req.getPurchasePrice());
         if (req.getPrice()            != null) p.setPrice(req.getPrice());
         if (req.getProductType()      != null) p.setProductType(req.getProductType());
+        if (req.getItemType()         != null) p.setItemType(req.getItemType());
         if (req.getTaxType()          != null) p.setTaxType(req.getTaxType());
         if (req.getTax()              != null) p.setTax(req.getTax());
         if (req.getDiscountType()     != null) p.setDiscountType(req.getDiscountType());

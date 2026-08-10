@@ -20,16 +20,14 @@ import {
     CheckCircle,
     X,
     UploadCloud,
-    Layers
+    Layers,
+    Factory,
+    PlayCircle
 } from 'lucide-react';
 import { useConfirm } from '../../../context/ConfirmContext';
 import { useCurrency } from '../../../hooks/useCurrency';
 
-
 const API_BASE = `${ENV.API_BASE_URL}/products`;
-
-// ── Fallback mock data (shown when DB is empty or API is offline) ──────────
-const _mockData = [];
 
 // ── Colour mapping for category badges ────────────────────────────────────
 const categoryColors = {
@@ -53,6 +51,7 @@ const Products = () => {
     const [loading, setLoading]         = useState(true);
     const [apiOnline, setApiOnline]     = useState(true);
     const [searchTerm, setSearchTerm]   = useState('');
+    const [itemTypeFilter, setItemTypeFilter] = useState('ALL');
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [toast, setToast]             = useState(null);
@@ -164,19 +163,21 @@ const Products = () => {
         document.body.removeChild(link);
     };
 
-    // ── Merge: DB products first, then mock (only if DB is empty/offline) ─
     const allProducts = dbProducts;
 
-    // ── Search filter ────────────────────────────────────────────────────
+    // ── Search & Classification Filter ───────────────────────────────────
     const filtered = allProducts.filter(item => {
-        if (!searchTerm) return true;
-        const t = searchTerm.toLowerCase();
-        return (
-            (item.name        || '').toLowerCase().includes(t) ||
-            (item.sku         || '').toLowerCase().includes(t) ||
-            (item.brand       || '').toLowerCase().includes(t) ||
-            (item.category    || '').toLowerCase().includes(t)
+        const matchesSearch = !searchTerm || (
+            (item.name        || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.sku         || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.brand       || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.category    || '').toLowerCase().includes(searchTerm.toLowerCase())
         );
+
+        const type = item.itemType || 'STANDARD_ITEM';
+        const matchesType = itemTypeFilter === 'ALL' || type === itemTypeFilter;
+
+        return matchesSearch && matchesType;
     });
 
     // ── Pagination ───────────────────────────────────────────────────────
@@ -247,19 +248,16 @@ const Products = () => {
         setTimeout(() => setToast(null), 3500);
     };
 
-    // ── Format price ─────────────────────────────────────────────────────
     const formatPrice = (price) => {
         if (price == null) return '—';
         return `${currencySymbol}${Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
-    // ── Format date ──────────────────────────────────────────────────────
     const formatDate = (dateStr) => {
         if (!dateStr) return '—';
         return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
     };
 
-    // ── Qty badge colour ─────────────────────────────────────────────────
     const getQtyBadge = (qty) => {
         if (qty <= 0)   return 'badge-danger';
         if (qty < 50)   return 'badge-warning';
@@ -278,7 +276,6 @@ const Products = () => {
                 </div>
             )}
 
-
             {/* Header */}
             <div className="ss-header-row">
                 <div className="ss-page-title-area">
@@ -287,8 +284,8 @@ const Products = () => {
                         {loading ? 'Loading…' : (
                             <>
                                 {dbProducts.length > 0
-                                    ? <span>{dbProducts.length} from database</span>
-                                    : <span>Showing demo data</span>
+                                    ? <span>{dbProducts.length} products total</span>
+                                    : <span>No products found</span>
                                 }
                             </>
                         )}
@@ -322,12 +319,43 @@ const Products = () => {
             {!apiOnline && !loading && (
                 <div className="api-offline-banner">
                     <AlertCircle size={16} />
-                    Backend API is offline — showing demo data. Start the Spring Boot server to load real products.
+                    Backend API is offline — start the Spring Boot server to load products.
                 </div>
             )}
 
             {/* Table Card */}
             <div className="ss-main-panel">
+
+                {/* Item Type Filter Tabs */}
+                <div className="d-flex gap-2 p-3 border-bottom bg-light">
+                    {[
+                        { id: 'ALL', label: 'All Products', icon: Package },
+                        { id: 'STANDARD_ITEM', label: 'Standard Products', icon: Package },
+                        { id: 'FINISHED_GOOD', label: 'Manufacturing Products', icon: Factory },
+                        { id: 'RAW_MATERIAL', label: 'Raw Materials', icon: Layers }
+                    ].map(tab => {
+                        const Icon = tab.icon;
+                        const isActive = itemTypeFilter === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                type="button"
+                                className={`btn btn-sm d-flex align-items-center gap-1 ${isActive ? 'fw-bold shadow-sm' : 'text-secondary'}`}
+                                style={{
+                                    backgroundColor: isActive ? '#ff9b29' : '#ffffff',
+                                    color: isActive ? '#ffffff' : '#495057',
+                                    border: isActive ? '1px solid #ff9b29' : '1px solid #dee2e6',
+                                    borderRadius: '8px',
+                                    padding: '6px 14px',
+                                    fontSize: '13px'
+                                }}
+                                onClick={() => { setItemTypeFilter(tab.id); setCurrentPage(1); }}
+                            >
+                                <Icon size={14} /> {tab.label}
+                            </button>
+                        );
+                    })}
+                </div>
 
                 {/* Filter Row */}
                 <div className="ss-table-controls">
@@ -340,14 +368,6 @@ const Products = () => {
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                         />
-                    </div>
-                    <div className="ss-filters-wrap">
-                        <select className="ss-filter-select">
-                            <option value="">Category</option>
-                        </select>
-                        <select className="ss-filter-select">
-                            <option value="">Brand</option>
-                        </select>
                     </div>
                 </div>
 
@@ -375,132 +395,152 @@ const Products = () => {
                                 <th style={{ textAlign: 'center' }}>Action</th>
                             </tr>
                         </thead>
-                    <tbody>
-                        {/* Loading skeletons */}
-                        {loading && Array.from({ length: 6 }).map((_, i) => (
-                            <tr key={`skel-${i}`} className="skeleton-row">
-                                <td><div className="skel skel-sm" /></td>
-                                <td><div className="skel skel-md" /></td>
-                                <td>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                        <div className="skel skel-circle" />
-                                        <div className="skel skel-lg" />
-                                    </div>
-                                </td>
-                                <td><div className="skel skel-sm" /></td>
-                                <td><div className="skel skel-md" /></td>
-                                <td><div className="skel skel-sm" /></td>
-                                <td><div className="skel skel-sm" /></td>
-                                <td><div className="skel skel-sm" /></td>
-                                <td><div className="skel skel-md" /></td>
-                                <td><div className="skel skel-md" /></td>
-                            </tr>
-                        ))}
+                        <tbody>
+                            {/* Loading skeletons */}
+                            {loading && Array.from({ length: 6 }).map((_, i) => (
+                                <tr key={`skel-${i}`} className="skeleton-row">
+                                    <td><div className="skel skel-sm" /></td>
+                                    <td><div className="skel skel-md" /></td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <div className="skel skel-circle" />
+                                            <div className="skel skel-lg" />
+                                        </div>
+                                    </td>
+                                    <td><div className="skel skel-sm" /></td>
+                                    <td><div className="skel skel-md" /></td>
+                                    <td><div className="skel skel-sm" /></td>
+                                    <td><div className="skel skel-sm" /></td>
+                                    <td><div className="skel skel-sm" /></td>
+                                    <td><div className="skel skel-md" /></td>
+                                    <td><div className="skel skel-md" /></td>
+                                </tr>
+                            ))}
 
-                        {/* Actual rows */}
-                        {!loading && paginated.length > 0 && paginated.map((item) => (
-                            <tr key={item.id} className={item._isMock ? 'mock-row' : 'db-row'}>
-                                <td>
-                                    <input 
-                                        type="checkbox" 
-                                        className="ss-checkbox" 
-                                        checked={selectedIds.includes(item.id)}
-                                        onChange={(e) => handleSelectItem(item.id, e.target.checked)}
-                                    />
-                                </td>
-                                <td>
-                                    <span className="ss-code-badge">{item.sku || '—'}</span>
-                                </td>
-                                <td>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        {/* Show real product image if available, else initials avatar */}
-                                        {item.images && item.images.split(',')[0]?.trim() ? (
-                                            <img
-                                                src={item.images.split(',')[0].trim()}
-                                                alt={item.name}
-                                                style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
+                            {/* Actual rows */}
+                            {!loading && paginated.length > 0 && paginated.map((item) => (
+                                <tr key={item.id} className={item._isMock ? 'mock-row' : 'db-row'}>
+                                    <td>
+                                        <input 
+                                            type="checkbox" 
+                                            className="ss-checkbox" 
+                                            checked={selectedIds.includes(item.id)}
+                                            onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <span className="ss-code-badge">{item.sku || '—'}</span>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            {item.images && item.images.split(',')[0]?.trim() ? (
+                                                <img
+                                                    src={item.images.split(',')[0].trim()}
+                                                    alt={item.name}
+                                                    style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div
+                                                style={{
+                                                    width: '28px', height: '28px', borderRadius: '4px',
+                                                    background: getAvatarColor(item.name),
+                                                    display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex',
+                                                    alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px', fontWeight: '600'
                                                 }}
-                                            />
-                                        ) : null}
-                                        {/* Initials avatar — shown when no image or image fails */}
-                                        <div
-                                            style={{
-                                                width: '28px', height: '28px', borderRadius: '4px',
-                                                background: getAvatarColor(item.name),
-                                                display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex',
-                                                alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px', fontWeight: '600'
-                                            }}
-                                        >
-                                            {getInitials(item.name)}
+                                            >
+                                                {getInitials(item.name)}
+                                            </div>
+                                            <div>
+                                                <div className="d-flex align-items-center gap-1">
+                                                    <span className="ss-item-name">{item.name}</span>
+                                                    {item.itemType === 'FINISHED_GOOD' && (
+                                                        <span className="badge bg-warning bg-opacity-25 text-dark border border-warning ms-1" style={{ fontSize: '10px', padding: '2px 6px' }}>
+                                                            Manufactured
+                                                        </span>
+                                                    )}
+                                                    {item.itemType === 'RAW_MATERIAL' && (
+                                                        <span className="badge bg-info bg-opacity-25 text-info border border-info ms-1" style={{ fontSize: '10px', padding: '2px 6px' }}>
+                                                            Raw Material
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {item._isMock && <span style={{ fontSize: '10px', color: '#999', fontStyle: 'italic' }}>demo</span>}
+                                            </div>
                                         </div>
-                                        <div>
-                                            <span className="ss-item-name">{item.name}</span>
-                                            {item._isMock && <span style={{ marginLeft: '5px', fontSize: '10px', color: '#999', fontStyle: 'italic' }}>demo</span>}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span
-                                        className="ss-status-badge ss-status-active"
-                                        style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category), borderColor: 'transparent' }}
-                                    >
-                                        {item.category || '—'}
-                                    </span>
-                                </td>
-                                <td>{item.brand || '—'}</td>
-                                <td>{formatPrice(item.purchasePrice)}</td>
-                                <td>{item.unit || 'Pc'}</td>
-                                <td>
-                                    <span className={`ss-status-badge ${item.quantity <= 0 ? 'ss-status-inactive' : item.quantity < 50 ? 'ss-status-pending' : 'ss-status-active'}`}>
-                                        {item.quantity ?? 0}
-                                    </span>
-                                </td>
-                                <td style={{ color: '#5b6670', fontSize: '13px' }}>{formatDate(item.createdAt)}</td>
-                                <td>
-                                    <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
-                                        <button 
-                                            className="ss-action-btn view" 
-                                            title="View"
-                                            onClick={() => { setViewProduct(item); setActiveImgIndex(0); }}
+                                    </td>
+                                    <td>
+                                        <span
+                                            className="ss-status-badge ss-status-active"
+                                            style={{ background: `${getCategoryColor(item.category)}18`, color: getCategoryColor(item.category), borderColor: 'transparent' }}
                                         >
-                                            <Eye size={15} />
-                                        </button>
-                                        <Link to={`/edit-product/${item.id}`} className="ss-action-btn edit" title="Edit">
-                                            <Pencil size={15} />
-                                        </Link>
-                                        <button
-                                            className="ss-action-btn delete"
-                                            title="Delete"
-                                            onClick={() => handleDelete(item.id)}
-                                        >
-                                            <Trash2 size={15} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-
-                        {/* Empty state */}
-                        {!loading && paginated.length === 0 && (
-                            <tr>
-                                <td colSpan="10">
-                                    <div className="empty-state">
-                                        <Package size={48} strokeWidth={1} />
-                                        <p>{searchTerm ? 'No products match your search.' : 'No products available.'}</p>
-                                        {!searchTerm && (
-                                            <Link to="/create-product" className="btn-orange text-decoration-none" style={{ fontSize: '0.85rem', padding: '8px 18px' }}>
-                                                <PlusCircle size={16} /> Add Product
+                                            {item.category || '—'}
+                                        </span>
+                                    </td>
+                                    <td>{item.brand || '—'}</td>
+                                    <td>{formatPrice(item.purchasePrice)}</td>
+                                    <td>{item.unit || 'Pc'}</td>
+                                    <td>
+                                        <span className={`ss-status-badge ${item.quantity <= 0 ? 'ss-status-inactive' : item.quantity < 50 ? 'ss-status-pending' : 'ss-status-active'}`}>
+                                            {item.quantity ?? 0}
+                                        </span>
+                                    </td>
+                                    <td style={{ color: '#5b6670', fontSize: '13px' }}>{formatDate(item.createdAt)}</td>
+                                    <td>
+                                        <div className="ss-actions-group" style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                            {item.itemType === 'FINISHED_GOOD' && (
+                                                <Link
+                                                    to="/manufacturing/work-orders"
+                                                    className="btn btn-sm text-dark fw-semibold me-1 d-flex align-items-center"
+                                                    style={{ backgroundColor: 'rgba(255, 155, 41, 0.15)', border: 'none', padding: '4px 8px', fontSize: '11px', borderRadius: '4px' }}
+                                                    title="Start Batch Work Order"
+                                                >
+                                                    <PlayCircle size={12} className="me-1" /> Produce
+                                                </Link>
+                                            )}
+                                            <button 
+                                                className="ss-action-btn view" 
+                                                title="View"
+                                                onClick={() => { setViewProduct(item); setActiveImgIndex(0); }}
+                                            >
+                                                <Eye size={15} />
+                                            </button>
+                                            <Link to={`/edit-product/${item.id}`} className="ss-action-btn edit" title="Edit">
+                                                <Pencil size={15} />
                                             </Link>
-                                        )}
-                                    </div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                            <button
+                                                className="ss-action-btn delete"
+                                                title="Delete"
+                                                onClick={() => handleDelete(item.id)}
+                                            >
+                                                <Trash2 size={15} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+
+                            {/* Empty state */}
+                            {!loading && paginated.length === 0 && (
+                                <tr>
+                                    <td colSpan="10">
+                                        <div className="empty-state">
+                                            <Package size={48} strokeWidth={1} />
+                                            <p>{searchTerm ? 'No products match your search.' : 'No products available.'}</p>
+                                            {!searchTerm && (
+                                                <Link to="/create-product" className="btn-orange text-decoration-none" style={{ fontSize: '0.85rem', padding: '8px 18px' }}>
+                                                    <PlusCircle size={16} /> Add Product
+                                                </Link>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
 
                 {/* Pagination */}
@@ -536,6 +576,7 @@ const Products = () => {
                     </div>
                 )}
             </div>
+
             {/* Enhanced Product View Modal */}
             {viewProduct && (
                 <div className="view-overlay" onClick={() => setViewProduct(null)}>
@@ -564,7 +605,6 @@ const Products = () => {
                                     )}
                                 </div>
                                 
-                                {/* Thumbnails Gallery */}
                                 {viewProduct.images && viewProduct.images.split(',').length > 1 && (
                                     <div className="view-thumbnails">
                                         {viewProduct.images.split(',').map((imgUrl, idx) => (
@@ -580,7 +620,7 @@ const Products = () => {
                                 )}
                             </div>
                             
-                            {/* Right Side: Tabular Details */}
+                            {/* Right Side: Details */}
                             <div className="view-modal-right">
                                 <div className="view-modal-scroll">
                                     <div className="view-header">
@@ -630,49 +670,7 @@ const Products = () => {
                                         </div>
                                     </div>
 
-                                    {/* Section 2: Pricing & Tax OR Variants */}
-                                    {viewProduct.productType === 'Variable Product' && viewProduct.variants && viewProduct.variants.length > 0 ? (
-                                        <div className="info-section">
-                                            <h6 className="section-title"><Layers size={14} style={{marginRight:5}} />Variant Details</h6>
-                                            {viewProduct.variants.map((vt, tIdx) => (
-                                                <div key={tIdx} className="view-variant-block">
-                                                    <div className="view-variant-type-header">
-                                                        <span className="view-variant-type-name">{vt.typeName || `Variant Type ${tIdx + 1}`}</span>
-                                                        <span className="view-variant-count">{vt.values?.length || 0} options</span>
-                                                    </div>
-                                                    <div className="view-variant-table">
-                                                        <div className="view-variant-table-head">
-                                                            <span className="vvt-col vvt-img">Image</span>
-                                                            <span className="vvt-col vvt-val">Value</span>
-                                                            <span className="vvt-col vvt-price">Price</span>
-                                                            <span className="vvt-col vvt-qty">Qty</span>
-                                                            <span className="vvt-col vvt-sku">SKU</span>
-                                                            <span className="vvt-col vvt-bar">Barcode</span>
-                                                        </div>
-                                                        {(vt.values || []).map((val, vIdx) => (
-                                                            <div key={vIdx} className={`view-variant-table-row${val.isDefault ? ' view-variant-default' : ''}`}>
-                                                                <span className="vvt-col vvt-img">
-                                                                    {val.image ? (
-                                                                        <img src={val.image} alt={val.value} className="vvt-thumb" />
-                                                                    ) : (
-                                                                        <div className="vvt-thumb-placeholder" style={{background: getAvatarColor(val.value || 'V')}}>{(val.value || 'V')[0]?.toUpperCase()}</div>
-                                                                    )}
-                                                                </span>
-                                                                <span className="vvt-col vvt-val">
-                                                                    {val.value || '—'}
-                                                                    {val.isDefault && <span className="vvt-default-badge">Default</span>}
-                                                                </span>
-                                                                <span className="vvt-col vvt-price">{formatPrice(val.price)}</span>
-                                                                <span className="vvt-col vvt-qty">{val.quantity != null ? val.quantity : '0'}</span>
-                                                                <span className="vvt-col vvt-sku">{val.sku || '—'}</span>
-                                                                <span className="vvt-col vvt-bar">{val.barcode || '—'}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
+                                    {/* Pricing */}
                                     <div className="info-section">
                                         <h6 className="section-title">Pricing & Taxation</h6>
                                         <div className="view-grid">
@@ -694,29 +692,24 @@ const Products = () => {
                                                 <span className="view-label">Tax</span>
                                                 <span className="view-value">{viewProduct.tax || '0%'} ({viewProduct.taxType || 'Exclusive'})</span>
                                             </div>
-                                            <div className="view-item">
-                                                <span className="view-label">Brand</span>
-                                                <span className="view-value">{viewProduct.brand || '---'}</span>
-                                            </div>
                                         </div>
                                     </div>
-                                    )}
 
-                                    {/* Section 3: Manufacturing & Barcode */}
+                                    {/* Manufacturing & Traceability Section */}
                                     <div className="info-section no-border">
-                                        <h6 className="section-title">Manufacturing & Traceability</h6>
+                                        <h6 className="section-title text-warning d-flex align-items-center gap-1">
+                                            <Factory size={15} /> Manufacturing & Traceability
+                                        </h6>
                                         <div className="view-grid">
                                             <div className="view-item">
-                                                <span className="view-label">Manufacturer</span>
+                                                <span className="view-label">Item Classification</span>
+                                                <span className="view-value fw-bold text-dark">
+                                                    {viewProduct.itemType === 'FINISHED_GOOD' ? '🏭 Finished Good (Manufactured)' : viewProduct.itemType === 'RAW_MATERIAL' ? '🧱 Raw Material (Ingredient)' : '📦 Standard Item'}
+                                                </span>
+                                            </div>
+                                            <div className="view-item">
+                                                <span className="view-label">Manufacturer Workshop</span>
                                                 <span className="view-value">{viewProduct.manufacturer || '---'}</span>
-                                            </div>
-                                            <div className="view-item">
-                                                <span className="view-label">Warranty</span>
-                                                <span className="view-value">{viewProduct.warranty || 'No Warranty'}</span>
-                                            </div>
-                                            <div className="view-item">
-                                                <span className="view-label">Barcode Type</span>
-                                                <span className="view-value">{viewProduct.barcodeSymbology || 'CODE128'}</span>
                                             </div>
                                             <div className="view-item">
                                                 <span className="view-label">Manufactured Date</span>
@@ -727,6 +720,20 @@ const Products = () => {
                                                 <span className="view-value text-danger">{formatDate(viewProduct.expiryDate)}</span>
                                             </div>
                                         </div>
+
+                                        {viewProduct.itemType === 'FINISHED_GOOD' && (
+                                            <div className="mt-3 p-2 bg-warning bg-opacity-10 rounded border border-warning d-flex justify-content-between align-items-center">
+                                                <span className="small fw-semibold text-dark">Production Ready (BOM Linked)</span>
+                                                <div className="d-flex gap-2">
+                                                    <Link to="/manufacturing/bom" className="btn btn-xs btn-outline-dark text-decoration-none">
+                                                        BOM Recipes
+                                                    </Link>
+                                                    <Link to="/manufacturing/work-orders" className="btn btn-xs btn-warning text-dark fw-bold text-decoration-none">
+                                                        Start Work Order
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -762,7 +769,6 @@ const Products = () => {
                                 </div>
                             )}
 
-                            {/* Drag and Drop Zone */}
                             {!importFile ? (
                                 <div 
                                     className={`import-drag-zone ${dragActive ? 'active' : ''}`}
@@ -804,12 +810,10 @@ const Products = () => {
                                 </div>
                             )}
 
-                            {/* Standard sample format helper button */}
                             <button className="import-btn-sample" onClick={downloadSampleCsv}>
                                 <Download size={14} /> Download Sample CSV Template
                             </button>
 
-                            {/* Instructions Box */}
                             <div className="import-instructions">
                                 <h4 className="import-instructions-title">
                                     <AlertCircle size={16} /> Column Requirements:

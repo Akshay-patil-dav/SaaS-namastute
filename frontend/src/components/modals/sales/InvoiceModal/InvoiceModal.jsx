@@ -29,22 +29,45 @@ function numToWords(amount) {
     return convert(num);
 }
 
-/* ── Simple SVG QR placeholder ───────────────────────────── */
-function QRPlaceholder({ value }) {
-    // deterministic pixel grid from hash of value
-    const hash = [...(value || 'X')].reduce((a, c) => a * 31 + c.charCodeAt(0), 0);
-    const cells = Array.from({ length: 49 }, (_, i) => (hash * (i + 7)) % 3 !== 0);
+/* ── Direct UPI Scan & Pay QR Code Component ─────────────────── */
+function RealQRCode({ invoiceNo, amount, storeName = 'Namastute Store', upiId = 'namastute.pay@upi' }) {
+    const numericAmount = parseFloat(amount || 0).toFixed(2);
+    const cleanInvoiceNo = invoiceNo || 'INV-SALES-BILLING';
+    
+    // Standard UPI Payment URI recognized by GPay, PhonePe, Paytm, BHIM & All UPI Banking Apps
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(storeName)}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent(`Bill Payment ${cleanInvoiceNo}`)}`;
+    
+    const qrData = encodeURIComponent(upiUri);
+    const primaryQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrData}&margin=1`;
+    const fallbackQrUrl = `https://bwipjs-api.metafloor.com/?bcid=qrcode&text=${qrData}&scale=4`;
+
     return (
-        <svg width="68" height="68" viewBox="0 0 7 7" xmlns="http://www.w3.org/2000/svg">
-            {cells.map((on, i) => (
-                <rect key={i} x={i % 7} y={Math.floor(i / 7)} width="1" height="1"
-                    fill={on ? '#1b2850' : '#fff'} />
-            ))}
-            {/* corner marks */}
-            <rect x="0" y="0" width="2" height="2" fill="#ff9f43" />
-            <rect x="5" y="0" width="2" height="2" fill="#ff9f43" />
-            <rect x="0" y="5" width="2" height="2" fill="#ff9f43" />
-        </svg>
+        <div style={{ textAlign: 'center' }}>
+            <div style={{
+                width: '74px',
+                height: '74px',
+                background: '#ffffff',
+                padding: '3px',
+                borderRadius: '6px',
+                border: '1px solid #cbd5e1',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto'
+            }}>
+                <img
+                    src={primaryQrUrl}
+                    alt={`Scan to Pay ₹${numericAmount} for ${cleanInvoiceNo}`}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    onError={(e) => {
+                        e.target.src = fallbackQrUrl;
+                    }}
+                />
+            </div>
+            <div style={{ fontSize: '8.5px', fontWeight: '700', color: '#16a34a', marginTop: '3px', lineHeight: '1.1' }}>
+                Scan &amp; Pay Bill (UPI)
+            </div>
+        </div>
     );
 }
 
@@ -224,7 +247,11 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                                 </span>
                             </div>
                             <div className="inv-qr">
-                                <QRPlaceholder value={order.referenceNo} />
+                                <RealQRCode
+                                    invoiceNo={order.invoiceNo || order.referenceNo || `INV-${order.id}`}
+                                    amount={grandTotal}
+                                    storeName={order.store || 'Namastute Store'}
+                                />
                             </div>
                         </div>
                     </div>

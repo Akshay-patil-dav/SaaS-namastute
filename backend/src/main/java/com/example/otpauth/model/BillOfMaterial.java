@@ -19,14 +19,14 @@ public class BillOfMaterial {
     private Long userId;
 
     // The finished good that this BOM creates
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @Column(nullable = false, length = 255)
     private String name;
 
-    @OneToMany(mappedBy = "billOfMaterial", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "billOfMaterial", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<BomItem> items = new ArrayList<>();
 
     @Column(updatable = false)
