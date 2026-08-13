@@ -17,6 +17,7 @@ const ContactUs          = lazy(() => import('./pages/website/ContactUs/ContactU
 const LivePreview        = lazy(() => import('./pages/website/LivePreview/LivePreview.jsx'));
 const ProjectWorks       = lazy(() => import('./pages/website/ProjectWorks/ProjectWorks.jsx'));
 const ProjectInfo        = lazy(() => import('./pages/website/ProjectInfo/ProjectInfo.jsx'));
+const PrivacyPolicy      = lazy(() => import('./pages/website/PrivacyPolicy/PrivacyPolicy.jsx'));
 
 // ── Global page loading fallback ─────────────────────────────────────────────
 function PageLoader() {
@@ -67,7 +68,9 @@ function AppRoutes() {
                 <Route path="/services/web-application-development" element={<WebApplicationDevelopment />} />
                 <Route path="/services/:serviceId" element={<ServiceDetail />} />
                 <Route path="/live-preview" element={<LivePreview />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             </Routes>
+
         </Suspense>
     );
 }

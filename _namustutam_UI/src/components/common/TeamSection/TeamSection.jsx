@@ -4,7 +4,7 @@ import './TeamSection.css';
 const teamMembers = [
     { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: '/team/Akshay.png' },
     // { name: 'Santosh Patil', role: 'Business Developer', image: '/team/sp.png' },
-    { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' },
+    // { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' },
     // { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' },
     // { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' }
 ];

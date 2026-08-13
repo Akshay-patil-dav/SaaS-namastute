@@ -1,0 +1,117 @@
+.privacy-root {
+    background-color: #f8fafc;
+    color: #334155;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.privacy-header {
+    padding: 120px 20px 60px;
+    text-align: center;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.privacy-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.privacy-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(99, 102, 241, 0.1);
+    color: #4f46e5;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.privacy-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.privacy-gradient-text {
+    background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.privacy-subtitle {
+    color: #475569;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.privacy-main {
+    padding: 60px 20px;
+}
+
+.privacy-content {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 40px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.privacy-content h2 {
+    color: #0f172a;
+    font-size: 1.5rem;
+    margin-top: 32px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.privacy-content h2:first-child {
+    margin-top: 0;
+}
+
+.privacy-content p {
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 16px;
+}
+
+.privacy-content ul {
+    color: #475569;
+    margin-bottom: 16px;
+    padding-left: 24px;
+}
+
+.privacy-content li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.privacy-content a {
+    color: #4f46e5;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.privacy-content a:hover {
+    color: #7e22ce;
+}
+
+@media (max-width: 768px) {
+    .privacy-title {
+        font-size: 2.2rem;
+    }
+    
+    .privacy-content {
+        padding: 24px;
+    }
+}

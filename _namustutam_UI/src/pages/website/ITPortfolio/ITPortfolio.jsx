@@ -118,10 +118,11 @@ export default function ITPortfolio() {
                 <div className="portfolio-hero-content reveal-up" style={{ position: 'relative', zIndex: 2 }}>
                     <div className="portfolio-badge">
                         <span className="portfolio-badge-dot"></span>
-                        Premium IT Services & Solutions
+                        {/* Premium IT Services & Solutions */}
+                        Freelance Software Developer • IT Solutions
                     </div>
                     <h1 className="portfolio-hero-title">
-                        Crafting Digital 
+                        Building Digital 
                         <div className="rotating-text-wrapper">
                             {rotatingWords.map((word, index) => {
                                 const isActive = index === wordIndex;
@@ -141,7 +142,8 @@ export default function ITPortfolio() {
                         For Modern Businesses
                     </h1>
                     <p className="portfolio-hero-subtitle">
-                        We transform ideas into high-performance web applications, scalable e-commerce platforms, and beautiful corporate websites. Your technology partner from concept to launch.
+                        {/* We transform ideas into high-performance web applications, scalable e-commerce platforms, and beautiful corporate websites. Your technology partner from concept to launch. */}
+                  I build custom software, POS solutions, business websites, and web applications tailored to your business needs — from idea to deployment
                     </p>
                     <div className="portfolio-hero-actions">
                         <button className="portfolio-btn-primary" onClick={() => scrollTo('portfolio')}>

@@ -68,7 +68,7 @@ const WebsiteFooter = () => {
                         <div className="premium-footer-col">
                             <h4>Legal</h4>
                             <ul>
-                                <li><Link to="#">Privacy Policy</Link></li>
+                                <li><Link to="/privacy-policy">Privacy Policy</Link></li>
                                 <li><Link to="#">Terms of Service</Link></li>
                                 <li><Link to="#">Cookie Policy</Link></li>
                                 <li><Link to="#">Refund Policy</Link></li>
