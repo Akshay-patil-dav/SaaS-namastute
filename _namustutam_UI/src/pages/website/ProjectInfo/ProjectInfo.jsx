@@ -174,9 +174,15 @@ export default function ProjectInfo() {
                         
                         {/* Primary Actions (Moved to Sidebar) */}
                         <div className="project-info-sidebar-actions">
-                            <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="btn-solid sidebar-btn">
-                                Preview in browser
+                            <div className="price-tag">{project.price || 'Free'}</div>
+                            <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="btn-solid sidebar-btn" style={{marginBottom: '10px'}}>
+                                Live Preview
                             </a>
+                            {project.githubLink && (
+                                <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="btn-outline sidebar-btn">
+                                    View Source Code
+                                </a>
+                            )}
                         </div>
 
                         <div className="project-info-sidebar-section">

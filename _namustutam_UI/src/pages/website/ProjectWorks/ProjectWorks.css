@@ -132,7 +132,7 @@
 }
 
 .filter-btn-glass.active {
-    background: #ffb38a;
+    background: var(--primary);
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(255, 179, 138, 0.3);
 }
@@ -215,7 +215,7 @@
 }
 
 .pw-glass-action-btn {
-    background: #ffb38a;
+    background: var(--primary);
     color: #ffffff;
     padding: 12px 28px;
     border-radius: 100px;
@@ -405,7 +405,7 @@
 }
 
 .pw-cta-btn {
-    background: #ffb38a;
+    background: var(--primary);
     color: #ffffff;
     padding: 18px 40px;
     border-radius: 100px;
