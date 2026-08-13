@@ -234,7 +234,7 @@
 }
 
 .bps-card:hover .bps-read-more {
-    background: var(--gradient, linear-gradient(135deg, #ffb38a 0%, #ff9666 100%));
+    background: var(--gradient, linear-gradient(135deg, #ff5b00 0%, #ff5b00 100%));
     color: #ffffff;
 }
 

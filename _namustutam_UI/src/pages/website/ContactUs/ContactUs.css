@@ -74,7 +74,7 @@
 
 /* ── Left Panel: Info ── */
 .contact-info-panel {
-    background: var(--gradient);
+    background: var(--primary);
     border-radius: 20px;
     padding: 40px;
     color: #ffffff;
@@ -206,7 +206,7 @@
 .contact-submit-btn {
     width: 100%;
     padding: 18px;
-    background: var(--gradient);
+    background: var(--primary);
     color: #ffffff;
     border: none;
     border-radius: 12px;

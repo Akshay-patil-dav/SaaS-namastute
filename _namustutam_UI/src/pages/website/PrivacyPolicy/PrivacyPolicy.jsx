@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
             </header>
 
             <section className="privacy-main">
-                <div className="privacy-container">
+                {/* <div className="privacy-container">
                     <div className="privacy-content">
                         <p><strong>Last Updated: {lastUpdated}</strong></p>
                         
@@ -79,7 +79,7 @@ export default function PrivacyPolicy() {
                             <strong>Phone:</strong> +91 82375 12742
                         </p>
                     </div>
-                </div>
+                </div> */}
             </section>
 
             <WebsiteFooter />
