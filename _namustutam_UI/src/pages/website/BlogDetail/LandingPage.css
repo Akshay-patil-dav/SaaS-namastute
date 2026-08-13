@@ -3,11 +3,11 @@
 
 /* ─── DESIGN TOKENS ──────────────────────────────────────────────────── */
 :root {
-  --primary:       #ffb38a;
-  --primary-d:     #e67820;
-  --primary-l:     #ffb570;
-  --primary-pale:  rgba(255, 179, 138,0.08);
-  --primary-glow:  rgba(255, 179, 138,0.18);
+  --primary:       #ff5b00;
+  --primary-d:     #e63500;
+  --primary-l:     #ff8038;
+  --primary-pale:  rgba(255, 91, 0, 0.10);
+  --primary-glow:  rgba(255, 91, 0, 0.18);
 
   /* Light/white palette */
   --bg:            #f5f7ff;

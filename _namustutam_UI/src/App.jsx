@@ -77,7 +77,8 @@ const WarningBanner = () => {
     
     return (
         <div style={{
-            background: 'linear-gradient(135deg, #ffb38a 0%, #ff9666 100%)',
+            // background: 'linear-gradient(135deg, #ffb38a 0%, #ff9666 100%)',
+            background: 'linear-gradient(135deg, rgb(255 98 11) 0%, rgb(255, 150, 102) 100%)',
             color: '#ffffff',
             padding: '0',
             fontWeight: '600',

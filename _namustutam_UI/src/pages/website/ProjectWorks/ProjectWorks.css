@@ -73,7 +73,7 @@
 }
 
 .portfolio-gradient-text {
-    background: linear-gradient(135deg, #ffb38a 0%, #f97316 100%);
+    background: linear-gradient(135deg, #ff5b00 0%, #b1591b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
