@@ -19,6 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import java.util.Collections;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -98,5 +104,51 @@ public class AuthService {
                 .collect(Collectors.toList());
         String planStr = user.getPlan() != null ? user.getPlan().name() : com.example.otpauth.model.SubscriptionPlan.NONE.name();
         return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+    }
+
+    @Transactional
+    public AuthResponse googleLogin(String credential) {
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                    .setAudience(Collections.singletonList("167861187519-tad34cb9ben048eb4ddfbf70h4plhj91.apps.googleusercontent.com"))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(credential);
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+                String email = payload.getEmail();
+                String name = (String) payload.get("name");
+
+                User user = userRepository.findByEmail(email).orElse(null);
+                if (user == null) {
+                    user = new User(
+                            email,
+                            passwordEncoder.encode(UUID.randomUUID().toString()),
+                            name
+                    );
+                    user.setEmailVerified(true);
+                    
+                    Role defaultRole = roleRepository.findByName(RoleName.CLIENT).orElseGet(() -> {
+                        Role newRole = new Role(RoleName.CLIENT);
+                        return roleRepository.save(newRole);
+                    });
+                    user.getRoles().add(defaultRole);
+                    user = userRepository.save(user);
+                }
+
+                UserDetailsImpl userDetails = new UserDetailsImpl(user);
+                String token = jwtUtil.generateToken(userDetails);
+
+                List<String> roles = user.getRoles().stream()
+                        .map(r -> r.getName().name())
+                        .collect(Collectors.toList());
+                String planStr = user.getPlan() != null ? user.getPlan().name() : com.example.otpauth.model.SubscriptionPlan.NONE.name();
+                return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+            } else {
+                throw new RuntimeException("Invalid Google ID token.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Google authentication failed: " + e.getMessage());
+        }
     }
 }

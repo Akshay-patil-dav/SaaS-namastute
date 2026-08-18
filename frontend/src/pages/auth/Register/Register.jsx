@@ -6,6 +6,7 @@ import {
     Facebook, Apple, Sparkles, ShieldCheck, Zap,
 } from 'lucide-react';
 import { API } from '../../../api/config';
+import { GoogleLogin } from '@react-oauth/google';
 import '../Login/Login.css';
 import '../Login/LoginNew.css';
 
@@ -27,7 +28,7 @@ export default function Register() {
 
     const [showPlanSelection, setShowPlanSelection] = useState(false);
 
-    const { register } = useAuth();
+    const { register, googleLogin } = useAuth();
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
@@ -56,6 +57,18 @@ export default function Register() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setError('');
+        setIsLoading(true);
+        const result = await googleLogin(credentialResponse.credential);
+        if (!result.success) {
+            setError(result.error);
+            setIsLoading(false);
+            return;
+        }
+        setShowPlanSelection(true);
     };
 
     const handlePlanSelectionComplete = () => {
@@ -243,31 +256,15 @@ export default function Register() {
                     <div className="divider">OR CONTINUE WITH</div>
 
                     {/* Social buttons */}
-                    <div className="social-login" style={{ marginBottom: '30px' }}>
-                        <button
-                            id="register-btn-facebook"
-                            className="btn-social btn-social-fb"
-                            onClick={() => window.location.href = API.OAUTH_FACEBOOK}
-                            type="button"
-                        >
-                            <Facebook size={18} fill="currentColor" />
-                        </button>
-                        <button
-                            id="register-btn-google"
-                            className="btn-social btn-social-google"
-                            onClick={() => window.location.href = API.OAUTH_GOOGLE}
-                            type="button"
-                        >
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '18px', height: '18px' }} />
-                        </button>
-                        <button
-                            id="register-btn-apple"
-                            className="btn-social btn-social-apple"
-                            onClick={() => window.location.href = '#'}
-                            type="button"
-                        >
-                            <Apple size={18} fill="currentColor" />
-                        </button>
+                    <div className="social-login" style={{ marginBottom: '30px', display: 'flex', justifyContent: 'center' }}>
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => setError('Google Registration was unsuccessful. Please try again.')}
+                            theme="outline"
+                            size="large"
+                            text="signup_with"
+                            shape="rectangular"
+                        />
                     </div>
 
                     <div className="login-footer">

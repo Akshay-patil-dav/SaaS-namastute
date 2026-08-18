@@ -99,6 +99,25 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    /**
+     * googleLogin(credential)
+     * Send Google JWT to backend to authenticate/register user
+     */
+    const googleLogin = async (credential) => {
+        try {
+            const res = await apiClient.post(`${AUTH_API}/google`, { credential });
+            const { token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified);
+            return { success: true, role };
+        } catch (err) {
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data ||
+                'Google Login failed. Please try again.';
+            return { success: false, error: typeof msg === 'string' ? msg : 'Google Login failed.' };
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem(STORAGE_KEY);
         setToken(null);
@@ -140,6 +159,7 @@ export const AuthProvider = ({ children }) => {
                 loading,
                 login,
                 register,
+                googleLogin,
                 logout,
                 isSuperAdmin,
                 isAdmin,

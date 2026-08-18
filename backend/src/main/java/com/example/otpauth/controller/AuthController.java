@@ -7,6 +7,7 @@ import com.example.otpauth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,6 +36,20 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Login failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> payload) {
+        try {
+            String credential = payload.get("credential");
+            if (credential == null || credential.isEmpty()) {
+                return ResponseEntity.badRequest().body("Missing credential");
+            }
+            AuthResponse response = authService.googleLogin(credential);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Google Login failed: " + e.getMessage());
         }
     }
 }
