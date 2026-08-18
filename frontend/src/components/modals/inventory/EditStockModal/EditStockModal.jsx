@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Minus, Plus, Trash2, Search } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import DeleteConfirmModal from '../../common/DeleteConfirmModal/DeleteConfirmModal';
@@ -18,8 +18,9 @@ const EditStockModal = ({ isOpen, onClose, stock, onSuccess }) => {
     const [searchResults, setSearchResults] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const searchRef = useRef(null);
     const [activeProduct, setActiveProduct] = useState(null);
+    const [warehouses, setWarehouses] = useState([]);
+    const [stores, setStores] = useState([]);
 
     useEffect(() => {
         if (isOpen && stock) {
@@ -37,6 +38,19 @@ const EditStockModal = ({ isOpen, onClose, stock, onSuccess }) => {
                 productImg: stock.productImg
             });
             setSearchQuery('');
+            const fetchDropdowns = async () => {
+                try {
+                    const [whRes, stRes] = await Promise.all([
+                        apiClient.get(`${ENV.API_BASE_URL}/warehouses`),
+                        apiClient.get(`${ENV.API_BASE_URL}/stores`)
+                    ]);
+                    setWarehouses(Array.isArray(whRes.data) ? whRes.data : []);
+                    setStores(Array.isArray(stRes.data) ? stRes.data : []);
+                } catch (err) {
+                    console.error('Failed to fetch dropdowns:', err);
+                }
+            };
+            fetchDropdowns();
         }
     }, [isOpen, stock]);
 
@@ -196,9 +210,9 @@ const EditStockModal = ({ isOpen, onClose, stock, onSuccess }) => {
                                 onChange={(e) => setFormData({...formData, warehouse: e.target.value})}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                <option value="">Select</option>
-                                <option>Lavish Warehouse</option>
-                                <option>Quaint Warehouse</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
+                                ))}
                             </select>
                         </div>
 
@@ -210,9 +224,9 @@ const EditStockModal = ({ isOpen, onClose, stock, onSuccess }) => {
                                 onChange={(e) => setFormData({...formData, store: e.target.value})}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                <option value="">Select</option>
-                                <option>Electro Mart</option>
-                                <option>Quantum Gadgets</option>
+                                {stores.filter(s => s.status !== false).map(s => (
+                                    <option key={s.id} value={s.name}>{s.name}</option>
+                                ))}
                             </select>
                         </div>
 

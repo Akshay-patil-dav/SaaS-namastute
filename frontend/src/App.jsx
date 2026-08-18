@@ -32,6 +32,8 @@ const SubCategory        = lazy(() => import('./pages/inventory/SubCategory/SubC
 const Brands             = lazy(() => import('./pages/inventory/Brands/Brands.jsx'));
 const Units              = lazy(() => import('./pages/inventory/Units/Units.jsx'));
 const Warranties         = lazy(() => import('./pages/inventory/Warranties/Warranties.jsx'));
+const Store              = lazy(() => import('./pages/inventory/Store/Store.jsx'));
+const Warehouse          = lazy(() => import('./pages/inventory/Warehouse/Warehouse.jsx'));
 const PrintBarcode       = lazy(() => import('./pages/inventory/PrintBarcode/PrintBarcode.jsx'));
 const PrintQRCode        = lazy(() => import('./pages/inventory/PrintQRCode/PrintQRCode.jsx'));
 const Purchases          = lazy(() => import('./pages/purchases/Purchases/Purchases.jsx'));
@@ -45,6 +47,7 @@ const BillOfMaterials    = lazy(() => import('./pages/manufacturing/BillOfMateri
 const WorkOrders         = lazy(() => import('./pages/manufacturing/WorkOrders/WorkOrders.jsx'));
 const WorkCenters        = lazy(() => import('./pages/manufacturing/WorkCenters/WorkCenters.jsx'));
 const Invoices           = lazy(() => import('./pages/sales/Invoices/Invoices.jsx'));
+const FinancialReport    = lazy(() => import('./pages/reports/FinancialReport/FinancialReport.jsx'));
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
@@ -187,6 +190,14 @@ function AppRoutes() {
                     element={<PosPage roles={ADMIN_ROLES}><Warranties /></PosPage>}
                 />
                 <Route
+                    path="/stores"
+                    element={<PosPage roles={ADMIN_ROLES}><Store /></PosPage>}
+                />
+                <Route
+                    path="/warehouses"
+                    element={<PosPage roles={ADMIN_ROLES}><Warehouse /></PosPage>}
+                />
+                <Route
                     path="/print-barcode"
                     element={<PosPage roles={ADMIN_ROLES}><PrintBarcode /></PosPage>}
                 />
@@ -239,6 +250,12 @@ function AppRoutes() {
                 <Route
                     path="/settings/*"
                     element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
+                />
+
+                {/* Reports */}
+                <Route
+                    path="/dashboard/financial-report"
+                    element={<PosPage roles={ADMIN_ROLES}><FinancialReport /></PosPage>}
                 />
 
 

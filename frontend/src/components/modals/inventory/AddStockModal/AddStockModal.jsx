@@ -15,6 +15,8 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [warehouses, setWarehouses] = useState([]);
+    const [stores, setStores] = useState([]);
     const searchRef = useRef(null);
 
     // Reset state when modal opens/closes and handle click outside
@@ -22,6 +24,19 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
         if (isOpen) {
             setSelectedProducts([]);
             setSearchQuery('');
+            const fetchDropdowns = async () => {
+                try {
+                    const [whRes, stRes] = await Promise.all([
+                        apiClient.get(`${ENV.API_BASE_URL}/warehouses`),
+                        apiClient.get(`${ENV.API_BASE_URL}/stores`)
+                    ]);
+                    setWarehouses(Array.isArray(whRes.data) ? whRes.data : []);
+                    setStores(Array.isArray(stRes.data) ? stRes.data : []);
+                } catch (err) {
+                    console.error('Failed to fetch dropdowns:', err);
+                }
+            };
+            fetchDropdowns();
         }
 
         const handleClickOutside = (event) => {
@@ -139,9 +154,9 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
                                 onChange={(e) => setFormData({...formData, warehouse: e.target.value})}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                <option value="">Select</option>
-                                <option>Lavish Warehouse</option>
-                                <option>Quaint Warehouse</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
+                                ))}
                             </select>
                         </div>
 
@@ -154,9 +169,9 @@ const AddStockModal = ({ isOpen, onClose, onSuccess }) => {
                                 onChange={(e) => setFormData({...formData, store: e.target.value})}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                <option value="">Select</option>
-                                <option>Electro Mart</option>
-                                <option>Quantum Gadgets</option>
+                                {stores.filter(s => s.status !== false).map(s => (
+                                    <option key={s.id} value={s.name}>{s.name}</option>
+                                ))}
                             </select>
                         </div>
 

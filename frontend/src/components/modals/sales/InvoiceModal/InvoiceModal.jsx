@@ -2,8 +2,7 @@ import React, { useRef } from 'react';
 import { X, Printer, Download, ArrowLeft, FileText } from 'lucide-react';
 import './invoice-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
-
-
+import { useCompany } from '../../../../context/CompanyContext';
 function payBadgeClass(status) {
     if (status === 'Paid')    return 'inv-pay-badge inv-pay-paid';
     if (status === 'Overdue') return 'inv-pay-badge inv-pay-overdue';
@@ -76,6 +75,7 @@ function RealQRCode({ invoiceNo, amount, storeName = 'Namastute Store', upiId = 
 ════════════════════════════════════════════════════════════ */
 const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
     const { currencySymbol } = useCurrency();
+    const { companyInfo } = useCompany();
     const printRef = useRef(null);
 
     if (!isOpen || !order) return null;
@@ -193,12 +193,17 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                     <div className="inv-head">
                         <div className="inv-logo-area">
                             <div className="inv-logo-mark">
-                                <div className="inv-logo-icon">N</div>
-                                <span className="inv-company-name">Namustutam</span>
+                                {companyInfo.logo ? (
+                                    <img src={companyInfo.logo} alt="Logo" style={{ height: '36px', objectFit: 'contain' }} />
+                                ) : (
+                                    <div className="inv-logo-icon">{companyInfo.name ? companyInfo.name.charAt(0).toUpperCase() : 'N'}</div>
+                                )}
+                                {!companyInfo.logo && <span className="inv-company-name">{companyInfo.name || 'Namustutam'}</span>}
                             </div>
                             <div className="inv-company-addr">
-                                123 Business Park, Pune, MH 411001<br />
-                                India
+                                {companyInfo.address || '123 Business Park, Pune, MH 411001'}<br />
+                                {companyInfo.phone && <>phone: {companyInfo.phone}<br /></>}
+                                {companyInfo.vat && <>VAT/GSTIN: {companyInfo.vat}</>}
                             </div>
                         </div>
                         <div className="inv-meta">
@@ -220,11 +225,11 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         {/* From */}
                         <div>
                             <div className="inv-party-label">From</div>
-                            <div className="inv-party-name">{order.biller || 'Namustutam Admin'}</div>
+                            <div className="inv-party-name">{order.biller || companyInfo.name || 'Namustutam Admin'}</div>
                             <div className="inv-party-detail">
-                                123 Business Park, Pune, MH 411001<br />
-                                Email : <a href="mailto:admin@namustutam.com">admin@namustutam.com</a><br />
-                                Phone : +91 98765 43210
+                                {companyInfo.address || '123 Business Park, Pune, MH 411001'}<br />
+                                Email : <a href={`mailto:${companyInfo.email || 'admin@namustutam.com'}`}>{companyInfo.email || 'admin@namustutam.com'}</a><br />
+                                Phone : {companyInfo.phone || '+91 98765 43210'}
                             </div>
                         </div>
 
@@ -250,7 +255,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                                 <RealQRCode
                                     invoiceNo={order.invoiceNo || order.referenceNo || `INV-${order.id}`}
                                     amount={grandTotal}
-                                    storeName={order.store || 'Namastute Store'}
+                                    storeName={companyInfo.name || order.store || 'Namastute Store'}
                                 />
                             </div>
                         </div>
@@ -351,11 +356,15 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                     {/* Footer strip */}
                     <div className="inv-footer-strip">
                         <div className="inv-footer-logo">
-                            <div className="inv-logo-icon" style={{ width: 24, height: 24, fontSize: 11 }}>N</div>
-                            <span style={{ fontSize: 16, fontWeight: 800, color: '#1b2850' }}>Namustutam</span>
+                            {companyInfo.logo ? (
+                                <img src={companyInfo.logo} alt="Logo" style={{ height: '24px', objectFit: 'contain' }} />
+                            ) : (
+                                <div className="inv-logo-icon" style={{ width: 24, height: 24, fontSize: 11 }}>{companyInfo.name ? companyInfo.name.charAt(0).toUpperCase() : 'N'}</div>
+                            )}
+                            <span style={{ fontSize: 16, fontWeight: 800, color: '#1b2850' }}>{companyInfo.name || 'Namustutam'}</span>
                         </div>
                         <div className="inv-footer-pay">
-                            Payment Made Via <strong>bank transfer / UPI</strong> in the name of <span style={{ color: '#ff9f43', fontWeight: 600 }}>Namustutam Pvt. Ltd.</span>
+                            Payment Made Via <strong>bank transfer / UPI</strong> in the name of <span style={{ color: '#ff9f43', fontWeight: 600 }}>{companyInfo.name || 'Namustutam Pvt. Ltd.'}</span>
                         </div>
                         <div className="inv-footer-bank">
                             Bank Name : HDFC Bank &nbsp;|&nbsp; Account Number : 50100XXXXXXXX &nbsp;|&nbsp; IFSC : HDFC0001234

@@ -49,6 +49,21 @@ export default function ManageStock() {
         fetchStocks();
     }, []);
 
+    const uniqueWarehouses = React.useMemo(() => {
+        const names = stocks.map(t => t.warehouse).filter(Boolean);
+        return [...new Set(names)].sort();
+    }, [stocks]);
+
+    const uniqueStores = React.useMemo(() => {
+        const names = stocks.map(t => t.store).filter(Boolean);
+        return [...new Set(names)].sort();
+    }, [stocks]);
+
+    const uniqueProducts = React.useMemo(() => {
+        const names = stocks.map(t => t.productName).filter(Boolean);
+        return [...new Set(names)].sort();
+    }, [stocks]);
+
     const toggleRow = (id) => {
         setSelectedRows(prev => 
             prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
@@ -131,18 +146,15 @@ export default function ManageStock() {
                     <div className="ss-filters-wrap">
                         <select className="ss-filter-select">
                             <option>Warehouse</option>
-                            <option>Lavish Warehouse</option>
-                            <option>Quaint Warehouse</option>
+                            {uniqueWarehouses.map(w => <option key={w} value={w}>{w}</option>)}
                         </select>
                         <select className="ss-filter-select">
                             <option>Store</option>
-                            <option>Electro Mart</option>
-                            <option>Quantum Gadgets</option>
+                            {uniqueStores.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                         <select className="ss-filter-select">
                             <option>Product</option>
-                            <option>Lenovo IdeaPad 3</option>
-                            <option>Beats Pro</option>
+                            {uniqueProducts.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
                     </div>
                 </div>

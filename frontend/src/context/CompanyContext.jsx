@@ -15,7 +15,15 @@ export function CompanyProvider({ children }) {
 
     const refreshCompany = useCallback(() => {
         if (!user) {
-            setCompanyInfo({ name: '', logo: '' });
+            setCompanyInfo({ 
+                name: 'Namastute Software', 
+                logo: '',
+                email: 'info@namastute.com',
+                phone: '+91-0000000000',
+                address: 'Business Avenue, Tech Park',
+                vat: '',
+                website: 'www.namastute.com'
+            });
             return;
         }
 
@@ -27,15 +35,28 @@ export function CompanyProvider({ children }) {
                         const list = JSON.parse(data.companies_list);
                         if (Array.isArray(list) && list.length > 0) {
                             setCompanyInfo({
-                                name: list[0].companyName || '',
+                                name: list[0].companyName || 'Namastute Software',
                                 logo: list[0].companyLogo || '',
+                                email: list[0].companyEmail || 'info@namastute.com',
+                                phone: list[0].companyPhone || '+91-0000000000',
+                                address: list[0].companyAddress || 'Business Avenue, Tech Park',
+                                vat: list[0].companyVat || '',
+                                website: list[0].companyWebsite || 'www.namastute.com'
                             });
                             return;
                         }
                     } catch { /* ignore parse error */ }
                 }
-                // No company configured → clear
-                setCompanyInfo({ name: '', logo: '' });
+                // No company configured → clear but use default placeholders
+                setCompanyInfo({ 
+                    name: 'Namastute Software', 
+                    logo: '',
+                    email: 'info@namastute.com',
+                    phone: '+91-0000000000',
+                    address: 'Business Avenue, Tech Park',
+                    vat: '',
+                    website: 'www.namastute.com'
+                });
             })
             .catch(() => { /* ignore network errors */ });
     }, [user]);

@@ -1,17 +1,9 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Minus, Plus, Trash2 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../AddTransferModal/add-transfer-modal.css';
 
-// Combined list of all possible warehouses
-const ALL_WAREHOUSES = [
-    'Lobar Handy',
-    'Lavish Warehouse',
-    'Quaint Warehouse',
-    'Selosy',
-    'North Zone Warehouse',
-    'Nova Storage Hub',
-];
+
 
 const EditTransferModal = ({ isOpen, onClose, onSuccess, initialData, isView = false }) => {
     const [formData, setFormData] = useState({
@@ -27,6 +19,7 @@ const EditTransferModal = ({ isOpen, onClose, onSuccess, initialData, isView = f
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [warehouses, setWarehouses] = useState([]);
     const searchRef = useRef(null);
 
     // Initialize data when modal opens
@@ -54,6 +47,16 @@ const EditTransferModal = ({ isOpen, onClose, onSuccess, initialData, isView = f
             setSearchQuery('');
             setSearchResults([]);
             setShowSuggestions(false);
+            
+            const fetchWarehouses = async () => {
+                try {
+                    const res = await apiClient.get(`${ENV.API_BASE_URL}/warehouses`);
+                    setWarehouses(Array.isArray(res.data) ? res.data : []);
+                } catch (err) {
+                    console.error('Failed to fetch warehouses:', err);
+                }
+            };
+            fetchWarehouses();
         } else if (!isOpen) {
             // Reset on close
             setSelectedProducts([]);
@@ -199,11 +202,11 @@ const EditTransferModal = ({ isOpen, onClose, onSuccess, initialData, isView = f
                                 disabled={isView}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                {ALL_WAREHOUSES.map(w => (
-                                    <option key={w} value={w}>{w}</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
                                 ))}
                                 {/* Show current value even if not in list */}
-                                {formData.warehouseFrom && !ALL_WAREHOUSES.includes(formData.warehouseFrom) && (
+                                {formData.warehouseFrom && !warehouses.some(w => w.name === formData.warehouseFrom) && (
                                     <option value={formData.warehouseFrom}>{formData.warehouseFrom}</option>
                                 )}
                             </select>
@@ -219,11 +222,11 @@ const EditTransferModal = ({ isOpen, onClose, onSuccess, initialData, isView = f
                                 disabled={isView}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                {ALL_WAREHOUSES.map(w => (
-                                    <option key={w} value={w}>{w}</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
                                 ))}
                                 {/* Show current value even if not in list */}
-                                {formData.warehouseTo && !ALL_WAREHOUSES.includes(formData.warehouseTo) && (
+                                {formData.warehouseTo && !warehouses.some(w => w.name === formData.warehouseTo) && (
                                     <option value={formData.warehouseTo}>{formData.warehouseTo}</option>
                                 )}
                             </select>

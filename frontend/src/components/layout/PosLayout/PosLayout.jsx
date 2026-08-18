@@ -3,6 +3,7 @@ import PosSidebar from '../PosSidebar/PosSidebar';
 import PosHeader from '../PosHeader/PosHeader';
 import './pos-layout.css';
 import AIHelper from '../../ai/AIHelper/AIHelper';
+import GlobalPrintHeader from '../GlobalPrintHeader/GlobalPrintHeader';
 
 // ── Safe initial sidebar state ───────────────────────────────────────────────
 // Guard against `window` being undefined in SSR / test environments.
@@ -44,6 +45,7 @@ export default function PosLayout({ children }) {
         <div className={`pos-layout-wrapper ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
             <PosSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
             <div className="pos-main-content">
+                <GlobalPrintHeader />
                 <PosHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
                 <main className="pos-content-area">
                     {children}

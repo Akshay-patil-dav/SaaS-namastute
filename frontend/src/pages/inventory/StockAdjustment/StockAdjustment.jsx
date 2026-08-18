@@ -76,6 +76,11 @@ export default function StockAdjustment() {
         fetchStocks();
     }, []);
 
+    const uniqueWarehouses = React.useMemo(() => {
+        const names = data.map(t => t.warehouse).filter(Boolean);
+        return [...new Set(names)].sort();
+    }, [data]);
+
     const toggleRow = (id) => {
         setSelectedRows(prev => 
             prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
@@ -226,8 +231,7 @@ export default function StockAdjustment() {
                     <div className="ss-filters-wrap">
                         <select className="ss-filter-select">
                             <option>Warehouse</option>
-                            <option>Lavish Warehouse</option>
-                            <option>Quaint Warehouse</option>
+                            {uniqueWarehouses.map(w => <option key={w} value={w}>{w}</option>)}
                         </select>
                         <select className="ss-filter-select">
                             <option>Sort By : Last 7 Days</option>

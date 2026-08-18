@@ -307,13 +307,16 @@ export const CompanySettings = () => {
         }
     };
 
-    const persistCompanies = (updatedCompanies) => {
+    const persistCompanies = async (updatedCompanies) => {
         const jsonValue = JSON.stringify(updatedCompanies);
         setCompanies(updatedCompanies);
         // Pass data directly to avoid React's async state race condition
-        saveSettings(null, { companies_list: jsonValue });
+        const res = await saveSettings(null, { companies_list: jsonValue });
         // Refresh the shared CompanyContext so sidebar/header/AI update instantly
         refreshCompany();
+        if (res?.success) {
+            window.location.reload();
+        }
     };
 
     const handleSaveCompany = () => {
@@ -325,6 +328,10 @@ export const CompanySettings = () => {
         if (editingIndex !== null) {
             updatedCompanies = companies.map((c, i) => i === editingIndex ? currentCompany : c);
         } else {
+            if (companies.length >= 1) {
+                alert('You are only allowed to add one company profile.');
+                return;
+            }
             updatedCompanies = [...companies, { ...currentCompany, id: Date.now() }];
         }
         persistCompanies(updatedCompanies);
@@ -362,10 +369,19 @@ export const CompanySettings = () => {
                         </div>
                         <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>View and manage your registered company profiles</p>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', background: '#f1f5f9', borderRadius: '20px', padding: '4px 12px' }}>
-                            {companies.length} {companies.length === 1 ? 'Company' : 'Companies'}
+                            {companies.length} / 1 Company
                         </span>
+                        {companies.length === 0 && (
+                            <button 
+                                onClick={() => handleOpenModal()} 
+                                className="btn-save"
+                                style={{ padding: '6px 14px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                            >
+                                + Add Company
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -532,7 +548,14 @@ export const CompanySettings = () => {
                                                 <Building size={32} color="#ff6b35" />
                                             </div>
                                             <p style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: '600', color: '#374151' }}>No company profiles yet</p>
-                                            <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>Add your company information using the settings form</p>
+                                            <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#94a3b8' }}>Add your company information using the settings form</p>
+                                            <button 
+                                                onClick={() => handleOpenModal()}
+                                                className="btn-save"
+                                                style={{ padding: '8px 20px' }}
+                                            >
+                                                + Add Company Details
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

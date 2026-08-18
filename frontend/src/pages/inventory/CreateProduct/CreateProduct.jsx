@@ -87,6 +87,8 @@ const CreateProduct = () => {
     const [brands, setBrands] = useState([]);
     const [units, setUnits] = useState([]);
     const [warranties, setWarranties] = useState([]);
+    const [stores, setStores] = useState([]);
+    const [warehouses, setWarehouses] = useState([]);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
     // Fetch categories, sub-categories, brands and units on mount
@@ -97,7 +99,9 @@ const CreateProduct = () => {
                 apiClient.get(`${ENV.API_BASE_URL}/subcategories`),
                 apiClient.get(`${ENV.API_BASE_URL}/brands`),
                 apiClient.get(`${ENV.API_BASE_URL}/units`),
-                apiClient.get(`${ENV.API_BASE_URL}/warranties`)
+                apiClient.get(`${ENV.API_BASE_URL}/warranties`),
+                apiClient.get(`${ENV.API_BASE_URL}/stores`),
+                apiClient.get(`${ENV.API_BASE_URL}/warehouses`)
             ]);
             
             setCategories(results[0].status === 'fulfilled' ? (results[0].value.data || []) : []);
@@ -105,6 +109,8 @@ const CreateProduct = () => {
             setBrands(results[2].status === 'fulfilled' ? (results[2].value.data || []) : []);
             setUnits(results[3].status === 'fulfilled' ? (results[3].value.data || []) : []);
             setWarranties(results[4].status === 'fulfilled' ? (results[4].value.data || []) : []);
+            setStores(results[5].status === 'fulfilled' ? (results[5].value.data || []) : []);
+            setWarehouses(results[6].status === 'fulfilled' ? (results[6].value.data || []) : []);
         } catch (err) {
             console.error('Failed to fetch initial data', err);
         }
@@ -424,18 +430,18 @@ const CreateProduct = () => {
                                 <label className="cp-label">Store</label>
                                 <select name="store" className="cp-input text-muted" value={form.store} onChange={handleChange}>
                                     <option value="">Select</option>
-                                    <option>Freshmart</option>
-                                    <option>Main Store</option>
-                                    <option>Warehouse A</option>
+                                    {stores.filter(s => s.status !== false).map(s => (
+                                        <option key={s.id} value={s.name}>{s.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="col-md-6 cp-form-group">
                                 <label className="cp-label">Warehouse</label>
                                 <select name="warehouse" className="cp-input text-muted" value={form.warehouse} onChange={handleChange}>
                                     <option value="">Select</option>
-                                    <option>Warehouse A</option>
-                                    <option>Warehouse B</option>
-                                    <option>Cold Storage</option>
+                                    {warehouses.filter(w => w.status !== false).map(w => (
+                                        <option key={w.id} value={w.name}>{w.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="col-md-6 cp-form-group">

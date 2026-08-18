@@ -1,17 +1,9 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, UploadCloud } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import './import-transfer-modal.css';
 
-// Combined list of all possible warehouses
-const ALL_WAREHOUSES = [
-    'Lobar Handy',
-    'Lavish Warehouse',
-    'Quaint Warehouse',
-    'Selosy',
-    'North Zone Warehouse',
-    'Nova Storage Hub',
-];
+
 
 const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -24,6 +16,7 @@ const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
     
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [csvFile, setCsvFile] = useState(null);
+    const [warehouses, setWarehouses] = useState([]);
     const fileInputRef = useRef(null);
 
     // Reset state when modal opens
@@ -32,6 +25,16 @@ const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
             setFormData({ from: '', to: '', status: '', shipping: '', description: '' });
             setCsvFile(null);
             setIsSubmitting(false);
+            
+            const fetchWarehouses = async () => {
+                try {
+                    const res = await apiClient.get(`${ENV.API_BASE_URL}/warehouses`);
+                    setWarehouses(Array.isArray(res.data) ? res.data : []);
+                } catch (err) {
+                    console.error('Failed to fetch warehouses:', err);
+                }
+            };
+            fetchWarehouses();
         }
     }, [isOpen]);
 
@@ -111,8 +114,8 @@ const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
                                 onChange={(e) => setFormData({...formData, from: e.target.value})}
                             >
                                 <option value="" disabled hidden>select</option>
-                                {ALL_WAREHOUSES.map(w => (
-                                    <option key={w} value={w}>{w}</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -124,8 +127,8 @@ const ImportTransferModal = ({ isOpen, onClose, onSuccess }) => {
                                 onChange={(e) => setFormData({...formData, to: e.target.value})}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                {ALL_WAREHOUSES.map(w => (
-                                    <option key={w} value={w}>{w}</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
                                 ))}
                             </select>
                         </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
+import TextLogo from '../../common/TextLogo/TextLogo';
 import {
     LayoutDashboard,
     Square,
@@ -65,6 +66,8 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
         location.pathname.startsWith('/brands') ||
         location.pathname.startsWith('/units') ||
         location.pathname.startsWith('/warranties') ||
+        location.pathname.startsWith('/stores') ||
+        location.pathname.startsWith('/warehouses') ||
         location.pathname.startsWith('/print-barcode') ||
         location.pathname.startsWith('/print-qrcode');
 
@@ -117,13 +120,10 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
             {/* Sidebar */}
             <aside className={`pos-sidebar`}>
                 <div className="pos-sidebar-header">
-                    <Link to="/dashboard" className="pos-sidebar-logo">
+                    <Link to="/dashboard" className="pos-sidebar-logo" style={{ textDecoration: 'none' }}>
                         {companyInfo.logo
                             ? <img src={companyInfo.logo} alt={companyInfo.name || 'Logo'} style={{ height: '32px', maxWidth: '120px', objectFit: 'contain' }} />
-                            : <ShoppingBag className="pos-logo-icon" />}
-                        <span style={{ color: '#1a1a1a', fontWeight: '800' }}>
-                            {companyInfo.name || 'Namustute'}
-                        </span>
+                            : <TextLogo name={companyInfo.name} color="#ff6b35" />}
                     </Link>
                 </div>
 
@@ -260,6 +260,16 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         <li>
                                             <NavLink to="/warranties" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                 Warranties
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/stores" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Stores
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/warehouses" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Warehouses
                                             </NavLink>
                                         </li>
                                         {user?.plan !== 'STARTER' && (
@@ -440,7 +450,19 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 </li>
                             </ul>
 
-
+                            {/* Reports Section */}
+                            <div className="pos-menu-divider"></div>
+                            <div className="pos-menu-section">Reports</div>
+                            <ul className="pos-menu-list pb-4">
+                                <li className="pos-menu-item">
+                                    <NavLink to="/dashboard/financial-report" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                        <div className="pos-menu-link-content">
+                                            <FileText className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Financial Report</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            </ul>
 
                         </>
                     )}

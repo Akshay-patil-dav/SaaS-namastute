@@ -1,0 +1,69 @@
+.global-print-header {
+    display: none;
+}
+
+@media print {
+    @page {
+        margin: 10mm;
+    }
+    
+    .global-print-header {
+        display: block !important;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #000;
+        width: 100%;
+    }
+    
+    .gph-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .gph-company-details {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .gph-logo {
+        max-height: 55px;
+        max-width: 150px;
+        object-fit: contain;
+    }
+    
+    .gph-company-text h1 {
+        margin: 0 0 5px 0;
+        font-size: 22px;
+        font-weight: 800;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .gph-company-text p {
+        margin: 3px 0;
+        font-size: 12px;
+        color: #222;
+        line-height: 1.4;
+    }
+    
+    .gph-company-text span {
+        color: #444;
+    }
+    
+    .gph-meta {
+        text-align: right;
+    }
+    
+    .gph-meta p {
+        margin: 0;
+        font-size: 11px;
+        color: #555;
+    }
+    
+    .gph-divider {
+        display: none; /* handled by border-bottom on container */
+    }
+}

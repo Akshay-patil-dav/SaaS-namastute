@@ -3,6 +3,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User, ChevronDown, LayoutDashboard, Shield } from 'lucide-react';
 import { useCompany } from '../../../context/CompanyContext';
+import TextLogo from '../../common/TextLogo/TextLogo';
 
 export default function AppHeader() {
     const { user, logout, isAdmin } = useAuth();
@@ -29,20 +30,11 @@ export default function AppHeader() {
     return (
         <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shrink-0">
             {/* Logo */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" style={{ textDecoration: 'none' }}>
                 {companyInfo.logo
                     ? <img src={companyInfo.logo} alt={companyInfo.name || 'Logo'} style={{ height: '32px', maxWidth: '120px', objectFit: 'contain' }} />
-                    : (
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 12V20H8V12H4Z" fill="#6366f1"/>
-                            <path d="M10 8V20H14V8H10Z" fill="#a855f7"/>
-                            <path d="M16 16V20H20V16H16Z" fill="#ec4899"/>
-                        </svg>
-                    )
+                    : <TextLogo name={companyInfo.name} color="#6366f1" />
                 }
-                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
-                    {companyInfo.name || 'Namustutam'}
-                </span>
             </div>
 
             {/* Profile Dropdown */}

@@ -3,15 +3,7 @@ import { X, Search, Minus, Plus, Trash2 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import './add-transfer-modal.css';
 
-// Combined list of all possible warehouses
-const ALL_WAREHOUSES = [
-    'Lobar Handy',
-    'Lavish Warehouse',
-    'Quaint Warehouse',
-    'Selosy',
-    'North Zone Warehouse',
-    'Nova Storage Hub',
-];
+
 
 const AddTransferModal = ({ isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -27,6 +19,7 @@ const AddTransferModal = ({ isOpen, onClose, onSuccess }) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [warehouses, setWarehouses] = useState([]);
     const searchRef = useRef(null);
 
     // Reset state when modal opens and handle click outside
@@ -43,6 +36,16 @@ const AddTransferModal = ({ isOpen, onClose, onSuccess }) => {
             setSearchQuery('');
             setSearchResults([]);
             setShowSuggestions(false);
+            
+            const fetchWarehouses = async () => {
+                try {
+                    const res = await apiClient.get(`${ENV.API_BASE_URL}/warehouses`);
+                    setWarehouses(Array.isArray(res.data) ? res.data : []);
+                } catch (err) {
+                    console.error('Failed to fetch warehouses:', err);
+                }
+            };
+            fetchWarehouses();
         }
 
         const handleClickOutside = (event) => {
@@ -173,8 +176,8 @@ const AddTransferModal = ({ isOpen, onClose, onSuccess }) => {
                                 onChange={(e) => setFormData({ ...formData, warehouseFrom: e.target.value })}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                {ALL_WAREHOUSES.map(w => (
-                                    <option key={w} value={w}>{w}</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -188,8 +191,8 @@ const AddTransferModal = ({ isOpen, onClose, onSuccess }) => {
                                 onChange={(e) => setFormData({ ...formData, warehouseTo: e.target.value })}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                {ALL_WAREHOUSES.map(w => (
-                                    <option key={w} value={w}>{w}</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
                                 ))}
                             </select>
                         </div>

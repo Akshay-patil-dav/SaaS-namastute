@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Minus, Plus, Trash2 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import './add-adjustment-modal.css';
@@ -18,7 +18,31 @@ const AddAdjustmentModal = ({ isOpen, onClose, onSuccess, initialData = null }) 
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    // Dynamic dropdown states
+    const [warehouses, setWarehouses] = useState([]);
+    const [stores, setStores] = useState([]);
+    
     const searchRef = useRef(null);
+
+    // Fetch initial data for dropdowns
+    useEffect(() => {
+        if (isOpen) {
+            const fetchDropdowns = async () => {
+                try {
+                    const [whRes, stRes] = await Promise.all([
+                        apiClient.get(`${ENV.API_BASE_URL}/warehouses`),
+                        apiClient.get(`${ENV.API_BASE_URL}/stores`)
+                    ]);
+                    setWarehouses(Array.isArray(whRes.data) ? whRes.data : []);
+                    setStores(Array.isArray(stRes.data) ? stRes.data : []);
+                } catch (err) {
+                    console.error('Failed to fetch dropdowns:', err);
+                }
+            };
+            fetchDropdowns();
+        }
+    }, [isOpen]);
 
     // Initial load and Reset state when modal opens/closes
     useEffect(() => {
@@ -214,10 +238,9 @@ const AddAdjustmentModal = ({ isOpen, onClose, onSuccess, initialData = null }) 
                                 onChange={(e) => setFormData({...formData, warehouse: e.target.value})}
                             >
                                 <option value="" disabled hidden>Select</option>
-                                <option value="Lavish Warehouse">Lavish Warehouse</option>
-                                <option value="Quaint Warehouse">Quaint Warehouse</option>
-                                <option value="Overflow Warehouse">Overflow Warehouse</option>
-                                <option value="Traditional Warehouse">Traditional Warehouse</option>
+                                {warehouses.filter(w => w.status !== false).map(w => (
+                                    <option key={w.id} value={w.name}>{w.name}</option>
+                                ))}
                             </select>
                         </div>
                         <div className="adjustment-form-group">
@@ -287,10 +310,9 @@ const AddAdjustmentModal = ({ isOpen, onClose, onSuccess, initialData = null }) 
                             onChange={(e) => setFormData({...formData, store: e.target.value})}
                         >
                             <option value="" disabled hidden>Select</option>
-                            <option value="Electro Mart">Electro Mart</option>
-                            <option value="Quantum Gadgets">Quantum Gadgets</option>
-                            <option value="Prime Bazaar">Prime Bazaar</option>
-                            <option value="Gadget World">Gadget World</option>
+                            {stores.filter(s => s.status !== false).map(s => (
+                                <option key={s.id} value={s.name}>{s.name}</option>
+                            ))}
                         </select>
                     </div>
 
