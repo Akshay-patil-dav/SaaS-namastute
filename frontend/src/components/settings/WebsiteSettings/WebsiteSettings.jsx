@@ -2,13 +2,13 @@ import { ENV } from '@/api/config';
 import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../../hooks/useSettings';
 import { useCompany } from '../../../context/CompanyContext';
-import { 
-    Building, 
-    Mail, 
-    Phone, 
+import {
+    Building,
+    Mail,
+    Phone,
     Smartphone,
-    Globe, 
-    MapPin, 
+    Globe,
+    MapPin,
     Hash,
     FileText,
     Image as ImageIcon,
@@ -58,8 +58,8 @@ export const SystemSettings = () => {
                 <div className="settings-form-row">
                     <div className="settings-form-group">
                         <label>Website Name <span className="required">*</span></label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={settings.websiteName || ''}
                             placeholder="Preadmin POS"
                             onChange={(e) => handleChange('websiteName', e.target.value)}
@@ -71,13 +71,13 @@ export const SystemSettings = () => {
                     {/* Logo Upload */}
                     <div className="settings-form-group">
                         <label><ImageIcon size={14} className="me-2" /> Website Logo</label>
-                        <div 
-                            className="image-upload-wrapper" 
-                            style={{ 
-                                border: '2px dashed #e2e8f0', 
-                                borderRadius: '12px', 
-                                padding: '20px', 
-                                textAlign: 'center', 
+                        <div
+                            className="image-upload-wrapper"
+                            style={{
+                                border: '2px dashed #e2e8f0',
+                                borderRadius: '12px',
+                                padding: '20px',
+                                textAlign: 'center',
                                 background: '#f8fafc',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s',
@@ -89,20 +89,20 @@ export const SystemSettings = () => {
                             onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                             onClick={() => document.getElementById('website-logo-upload').click()}
                         >
-                            <input 
+                            <input
                                 id="website-logo-upload"
-                                type="file" 
+                                type="file"
                                 accept="image/*"
                                 style={{ display: 'none' }}
                                 onChange={(e) => handleImageUpload(e, 'websiteLogo')}
                             />
-                            
+
                             {settings.websiteLogo ? (
                                 <div style={{ position: 'relative' }}>
-                                    <img 
-                                        src={settings.websiteLogo} 
-                                        alt="Logo Preview" 
-                                        style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }} 
+                                    <img
+                                        src={settings.websiteLogo}
+                                        alt="Logo Preview"
+                                        style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }}
                                     />
                                     <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleChange('websiteLogo', ''); }}>
                                         <X size={14} />
@@ -121,13 +121,13 @@ export const SystemSettings = () => {
                     {/* Favicon Upload */}
                     <div className="settings-form-group">
                         <label><ImageIcon size={14} className="me-2" /> Website Favicon</label>
-                        <div 
-                            className="image-upload-wrapper" 
-                            style={{ 
-                                border: '2px dashed #e2e8f0', 
-                                borderRadius: '12px', 
-                                padding: '20px', 
-                                textAlign: 'center', 
+                        <div
+                            className="image-upload-wrapper"
+                            style={{
+                                border: '2px dashed #e2e8f0',
+                                borderRadius: '12px',
+                                padding: '20px',
+                                textAlign: 'center',
                                 background: '#f8fafc',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s',
@@ -143,21 +143,21 @@ export const SystemSettings = () => {
                             onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                             onClick={() => document.getElementById('website-favicon-upload').click()}
                         >
-                            <input 
+                            <input
                                 id="website-favicon-upload"
-                                type="file" 
+                                type="file"
                                 accept="image/*"
                                 style={{ display: 'none' }}
                                 onChange={(e) => handleImageUpload(e, 'websiteFavicon')}
                             />
-                            
+
                             {settings.websiteFavicon ? (
                                 <div style={{ position: 'relative' }}>
                                     <div style={{ width: '64px', height: '64px', background: '#fff', borderRadius: '12px', padding: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9' }}>
-                                        <img 
-                                            src={settings.websiteFavicon} 
-                                            alt="Favicon Preview" 
-                                            style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                        <img
+                                            src={settings.websiteFavicon}
+                                            alt="Favicon Preview"
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                         />
                                     </div>
                                     <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleChange('websiteFavicon', ''); }}>
@@ -176,7 +176,7 @@ export const SystemSettings = () => {
                 </div>
 
                 <div className="settings-actions">
-                    <button 
+                    <button
                         className="btn-save"
                         onClick={() => saveSettings(systemFields)}
                         disabled={saving}
@@ -215,28 +215,28 @@ export const CompanySettings = () => {
             // One-time migration: seed the list from legacy flat fields
             const migrated = [{
                 id: Date.now(),
-                companyName:    settings.companyName    || '',
-                companyEmail:   settings.companyEmail   || '',
-                companyPhone:   settings.companyPhone   || '',
-                companyMobile:  settings.companyMobile  || '',
-                companyFax:     settings.companyFax     || '',
+                companyName: settings.companyName || '',
+                companyEmail: settings.companyEmail || '',
+                companyPhone: settings.companyPhone || '',
+                companyMobile: settings.companyMobile || '',
+                companyFax: settings.companyFax || '',
                 companyWebsite: settings.companyWebsite || '',
                 companyAddress1: settings.companyAddress1 || settings.companyAddress || '',
                 companyAddress2: settings.companyAddress2 || '',
-                companyCity:    settings.companyCity    || '',
-                companyState:   settings.companyState   || '',
+                companyCity: settings.companyCity || '',
+                companyState: settings.companyState || '',
                 companyZipCode: settings.companyZipCode || '',
                 companyCountry: settings.companyCountry || '',
-                companyTaxId:   settings.companyTaxId   || '',
+                companyTaxId: settings.companyTaxId || '',
                 companyRegNumber: settings.companyRegNumber || '',
-                companyLogo:    settings.companyLogo    || '',
+                companyLogo: settings.companyLogo || '',
                 companyFavicon: settings.companyFavicon || ''
             }];
             setCompanies(migrated);
         } else {
             setCompanies([]);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loading, settings.companies_list]);
 
     const handleOpenModal = (company = null, index = null) => {
@@ -374,8 +374,8 @@ export const CompanySettings = () => {
                             {companies.length} / 1 Company
                         </span>
                         {companies.length === 0 && (
-                            <button 
-                                onClick={() => handleOpenModal()} 
+                            <button
+                                onClick={() => handleOpenModal()}
                                 className="btn-save"
                                 style={{ padding: '6px 14px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
                             >
@@ -549,7 +549,7 @@ export const CompanySettings = () => {
                                             </div>
                                             <p style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: '600', color: '#374151' }}>No company profiles yet</p>
                                             <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#94a3b8' }}>Add your company information using the settings form</p>
-                                            <button 
+                                            <button
                                                 onClick={() => handleOpenModal()}
                                                 className="btn-save"
                                                 style={{ padding: '8px 20px' }}
@@ -593,11 +593,11 @@ export const CompanySettings = () => {
                             <div className="settings-section-title"><Building size={16} /><span>Basic Information</span></div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
                                 {[['Company Name', viewCompany.companyName, <Building size={14} />],
-                                  ['Email', viewCompany.companyEmail, <Mail size={14} />],
-                                  ['Phone', viewCompany.companyPhone, <Phone size={14} />],
-                                  ['Mobile', viewCompany.companyMobile, <Smartphone size={14} />],
-                                  ['Fax', viewCompany.companyFax, <Hash size={14} />],
-                                  ['Website', viewCompany.companyWebsite, <Globe size={14} />],
+                                ['Email', viewCompany.companyEmail, <Mail size={14} />],
+                                ['Phone', viewCompany.companyPhone, <Phone size={14} />],
+                                ['Mobile', viewCompany.companyMobile, <Smartphone size={14} />],
+                                ['Fax', viewCompany.companyFax, <Hash size={14} />],
+                                ['Website', viewCompany.companyWebsite, <Globe size={14} />],
                                 ].map(([label, value, icon]) => (
                                     <div key={label} style={{ background: '#f8fafc', borderRadius: '8px', padding: '14px 16px', border: '1px solid #f1f5f9' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
@@ -614,11 +614,11 @@ export const CompanySettings = () => {
                             <div className="settings-section-title"><MapPin size={16} /><span>Address</span></div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
                                 {[['Address Line 1', viewCompany.companyAddress1, <MapPin size={14} />],
-                                  ['Address Line 2', viewCompany.companyAddress2, <MapPin size={14} />],
-                                  ['City', viewCompany.companyCity, <Globe size={14} />],
-                                  ['State / Province', viewCompany.companyState, <Globe size={14} />],
-                                  ['Zip / Postal Code', viewCompany.companyZipCode, <Hash size={14} />],
-                                  ['Country', viewCompany.companyCountry, <Globe size={14} />],
+                                ['Address Line 2', viewCompany.companyAddress2, <MapPin size={14} />],
+                                ['City', viewCompany.companyCity, <Globe size={14} />],
+                                ['State / Province', viewCompany.companyState, <Globe size={14} />],
+                                ['Zip / Postal Code', viewCompany.companyZipCode, <Hash size={14} />],
+                                ['Country', viewCompany.companyCountry, <Globe size={14} />],
                                 ].map(([label, value, icon]) => (
                                     <div key={label} style={{ background: '#f8fafc', borderRadius: '8px', padding: '14px 16px', border: '1px solid #f1f5f9' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
@@ -635,7 +635,7 @@ export const CompanySettings = () => {
                             <div className="settings-section-title"><FileText size={16} /><span>Legal & Tax</span></div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
                                 {[['Tax ID / VAT', viewCompany.companyTaxId, <Hash size={14} />],
-                                  ['Registration No.', viewCompany.companyRegNumber, <FileText size={14} />],
+                                ['Registration No.', viewCompany.companyRegNumber, <FileText size={14} />],
                                 ].map(([label, value, icon]) => (
                                     <div key={label} style={{ background: '#f8fafc', borderRadius: '8px', padding: '14px 16px', border: '1px solid #f1f5f9' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
@@ -696,18 +696,18 @@ export const CompanySettings = () => {
                                 <X size={24} />
                             </button>
                         </div>
-                        <div className="modal-body" style={{ padding: '24px' }}>
+                        <div className="modal-body" style={{ padding: '24px', overflow: "scroll" }}>
                             {/* Basic Information */}
                             <div className="settings-section-title">
                                 <Building size={18} />
                                 <span>Basic Information</span>
                             </div>
-                            
+
                             <div className="settings-form-row">
                                 <div className="settings-form-group">
                                     <label><Building size={14} className="me-2" /> Company Name <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyName || ''}
                                         placeholder="Dreamguys Technologies"
                                         onChange={(e) => handleFormChange('companyName', e.target.value)}
@@ -715,8 +715,8 @@ export const CompanySettings = () => {
                                 </div>
                                 <div className="settings-form-group">
                                     <label><Mail size={14} className="me-2" /> Company Email <span className="required">*</span></label>
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         value={currentCompany.companyEmail || ''}
                                         placeholder="info@dreamguys.co.in"
                                         onChange={(e) => handleFormChange('companyEmail', e.target.value)}
@@ -727,8 +727,8 @@ export const CompanySettings = () => {
                             <div className="settings-form-row">
                                 <div className="settings-form-group">
                                     <label><Phone size={14} className="me-2" /> Company Phone <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyPhone || ''}
                                         placeholder="+1 234 567 890"
                                         onChange={(e) => handleFormChange('companyPhone', e.target.value)}
@@ -736,8 +736,8 @@ export const CompanySettings = () => {
                                 </div>
                                 <div className="settings-form-group">
                                     <label><Smartphone size={14} className="me-2" /> Company Mobile</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyMobile || ''}
                                         placeholder="+1 987 654 321"
                                         onChange={(e) => handleFormChange('companyMobile', e.target.value)}
@@ -748,8 +748,8 @@ export const CompanySettings = () => {
                             <div className="settings-form-row">
                                 <div className="settings-form-group">
                                     <label><Hash size={14} className="me-2" /> Company Fax</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyFax || ''}
                                         placeholder="+1 234 567 891"
                                         onChange={(e) => handleFormChange('companyFax', e.target.value)}
@@ -757,8 +757,8 @@ export const CompanySettings = () => {
                                 </div>
                                 <div className="settings-form-group">
                                     <label><Globe size={14} className="me-2" /> Website <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyWebsite || ''}
                                         placeholder="www.example.com"
                                         onChange={(e) => handleFormChange('companyWebsite', e.target.value)}
@@ -777,8 +777,8 @@ export const CompanySettings = () => {
                             <div className="settings-form-row">
                                 <div className="settings-form-group">
                                     <label><MapPin size={14} className="me-2" /> Address Line 1 <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyAddress1 || ''}
                                         placeholder="123 Street Name"
                                         onChange={(e) => handleFormChange('companyAddress1', e.target.value)}
@@ -786,8 +786,8 @@ export const CompanySettings = () => {
                                 </div>
                                 <div className="settings-form-group">
                                     <label><MapPin size={14} className="me-2" /> Address Line 2</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyAddress2 || ''}
                                         placeholder="Suite, Apartment, etc."
                                         onChange={(e) => handleFormChange('companyAddress2', e.target.value)}
@@ -798,8 +798,8 @@ export const CompanySettings = () => {
                             <div className="settings-form-row">
                                 <div className="settings-form-group">
                                     <label><Globe size={14} className="me-2" /> City <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyCity || ''}
                                         placeholder="City"
                                         onChange={(e) => handleFormChange('companyCity', e.target.value)}
@@ -807,8 +807,8 @@ export const CompanySettings = () => {
                                 </div>
                                 <div className="settings-form-group">
                                     <label><Globe size={14} className="me-2" /> State / Province <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyState || ''}
                                         placeholder="State / Province"
                                         onChange={(e) => handleFormChange('companyState', e.target.value)}
@@ -819,8 +819,8 @@ export const CompanySettings = () => {
                             <div className="settings-form-row">
                                 <div className="settings-form-group">
                                     <label><Hash size={14} className="me-2" /> Zip / Postal Code <span className="required">*</span></label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyZipCode || ''}
                                         placeholder="Zip / Postal Code"
                                         onChange={(e) => handleFormChange('companyZipCode', e.target.value)}
@@ -853,8 +853,8 @@ export const CompanySettings = () => {
                             <div className="settings-form-row">
                                 <div className="settings-form-group">
                                     <label><Hash size={14} className="me-2" /> Tax ID / VAT Number</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyTaxId || ''}
                                         placeholder="TAX-123456"
                                         onChange={(e) => handleFormChange('companyTaxId', e.target.value)}
@@ -862,8 +862,8 @@ export const CompanySettings = () => {
                                 </div>
                                 <div className="settings-form-group">
                                     <label><FileText size={14} className="me-2" /> Registration Number</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={currentCompany.companyRegNumber || ''}
                                         placeholder="REG-789012"
                                         onChange={(e) => handleFormChange('companyRegNumber', e.target.value)}
@@ -883,13 +883,13 @@ export const CompanySettings = () => {
                                 {/* Logo Upload */}
                                 <div className="settings-form-group">
                                     <label><ImageIcon size={14} className="me-2" /> Company Logo</label>
-                                    <div 
-                                        className="image-upload-wrapper" 
-                                        style={{ 
-                                            border: '2px dashed #e2e8f0', 
-                                            borderRadius: '12px', 
-                                            padding: '20px', 
-                                            textAlign: 'center', 
+                                    <div
+                                        className="image-upload-wrapper"
+                                        style={{
+                                            border: '2px dashed #e2e8f0',
+                                            borderRadius: '12px',
+                                            padding: '20px',
+                                            textAlign: 'center',
                                             background: '#f8fafc',
                                             cursor: 'pointer',
                                             transition: 'all 0.2s',
@@ -900,20 +900,20 @@ export const CompanySettings = () => {
                                         onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                                         onClick={() => document.getElementById('logo-upload-input').click()}
                                     >
-                                        <input 
+                                        <input
                                             id="logo-upload-input"
-                                            type="file" 
+                                            type="file"
                                             accept="image/*"
                                             style={{ display: 'none' }}
                                             onChange={(e) => handleImageUpload(e, 'companyLogo')}
                                         />
-                                        
+
                                         {currentCompany.companyLogo ? (
                                             <div style={{ position: 'relative' }}>
-                                                <img 
-                                                    src={currentCompany.companyLogo} 
-                                                    alt="Logo Preview" 
-                                                    style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }} 
+                                                <img
+                                                    src={currentCompany.companyLogo}
+                                                    alt="Logo Preview"
+                                                    style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }}
                                                 />
                                                 <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleFormChange('companyLogo', ''); }}>
                                                     <X size={14} />
@@ -932,13 +932,13 @@ export const CompanySettings = () => {
                                 {/* Favicon Upload */}
                                 <div className="settings-form-group">
                                     <label><ImageIcon size={14} className="me-2" /> Company Favicon</label>
-                                    <div 
-                                        className="image-upload-wrapper" 
-                                        style={{ 
-                                            border: '2px dashed #e2e8f0', 
-                                            borderRadius: '12px', 
-                                            padding: '20px', 
-                                            textAlign: 'center', 
+                                    <div
+                                        className="image-upload-wrapper"
+                                        style={{
+                                            border: '2px dashed #e2e8f0',
+                                            borderRadius: '12px',
+                                            padding: '20px',
+                                            textAlign: 'center',
                                             background: '#f8fafc',
                                             cursor: 'pointer',
                                             transition: 'all 0.2s',
@@ -954,21 +954,21 @@ export const CompanySettings = () => {
                                         onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                                         onClick={() => document.getElementById('favicon-upload-input').click()}
                                     >
-                                        <input 
+                                        <input
                                             id="favicon-upload-input"
-                                            type="file" 
+                                            type="file"
                                             accept="image/*"
                                             style={{ display: 'none' }}
                                             onChange={(e) => handleImageUpload(e, 'companyFavicon')}
                                         />
-                                        
+
                                         {currentCompany.companyFavicon ? (
                                             <div style={{ position: 'relative' }}>
                                                 <div style={{ width: '64px', height: '64px', background: '#fff', borderRadius: '12px', padding: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9' }}>
-                                                    <img 
-                                                        src={currentCompany.companyFavicon} 
-                                                        alt="Favicon Preview" 
-                                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                                    <img
+                                                        src={currentCompany.companyFavicon}
+                                                        alt="Favicon Preview"
+                                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                                     />
                                                 </div>
                                                 <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleFormChange('companyFavicon', ''); }}>
@@ -988,8 +988,8 @@ export const CompanySettings = () => {
                         </div>
                         <div className="modal-footer" style={{ padding: '20px 24px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: '12px', position: 'sticky', bottom: 0, backgroundColor: '#fff' }}>
                             <button className="btn-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                            <button 
-                                className="btn-save" 
+                            <button
+                                className="btn-save"
                                 onClick={handleSaveCompany}
                                 disabled={saving}
                             >
@@ -1064,8 +1064,8 @@ export const Localization = () => {
                     </div>
                 </div>
                 <div className="settings-actions">
-                    <button 
-                        className="btn-save" 
+                    <button
+                        className="btn-save"
                         onClick={() => saveSettings(['timezone', 'dateFormat', 'timeFormat', 'financialYearStart'])}
                         disabled={saving}
                     >
@@ -1091,8 +1091,8 @@ export const Prefixes = () => {
                 <div className="settings-form-row">
                     <div className="settings-form-group">
                         <label>Product Prefix</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={settings.productPrefix || ''}
                             placeholder="PROD-"
                             onChange={(e) => handleChange('productPrefix', e.target.value)}
@@ -1100,8 +1100,8 @@ export const Prefixes = () => {
                     </div>
                     <div className="settings-form-group">
                         <label>Purchase Prefix</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={settings.purchasePrefix || ''}
                             placeholder="PUR-"
                             onChange={(e) => handleChange('purchasePrefix', e.target.value)}
@@ -1111,8 +1111,8 @@ export const Prefixes = () => {
                 <div className="settings-form-row">
                     <div className="settings-form-group">
                         <label>Sale Prefix</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={settings.salePrefix || ''}
                             placeholder="SALE-"
                             onChange={(e) => handleChange('salePrefix', e.target.value)}
@@ -1120,8 +1120,8 @@ export const Prefixes = () => {
                     </div>
                     <div className="settings-form-group">
                         <label>Expense Prefix</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={settings.expensePrefix || ''}
                             placeholder="EXP-"
                             onChange={(e) => handleChange('expensePrefix', e.target.value)}
@@ -1129,8 +1129,8 @@ export const Prefixes = () => {
                     </div>
                 </div>
                 <div className="settings-actions">
-                    <button 
-                        className="btn-save" 
+                    <button
+                        className="btn-save"
                         onClick={() => saveSettings(['productPrefix', 'purchasePrefix', 'salePrefix', 'expensePrefix'])}
                         disabled={saving}
                     >
@@ -1160,8 +1160,8 @@ export const Preference = () => {
                     </div>
                     <div className="security-item-action">
                         <label className="toggle-switch">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 checked={settings.maintenanceMode === 'true'}
                                 onChange={(e) => handleChange('maintenanceMode', e.target.checked ? 'true' : 'false')}
                             />
@@ -1176,8 +1176,8 @@ export const Preference = () => {
                     </div>
                     <div className="security-item-action">
                         <label className="toggle-switch">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 checked={settings.enableRegistration !== 'false'}
                                 onChange={(e) => handleChange('enableRegistration', e.target.checked ? 'true' : 'false')}
                             />
@@ -1186,8 +1186,8 @@ export const Preference = () => {
                     </div>
                 </div>
                 <div className="settings-actions">
-                    <button 
-                        className="btn-save" 
+                    <button
+                        className="btn-save"
                         onClick={() => saveSettings(['maintenanceMode', 'enableRegistration'])}
                         disabled={saving}
                     >
@@ -1223,15 +1223,15 @@ export const Appearance = () => {
                 </div>
                 <div className="settings-form-group">
                     <label>Primary Color</label>
-                    <input 
-                        type="color" 
+                    <input
+                        type="color"
                         value={settings.primaryColor || '#ff9f43'}
                         onChange={(e) => handleChange('primaryColor', e.target.value)}
                     />
                 </div>
                 <div className="settings-actions">
-                    <button 
-                        className="btn-save" 
+                    <button
+                        className="btn-save"
                         onClick={() => saveSettings(['themeLayout', 'primaryColor'])}
                         disabled={saving}
                     >
@@ -1261,8 +1261,8 @@ export const SocialAuthentication = () => {
                     </div>
                     <div className="security-item-action">
                         <label className="toggle-switch">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 checked={settings.enableGoogleLogin !== 'false'}
                                 onChange={(e) => handleChange('enableGoogleLogin', e.target.checked ? 'true' : 'false')}
                             />
@@ -1277,8 +1277,8 @@ export const SocialAuthentication = () => {
                     </div>
                     <div className="security-item-action">
                         <label className="toggle-switch">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 checked={settings.enableFacebookLogin === 'true'}
                                 onChange={(e) => handleChange('enableFacebookLogin', e.target.checked ? 'true' : 'false')}
                             />
@@ -1287,8 +1287,8 @@ export const SocialAuthentication = () => {
                     </div>
                 </div>
                 <div className="settings-actions">
-                    <button 
-                        className="btn-save" 
+                    <button
+                        className="btn-save"
                         onClick={() => saveSettings(['enableGoogleLogin', 'enableFacebookLogin'])}
                         disabled={saving}
                     >
@@ -1325,8 +1325,8 @@ export const Language = () => {
                     </select>
                 </div>
                 <div className="settings-actions">
-                    <button 
-                        className="btn-save" 
+                    <button
+                        className="btn-save"
                         onClick={() => saveSettings(['defaultLanguage'])}
                         disabled={saving}
                     >
