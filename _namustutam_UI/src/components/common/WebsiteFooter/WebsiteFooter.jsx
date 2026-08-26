@@ -27,8 +27,8 @@ const WebsiteFooter = () => {
                             
                             <div className="company-info-box">
                                 <div className="company-info-header">
-                                    <span className="flag-icon">🇮🇳</span> <strong>Namustutam</strong> 
-                                    <span className="verified-badge">Verified IT Agency</span>
+                                     <strong>Namustutam</strong> 
+                                    {/* <span className="verified-badge">Verified IT Agency</span> */}
                                 </div>
                                 <div className="company-info-item">
                                     <FaMapMarkerAlt className="info-icon" />

@@ -31,14 +31,13 @@ const ChatBot = () => {
         setIsLoading(true);
 
         try {
-            // Split the fallback key to avoid IDE Secret Scanner warnings while keeping deployment working
-            const fallbackKey = "gsk_" + "rmAFt0PVHgLwIxsWr4suWGdyb3FYSSIoY2Y3FxctTD6kun7VV7tW";
-            const apiKey = import.meta.env.VITE_GEMINI_API_KEY?.trim() || fallbackKey;
-            
+            // Use the provided API key directly
+            const apiKey = "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";
+
             if (!apiKey || apiKey === 'YOUR_FREE_GEMINI_API_KEY_HERE') {
-                setMessages(prev => [...prev, { 
-                    id: Date.now(), 
-                    text: "API Key is missing! Please add your free Gemini or Groq API key in the .env file.", 
+                setMessages(prev => [...prev, {
+                    id: Date.now(),
+                    text: "API Key is missing! Please add your free Gemini or Groq API key in the .env file.",
                     sender: 'bot',
                     isError: true
                 }]);
@@ -64,7 +63,7 @@ const ChatBot = () => {
                 const response = await axios.post(
                     '/api/groq/openai/v1/chat/completions',
                     {
-                        model: "llama-3.1-8b-instant",
+                        model: "groq/compound",
                         messages: groqMessages
                     },
                     {
@@ -110,25 +109,25 @@ const ChatBot = () => {
                 );
                 botReplyText = response.data.candidates[0].content.parts[0].text;
             }
-            
-            setMessages(prev => [...prev, { 
-                id: Date.now(), 
-                text: botReplyText, 
-                sender: 'bot' 
+
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                text: botReplyText,
+                sender: 'bot'
             }]);
 
         } catch (error) {
             console.error("Error communicating with AI API:", error);
-            
+
             // Extract meaningful error message
             let errMsg = error.message || "Unknown network error";
             if (error.response) {
                 errMsg = error.response.data?.error?.message || `HTTP ${error.response.status}: ${error.response.statusText}`;
             }
 
-            setMessages(prev => [...prev, { 
-                id: Date.now(), 
-                text: `Error connecting to AI: ${errMsg}. Please check your API key or network.`, 
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                text: `Error connecting to AI: ${errMsg}. Please check your API key or network.`,
                 sender: 'bot',
                 isError: true
             }]);
@@ -139,7 +138,7 @@ const ChatBot = () => {
 
     const renderTextWithLinks = (text) => {
         if (!text) return null;
-        
+
         // 1. Split by ### Headers
         const headerRegex = /(###\s+[^\n]+)/g;
         const headerParts = text.split(headerRegex);
@@ -156,14 +155,14 @@ const ChatBot = () => {
             // 2. Split by URL
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             const urlParts = headerPart.split(urlRegex);
-            
+
             return urlParts.map((part, i) => {
                 if (part.match(urlRegex)) {
                     return (
-                        <a 
-                            key={`u-${h}-${i}`} 
-                            href={part} 
-                            target="_blank" 
+                        <a
+                            key={`u-${h}-${i}`}
+                            href={part}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="chat-link"
                         >
@@ -171,16 +170,16 @@ const ChatBot = () => {
                         </a>
                     );
                 }
-                
+
                 // 3. Parse **bold** text
                 const boldRegex = /\*\*(.*?)\*\*/g;
                 const boldParts = part.split(boldRegex);
-                
+
                 return boldParts.map((subPart, j) => {
                     if (j % 2 === 1) {
                         return <strong key={`b-${h}-${i}-${j}`} className="chat-bold">{subPart}</strong>;
                     }
-                    return subPart; 
+                    return subPart;
                 });
             });
         });
@@ -189,7 +188,7 @@ const ChatBot = () => {
     return (
         <div className="chatbot-wrapper">
             {/* Chatbot Toggle Button */}
-            <button 
+            <button
                 className={`chatbot-toggle ${isOpen ? 'active' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Toggle Chatbot"
@@ -218,7 +217,7 @@ const ChatBot = () => {
                     {messages.map((msg) => {
                         let thinkingText = null;
                         let mainText = msg.text;
-                        
+
                         if (msg.sender === 'bot') {
                             const thinkMatch = mainText.match(/<think>([\s\S]*?)<\/think>/i);
                             if (thinkMatch) {

@@ -66,7 +66,7 @@ export default function Login() {
     return (
         <div className="login-v2-container">
             <div className="login-v2-mouse-glow"></div>
-            
+
             {/* Left Panel: Form */}
             <div className="login-v2-left">
                 <div className="login-v2-form-wrapper">
@@ -92,7 +92,7 @@ export default function Login() {
                         </div>
                     )}
 
-                    <form onSubmit={handleLogin} className="login-v2-form">
+                    {/* <form onSubmit={handleLogin} className="login-v2-form">
                         <div className="input-v2-group">
                             <label>Email Address</label>
                             <div className="input-v2-wrapper">
@@ -150,7 +150,7 @@ export default function Login() {
 
                     <div className="divider-v2">
                         <span>Or continue with</span>
-                    </div>
+                    </div> */}
 
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', marginBottom: '1.5rem' }}>
                         <GoogleLogin
@@ -162,7 +162,7 @@ export default function Login() {
                             shape="rectangular"
                         />
                     </div>
-                    
+
                     <p className="login-v2-footer">© 2026 Namustute Inc. All rights reserved.</p>
                 </div>
             </div>
@@ -201,7 +201,7 @@ export default function Login() {
 
                 <div className="right-v2-content">
                     <div className="right-v2-badge">v2.0 Beta</div>
-                    <h2>Powering Modern<br/>Businesses</h2>
+                    <h2>Powering Modern<br />Businesses</h2>
                     <p>Join thousands of forward-thinking companies using Namustute to scale their operations, manage resources, and drive unprecedented growth.</p>
 
                 </div>
