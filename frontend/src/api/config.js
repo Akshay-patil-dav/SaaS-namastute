@@ -5,7 +5,7 @@
  * files here. Pages/components should import from this file, NOT use
  * import.meta.env directly.
  *
- * Local dev  →  frontend/.env           →  points to http://localhost:3000
+ * Local dev  →  frontend/.env           →  points to https://namustutamsaas.onrender.com
  * Production →  frontend/.env.production →  points to https://springboot-app-pb1v.onrender.com
  *               (or override via Vercel Dashboard → Settings → Environment Variables)
  *
@@ -21,11 +21,11 @@ const isProduction = import.meta.env.PROD === true;
 
 const DEFAULT_API_BASE_URL = isProduction
   ? 'https://springboot-app-pb1v.onrender.com/api'
-  : 'http://localhost:3000/api';
+  : 'https://namustutamsaas.onrender.com/api';
 
 const DEFAULT_BACKEND_BASE_URL = isProduction
   ? 'https://springboot-app-pb1v.onrender.com'
-  : 'http://localhost:3000';
+  : 'https://namustutamsaas.onrender.com';
 
 const DEFAULT_FRONTEND_URL = isProduction
   ? 'https://saa-s-namustutam.vercel.app'
@@ -33,10 +33,10 @@ const DEFAULT_FRONTEND_URL = isProduction
 
 // ── Raw env values ─────────────────────────────────────────────────────────
 export const ENV = {
-  /** e.g.  http://localhost:3000/api   or   https://springboot-app-pb1v.onrender.com/api */
+  /** e.g.  https://namustutamsaas.onrender.com/api   or   https://springboot-app-pb1v.onrender.com/api */
   API_BASE_URL:     import.meta.env.VITE_API_BASE_URL     || DEFAULT_API_BASE_URL,
 
-  /** e.g.  http://localhost:3000  (no trailing slash) */
+  /** e.g.  https://namustutamsaas.onrender.com  (no trailing slash) */
   BACKEND_BASE_URL: import.meta.env.VITE_BACKEND_BASE_URL || DEFAULT_BACKEND_BASE_URL,
 
   /** e.g.  https://saa-s-namustutam.vercel.app  or  http://localhost:5173 */

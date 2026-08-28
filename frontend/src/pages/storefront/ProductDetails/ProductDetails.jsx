@@ -19,7 +19,7 @@ const ProductDetails = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:3000/api/products/${id}`)
+        axios.get(`https://namustutamsaas.onrender.com/api/products/${id}`)
             .then(response => {
                 setProduct(response.data);
                 setLoading(false);
