@@ -45,7 +45,7 @@ If a user asks for examples of our work, share these specific projects:
 When users ask for ways to contact us or reach out for support, provide these details:
 * **Email**: namustutam@gmail.com
 * **WhatsApp / Phone**: +91 82375 12742
-* **Address**: Remote / Global Agency (HQ in India)
+* **Address**: Remote / Global Freelancer (HQ in India)
 * **Availability**: 24/7 Support
 
 ## 8. Internal Navigation & Links

@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { NavLogo } from '../WebsiteNavbar/WebsiteNavbar';
-import { 
+import {
     FaTwitter, FaGithub, FaDiscord, FaInstagram, FaLinkedinIn,
-    FaMapMarkerAlt, FaEnvelope, FaRegClock, FaLock, FaShieldAlt, 
+    FaMapMarkerAlt, FaEnvelope, FaRegClock, FaLock, FaShieldAlt,
     FaRegCreditCard, FaCode, FaTrophy, FaHandshake
 } from 'react-icons/fa';
 import './WebsiteFooter.css';
@@ -16,7 +16,7 @@ const WebsiteFooter = () => {
                     <div className="footer-watermark">namustutam</div>
 
                     <div className="premium-footer-grid">
-                        
+
                         <div className="premium-footer-brand">
                             <div className="logo" style={{ marginBottom: '16px' }}>
                                 <NavLogo />
@@ -24,15 +24,15 @@ const WebsiteFooter = () => {
                             <p className="brand-description">
                                 Namustutam empowers businesses to scale and innovate with premium Web Development, SaaS Applications, AI Automation, and cutting-edge UI/UX Design tailored to your specific needs.
                             </p>
-                            
+
                             <div className="company-info-box">
                                 <div className="company-info-header">
-                                     <strong>Namustutam</strong> 
+                                    <strong>Namustutam</strong>
                                     {/* <span className="verified-badge">Verified IT Agency</span> */}
                                 </div>
                                 <div className="company-info-item">
                                     <FaMapMarkerAlt className="info-icon" />
-                                    <span>Remote / Global Agency</span>
+                                    <span>Remote / Global Freelancer</span>
                                 </div>
                                 <div className="company-info-item">
                                     <FaEnvelope className="info-icon" />
