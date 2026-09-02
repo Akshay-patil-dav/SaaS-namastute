@@ -90,13 +90,15 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
+        // authenticate() internally calls UserDetailsServiceImpl.loadUserByUsername()
+        // which already fetches the User from DB — so we extract it from the principal
+        // directly rather than issuing a second findByEmail() query.
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        User user = userDetails.getUser();
 
-        UserDetailsImpl userDetails = new UserDetailsImpl(user);
         String token = jwtUtil.generateToken(userDetails);
 
         List<String> roles = user.getRoles().stream()
@@ -125,9 +127,14 @@ public class AuthService {
 
                 User user = userRepository.findByEmail(email).orElse(null);
                 if (user == null) {
+                    // Generate a cryptographically unique random password for OAuth users.
+                    // Each call to UUID.randomUUID() uses SecureRandom internally, so every
+                    // user gets a distinct random value. BCrypt then adds its own random salt
+                    // on top, guaranteeing the stored hash is unique in the DB as well.
+                    String uniqueRawPassword = UUID.randomUUID().toString() + "-" + UUID.randomUUID().toString();
                     user = new User(
                             email,
-                            passwordEncoder.encode(UUID.randomUUID().toString()),
+                            passwordEncoder.encode(uniqueRawPassword),
                             name);
                     user.setEmailVerified(true);
 
