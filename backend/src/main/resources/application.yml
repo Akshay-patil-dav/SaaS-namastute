@@ -4,15 +4,15 @@ spring:
 
   datasource:
     # Read from Render environment variables
-    # url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/namustute_db_pos}
-    # username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    # password: ${SPRING_DATASOURCE_PASSWORD:root}
-    # driver-class-name: org.postgresql.Driver
-
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-da8mbgid0e5s7393gvug-a.oregon-postgres.render.com:5432/namustute_db_pos?sslmode=require}
-    username: ${SPRING_DATASOURCE_USERNAME:namustute_db_pos_user}
-    password: ${SPRING_DATASOURCE_PASSWORD:e3JfUQ88vrWLNALrwa7bzvpsaO9nc389}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/namustute_db_pos}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
+
+    # url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-da8mbgid0e5s7393gvug-a.oregon-postgres.render.com:5432/namustute_db_pos?sslmode=require}
+    # username: ${SPRING_DATASOURCE_USERNAME:namustute_db_pos_user}
+    # password: ${SPRING_DATASOURCE_PASSWORD:e3JfUQ88vrWLNALrwa7bzvpsaO9nc389}
+    # driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -57,16 +57,16 @@ spring:
 server:
   port: 3000
 
-# app:
-#   base-url: ${APP_BASE_URL:http://localhost:3000}
-#   frontend-url: ${FRONTEND_URL:http://localhost:5173}
-#   cors-extra-origins: ${CORS_EXTRA_ORIGINS:}
-
-
 app:
-  base-url: ${APP_BASE_URL:https://namustutamsaas.onrender.com/}
-  frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
+  base-url: ${APP_BASE_URL:http://localhost:3000}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
   cors-extra-origins: ${CORS_EXTRA_ORIGINS:}
+
+
+# app:
+#   base-url: ${APP_BASE_URL:https://namustutamsaas.onrender.com/}
+#   frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
+#   cors-extra-origins: ${CORS_EXTRA_ORIGINS:}
 
 
 jwt:

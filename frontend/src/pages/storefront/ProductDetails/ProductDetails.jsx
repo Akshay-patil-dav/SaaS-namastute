@@ -12,14 +12,14 @@ const ProductDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const addToCart = useCartStore(state => state.addToCart);
-    
+
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`https://namustutamsaas.onrender.com/api/products/${id}`)
+        axios.get(`http://localhost:3000/api/products/${id}`)
             .then(response => {
                 setProduct(response.data);
                 setLoading(false);
@@ -72,8 +72,8 @@ const ProductDetails = () => {
         <div className="product-details-page">
             <div className="product-details-container">
                 <div className="breadcrumb">
-                    <Link to="/"><ArrowLeft size={16}/> Back</Link> / 
-                    <Link to="/shop">Shop</Link> / 
+                    <Link to="/"><ArrowLeft size={16} /> Back</Link> /
+                    <Link to="/shop">Shop</Link> /
                     <span>{product.name}</span>
                 </div>
 
@@ -97,14 +97,14 @@ const ProductDetails = () => {
                     <div className="product-info-section">
                         <span className="product-category-badge">{product.category}</span>
                         <h1 className="product-title">{product.name}</h1>
-                        
+
                         <div className="product-rating-row">
                             <div className="stars">
                                 {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star 
-                                        key={star} 
-                                        size={18} 
-                                        className={`star-icon ${star <= Math.round(product.rating) ? 'filled' : ''}`} 
+                                    <Star
+                                        key={star}
+                                        size={18}
+                                        className={`star-icon ${star <= Math.round(product.rating) ? 'filled' : ''}`}
                                     />
                                 ))}
                             </div>
@@ -123,9 +123,9 @@ const ProductDetails = () => {
                             <div className="quantity-selector">
                                 <label>Quantity</label>
                                 <div className="qty-controls">
-                                    <button onClick={() => handleQuantityChange('dec')}><Minus size={16}/></button>
+                                    <button onClick={() => handleQuantityChange('dec')}><Minus size={16} /></button>
                                     <span>{quantity}</span>
-                                    <button onClick={() => handleQuantityChange('inc')}><Plus size={16}/></button>
+                                    <button onClick={() => handleQuantityChange('inc')}><Plus size={16} /></button>
                                 </div>
                             </div>
 

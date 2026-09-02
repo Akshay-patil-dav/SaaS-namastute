@@ -1,38 +1,43 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Primary Meta -->
-    <title>Namustutam POS — Retail SaaS Platform</title>
-    <meta name="description" content="Namustutam POS is a powerful all-in-one retail SaaS platform for inventory management, point of sale, purchase tracking, and sales analytics." />
-    <meta name="keywords" content="Namustutam POS, retail POS, inventory management, point of sale, SaaS, retail software, India" />
-    <meta name="author" content="Namustutam" />
-    <meta name="theme-color" content="#0f172a" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://saa-s-namustutam.vercel.app/" />
-    <meta property="og:title" content="Namustutam POS — Retail SaaS Platform" />
-    <meta property="og:description" content="All-in-one retail management: POS, inventory, purchases, and sales analytics — built for modern businesses." />
-    <meta property="og:image" content="/hero_retail_saas.png" />
+  <!-- Primary Meta -->
+  <title>Namustutam POS — Retail SaaS Platform</title>
+  <meta name="description"
+    content="Namustutam POS is a powerful all-in-one retail SaaS platform for inventory management, point of sale, purchase tracking, and sales analytics." />
+  <meta name="keywords"
+    content="Namustutam POS, retail POS, inventory management, point of sale, SaaS, retail software, India" />
+  <meta name="author" content="Namustutam" />
+  <meta name="theme-color" content="#0f172a" />
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Namustutam POS — Retail SaaS Platform" />
-    <meta name="twitter:description" content="All-in-one retail management: POS, inventory, purchases, and sales analytics." />
-    <meta name="twitter:image" content="/hero_retail_saas.png" />
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://saa-s-namustutam.vercel.app/" />
+  <meta property="og:title" content="Namustutam POS — Retail SaaS Platform" />
+  <meta property="og:description"
+    content="All-in-one retail management: POS, inventory, purchases, and sales analytics — built for modern businesses." />
+  <meta property="og:image" content="/hero_retail_saas.png" />
 
-    <!-- Performance: DNS prefetch & preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://namustutamsaas.onrender.com" />
-    <link rel="dns-prefetch" href="https://namustutamsaas.onrender.com" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Namustutam POS — Retail SaaS Platform" />
+  <meta name="twitter:description"
+    content="All-in-one retail management: POS, inventory, purchases, and sales analytics." />
+  <meta name="twitter:image" content="/hero_retail_saas.png" />
+
+  <!-- Performance: DNS prefetch & preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="http://localhost:3000" />
+  <link rel="dns-prefetch" href="http://localhost:3000" />
   <style>
     /* ===== BRAND THEME TOKENS ===== */
     /* Primary : #ff902f  (Namustutam orange)                    */
@@ -67,7 +72,7 @@
       width: 420px;
       height: 420px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,144,47,0.10) 0%, rgba(255,144,47,0.04) 50%, transparent 70%);
+      background: radial-gradient(circle, rgba(255, 144, 47, 0.10) 0%, rgba(255, 144, 47, 0.04) 50%, transparent 70%);
       animation: pulse-glow 2.4s ease-in-out infinite;
     }
 
@@ -78,19 +83,39 @@
       width: 260px;
       height: 260px;
       border-radius: 50%;
-      border: 1.5px solid rgba(255,144,47,0.14);
+      border: 1.5px solid rgba(255, 144, 47, 0.14);
       animation: ring-expand 2.4s ease-in-out infinite 0.6s;
     }
 
     @keyframes pulse-glow {
-      0%, 100% { transform: scale(1);    opacity: 0.8; }
-      50%       { transform: scale(1.18); opacity: 1;   }
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+
+      50% {
+        transform: scale(1.18);
+        opacity: 1;
+      }
     }
 
     @keyframes ring-expand {
-      0%   { transform: scale(0.85); opacity: 0.7; }
-      50%  { transform: scale(1.15); opacity: 0.2; }
-      100% { transform: scale(0.85); opacity: 0.7; }
+      0% {
+        transform: scale(0.85);
+        opacity: 0.7;
+      }
+
+      50% {
+        transform: scale(1.15);
+        opacity: 0.2;
+      }
+
+      100% {
+        transform: scale(0.85);
+        opacity: 0.7;
+      }
     }
 
     /* ---- Logo bounce ---- */
@@ -110,13 +135,17 @@
       object-fit: contain;
       animation: logo-bounce 0.85s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite alternate;
       /* Softer orange glow on white — no dark shadow */
-      filter: drop-shadow(0 0 18px rgba(255,144,47,0.45))
-              drop-shadow(0 6px 16px rgba(255,144,47,0.18));
+      filter: drop-shadow(0 0 18px rgba(255, 144, 47, 0.45)) drop-shadow(0 6px 16px rgba(255, 144, 47, 0.18));
     }
 
     @keyframes logo-bounce {
-      0%   { transform: translateY(0px)   scale(1);    }
-      100% { transform: translateY(-22px) scale(1.07); }
+      0% {
+        transform: translateY(0px) scale(1);
+      }
+
+      100% {
+        transform: translateY(-22px) scale(1.07);
+      }
     }
 
     /* Shadow under logo — orange on light bg */
@@ -124,14 +153,21 @@
       width: 60px;
       height: 10px;
       border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(255,144,47,0.30) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(255, 144, 47, 0.30) 0%, transparent 70%);
       margin-top: 6px;
       animation: shadow-squish 0.85s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite alternate;
     }
 
     @keyframes shadow-squish {
-      0%   { transform: scaleX(1)    scaleY(1);   opacity: 0.6; }
-      100% { transform: scaleX(0.5) scaleY(0.4); opacity: 0.15; }
+      0% {
+        transform: scaleX(1) scaleY(1);
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: scaleX(0.5) scaleY(0.4);
+        opacity: 0.15;
+      }
     }
 
     /* ---- Brand name — dark navy text with orange shimmer ---- */
@@ -151,8 +187,13 @@
     }
 
     @keyframes shimmer-text {
-      0%   { background-position: 0%   center; }
-      100% { background-position: 280% center; }
+      0% {
+        background-position: 0% center;
+      }
+
+      100% {
+        background-position: 280% center;
+      }
     }
 
     /* ---- Loading bar — orange on light gray track ---- */
@@ -175,14 +216,27 @@
     }
 
     @keyframes bar-slide {
-      0%   { transform: translateX(-100%); }
-      50%  { transform: translateX(0%);    }
-      100% { transform: translateX(100%);  }
+      0% {
+        transform: translateX(-100%);
+      }
+
+      50% {
+        transform: translateX(0%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
     }
 
     @keyframes shimmer-bar {
-      0%   { background-position: 0%   center; }
-      100% { background-position: 250% center; }
+      0% {
+        background-position: 0% center;
+      }
+
+      100% {
+        background-position: 250% center;
+      }
     }
 
     /* ---- Loading text + dots — muted slate on white ---- */
@@ -205,66 +259,84 @@
       animation: dot-blink 1.4s ease-in-out infinite;
       color: #ff902f;
     }
-    .loader-dot:nth-child(2) { animation-delay: 0.2s; }
-    .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    .loader-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loader-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
 
     @keyframes dot-blink {
-      0%, 80%, 100% { opacity: 0.25; transform: translateY(0);   }
-      40%           { opacity: 1;    transform: translateY(-4px); }
+
+      0%,
+      80%,
+      100% {
+        opacity: 0.25;
+        transform: translateY(0);
+      }
+
+      40% {
+        opacity: 1;
+        transform: translateY(-4px);
+      }
     }
   </style>
-  </head>
-  <body>
-    <!-- ===== LOADING SCREEN ===== -->
-    <div id="app-loader">
-      <div class="loader-logo-wrap">
-        <img class="loader-logo" src="/logo.png" alt="Namustutam Logo" />
-        <div class="loader-shadow"></div>
-      </div>
-      <div class="loader-brand">Namustutam</div>
-      <div class="loader-bar-track">
-        <div class="loader-bar-fill"></div>
-      </div>
-      <div class="loader-text">
-        Loading
-        <span class="loader-dot">.</span>
-        <span class="loader-dot">.</span>
-        <span class="loader-dot">.</span>
-      </div>
+</head>
+
+<body>
+  <!-- ===== LOADING SCREEN ===== -->
+  <div id="app-loader">
+    <div class="loader-logo-wrap">
+      <img class="loader-logo" src="/logo.png" alt="Namustutam Logo" />
+      <div class="loader-shadow"></div>
     </div>
+    <div class="loader-brand">Namustutam</div>
+    <div class="loader-bar-track">
+      <div class="loader-bar-fill"></div>
+    </div>
+    <div class="loader-text">
+      Loading
+      <span class="loader-dot">.</span>
+      <span class="loader-dot">.</span>
+      <span class="loader-dot">.</span>
+    </div>
+  </div>
 
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 
-    <script>
-      // Hide loader once React has mounted
-      (function () {
-        var loader = document.getElementById('app-loader');
-        var root   = document.getElementById('root');
+  <script>
+    // Hide loader once React has mounted
+    (function () {
+      var loader = document.getElementById('app-loader');
+      var root = document.getElementById('root');
 
-        // Observer: detect when React injects content into #root
-        var observer = new MutationObserver(function () {
-          if (root.children.length > 0) {
-            observer.disconnect();
-            // Small delay so the first frame is painted
+      // Observer: detect when React injects content into #root
+      var observer = new MutationObserver(function () {
+        if (root.children.length > 0) {
+          observer.disconnect();
+          // Small delay so the first frame is painted
+          setTimeout(function () {
+            loader.classList.add('hidden');
+            // Remove from DOM after fade finishes
             setTimeout(function () {
-              loader.classList.add('hidden');
-              // Remove from DOM after fade finishes
-              setTimeout(function () {
-                loader.remove();
-              }, 700);
-            }, 350);
-          }
-        });
+              loader.remove();
+            }, 700);
+          }, 350);
+        }
+      });
 
-        observer.observe(root, { childList: true, subtree: false });
+      observer.observe(root, { childList: true, subtree: false });
 
-        // Fallback: hide after 6 s even if observer didn't fire
-        setTimeout(function () {
-          loader.classList.add('hidden');
-          setTimeout(function () { loader.remove(); }, 700);
-        }, 6000);
-      })();
-    </script>
-  </body>
+      // Fallback: hide after 6 s even if observer didn't fire
+      setTimeout(function () {
+        loader.classList.add('hidden');
+        setTimeout(function () { loader.remove(); }, 700);
+      }, 6000);
+    })();
+  </script>
+</body>
+
 </html>

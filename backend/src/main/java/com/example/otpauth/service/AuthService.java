@@ -36,8 +36,8 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public AuthService(UserRepository userRepository, RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                       JwtUtil jwtUtil) {
+            PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
+            JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -46,10 +46,9 @@ public class AuthService {
     }
 
     private static final java.util.Set<String> DISPOSABLE_DOMAINS = java.util.Set.of(
-            "oineprovi.com", "yopmail.com", "mailinator.com", "guerrillamail.com", 
+            "oineprovi.com", "yopmail.com", "mailinator.com", "guerrillamail.com",
             "10minutemail.com", "temp-mail.org", "throwawaymail.com", "maildrop.cc",
-            "trashmail.com", "sharklasers.com", "dispostable.com"
-    );
+            "trashmail.com", "sharklasers.com", "dispostable.com");
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -57,9 +56,10 @@ public class AuthService {
         String domain = email.substring(email.indexOf("@") + 1);
 
         if (DISPOSABLE_DOMAINS.contains(domain)) {
-            throw new RuntimeException("Disposable emails are not permitted. Please use a valid business or personal email.");
+            throw new RuntimeException(
+                    "Disposable emails are not permitted. Please use a valid business or personal email.");
         }
-        
+
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email is already registered");
         }
@@ -67,8 +67,7 @@ public class AuthService {
         User user = new User(
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
-                request.getFullName()
-        );
+                request.getFullName());
         user.setPhoneNumber(request.getPhoneNumber());
 
         Role defaultRole = roleRepository.findByName(RoleName.CLIENT).orElseGet(() -> {
@@ -84,14 +83,15 @@ public class AuthService {
         List<String> roles = user.getRoles().stream()
                 .map(r -> r.getName().name())
                 .collect(Collectors.toList());
-        String planStr = user.getPlan() != null ? user.getPlan().name() : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+        String planStr = user.getPlan() != null ? user.getPlan().name()
+                : com.example.otpauth.model.SubscriptionPlan.NONE.name();
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(),
+                user.isPhoneVerified());
     }
 
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -102,15 +102,19 @@ public class AuthService {
         List<String> roles = user.getRoles().stream()
                 .map(r -> r.getName().name())
                 .collect(Collectors.toList());
-        String planStr = user.getPlan() != null ? user.getPlan().name() : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+        String planStr = user.getPlan() != null ? user.getPlan().name()
+                : com.example.otpauth.model.SubscriptionPlan.NONE.name();
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(),
+                user.isPhoneVerified());
     }
 
     @Transactional
     public AuthResponse googleLogin(String credential) {
         try {
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                    .setAudience(Collections.singletonList("167861187519-tad34cb9ben048eb4ddfbf70h4plhj91.apps.googleusercontent.com"))
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
+                    new GsonFactory())
+                    .setAudience(Collections
+                            .singletonList("167861187519-tad34cb9ben048eb4ddfbf70h4plhj91.apps.googleusercontent.com"))
                     .build();
 
             GoogleIdToken idToken = verifier.verify(credential);
@@ -124,10 +128,9 @@ public class AuthService {
                     user = new User(
                             email,
                             passwordEncoder.encode(UUID.randomUUID().toString()),
-                            name
-                    );
+                            name);
                     user.setEmailVerified(true);
-                    
+
                     Role defaultRole = roleRepository.findByName(RoleName.CLIENT).orElseGet(() -> {
                         Role newRole = new Role(RoleName.CLIENT);
                         return roleRepository.save(newRole);
@@ -142,8 +145,10 @@ public class AuthService {
                 List<String> roles = user.getRoles().stream()
                         .map(r -> r.getName().name())
                         .collect(Collectors.toList());
-                String planStr = user.getPlan() != null ? user.getPlan().name() : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-                return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+                String planStr = user.getPlan() != null ? user.getPlan().name()
+                        : com.example.otpauth.model.SubscriptionPlan.NONE.name();
+                return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr,
+                        user.isEmailVerified(), user.isPhoneVerified());
             } else {
                 throw new RuntimeException("Invalid Google ID token.");
             }
