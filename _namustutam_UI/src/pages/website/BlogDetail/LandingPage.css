@@ -165,7 +165,33 @@
 }
 .lp-btn-primary:active { transform: translateY(0); }
 
-/* ─── HAMBURGER ──────────────────────────────────────────────────────── */
+/* ─── SOCIAL ICONS ───────────────────────────────────────────────────── */
+.lp-nav-socials {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 20px;
+}
+
+.lp-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-2);
+  background-color: transparent;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.lp-social-icon:hover {
+  color: white;
+  background-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px var(--primary-glow);
+}
 .lp-hamburger {
   display: none;
   flex-direction: column;
@@ -380,6 +406,7 @@
 @media (max-width: 1080px) {
   .lp-nav-links { display: none; }
   .lp-nav-cta { display: none; }
+  .lp-nav-socials { display: none; }
   .lp-hamburger { display: flex; }
 }
 

@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { X, Printer, Download, ArrowLeft, FileText } from 'lucide-react';
 import './invoice-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
 import { useCompany } from '../../../../context/CompanyContext';
+import apiClient from '../../../../api/config';
 function payBadgeClass(status) {
     if (status === 'Paid')    return 'inv-pay-badge inv-pay-paid';
     if (status === 'Overdue') return 'inv-pay-badge inv-pay-overdue';
@@ -29,12 +30,14 @@ function numToWords(amount) {
 }
 
 /* ── Direct UPI Scan & Pay QR Code Component ─────────────────── */
-function RealQRCode({ invoiceNo, amount, storeName = 'Namastute Store', upiId = 'namastute.pay@upi' }) {
+function RealQRCode({ invoiceNo, amount, storeName = 'Namastute Store', upiId = 'namastute.pay@upi', bankAccount = null }) {
     const numericAmount = parseFloat(amount || 0).toFixed(2);
     const cleanInvoiceNo = invoiceNo || 'INV-SALES-BILLING';
     
     // Standard UPI Payment URI recognized by GPay, PhonePe, Paytm, BHIM & All UPI Banking Apps
-    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(storeName)}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent(`Bill Payment ${cleanInvoiceNo}`)}`;
+    const upiUri = bankAccount 
+        ? `upi://pay?pa=${bankAccount.accountNumber}@${bankAccount.branchIfsc}.ifsc.npci&pn=${encodeURIComponent(storeName)}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent(`Bill Payment ${cleanInvoiceNo}`)}`
+        : `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(storeName)}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent(`Bill Payment ${cleanInvoiceNo}`)}`;
     
     const qrData = encodeURIComponent(upiUri);
     const primaryQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrData}&margin=1`;
@@ -77,6 +80,13 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
     const { currencySymbol } = useCurrency();
     const { companyInfo } = useCompany();
     const printRef = useRef(null);
+    const [bankAccounts, setBankAccounts] = useState([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            apiClient.get('/bank-accounts').then(res => setBankAccounts(res.data)).catch(console.error);
+        }
+    }, [isOpen]);
 
     if (!isOpen || !order) return null;
 
@@ -256,6 +266,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                                     invoiceNo={order.invoiceNo || order.referenceNo || `INV-${order.id}`}
                                     amount={grandTotal}
                                     storeName={companyInfo.name || order.store || 'Namastute Store'}
+                                    bankAccount={bankAccounts.length > 0 ? bankAccounts[0] : null}
                                 />
                             </div>
                         </div>
@@ -367,7 +378,16 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                             Payment Made Via <strong>bank transfer / UPI</strong> in the name of <span style={{ color: '#ff9f43', fontWeight: 600 }}>{companyInfo.name || 'Namustutam Pvt. Ltd.'}</span>
                         </div>
                         <div className="inv-footer-bank">
-                            Bank Name : HDFC Bank &nbsp;|&nbsp; Account Number : 50100XXXXXXXX &nbsp;|&nbsp; IFSC : HDFC0001234
+                            {bankAccounts.length > 0 ? (
+                                bankAccounts.map((b, idx) => (
+                                    <span key={b.id}>
+                                        {idx > 0 && <span> &nbsp;|&nbsp; </span>}
+                                        Bank Name : {b.bankName} &nbsp;|&nbsp; Account Number : {b.accountNumber} &nbsp;|&nbsp; IFSC : {b.branchIfsc}
+                                    </span>
+                                ))
+                            ) : (
+                                "Bank Name : HDFC Bank | Account Number : 50100XXXXXXXX | IFSC : HDFC0001234"
+                            )}
                         </div>
                     </div>
                 </div>

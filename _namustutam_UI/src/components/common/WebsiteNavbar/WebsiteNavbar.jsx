@@ -1,39 +1,31 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette } from 'lucide-react';
+import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette, Linkedin, Github, Instagram, Twitter } from 'lucide-react';
 import logo from '../../../assets/logo.svg';
 import '../../../pages/website/BlogDetail/LandingPage.css';
 
 
 const servicesDropdown = {
-  columns: [
-    {
-      heading: 'Development Services',
-      items: [
-        { icon: <Globe size={20} />, title: 'Web Development', desc: 'Shopify & WordPress Development', color: '#2563EB', link: '/services/web-development' },
-        { icon: <Monitor size={20} />, title: 'Web Application Development', desc: 'Single, Multiple & Business Use', color: '#8B5CF6', link: '/services/web-application-development' },
-        { icon: <Code size={20} />, title: 'Software Development', desc: 'Custom & Business requirement based', color: '#EC4899', link: '/services/software-development' },
-        { icon: <Wrench size={20} />, title: 'Custom Development', desc: 'Tailored solutions for your needs', color: '#06B6D4', link: '/services/custom-development' },
-      ],
-    },
-    {
-      heading: 'Platform & E-commerce',
-      items: [
-        { icon: <ShoppingBag size={20} />, title: 'E-commerce Platform Development', desc: 'Online stores and marketplaces', color: '#F59E0B', link: '/services/e-commerce-platform-development' },
-        { icon: <GraduationCap size={20} />, title: 'Education Platform Development', desc: 'Institute, Startup & Market Level', color: '#10B981', link: '/services/education-platform-development' },
-        { icon: <Building2 size={20} />, title: 'Business Website Development', desc: 'Static Service & Landing Sites', color: '#3B82F6', link: '/services/business-website-development' },
-        { icon: <Bot size={20} />, title: 'AI Automation', desc: 'Voice call & Chatbot automation', color: '#7C3AED', link: '/services/ai-automation' },
-      ],
-    },
-    {
-      heading: 'Design & Templates',
-      items: [
-        { icon: <FileText size={20} />, title: 'Form Development', desc: 'Event, Organization & Registration Forms', color: '#10B981', link: '/services/form-development' },
-        { icon: <FileCode size={20} />, title: 'Template Development', desc: 'Custom template creation', color: '#EF4444', link: '/services/template-development' },
-        { icon: <Palette size={20} />, title: 'Event Banner Design', desc: 'Business, Events, Rentals & Product', color: '#F97316', link: '/services/event-banner-design' },
-      ],
-    },
-  ],
+    columns: [
+        {
+            heading: 'Development Services',
+            items: [
+                { icon: <Globe size={20} />, title: 'Web Application Development', desc: 'Shopify & WordPress Development', color: '#2563EB', link: '/services/web-development' },
+                // { icon: <Monitor size={20} />, title: 'Web Application Development', desc: 'Single, Multiple & Business Use', color: '#8B5CF6', link: '/services/web-application-development' },
+                { icon: <Code size={20} />, title: 'Software Development', desc: 'Custom & Business requirement based', color: '#EC4899', link: '/services/software-development' },
+                { icon: <Wrench size={20} />, title: 'Custom Development', desc: 'Tailored solutions for your needs', color: '#06B6D4', link: '/services/custom-development' },
+            ],
+        },
+        {
+            heading: 'Platform & E-commerce',
+            items: [
+                { icon: <ShoppingBag size={20} />, title: 'E-commerce Platform Development', desc: 'Online stores and marketplaces', color: '#F59E0B', link: '/services/e-commerce-platform-development' },
+                { icon: <GraduationCap size={20} />, title: 'Education Platform Development', desc: 'Institute, Startup & Market Level', color: '#10B981', link: '/services/education-platform-development' },
+                { icon: <Building2 size={20} />, title: 'Business Website Development', desc: 'Static Service & Landing Sites', color: '#3B82F6', link: '/services/business-website-development' },
+                { icon: <Bot size={20} />, title: 'AI Automation', desc: 'Voice call & Chatbot automation', color: '#7C3AED', link: '/services/ai-automation' },
+            ],
+        }
+    ],
 };
 
 const dropdownMap = {
@@ -148,17 +140,17 @@ const WebsiteNavbar = () => {
 
                 <ul className="lp-nav-links">
                     <li><Link to="/project-works" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'inherit', textDecoration: 'none' }}><Briefcase size={16} /> Project Works</Link></li>
-                    <li 
+                    <li
                         className="lp-nav-dropdown-trigger"
                         onMouseEnter={() => handleMouseEnter('services')}
                         onMouseLeave={handleMouseLeave}
                     >
-                        <button 
+                        <button
                             ref={(el) => (linkRefs.current.services = el)}
                             className={`lp-nav-btn ${activeDropdown === 'services' ? 'active' : ''}`}
                             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
                         >
-                            <Layers size={16} /> Services
+                            <Layers size={16} /> Skill
                             <svg className={`lp-nav-chevron ${activeDropdown === 'services' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
                         </button>
                     </li>
@@ -171,6 +163,14 @@ const WebsiteNavbar = () => {
                     <li><Link to="/blog" style={{ color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}><BookOpen size={16} /> Blog</Link></li>
                     <li><Link to="/contact" style={{ color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}><Phone size={16} /> Contact</Link></li>
                 </ul>
+
+                {/* Social Icons */}
+                <div className="lp-nav-socials">
+                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Linkedin size={20} /></a>
+                    <a href="https://github.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Github size={20} /></a>
+                    <a href="https://instagram.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Instagram size={20} /></a>
+                    <a href="https://x.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Twitter size={20} /></a>
+                </div>
 
                 {showCTA && (
                     <div className="lp-nav-cta">
@@ -201,8 +201,8 @@ const WebsiteNavbar = () => {
                         >
                             <div className="lp-dropdown-caret" style={{ left: `${caretLeft}px` }} />
                             <div className="lp-dropdown-body">
-                                <div 
-                                    className="lp-dropdown-inner" 
+                                <div
+                                    className="lp-dropdown-inner"
                                     style={isWide ? {} : { left: `${caretLeft}px`, transform: 'translateX(-50%)' }}
                                 >
                                     {activeData.columns.map((col, ci) => (
@@ -247,6 +247,14 @@ const WebsiteNavbar = () => {
                         <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/register'); }}>Get Started Free</a>
                     </div>
                 )}
+                
+                {/* Mobile Social Icons */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '24px 0 10px' }}>
+                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Linkedin size={22} /></a>
+                    <a href="https://github.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Github size={22} /></a>
+                    <a href="https://instagram.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Instagram size={22} /></a>
+                    <a href="https://x.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Twitter size={22} /></a>
+                </div>
             </div>
         </>
     );

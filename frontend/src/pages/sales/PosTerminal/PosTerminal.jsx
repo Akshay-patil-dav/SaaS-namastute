@@ -55,6 +55,7 @@ export default function PosTerminal() {
     const [invoiceOpen, setInvoiceOpen] = useState(false);
     const [completedOrder, setCompletedOrder] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
+    const [bankAccounts, setBankAccounts] = useState([]);
 
     const barcodeRef = useRef(null);
 
@@ -77,6 +78,7 @@ export default function PosTerminal() {
 
     useEffect(() => {
         fetchCatalog();
+        apiClient.get(`${BASE_URL}/bank-accounts`).then(res => setBankAccounts(res.data)).catch(console.error);
     }, [fetchCatalog]);
 
     // Barcode scanner trigger
@@ -571,17 +573,38 @@ export default function PosTerminal() {
                                     </div>
                                     <div className="d-inline-block bg-white p-2 rounded border my-1">
                                         <img
-                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`upi://pay?pa=namastute.pay@upi&pn=Namastute%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`)}`}
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(bankAccounts.length > 0 ? `upi://pay?pa=${bankAccounts[0].accountNumber}@${bankAccounts[0].branchIfsc}.ifsc.npci&pn=${encodeURIComponent(user?.companyName || 'Namastute Store')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill` : `upi://pay?pa=namastute.pay@upi&pn=Namastute%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`)}`}
                                             alt="UPI Scan to Pay"
                                             style={{ width: '130px', height: '130px', objectFit: 'contain' }}
                                             onError={(e) => {
-                                                e.target.src = `https://bwipjs-api.metafloor.com/?bcid=qrcode&text=${encodeURIComponent(`upi://pay?pa=namastute.pay@upi&pn=Namastute%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`)}&scale=4`;
+                                                e.target.src = `https://bwipjs-api.metafloor.com/?bcid=qrcode&text=${encodeURIComponent(bankAccounts.length > 0 ? `upi://pay?pa=${bankAccounts[0].accountNumber}@${bankAccounts[0].branchIfsc}.ifsc.npci&pn=${encodeURIComponent(user?.companyName || 'Namastute Store')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill` : `upi://pay?pa=namastute.pay@upi&pn=Namastute%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`)}&scale=4`;
                                             }}
                                         />
                                     </div>
                                     <div className="small text-success fw-bold">
                                         Scan with GPay, PhonePe, Paytm, BHIM or any UPI app
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Bank Details Box */}
+                            {paymentMethod === 'Bank' && grandTotal > 0 && (
+                                <div className="p-3 my-2 bg-light border rounded shadow-sm text-start">
+                                    <div className="fw-bold text-dark mb-2" style={{ fontSize: '12px' }}>
+                                        🏦 Bank Transfer Details
+                                    </div>
+                                    {bankAccounts.length > 0 ? (
+                                        bankAccounts.map((b, idx) => (
+                                            <div key={b.id} className="mb-2" style={{ fontSize: '11px', color: '#4b5563' }}>
+                                                <strong>{b.bankName}</strong><br/>
+                                                Name: {b.accountName}<br/>
+                                                A/C No: {b.accountNumber}<br/>
+                                                IFSC: {b.branchIfsc}
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div style={{ fontSize: '11px', color: '#dc2626' }}>No Bank Accounts configured. Please add one in Settings.</div>
+                                    )}
                                 </div>
                             )}
 
