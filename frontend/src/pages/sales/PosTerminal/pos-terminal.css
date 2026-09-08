@@ -44,8 +44,8 @@
 
 .pos-tab-btn.active {
     background: #fff7ed;
-    color: #ff9b29;
-    border-color: #ffedd5;
+    color: var(--primary-color);
+    border-color: var(--primary-light);
     box-shadow: 0 1px 2px rgba(255, 155, 41, 0.1);
 }
 
@@ -116,7 +116,7 @@
 }
 
 .pos-search-input-wrap input:focus {
-    border-color: #ff9b29;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.15);
 }
 
@@ -159,9 +159,9 @@
 }
 
 .pos-cat-pill.active {
-    background: #ff9b29;
+    background: var(--primary-color);
     color: #ffffff;
-    border-color: #ff9b29;
+    border-color: var(--primary-color);
     box-shadow: 0 2px 4px rgba(255, 155, 41, 0.25);
 }
 
@@ -189,12 +189,12 @@
 
 .pos-prod-card:hover {
     transform: translateY(-2px);
-    border-color: #ff9b29;
+    border-color: var(--primary-color);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .pos-prod-card.in-cart {
-    border-color: #ff9b29;
+    border-color: var(--primary-color);
     background: #fffdfa;
 }
 
@@ -250,7 +250,7 @@
 .pos-prod-price {
     font-size: 14px;
     font-weight: 700;
-    color: #ff9b29;
+    color: var(--primary-color);
 }
 
 .pos-prod-stock {
@@ -274,7 +274,7 @@
     position: absolute;
     top: 8px;
     right: 8px;
-    background: #ff9b29;
+    background: var(--primary-color);
     color: #ffffff;
     font-size: 11px;
     font-weight: 700;
@@ -378,7 +378,7 @@
 }
 
 .pos-qty-btn:hover {
-    background: #ff9b29;
+    background: var(--primary-color);
     color: #ffffff;
 }
 
@@ -464,14 +464,14 @@
 }
 
 .pos-pay-btn:hover {
-    border-color: #ff9b29;
-    color: #ff9b29;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .pos-pay-btn.selected {
-    background: #ff9b29;
+    background: var(--primary-color);
     color: #ffffff;
-    border-color: #ff9b29;
+    border-color: var(--primary-color);
     box-shadow: 0 2px 6px rgba(255, 155, 41, 0.3);
 }
 
@@ -502,7 +502,7 @@
 .pos-checkout-btn {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #ff9b29 0%, #ff8000 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, #ff8000 100%);
     color: #ffffff;
     border: none;
     border-radius: 10px;

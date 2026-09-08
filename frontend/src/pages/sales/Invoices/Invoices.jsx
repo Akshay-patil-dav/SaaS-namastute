@@ -3,6 +3,7 @@ import apiClient, { ENV } from '@/api/config';
 import InvoiceModal from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
 import AddSalesModal from '../../../components/modals/sales/AddSalesModal/AddSalesModal';
 import { useCurrency } from '../../../hooks/useCurrency';
+import { useSettings } from '../../../hooks/useSettings';
 import {
     FileText,
     Search,
@@ -27,6 +28,9 @@ import './Invoices.css';
 
 export default function Invoices() {
     const { currencySymbol } = useCurrency();
+    const { settings } = useSettings();
+    const prefix = settings?.invoicePrefix || 'INV-';
+    
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
@@ -60,7 +64,7 @@ export default function Invoices() {
             const posOrders = (posRes.data || []).map(order => ({
                 ...order,
                 invoiceType: 'POS',
-                invoiceNo: order.invoiceNo || `INV-POS-${order.id}`,
+                invoiceNo: order.invoiceNo || `${prefix}POS-${order.id}`,
                 formattedDate: order.orderDate || order.createdAt || new Date().toISOString(),
                 customerName: order.customerName || order.customer?.name || 'Walk-in Customer',
                 grandTotalNum: parseFloat(order.grandTotal || order.totalAmount || 0),
@@ -70,7 +74,7 @@ export default function Invoices() {
             const onlineOrders = (onlineRes.data || []).map(order => ({
                 ...order,
                 invoiceType: 'ONLINE',
-                invoiceNo: order.orderId ? `INV-${order.orderId}` : `INV-SLS-${order.id}`,
+                invoiceNo: order.orderId ? `${prefix}${order.orderId}` : `${prefix}SLS-${order.id}`,
                 formattedDate: order.orderDate || order.createdAt || new Date().toISOString(),
                 customerName: order.customerName || order.customer?.name || 'Online Customer',
                 grandTotalNum: parseFloat(order.grandTotal || order.totalAmount || 0),
@@ -450,7 +454,7 @@ export default function Invoices() {
                             setSelectedOrder({
                                 ...newOrder,
                                 invoiceType: 'ONLINE',
-                                invoiceNo: newOrder.orderId ? `INV-${newOrder.orderId}` : `INV-SLS-${newOrder.id}`,
+                                invoiceNo: newOrder.orderId ? `${prefix}${newOrder.orderId}` : `${prefix}SLS-${newOrder.id}`,
                                 formattedDate: newOrder.orderDate || newOrder.createdAt || new Date().toISOString(),
                                 customerName: newOrder.customerName || 'Customer',
                                 grandTotalNum: parseFloat(newOrder.grandTotal || newOrder.totalAmount || 0),

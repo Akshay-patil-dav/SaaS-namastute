@@ -3,6 +3,7 @@ import { X, Printer, Download, ArrowLeft, FileText } from 'lucide-react';
 import './invoice-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
 import { useCompany } from '../../../../context/CompanyContext';
+import { useSettings } from '../../../../hooks/useSettings';
 import apiClient from '../../../../api/config';
 function payBadgeClass(status) {
     if (status === 'Paid')    return 'inv-pay-badge inv-pay-paid';
@@ -79,6 +80,7 @@ function RealQRCode({ invoiceNo, amount, storeName = 'Namastute Store', upiId = 
 const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
     const { currencySymbol } = useCurrency();
     const { companyInfo } = useCompany();
+    const { settings } = useSettings();
     const printRef = useRef(null);
     const [bankAccounts, setBankAccounts] = useState([]);
 
@@ -117,7 +119,8 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
     const due        = parseFloat(order.dueAmount)  || 0;
 
     /* invoice number */
-    const invoiceNo = `#${order.referenceNo || 'INV0001'}`;
+    const prefix = settings?.invoicePrefix || 'INV-';
+    const invoiceNo = order.invoiceNo || order.referenceNo ? `#${order.invoiceNo || order.referenceNo}` : `#${prefix}0001`;
 
     /* print handler */
     const handlePrint = () => {
@@ -349,12 +352,12 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         <div>
                             <div className="inv-terms-label">Terms and Conditions</div>
                             <div className="inv-terms-text">
-                                Please pay within 15 days from the date of invoice. Overdue interest
-                                @ 14% will be charged on delayed payments.
+                                Payment terms: <strong>{settings?.invoiceDue || 'Due on Receipt'}</strong>. 
+                                Overdue interest @ 14% will be charged on delayed payments.
                             </div>
                             <div className="inv-notes-label">Notes</div>
                             <div className="inv-terms-text">
-                                Please quote invoice number {invoiceNo} when remitting funds.
+                                {settings?.invoiceNotes || `Please quote invoice number ${invoiceNo} when remitting funds.`}
                             </div>
                         </div>
                         <div className="inv-sig-area">

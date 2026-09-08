@@ -123,7 +123,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                     <Link to="/dashboard" className="pos-sidebar-logo" style={{ textDecoration: 'none' }}>
                         {companyInfo.logo
                             ? <img src={companyInfo.logo} alt={companyInfo.name || 'Logo'} style={{ height: '32px', maxWidth: '120px', objectFit: 'contain' }} />
-                            : <TextLogo name={companyInfo.name} color="#ff6b35" />}
+                            : <TextLogo name={companyInfo.name} color="var(--primary-color)" />}
                     </Link>
                 </div>
 
@@ -325,34 +325,38 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
 
                             {/* Manufacturing Section */}
-                            <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Manufacturing</div>
-                            <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <NavLink to="/manufacturing/bom" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <Layers className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Bill of Materials (BOM)</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                                <li className="pos-menu-item">
-                                    <NavLink to="/manufacturing/work-orders" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <Cpu className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Work Orders (Production)</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                                <li className="pos-menu-item">
-                                    <NavLink to="/manufacturing/work-centers" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <Factory className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Work Centers</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                            </ul>
+                            {user?.businessType === 'Manufacturing' && (
+                                <>
+                                    <div className="pos-menu-divider"></div>
+                                    <div className="pos-menu-section">Manufacturing</div>
+                                    <ul className="pos-menu-list pb-4">
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/manufacturing/bom" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <Layers className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Bill of Materials (BOM)</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/manufacturing/work-orders" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <Cpu className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Work Orders (Production)</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/manufacturing/work-centers" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <Factory className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Work Centers</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </>
+                            )}
 
                             {/* Sales Section */}
                             <div className="pos-menu-divider"></div>

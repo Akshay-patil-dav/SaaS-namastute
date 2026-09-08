@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './PosHeader.css';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
@@ -6,10 +7,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useSettings } from '../../../hooks/useSettings';
 import { ENV } from '@/api/config';
-import { 
-    ChevronsLeft, 
-    Search, 
-    Store, 
+import {
+    ChevronsLeft,
+    Search,
+    Store,
     MonitorDot,
     Globe,
     Maximize,
@@ -59,6 +60,36 @@ const initialNotifications = [
     { id: 'NT-4', title: 'Payroll Run Completed', message: 'Monthly salary runs sheet for May 2026 was processed successfully. 12 payslip receipts compiled.', type: 'Payroll', date: '2026-05-23', unread: false }
 ];
 
+const searchablePages = [
+    { title: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={14} /> },
+    { title: 'Sales Dashboard', path: '/dashboard/sales', icon: <BarChart2 size={14} /> },
+    { title: 'Super Admin Dashboard', path: '/dashboard/super-dashboard', icon: <UserCog size={14} /> },
+    { title: 'Super Admin Companies', path: '/dashboard/super-companies', icon: <Building size={14} /> },
+    { title: 'Super Admin Subscriptions', path: '/dashboard/super-subscriptions', icon: <DollarSign size={14} /> },
+    { title: 'Super Admin Packages', path: '/dashboard/super-packages', icon: <Package size={14} /> },
+    { title: 'Products', path: '/products', icon: <Package size={14} /> },
+    { title: 'Expired Products', path: '/expired-products', icon: <CalendarX size={14} /> },
+    { title: 'Low Stocks', path: '/low-stocks', icon: <TrendingDown size={14} /> },
+    { title: 'Category', path: '/category', icon: <Folder size={14} /> },
+    { title: 'Sub Category', path: '/sub-category', icon: <List size={14} /> },
+    { title: 'Brands', path: '/brands', icon: <Tag size={14} /> },
+    { title: 'Units', path: '/units', icon: <Scale size={14} /> },
+    { title: 'Warranties', path: '/warranties', icon: <ShieldCheck size={14} /> },
+    { title: 'Print Barcode', path: '/print-barcode', icon: <Barcode size={14} /> },
+    { title: 'Manage Stock', path: '/dashboard/manage-stock', icon: <Box size={14} /> },
+    { title: 'Stock Adjustment', path: '/dashboard/stock-adjustment', icon: <SlidersHorizontal size={14} /> },
+    { title: 'Stock Transfer', path: '/dashboard/stock-transfer', icon: <ArrowRightLeft size={14} /> },
+    { title: 'Online Orders', path: '/dashboard/sales-online', icon: <ShoppingCart size={14} /> },
+    { title: 'POS Orders', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
+    { title: 'POS Page', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
+    { title: 'Sales Return', path: '/dashboard/sales-return', icon: <RotateCcw size={14} /> },
+    { title: 'Orders', path: '/dashboard/orders', icon: <ShoppingCart size={14} /> },
+    { title: 'Purchase', path: '/purchases', icon: <ShoppingBag size={14} /> },
+    { title: 'Purchase Return', path: '/purchase-return', icon: <FileUp size={14} /> },
+    { title: 'Web App Menus', path: '/dashboard/menus', icon: <List size={14} /> },
+    { title: 'Blog Posts', path: '/dashboard/blog-posts', icon: <FileText size={14} /> }
+];
+
 export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
@@ -84,37 +115,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const [salesOpen, setSalesOpen] = useState(false);
     const salesRef = useRef(null);
 
-    const searchablePages = [
-        { title: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={14} /> },
-        { title: 'Sales Dashboard', path: '/dashboard/sales', icon: <BarChart2 size={14} /> },
-        { title: 'Super Admin Dashboard', path: '/dashboard/super-dashboard', icon: <UserCog size={14} /> },
-        { title: 'Super Admin Companies', path: '/dashboard/super-companies', icon: <Building size={14} /> },
-        { title: 'Super Admin Subscriptions', path: '/dashboard/super-subscriptions', icon: <DollarSign size={14} /> },
-        { title: 'Super Admin Packages', path: '/dashboard/super-packages', icon: <Package size={14} /> },
-        { title: 'Products', path: '/products', icon: <Package size={14} /> },
-        { title: 'Expired Products', path: '/expired-products', icon: <CalendarX size={14} /> },
-        { title: 'Low Stocks', path: '/low-stocks', icon: <TrendingDown size={14} /> },
-        { title: 'Category', path: '/category', icon: <Folder size={14} /> },
-        { title: 'Sub Category', path: '/sub-category', icon: <List size={14} /> },
-        { title: 'Brands', path: '/brands', icon: <Tag size={14} /> },
-        { title: 'Units', path: '/units', icon: <Scale size={14} /> },
-        { title: 'Warranties', path: '/warranties', icon: <ShieldCheck size={14} /> },
-        { title: 'Print Barcode', path: '/print-barcode', icon: <Barcode size={14} /> },
-        { title: 'Manage Stock', path: '/dashboard/manage-stock', icon: <Box size={14} /> },
-        { title: 'Stock Adjustment', path: '/dashboard/stock-adjustment', icon: <SlidersHorizontal size={14} /> },
-        { title: 'Stock Transfer', path: '/dashboard/stock-transfer', icon: <ArrowRightLeft size={14} /> },
-        { title: 'Online Orders', path: '/dashboard/sales-online', icon: <ShoppingCart size={14} /> },
-        { title: 'POS Orders', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
-        { title: 'POS Page', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
-        { title: 'Sales Return', path: '/dashboard/sales-return', icon: <RotateCcw size={14} /> },
-        { title: 'Orders', path: '/dashboard/orders', icon: <ShoppingCart size={14} /> },
-        { title: 'Purchase', path: '/purchases', icon: <ShoppingBag size={14} /> },
-        { title: 'Purchase Return', path: '/purchase-return', icon: <FileUp size={14} /> },
-        { title: 'Web App Menus', path: '/dashboard/menus', icon: <List size={14} /> },
-        { title: 'Blog Posts', path: '/dashboard/blog-posts', icon: <FileText size={14} /> }
-    ];
-
-    const filteredPages = searchablePages.filter(page => 
+    const filteredPages = searchablePages.filter(page =>
         page.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -153,12 +154,12 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const nameToUse = settings?.profileFirstName
         ? `${settings.profileFirstName} ${settings.profileLastName || ''}`.trim()
         : (user?.name || user?.identifier?.split('@')[0] || 'User');
-        
+
     const initials = nameToUse.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
     const roleColor = user?.role === 'SUPER_ADMIN' ? '#f59e0b'
         : user?.role === 'ADMIN' ? '#6366f1'
-        : '#22c55e';
+            : '#22c55e';
 
     const toggleFullScreen = () => {
         if (!document.fullscreenElement) {
@@ -196,9 +197,9 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                 <div className="pos-search-bar hide-on-mobile" ref={searchRef} style={{ position: 'relative' }}>
                     <Search size={16} color="#888" className="me-2" />
-                    <input 
-                        type="text" 
-                        placeholder="Search" 
+                    <input
+                        type="text"
+                        placeholder="Search"
                         ref={searchInputRef}
                         value={searchQuery}
                         onChange={(e) => {
@@ -210,11 +211,11 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <div className="pos-search-shortcut">
                         <MonitorDot size={12} /> K
                     </div>
-                    
+
                     {/* Search Suggestions Dropdown */}
                     {searchOpen && (
-                        <div 
-                            className="shadow-lg border rounded-3 bg-white" 
+                        <div
+                            className="shadow-lg border rounded-3 bg-white"
                             style={{
                                 position: 'absolute',
                                 top: '100%',
@@ -233,7 +234,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             <div className="d-flex flex-column">
                                 {filteredPages.length > 0 ? (
                                     filteredPages.map((page, idx) => (
-                                        <div 
+                                        <div
                                             key={idx}
                                             className="d-flex align-items-center gap-3 p-2 border-bottom cursor-pointer text-decoration-none text-dark notification-feed-item"
                                             style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
@@ -263,7 +264,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                 {/* Sales Navbar Dropdown */}
                 <div className="d-none d-md-flex align-items-center ms-2" ref={salesRef} style={{ position: 'relative' }}>
-                    <button 
+                    <button
                         onClick={() => setSalesOpen(!salesOpen)}
                         className="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill border-0"
                         style={{
@@ -271,19 +272,19 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             fontSize: '13.5px',
                             fontWeight: '600',
                             backgroundColor: salesOpen ? 'rgba(255, 155, 41, 0.12)' : '#f4f5f9',
-                            color: salesOpen ? '#ff9b29' : '#4b5563',
+                            color: salesOpen ? 'var(--primary-color)' : '#4b5563',
                             transition: 'all 0.2s ease'
                         }}
                     >
-                        <ShoppingCart size={16} style={{ color: '#ff9b29' }} />
+                        <ShoppingCart size={16} style={{ color: 'var(--primary-color)' }} />
                         <span>Sales</span>
                         <ChevronDown size={14} style={{ transform: salesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                     </button>
 
                     {/* Sales Dropdown Menu */}
                     {salesOpen && (
-                        <div 
-                            className="shadow-lg border rounded-3 bg-white py-2" 
+                        <div
+                            className="shadow-lg border rounded-3 bg-white py-2"
                             style={{
                                 position: 'absolute',
                                 top: '100%',
@@ -298,13 +299,13 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 SALES & POS
                             </div>
 
-                            <Link 
-                                to="/dashboard/sales-pos" 
+                            <Link
+                                to="/dashboard/sales-pos"
                                 className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
                                 style={{ fontSize: '13px', fontWeight: '500' }}
                                 onClick={() => setSalesOpen(false)}
                             >
-                                <div className="p-1.5 rounded" style={{ background: 'rgba(255, 155, 41, 0.12)', color: '#ff9b29' }}>
+                                <div className="p-1.5 rounded" style={{ background: 'rgba(255, 155, 41, 0.12)', color: 'var(--primary-color)' }}>
                                     <MonitorDot size={15} />
                                 </div>
                                 <div>
@@ -313,8 +314,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 </div>
                             </Link>
 
-                            <Link 
-                                to="/dashboard/sales-online" 
+                            <Link
+                                to="/dashboard/sales-online"
                                 className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
                                 style={{ fontSize: '13px', fontWeight: '500' }}
                                 onClick={() => setSalesOpen(false)}
@@ -328,8 +329,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 </div>
                             </Link>
 
-                            <Link 
-                                to="/dashboard/sales-return" 
+                            <Link
+                                to="/dashboard/sales-return"
                                 className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
                                 style={{ fontSize: '13px', fontWeight: '500' }}
                                 onClick={() => setSalesOpen(false)}
@@ -356,15 +357,16 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                 </div>
 
                 {/* Quick POS Page Action Button */}
-                <Link 
-                    to="/dashboard/sales-pos" 
+                <Link
+                    to="/dashboard/sales-pos"
                     className="pos-btn-orange text-decoration-none hide-on-mobile"
                     style={{
                         padding: '6px 14px',
                         borderRadius: '20px',
                         fontWeight: '600',
                         fontSize: '13px',
-                        boxShadow: '0 2px 4px rgba(255, 155, 41, 0.2)'
+                        boxShadow: '0 2px 4px rgba(255, 155, 41, 0.2)',
+                        background: "linear-gradient(135deg, #ff822d 0%, #ea580c 100%)"
                     }}
                 >
                     <MonitorDot size={16} />
@@ -380,27 +382,6 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                 {/* Notification Bell Dropdown Section */}
                 <div style={{ position: 'relative' }}>
-                    <style>{`
-                        .notification-feed-item {
-                            transition: background-color 0.2s ease, transform 0.1s ease;
-                        }
-                        .notification-feed-item:hover {
-                            background-color: #f8fafc !important;
-                        }
-                        .notification-feed-item .show-on-hover {
-                            opacity: 0;
-                            transform: translateY(-50%) scale(0.8);
-                            transition: all 0.2s ease;
-                        }
-                        .notification-feed-item:hover .show-on-hover {
-                            opacity: 0.85 !important;
-                            transform: translateY(-50%) scale(1);
-                        }
-                        @keyframes fadeIn {
-                            from { opacity: 0; transform: scale(0.95); }
-                            to { opacity: 1; transform: scale(1); }
-                        }
-                    `}</style>
 
                     <button className="pos-icon-btn" onClick={() => setNotiOpen(!notiOpen)} title="Corporate Notifications & Alerts">
                         <Bell size={18} />
@@ -410,7 +391,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     {notiOpen && (
                         <>
                             {/* Close overlay on tap */}
-                            <div 
+                            <div
                                 style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1040 }}
                                 onClick={() => setNotiOpen(false)}
                             />
@@ -428,14 +409,14 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             }}>
                                 <div className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                     <span className="fw-bold text-dark d-flex align-items-center gap-1.5" style={{ fontSize: '13.5px' }}>
-                                        <span style={{ width: '4px', height: '12px', background: '#ff9b29', borderRadius: '2px' }} />
+                                        <span style={{ width: '4px', height: '12px', background: 'var(--primary-color)', borderRadius: '2px' }} />
                                         Corporate Alerts
                                     </span>
                                     <div className="d-flex align-items-center gap-2">
                                         {unreadCount > 0 && (
-                                            <button 
-                                                className="btn p-0 text-decoration-none font-semibold border-0" 
-                                                style={{ color: '#ff9b29', background: 'none', fontSize: '11px' }}
+                                            <button
+                                                className="btn p-0 text-decoration-none font-semibold border-0"
+                                                style={{ color: 'var(--primary-color)', background: 'none', fontSize: '11px' }}
                                                 onClick={handleMarkAllRead}
                                             >
                                                 Mark all read
@@ -443,7 +424,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                         )}
                                         <button
                                             className="btn p-0 text-decoration-none border-0 d-flex align-items-center justify-content-center"
-                                            style={{ color: '#ff9b29', background: 'none', opacity: 0.8 }}
+                                            style={{ color: 'var(--primary-color)', background: 'none', opacity: 0.8 }}
                                             onClick={() => {
                                                 setAllNotiMaximized(true);
                                                 setNotiOpen(false);
@@ -457,19 +438,19 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 <div className="d-flex flex-column gap-2" style={{ maxHeight: '280px', overflowY: 'auto' }}>
                                     {notifications.length > 0 ? (
                                         notifications.map((n) => {
-                                            const notiColors = 
+                                            const notiColors =
                                                 n.type === 'Stock' ? { bg: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', icon: <AlertTriangle size={14} /> } :
-                                                n.type === 'Leave' ? { bg: 'rgba(245, 158, 11, 0.08)', color: '#f59e0b', icon: <Calendar size={14} /> } :
-                                                n.type === 'Payroll' ? { bg: 'rgba(16, 185, 129, 0.08)', color: '#10b981', icon: <DollarSign size={14} /> } :
-                                                { bg: 'rgba(99, 102, 241, 0.08)', color: '#6366f1', icon: <Cpu size={14} /> };
+                                                    n.type === 'Leave' ? { bg: 'rgba(245, 158, 11, 0.08)', color: '#f59e0b', icon: <Calendar size={14} /> } :
+                                                        n.type === 'Payroll' ? { bg: 'rgba(16, 185, 129, 0.08)', color: '#10b981', icon: <DollarSign size={14} /> } :
+                                                            { bg: 'rgba(99, 102, 241, 0.08)', color: '#6366f1', icon: <Cpu size={14} /> };
 
                                             return (
-                                                <div 
-                                                    key={n.id} 
+                                                <div
+                                                    key={n.id}
                                                     onClick={() => handleNotiClick(n)}
                                                     className="p-2.5 rounded-2 d-flex gap-2.5 align-items-start border-bottom cursor-pointer transition-all notification-feed-item"
-                                                    style={{ 
-                                                        borderLeft: n.unread ? '3.5px solid #ff9b29' : '3.5px solid transparent',
+                                                    style={{
+                                                        borderLeft: n.unread ? '3.5px solid var(--primary-color)' : '3.5px solid transparent',
                                                         background: n.unread ? 'rgba(255, 155, 41, 0.03)' : 'transparent',
                                                         cursor: 'pointer',
                                                         position: 'relative',
@@ -485,7 +466,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                                         <div className="small text-muted" style={{ fontSize: '9px', marginTop: '2px' }}>{n.date}</div>
                                                     </div>
                                                     <div className="position-absolute end-0 top-50 translate-middle-y me-2 show-on-hover" style={{
-                                                        color: '#ff9b29'
+                                                        color: 'var(--primary-color)'
                                                     }}>
                                                         <Maximize size={12} />
                                                     </div>
@@ -634,17 +615,17 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         maxWidth: '460px',
                         width: '90%',
                         animation: 'fadeIn 0.2s ease-in-out',
-                        borderLeft: '5px solid #ff9b29',
+                        borderLeft: '5px solid var(--primary-color)',
                         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
                     }}>
                         <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style={{ borderBottomColor: '#f1f5f9' }}>
                             <span className="badge font-monospace text-uppercase" style={{
                                 background: selectedNotiPopup.type === 'Stock' ? 'rgba(239, 68, 68, 0.1)' :
-                                            selectedNotiPopup.type === 'Leave' ? 'rgba(245, 158, 11, 0.1)' :
-                                            selectedNotiPopup.type === 'Payroll' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(99, 102, 241, 0.1)',
+                                    selectedNotiPopup.type === 'Leave' ? 'rgba(245, 158, 11, 0.1)' :
+                                        selectedNotiPopup.type === 'Payroll' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(99, 102, 241, 0.1)',
                                 color: selectedNotiPopup.type === 'Stock' ? '#ef4444' :
-                                       selectedNotiPopup.type === 'Leave' ? '#f59e0b' :
-                                       selectedNotiPopup.type === 'Payroll' ? '#10b981' : '#6366f1',
+                                    selectedNotiPopup.type === 'Leave' ? '#f59e0b' :
+                                        selectedNotiPopup.type === 'Payroll' ? '#10b981' : '#6366f1',
                                 fontWeight: '700',
                                 fontSize: '10px'
                             }}>
@@ -652,27 +633,27 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             </span>
                             <button className="btn-close" onClick={() => setSelectedNotiPopup(null)} style={{ background: 'none', border: 'none', fontSize: '20px', color: '#64748b' }}>×</button>
                         </div>
-                        
+
                         <h5 className="fw-bold mb-1" style={{ color: '#1c2b36' }}>{selectedNotiPopup.title}</h5>
                         <p className="small text-muted font-monospace mb-3">{selectedNotiPopup.date}</p>
-                        
+
                         <p className="text-secondary mb-4 p-3 rounded" style={{ fontSize: '13.5px', background: '#f8fafc', borderLeft: '3px solid #cbd5e1', lineHeight: '1.5' }}>
                             {selectedNotiPopup.message}
                         </p>
-                        
+
                         <div className="d-flex gap-2">
                             <button className="btn btn-secondary w-100" onClick={() => setSelectedNotiPopup(null)}>Close Details</button>
-                            <button className="btn text-white w-100 fw-semibold" 
-                                    style={{ background: '#ff9b29', border: 'none' }}
-                                    onClick={() => {
-                                        setSelectedNotiPopup(null);
-                                        // Auto route depending on category
-                                        if (selectedNotiPopup.type === 'Leave' || selectedNotiPopup.type === 'Payroll') {
-                                            navigate('/hr/employees');
-                                        } else if (selectedNotiPopup.type === 'Stock') {
-                                            navigate('/dashboard/manage-stock');
-                                        }
-                                    }}>
+                            <button className="btn text-white w-100 fw-semibold"
+                                style={{ background: 'var(--primary-color)', border: 'none' }}
+                                onClick={() => {
+                                    setSelectedNotiPopup(null);
+                                    // Auto route depending on category
+                                    if (selectedNotiPopup.type === 'Leave' || selectedNotiPopup.type === 'Payroll') {
+                                        navigate('/hr/employees');
+                                    } else if (selectedNotiPopup.type === 'Stock') {
+                                        navigate('/dashboard/manage-stock');
+                                    }
+                                }}>
                                 Action Center
                             </button>
                         </div>
@@ -702,13 +683,13 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         flexDirection: 'column',
                         animation: 'fadeIn 0.25s ease-out',
                         overflow: 'hidden',
-                        borderLeft: '6px solid #ff9b29',
+                        borderLeft: '6px solid var(--primary-color)',
                         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
                     }}>
                         {/* Modal Header */}
                         <div className="d-flex justify-content-between align-items-center p-3 border-bottom" style={{ background: '#fafafa' }}>
                             <div className="d-flex align-items-center gap-2">
-                                <Bell size={18} color="#ff9b29" />
+                                <Bell size={18} color="var(--primary-color)" />
                                 <span className="fw-bold text-dark" style={{ fontSize: '15px' }}>Corporate Alerts Console</span>
                                 <span className="badge rounded-pill bg-danger" style={{ fontSize: '10px' }}>
                                     {unreadCount} Unread
@@ -716,9 +697,9 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             </div>
                             <div className="d-flex align-items-center gap-3">
                                 {unreadCount > 0 && (
-                                    <button 
-                                        className="btn btn-sm btn-outline-warning fw-semibold" 
-                                        style={{ fontSize: '11px', color: '#ff9b29', borderColor: '#ff9b29', background: 'none' }}
+                                    <button
+                                        className="btn btn-sm btn-outline-warning fw-semibold"
+                                        style={{ fontSize: '11px', color: 'var(--primary-color)', borderColor: 'var(--primary-color)', background: 'none' }}
                                         onClick={handleMarkAllRead}
                                     >
                                         Mark all read
@@ -734,12 +715,12 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             <div className="border-right" style={{ width: '38%', overflowY: 'auto', borderRight: '1px solid #eaedf0', background: '#f8fafc' }}>
                                 {notifications.map((n) => {
                                     const isActive = n.id === maximizedActiveId;
-                                    const notiColors = 
+                                    const notiColors =
                                         n.type === 'Stock' ? { color: '#ef4444' } :
-                                        n.type === 'Leave' ? { color: '#f59e0b' } :
-                                        n.type === 'Payroll' ? { color: '#10b981' } :
-                                        { color: '#6366f1' };
-                                    
+                                            n.type === 'Leave' ? { color: '#f59e0b' } :
+                                                n.type === 'Payroll' ? { color: '#10b981' } :
+                                                    { color: '#6366f1' };
+
                                     return (
                                         <div
                                             key={n.id}
@@ -751,7 +732,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                             className="p-3 border-bottom cursor-pointer transition-all"
                                             style={{
                                                 background: isActive ? '#ffffff' : 'transparent',
-                                                borderLeft: isActive ? '4px solid #ff9b29' : '4px solid transparent',
+                                                borderLeft: isActive ? '4px solid var(--primary-color)' : '4px solid transparent',
                                                 cursor: 'pointer'
                                             }}
                                         >
@@ -783,11 +764,11 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                         );
                                     }
 
-                                    const notiColors = 
+                                    const notiColors =
                                         activeNoti.type === 'Stock' ? { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: <AlertTriangle size={24} /> } :
-                                        activeNoti.type === 'Leave' ? { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: <Calendar size={24} /> } :
-                                        activeNoti.type === 'Payroll' ? { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', icon: <DollarSign size={24} /> } :
-                                        { bg: 'rgba(99, 102, 241, 0.1)', color: '#6366f1', icon: <Cpu size={24} /> };
+                                            activeNoti.type === 'Leave' ? { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: <Calendar size={24} /> } :
+                                                activeNoti.type === 'Payroll' ? { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', icon: <DollarSign size={24} /> } :
+                                                    { bg: 'rgba(99, 102, 241, 0.1)', color: '#6366f1', icon: <Cpu size={24} /> };
 
                                     return (
                                         <div className="d-flex flex-column h-100">
@@ -809,7 +790,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                                             <hr style={{ borderStyle: 'dashed', color: '#eaedf0' }} />
 
-                                            <div className="flex-grow-1 p-3 rounded mb-4" style={{ background: '#f8fafc', borderLeft: '4px solid #ff9b29', minHeight: '120px' }}>
+                                            <div className="flex-grow-1 p-3 rounded mb-4" style={{ background: '#f8fafc', borderLeft: '4px solid var(--primary-color)', minHeight: '120px' }}>
                                                 <h6 className="fw-bold text-dark mb-2" style={{ fontSize: '12.5px' }}>Detailed Feed Record</h6>
                                                 <p className="text-secondary mb-0" style={{ fontSize: '13.5px', lineHeight: '1.6' }}>
                                                     {activeNoti.message}
@@ -818,9 +799,9 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                                             <div className="d-flex gap-3 mt-auto">
                                                 <button className="btn btn-light border flex-grow-1" onClick={() => setAllNotiMaximized(false)}>Close Console</button>
-                                                <button 
-                                                    className="btn text-white fw-semibold" 
-                                                    style={{ background: '#ff9b29', border: 'none', flexGrow: 2 }}
+                                                <button
+                                                    className="btn text-white fw-semibold"
+                                                    style={{ background: 'var(--primary-color)', border: 'none', flexGrow: 2 }}
                                                     onClick={() => {
                                                         setAllNotiMaximized(false);
                                                         if (activeNoti.type === 'Leave' || activeNoti.type === 'Payroll') {

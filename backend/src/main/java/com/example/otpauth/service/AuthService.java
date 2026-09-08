@@ -85,8 +85,7 @@ public class AuthService {
                 .collect(Collectors.toList());
         String planStr = user.getPlan() != null ? user.getPlan().name()
                 : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(),
-                user.isPhoneVerified());
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -106,8 +105,7 @@ public class AuthService {
                 .collect(Collectors.toList());
         String planStr = user.getPlan() != null ? user.getPlan().name()
                 : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr, user.isEmailVerified(),
-                user.isPhoneVerified());
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
     }
 
     @Transactional
@@ -154,13 +152,64 @@ public class AuthService {
                         .collect(Collectors.toList());
                 String planStr = user.getPlan() != null ? user.getPlan().name()
                         : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-                return new AuthResponse(token, user.getEmail(), user.getFullName(), roles, planStr,
-                        user.isEmailVerified(), user.isPhoneVerified());
+                return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
             } else {
                 throw new RuntimeException("Invalid Google ID token.");
             }
         } catch (Exception e) {
             throw new RuntimeException("Google authentication failed: " + e.getMessage());
         }
+    }
+
+    @Transactional
+    public AuthResponse completeOnboarding(com.example.otpauth.dto.OnboardingRequest request, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (userRepository.existsByUsername(request.getUsername()) && 
+            (user.getUsername() == null || !user.getUsername().equals(request.getUsername()))) {
+            throw new RuntimeException("Username is already taken");
+        }
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setUsername(request.getUsername());
+        user.setBusinessType(request.getBusinessType());
+        // Also update fullName for backward compatibility if needed
+        if (request.getFirstName() != null && request.getLastName() != null) {
+            user.setFullName(request.getFirstName() + " " + request.getLastName());
+        }
+        
+        userRepository.save(user);
+
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
+        String token = jwtUtil.generateToken(userDetails); // Optional: regenerate token if claims change
+
+        List<String> roles = user.getRoles().stream()
+                .map(r -> r.getName().name())
+                .collect(Collectors.toList());
+        String planStr = user.getPlan() != null ? user.getPlan().name()
+                : com.example.otpauth.model.SubscriptionPlan.NONE.name();
+        
+        return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+    }
+
+    public java.util.Map<String, Object> checkUsername(String username) {
+        boolean exists = userRepository.existsByUsername(username);
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("available", !exists);
+        if (exists) {
+            java.util.List<String> suggestions = new java.util.ArrayList<>();
+            int count = 1;
+            while (suggestions.size() < 3) {
+                String suggestion = username + count;
+                if (!userRepository.existsByUsername(suggestion)) {
+                    suggestions.add(suggestion);
+                }
+                count++;
+            }
+            response.put("suggestions", suggestions);
+        }
+        return response;
     }
 }

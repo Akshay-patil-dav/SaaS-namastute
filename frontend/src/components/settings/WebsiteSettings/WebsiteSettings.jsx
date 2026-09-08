@@ -85,7 +85,7 @@ export const SystemSettings = () => {
                                 overflow: 'hidden',
                                 marginBottom: '20px'
                             }}
-                            onMouseEnter={e => e.currentTarget.style.borderColor = '#ff6b35'}
+                            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-color)'}
                             onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                             onClick={() => document.getElementById('website-logo-upload').click()}
                         >
@@ -139,7 +139,7 @@ export const SystemSettings = () => {
                                 justifyContent: 'center',
                                 minHeight: '144px'
                             }}
-                            onMouseEnter={e => e.currentTarget.style.borderColor = '#ff6b35'}
+                            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-color)'}
                             onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                             onClick={() => document.getElementById('website-favicon-upload').click()}
                         >
@@ -362,7 +362,7 @@ export const CompanySettings = () => {
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #ff6b35, #f7931e)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary-color), #f7931e)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Building size={18} color="#fff" />
                             </div>
                             <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#1e293b' }}>Company Settings</h3>
@@ -393,7 +393,7 @@ export const CompanySettings = () => {
                                 key={c.id || i}
                                 onClick={() => handleOpenView(c, i)}
                                 style={{ minWidth: '200px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 16px', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
-                                onMouseEnter={e => { e.currentTarget.style.borderColor = '#ff6b35'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(255,107,53,0.12)'; }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary-color)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(255,107,53,0.12)'; }}
                                 onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
@@ -409,7 +409,7 @@ export const CompanySettings = () => {
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <div style={{ flex: 1, height: '4px', borderRadius: '99px', background: '#f1f5f9', overflow: 'hidden' }}>
-                                        <div style={{ height: '100%', width: `${Math.round((filledCount(c) / totalFields) * 100)}%`, background: 'linear-gradient(90deg, #ff6b35, #f7931e)', borderRadius: '99px' }} />
+                                        <div style={{ height: '100%', width: `${Math.round((filledCount(c) / totalFields) * 100)}%`, background: 'linear-gradient(90deg, var(--primary-color), #f7931e)', borderRadius: '99px' }} />
                                     </div>
                                     <span style={{ fontSize: '10px', fontWeight: '600', color: '#64748b' }}>{Math.round((filledCount(c) / totalFields) * 100)}%</span>
                                 </div>
@@ -446,7 +446,7 @@ export const CompanySettings = () => {
                                             <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'linear-gradient(135deg, #fff7f0, #ffe8d6)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #ffdcc4', flexShrink: 0 }}>
                                                 {company.companyLogo
                                                     ? <img src={company.companyLogo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                                    : <Building size={20} color="#ff6b35" />}
+                                                    : <Building size={20} color="var(--primary-color)" />}
                                             </div>
                                             <div>
                                                 <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b', marginBottom: '2px' }}>{company.companyName || 'Unnamed Company'}</div>
@@ -545,7 +545,7 @@ export const CompanySettings = () => {
                                     <td colSpan="5">
                                         <div style={{ padding: '60px 40px', textAlign: 'center' }}>
                                             <div style={{ width: '72px', height: '72px', borderRadius: '18px', background: 'linear-gradient(135deg, #fff7f0, #ffe8d6)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                                                <Building size={32} color="#ff6b35" />
+                                                <Building size={32} color="var(--primary-color)" />
                                             </div>
                                             <p style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: '600', color: '#374151' }}>No company profiles yet</p>
                                             <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#94a3b8' }}>Add your company information using the settings form</p>
@@ -896,7 +896,7 @@ export const CompanySettings = () => {
                                             position: 'relative',
                                             overflow: 'hidden'
                                         }}
-                                        onMouseEnter={e => e.currentTarget.style.borderColor = '#ff6b35'}
+                                        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-color)'}
                                         onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                                         onClick={() => document.getElementById('logo-upload-input').click()}
                                     >
@@ -950,7 +950,7 @@ export const CompanySettings = () => {
                                             justifyContent: 'center',
                                             minHeight: '144px'
                                         }}
-                                        onMouseEnter={e => e.currentTarget.style.borderColor = '#ff6b35'}
+                                        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-color)'}
                                         onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                                         onClick={() => document.getElementById('favicon-upload-input').click()}
                                     >
@@ -1199,49 +1199,6 @@ export const Preference = () => {
     );
 };
 
-export const Appearance = () => {
-    const { settings, loading, saving, handleChange, saveSettings } = useSettings();
-
-    if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
-
-    return (
-        <>
-            <div className="settings-content-header">
-                <h3>Appearance</h3>
-            </div>
-            <div className="settings-content-body">
-                <div className="settings-form-group">
-                    <label>Theme Layout</label>
-                    <select
-                        value={settings.themeLayout || ''}
-                        onChange={(e) => handleChange('themeLayout', e.target.value)}
-                    >
-                        <option value="">Select Layout</option>
-                        <option value="Light">Light</option>
-                        <option value="Dark">Dark</option>
-                    </select>
-                </div>
-                <div className="settings-form-group">
-                    <label>Primary Color</label>
-                    <input
-                        type="color"
-                        value={settings.primaryColor || '#ff9f43'}
-                        onChange={(e) => handleChange('primaryColor', e.target.value)}
-                    />
-                </div>
-                <div className="settings-actions">
-                    <button
-                        className="btn-save"
-                        onClick={() => saveSettings(['themeLayout', 'primaryColor'])}
-                        disabled={saving}
-                    >
-                        {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
-                </div>
-            </div>
-        </>
-    );
-};
 
 export const SocialAuthentication = () => {
     const { settings, loading, saving, handleChange, saveSettings } = useSettings();

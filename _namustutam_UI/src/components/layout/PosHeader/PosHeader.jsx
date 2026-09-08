@@ -3,10 +3,10 @@ import { createPortal } from 'react-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { 
-    ChevronsLeft, 
-    Search, 
-    Store, 
+import {
+    ChevronsLeft,
+    Search,
+    Store,
     MonitorDot,
     Globe,
     Maximize,
@@ -63,7 +63,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
     const roleColor = user?.role === 'SUPER_ADMIN' ? '#f59e0b'
         : user?.role === 'ADMIN' ? '#6366f1'
-        : '#22c55e';
+            : '#22c55e';
 
     const toggleFullScreen = () => {
         if (!document.fullscreenElement) {
@@ -123,7 +123,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                 {/* Sales Navbar Dropdown */}
                 <div className="d-none d-md-flex align-items-center ms-2" ref={salesRef} style={{ position: 'relative' }}>
-                    <button 
+                    <button
                         onClick={() => setSalesOpen(!salesOpen)}
                         className="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill border-0"
                         style={{
@@ -142,8 +142,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                     {/* Sales Dropdown Menu */}
                     {salesOpen && (
-                        <div 
-                            className="shadow-lg border rounded-3 bg-white py-2" 
+                        <div
+                            className="shadow-lg border rounded-3 bg-white py-2"
                             style={{
                                 position: 'absolute',
                                 top: '100%',
@@ -158,8 +158,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 SALES & POS
                             </div>
 
-                            <Link 
-                                to="/dashboard/sales-pos" 
+                            <Link
+                                to="/dashboard/sales-pos"
                                 className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
                                 style={{ fontSize: '13px', fontWeight: '500' }}
                                 onClick={() => setSalesOpen(false)}
@@ -173,8 +173,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 </div>
                             </Link>
 
-                            <Link 
-                                to="/dashboard/sales-online" 
+                            <Link
+                                to="/dashboard/sales-online"
                                 className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
                                 style={{ fontSize: '13px', fontWeight: '500' }}
                                 onClick={() => setSalesOpen(false)}
@@ -188,8 +188,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 </div>
                             </Link>
 
-                            <Link 
-                                to="/dashboard/sales-return" 
+                            <Link
+                                to="/dashboard/sales-return"
                                 className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
                                 style={{ fontSize: '13px', fontWeight: '500' }}
                                 onClick={() => setSalesOpen(false)}
@@ -215,7 +215,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <ChevronDown size={14} color="#888" />
                 </div>
 
-                <Link to="/dashboard/sales-pos" className="pos-btn-orange text-decoration-none hide-on-mobile" style={{ borderRadius: '20px', padding: '6px 14px', fontWeight: '600', fontSize: '13px' }}>
+                <Link to="/dashboard/sales-pos" className="pos-btn-orange text-decoration-none hide-on-mobile" style={{ borderRadius: '20px', padding: '6px 14px', fontWeight: '600', fontSize: '13px', background: "#e68a22" }}>
                     <MonitorDot size={16} />
                     <span>POS Page</span>
                 </Link>
@@ -261,7 +261,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     {notiOpen && (
                         <>
                             {/* Close overlay on tap */}
-                            <div 
+                            <div
                                 style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1040 }}
                                 onClick={() => setNotiOpen(false)}
                             />
@@ -284,8 +284,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                     </span>
                                     <div className="d-flex align-items-center gap-2">
                                         {unreadCount > 0 && (
-                                            <button 
-                                                className="btn p-0 text-decoration-none font-semibold border-0" 
+                                            <button
+                                                className="btn p-0 text-decoration-none font-semibold border-0"
                                                 style={{ color: '#ffb38a', background: 'none', fontSize: '11px' }}
                                                 onClick={handleMarkAllRead}
                                             >
@@ -308,18 +308,18 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 <div className="d-flex flex-column gap-2" style={{ maxHeight: '280px', overflowY: 'auto' }}>
                                     {notifications.length > 0 ? (
                                         notifications.map((n) => {
-                                            const notiColors = 
+                                            const notiColors =
                                                 n.type === 'Stock' ? { bg: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', icon: <AlertTriangle size={14} /> } :
-                                                n.type === 'Leave' ? { bg: 'rgba(245, 158, 11, 0.08)', color: '#f59e0b', icon: <Calendar size={14} /> } :
-                                                n.type === 'Payroll' ? { bg: 'rgba(16, 185, 129, 0.08)', color: '#10b981', icon: <DollarSign size={14} /> } :
-                                                { bg: 'rgba(99, 102, 241, 0.08)', color: '#6366f1', icon: <Cpu size={14} /> };
+                                                    n.type === 'Leave' ? { bg: 'rgba(245, 158, 11, 0.08)', color: '#f59e0b', icon: <Calendar size={14} /> } :
+                                                        n.type === 'Payroll' ? { bg: 'rgba(16, 185, 129, 0.08)', color: '#10b981', icon: <DollarSign size={14} /> } :
+                                                            { bg: 'rgba(99, 102, 241, 0.08)', color: '#6366f1', icon: <Cpu size={14} /> };
 
                                             return (
-                                                <div 
-                                                    key={n.id} 
+                                                <div
+                                                    key={n.id}
                                                     onClick={() => handleNotiClick(n)}
                                                     className="p-2.5 rounded-2 d-flex gap-2.5 align-items-start border-bottom cursor-pointer transition-all notification-feed-item"
-                                                    style={{ 
+                                                    style={{
                                                         borderLeft: n.unread ? '3.5px solid #ffb38a' : '3.5px solid transparent',
                                                         background: n.unread ? 'rgba(255, 179, 138, 0.03)' : 'transparent',
                                                         cursor: 'pointer',
@@ -484,11 +484,11 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style={{ borderBottomColor: '#f1f5f9' }}>
                             <span className="badge font-monospace text-uppercase" style={{
                                 background: selectedNotiPopup.type === 'Stock' ? 'rgba(239, 68, 68, 0.1)' :
-                                            selectedNotiPopup.type === 'Leave' ? 'rgba(245, 158, 11, 0.1)' :
-                                            selectedNotiPopup.type === 'Payroll' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(99, 102, 241, 0.1)',
+                                    selectedNotiPopup.type === 'Leave' ? 'rgba(245, 158, 11, 0.1)' :
+                                        selectedNotiPopup.type === 'Payroll' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(99, 102, 241, 0.1)',
                                 color: selectedNotiPopup.type === 'Stock' ? '#ef4444' :
-                                       selectedNotiPopup.type === 'Leave' ? '#f59e0b' :
-                                       selectedNotiPopup.type === 'Payroll' ? '#10b981' : '#6366f1',
+                                    selectedNotiPopup.type === 'Leave' ? '#f59e0b' :
+                                        selectedNotiPopup.type === 'Payroll' ? '#10b981' : '#6366f1',
                                 fontWeight: '700',
                                 fontSize: '10px'
                             }}>
@@ -496,27 +496,27 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             </span>
                             <button className="btn-close" onClick={() => setSelectedNotiPopup(null)} style={{ background: 'none', border: 'none', fontSize: '20px', color: '#64748b' }}>×</button>
                         </div>
-                        
+
                         <h5 className="fw-bold mb-1" style={{ color: '#1c2b36' }}>{selectedNotiPopup.title}</h5>
                         <p className="small text-muted font-monospace mb-3">{selectedNotiPopup.date}</p>
-                        
+
                         <p className="text-secondary mb-4 p-3 rounded" style={{ fontSize: '13.5px', background: '#f8fafc', borderLeft: '3px solid #cbd5e1', lineHeight: '1.5' }}>
                             {selectedNotiPopup.message}
                         </p>
-                        
+
                         <div className="d-flex gap-2">
                             <button className="btn btn-secondary w-100" onClick={() => setSelectedNotiPopup(null)}>Close Details</button>
-                            <button className="btn text-white w-100 fw-semibold" 
-                                    style={{ background: '#ffb38a', border: 'none' }}
-                                    onClick={() => {
-                                        setSelectedNotiPopup(null);
-                                        // Auto route depending on category
-                                        if (selectedNotiPopup.type === 'Leave' || selectedNotiPopup.type === 'Payroll') {
-                                            navigate('/hr/employees');
-                                        } else if (selectedNotiPopup.type === 'Stock') {
-                                            navigate('/dashboard/manage-stock');
-                                        }
-                                    }}>
+                            <button className="btn text-white w-100 fw-semibold"
+                                style={{ background: '#ffb38a', border: 'none' }}
+                                onClick={() => {
+                                    setSelectedNotiPopup(null);
+                                    // Auto route depending on category
+                                    if (selectedNotiPopup.type === 'Leave' || selectedNotiPopup.type === 'Payroll') {
+                                        navigate('/hr/employees');
+                                    } else if (selectedNotiPopup.type === 'Stock') {
+                                        navigate('/dashboard/manage-stock');
+                                    }
+                                }}>
                                 Action Center
                             </button>
                         </div>
@@ -560,8 +560,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             </div>
                             <div className="d-flex align-items-center gap-3">
                                 {unreadCount > 0 && (
-                                    <button 
-                                        className="btn btn-sm btn-outline-warning fw-semibold" 
+                                    <button
+                                        className="btn btn-sm btn-outline-warning fw-semibold"
                                         style={{ fontSize: '11px', color: '#ffb38a', borderColor: '#ffb38a', background: 'none' }}
                                         onClick={handleMarkAllRead}
                                     >
@@ -578,12 +578,12 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             <div className="border-right" style={{ width: '38%', overflowY: 'auto', borderRight: '1px solid #eaedf0', background: '#f8fafc' }}>
                                 {notifications.map((n) => {
                                     const isActive = n.id === maximizedActiveId;
-                                    const notiColors = 
+                                    const notiColors =
                                         n.type === 'Stock' ? { color: '#ef4444' } :
-                                        n.type === 'Leave' ? { color: '#f59e0b' } :
-                                        n.type === 'Payroll' ? { color: '#10b981' } :
-                                        { color: '#6366f1' };
-                                    
+                                            n.type === 'Leave' ? { color: '#f59e0b' } :
+                                                n.type === 'Payroll' ? { color: '#10b981' } :
+                                                    { color: '#6366f1' };
+
                                     return (
                                         <div
                                             key={n.id}
@@ -627,11 +627,11 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                         );
                                     }
 
-                                    const notiColors = 
+                                    const notiColors =
                                         activeNoti.type === 'Stock' ? { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: <AlertTriangle size={24} /> } :
-                                        activeNoti.type === 'Leave' ? { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: <Calendar size={24} /> } :
-                                        activeNoti.type === 'Payroll' ? { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', icon: <DollarSign size={24} /> } :
-                                        { bg: 'rgba(99, 102, 241, 0.1)', color: '#6366f1', icon: <Cpu size={24} /> };
+                                            activeNoti.type === 'Leave' ? { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: <Calendar size={24} /> } :
+                                                activeNoti.type === 'Payroll' ? { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', icon: <DollarSign size={24} /> } :
+                                                    { bg: 'rgba(99, 102, 241, 0.1)', color: '#6366f1', icon: <Cpu size={24} /> };
 
                                     return (
                                         <div className="d-flex flex-column h-100">
@@ -662,8 +662,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                                             <div className="d-flex gap-3 mt-auto">
                                                 <button className="btn btn-light border flex-grow-1" onClick={() => setAllNotiMaximized(false)}>Close Console</button>
-                                                <button 
-                                                    className="btn text-white fw-semibold" 
+                                                <button
+                                                    className="btn text-white fw-semibold"
                                                     style={{ background: '#ffb38a', border: 'none', flexGrow: 2 }}
                                                     onClick={() => {
                                                         setAllNotiMaximized(false);

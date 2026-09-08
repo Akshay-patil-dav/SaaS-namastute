@@ -21,6 +21,13 @@ const getImageUrl = (url) => {
     return `${ENV.BACKEND_BASE_URL}${cleanUrl.startsWith('/') ? '' : '/'}${cleanUrl}`;
 };
 
+const getUpiQrUrl = (bankAccounts, user, grandTotal) => {
+    if (bankAccounts.length > 0) {
+        return `upi://pay?pa=${bankAccounts[0].accountNumber}@${bankAccounts[0].branchIfsc}.ifsc.npci&pn=${encodeURIComponent(user?.companyName || 'Namastute Store')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`;
+    }
+    return `upi://pay?pa=namastute.pay@upi&pn=Namastute%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`;
+};
+
 export default function PosTerminal() {
     const { currencySymbol } = useCurrency();
     const { user } = useAuth();
@@ -295,7 +302,7 @@ export default function PosTerminal() {
 
                 <div className="d-none d-md-flex align-items-center gap-3 text-muted small">
                     <span className="d-flex align-items-center gap-1">
-                        <MonitorDot size={14} color="#ff9b29" /> Terminal Active
+                        <MonitorDot size={14} color="var(--primary-color)" /> Terminal Active
                     </span>
                     <span className="border-end pe-3">
                         Cashier: <strong className="text-dark">{user?.name || user?.identifier?.split('@')[0] || 'Admin'}</strong>
@@ -573,11 +580,11 @@ export default function PosTerminal() {
                                     </div>
                                     <div className="d-inline-block bg-white p-2 rounded border my-1">
                                         <img
-                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(bankAccounts.length > 0 ? `upi://pay?pa=${bankAccounts[0].accountNumber}@${bankAccounts[0].branchIfsc}.ifsc.npci&pn=${encodeURIComponent(user?.companyName || 'Namastute Store')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill` : `upi://pay?pa=namastute.pay@upi&pn=Namastute%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`)}`}
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(getUpiQrUrl(bankAccounts, user, grandTotal))}`}
                                             alt="UPI Scan to Pay"
                                             style={{ width: '130px', height: '130px', objectFit: 'contain' }}
                                             onError={(e) => {
-                                                e.target.src = `https://bwipjs-api.metafloor.com/?bcid=qrcode&text=${encodeURIComponent(bankAccounts.length > 0 ? `upi://pay?pa=${bankAccounts[0].accountNumber}@${bankAccounts[0].branchIfsc}.ifsc.npci&pn=${encodeURIComponent(user?.companyName || 'Namastute Store')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill` : `upi://pay?pa=namastute.pay@upi&pn=Namastute%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`)}&scale=4`;
+                                                e.target.src = `https://bwipjs-api.metafloor.com/?bcid=qrcode&text=${encodeURIComponent(getUpiQrUrl(bankAccounts, user, grandTotal))}&scale=4`;
                                             }}
                                         />
                                     </div>

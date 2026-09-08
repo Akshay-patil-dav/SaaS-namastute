@@ -38,14 +38,14 @@ const ProductLayout = ({ children }) => {
             >
                 <div className="sidebar-brand">
                     <a href="/products" className="text-decoration-none">
-                        Dream<span>POS</span>
+                        Dream<span className="brand-accent">POS</span>
                     </a>
                 </div>
                 <ul className="sidebar-menu">
                     <li>
-                        <NavLink to="/dashboard" className="sidebar-menu-item">
+                        <NavLink to="/dashboard" className={({ isActive }) => `sidebar-menu-item ${isActive ? 'active' : ''}`}>
                             <LayoutDashboard />
-                            Dashboard
+                            <span className="menu-text">Dashboard</span>
                         </NavLink>
                     </li>
                     <li>
@@ -54,13 +54,13 @@ const ProductLayout = ({ children }) => {
                             className={({ isActive }) => `sidebar-menu-item ${isActive ? 'active' : ''}`}
                         >
                             <Package />
-                            Products
+                            <span className="menu-text">Products</span>
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/settings" className="sidebar-menu-item">
+                        <NavLink to="/settings" className={({ isActive }) => `sidebar-menu-item ${isActive ? 'active' : ''}`}>
                             <Settings />
-                            Settings
+                            <span className="menu-text">Settings</span>
                         </NavLink>
                     </li>
                 </ul>

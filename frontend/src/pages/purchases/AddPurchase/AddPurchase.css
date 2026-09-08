@@ -5,7 +5,7 @@
 
 .bg-soft-orange {
     background-color: #fff7ed;
-    border: 1px solid #ffedd5;
+    border: 1px solid var(--primary-light);
 }
 
 .text-orange {

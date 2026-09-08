@@ -116,7 +116,7 @@
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
-    background: #ff9b29;
+    background: var(--primary-color);
     color: #fff;
     border: none;
     cursor: pointer;
@@ -125,7 +125,7 @@
 }
 
 .add-unit-modal .btn-add-unit:hover {
-    background: #e68a1f;
+    background: var(--primary-hover);
     transform: translateY(-1px);
 }
 
@@ -174,5 +174,5 @@
 }
 
 .add-unit-modal .form-input:focus {
-    border-color: #ff9b29;
+    border-color: var(--primary-color);
 }

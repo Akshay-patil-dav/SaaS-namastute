@@ -619,7 +619,7 @@ input:checked + .toggle-slider:before {
 
 .bg-indigo-light { background: #e0e7ff; }
 .text-indigo { color: #4f46e5; }
-.bg-orange-light { background: #ffedd5; }
+.bg-orange-light { background: var(--primary-light); }
 .text-orange { color: #ea580c; }
 
 .section-title-wrapper h4 {

@@ -49,9 +49,9 @@ export const AuthProvider = ({ children }) => {
      * _persist(token, email, roles)
      * Save to state + localStorage + axios headers.
      */
-    const _persist = (jwtToken, email, roles, fullName, plan, emailVerified, phoneVerified) => {
+    const _persist = (jwtToken, email, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType) => {
         const role = pickRole(roles);
-        const userData = { email, name: fullName ?? email, role, roles, plan, emailVerified, phoneVerified };
+        const userData = { email, name: fullName ?? email, role, roles, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: jwtToken, user: userData }));
         // No need to set axios.defaults — apiClient interceptor reads from localStorage on every request
@@ -68,8 +68,8 @@ export const AuthProvider = ({ children }) => {
     const login = async ({ email, password }) => {
         try {
             const res = await apiClient.post(`${AUTH_API}/login`, { email, password });
-            const { token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified } = res.data;
-            const { role } = _persist(jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified);
+            const { token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -87,8 +87,8 @@ export const AuthProvider = ({ children }) => {
     const register = async ({ fullName, email, password, phoneNumber }) => {
         try {
             const res = await apiClient.post(`${AUTH_API}/register`, { fullName, email, password, phoneNumber });
-            const { token: jwt, email: userEmail, roles, fullName: returnedFullName, plan, emailVerified, phoneVerified } = res.data;
-            const { role } = _persist(jwt, userEmail, roles, returnedFullName, plan, emailVerified, phoneVerified);
+            const { token: jwt, email: userEmail, roles, fullName: returnedFullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, returnedFullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -106,8 +106,8 @@ export const AuthProvider = ({ children }) => {
     const googleLogin = async (credential) => {
         try {
             const res = await apiClient.post(`${AUTH_API}/google`, { credential });
-            const { token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified } = res.data;
-            const { role } = _persist(jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified);
+            const { token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -115,6 +115,21 @@ export const AuthProvider = ({ children }) => {
                 err.response?.data ||
                 'Google Login failed. Please try again.';
             return { success: false, error: typeof msg === 'string' ? msg : 'Google Login failed.' };
+        }
+    };
+
+    const completeOnboarding = async (onboardingData) => {
+        try {
+            const res = await apiClient.post(`${AUTH_API}/onboarding`, onboardingData);
+            const { token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType } = res.data;
+            const { role } = _persist(jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType);
+            return { success: true, role };
+        } catch (err) {
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data ||
+                'Onboarding failed. Please try again.';
+            return { success: false, error: typeof msg === 'string' ? msg : 'Onboarding failed.' };
         }
     };
 
@@ -160,6 +175,7 @@ export const AuthProvider = ({ children }) => {
                 login,
                 register,
                 googleLogin,
+                completeOnboarding,
                 logout,
                 isSuperAdmin,
                 isAdmin,

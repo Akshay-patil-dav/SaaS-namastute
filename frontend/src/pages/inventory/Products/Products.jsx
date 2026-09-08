@@ -342,9 +342,9 @@ const Products = () => {
                                 type="button"
                                 className={`btn btn-sm d-flex align-items-center gap-1 ${isActive ? 'fw-bold shadow-sm' : 'text-secondary'}`}
                                 style={{
-                                    backgroundColor: isActive ? '#ff9b29' : '#ffffff',
+                                    background: isActive ? 'var(--primary-color)' : '#ffffff',
                                     color: isActive ? '#ffffff' : '#495057',
-                                    border: isActive ? '1px solid #ff9b29' : '1px solid #dee2e6',
+                                    border: isActive ? 'none' : '1px solid #dee2e6',
                                     borderRadius: '8px',
                                     padding: '6px 14px',
                                     fontSize: '13px'

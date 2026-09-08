@@ -41,7 +41,7 @@ export default function Login() {
         }
 
         if (result.role === 'SUPER_ADMIN') {
-            navigate('/dashboard/super-dashboard');
+            navigate('/dashboard'); // Changed from /dashboard/super-dashboard to prevent infinite loops since page doesn't exist
         } else {
             navigate('/dashboard');
         }
@@ -57,7 +57,7 @@ export default function Login() {
             return;
         }
         if (result.role === 'SUPER_ADMIN') {
-            navigate('/dashboard/super-dashboard');
+            navigate('/dashboard'); // Changed from /dashboard/super-dashboard
         } else {
             navigate('/dashboard');
         }

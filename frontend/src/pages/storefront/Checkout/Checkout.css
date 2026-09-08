@@ -109,7 +109,7 @@
 
 .btn-place-order {
   width: 100%;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: white;
   border: none;
   padding: 1.25rem;
@@ -187,7 +187,7 @@
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: white;
   font-size: 0.75rem;
   font-weight: 700;

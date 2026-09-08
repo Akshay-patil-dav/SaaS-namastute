@@ -40,7 +40,7 @@ export default function GuestRoute({ children }) {
     // Already logged in → send to the right dashboard
     if (isAuthenticated()) {
         if (user?.role === 'SUPER_ADMIN') {
-            return <Navigate to="/dashboard/super-dashboard" replace />;
+            return <Navigate to="/dashboard" replace />;
         }
         return <Navigate to="/dashboard" replace />;
     }

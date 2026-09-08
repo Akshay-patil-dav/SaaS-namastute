@@ -455,7 +455,7 @@ select.cp-input {
     justify-content: space-between;
     gap: 12px;
     padding: 12px 16px;
-    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+    background: linear-gradient(135deg, #fff7ed, var(--primary-light));
     border-bottom: 1px solid #fed7aa;
 }
 
@@ -653,7 +653,7 @@ select.cp-input {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+    background: linear-gradient(135deg, #fff7ed, var(--primary-light));
     border: 1px solid #fed7aa;
     border-radius: 8px;
     padding: 10px 16px;

@@ -1,7 +1,7 @@
 /* Production Work Orders - Manufacturing Module Theme */
 
 :root {
-  --mfg-orange-primary: #ff9b29;
+  --mfg-orange-primary: var(--primary-color);
   --mfg-orange-hover: #e68a22;
   --mfg-orange-light: rgba(255, 155, 41, 0.12);
   --mfg-orange-glow: rgba(255, 155, 41, 0.25);
@@ -67,7 +67,7 @@
 
 /* Primary Action Button */
 .btn-mfg-orange {
-  background: linear-gradient(135deg, #ff9b29 0%, #f5880b 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #f5880b 100%);
   color: #ffffff;
   border: none;
   display: inline-flex;
@@ -420,13 +420,13 @@
 }
 
 .wo-progress-fill.draft { width: 15%; background-color: #94a3b8; }
-.wo-progress-fill.in_progress { width: 55%; background: linear-gradient(90deg, #ff9b29, #f59e0b); }
+.wo-progress-fill.in_progress { width: 55%; background: linear-gradient(90deg, var(--primary-color), #f59e0b); }
 .wo-progress-fill.completed { width: 100%; background: linear-gradient(90deg, #10b981, #059669); }
 .wo-progress-fill.cancelled { width: 100%; background-color: #ef4444; }
 
 /* Custom Action Buttons */
 .btn-wo-start {
-  background: linear-gradient(135deg, #ff9b29 0%, #d97706 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #d97706 100%);
   color: #ffffff;
   border: none;
   border-radius: 9px;

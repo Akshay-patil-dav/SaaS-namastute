@@ -182,7 +182,7 @@ const PrintQRCode = () => {
                 <div className="d-flex justify-content-end gap-3 pt-4" style={{borderTop: '1px solid #e2e8f0'}}>
                     <button 
                         className="btn text-white fw-bold d-flex align-items-center gap-2" 
-                        style={{ height: '42px', padding: '0 24px', borderRadius: '8px', backgroundColor: '#ff9b29', border: 'none' }}
+                        style={{ height: '42px', padding: '0 24px', borderRadius: '8px', backgroundColor: 'var(--primary-color)', border: 'none' }}
                         onClick={() => setIsModalOpen(true)}
                         disabled={selectedProducts.length === 0}
                     >

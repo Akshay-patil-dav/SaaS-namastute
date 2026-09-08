@@ -81,7 +81,7 @@
 }
 .bg-light-blue { background-color: #e0f2fe; color: #0284c7; }
 .bg-light-teal { background-color: #ccfbf1; color: #0d9488; }
-.bg-light-orange { background-color: #ffedd5; color: #ea580c; }
+.bg-light-orange { background-color: var(--primary-light); color: #ea580c; }
 .bg-light-purple { background-color: #f3e8ff; color: #9333ea; }
 .bg-light-red { background-color: #fee2e2; color: #dc2626; }
 .bg-light-green { background-color: #dcfce7; color: #16a34a; }

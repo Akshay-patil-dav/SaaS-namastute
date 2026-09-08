@@ -11,6 +11,7 @@ import PosLayout from './components/layout/PosLayout/PosLayout';
 const Login              = lazy(() => import('./pages/auth/Login/Login.jsx'));
 const Register           = lazy(() => import('./pages/auth/Register/Register.jsx'));
 
+const Onboarding           = lazy(() => import('./pages/auth/Onboarding/Onboarding.jsx'));
 const Unauthorized       = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
 const Dashboard          = lazy(() => import('./pages/dashboard/Dashboard/Dashboard.jsx'));
 const Dashboard2         = lazy(() => import('./pages/dashboard/Dashboard2/Dashboard2.jsx'));
@@ -51,8 +52,8 @@ const FinancialReport    = lazy(() => import('./pages/reports/FinancialReport/Fi
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
-const CLIENT_ADMIN_ROLES = ['ADMIN', 'CLIENT'];
-const ADMIN_ROLES        = ['ADMIN', 'CLIENT'];
+const CLIENT_ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
+const ADMIN_ROLES        = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
 const SUPER_ADMIN_ROLES  = ['SUPER_ADMIN'];
 
 // ── Global page loading fallback ─────────────────────────────────────────────
@@ -101,6 +102,12 @@ function AppRoutes() {
                 <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
 
                 <Route path="/unauthorized" element={<Unauthorized />} />
+                
+                {/* ── ONBOARDING ───────────────────────── */}
+                <Route 
+                    path="/onboarding" 
+                    element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'CLIENT']}><Onboarding /></ProtectedRoute>} 
+                />
 
                 {/* ── CLIENT + ADMIN ───────────────────────── */}
                 <Route

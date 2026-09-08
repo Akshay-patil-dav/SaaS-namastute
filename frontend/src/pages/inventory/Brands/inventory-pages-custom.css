@@ -49,7 +49,7 @@
 }
 
 .ss-btn-orange {
-  background-color: #ff9b29;
+  background: var(--primary-color);
   color: white;
   border: none;
   display: inline-flex;
@@ -192,7 +192,7 @@
 }
 
 .ss-search-input:focus {
-  border-color: #ff9b29;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.05);
 }
 
@@ -264,7 +264,7 @@
   border: 1px solid #cbd5e1;
   border-radius: 4px;
   cursor: pointer;
-  accent-color: #ff9b29;
+  accent-color: var(--primary-color);
 }
 
 .row-selected {
@@ -320,7 +320,7 @@
 }
 
 .ss-status-pending {
-  background: #ff9b29;
+  background: var(--primary-color);
   color: white;
 }
 
@@ -403,8 +403,8 @@
 
 .ss-action-btn:hover {
   background: #f8f9fa;
-  color: #ff9b29;
-  border-color: #ff9b29;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .ss-action-btn.view:hover {
@@ -484,13 +484,13 @@
 
 .ss-page-btn:hover:not(:disabled) {
   background: #f8f9fa;
-  color: #ff9b29;
+  color: var(--primary-color);
 }
 
 .ss-page-btn.active {
-  background: #ff9b29;
+  background: var(--primary-color);
   color: white;
-  border-color: #ff9b29;
+  border-color: var(--primary-color);
 }
 
 .ss-page-btn:disabled {
@@ -581,7 +581,7 @@
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* Icons */
-.icon-orange { color: #ff9b29; }
+.icon-orange { color: var(--primary-color); }
 .icon-green { color: #22c55e; }
 .icon-blue { color: #3b82f6; }
 .icon-red { color: #ef4444; }
@@ -737,12 +737,12 @@
 }
 
 .ss-input:focus {
-  border-color: #ff9b29;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(255, 155, 41, 0.1);
 }
 
 .ss-btn-primary {
-  background: #ff9b29;
+  background: var(--primary-color);
   color: white;
   border: none;
   padding: 10px 20px;

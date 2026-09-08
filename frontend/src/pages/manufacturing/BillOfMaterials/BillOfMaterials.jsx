@@ -181,7 +181,7 @@ const BillOfMaterials = () => {
             <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
                     <h4 className="mfg-page-title d-flex align-items-center gap-2">
-                        <Layers style={{ color: '#ff9b29' }} /> Bill of Materials (BOM Recipes)
+                        <Layers style={{ color: 'var(--primary-color)' }} /> Bill of Materials (BOM Recipes)
                     </h4>
                     <p className="mfg-page-subtitle">Define raw material recipes and quantities required to manufacture finished goods.</p>
                 </div>

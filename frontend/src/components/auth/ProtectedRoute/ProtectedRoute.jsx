@@ -47,6 +47,11 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
 
 
 
+    // Check if onboarding is required
+    if (user && !user.businessType && location.pathname !== '/onboarding') {
+        return <Navigate to="/onboarding" replace />;
+    }
+
     // Logged in but wrong role → go to unauthorized
     if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
         return <Navigate to="/unauthorized" replace />;

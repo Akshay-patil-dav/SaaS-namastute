@@ -1,7 +1,8 @@
 /* Storefront Global Layout Variables */
 :root {
-  --primary-color: #6366f1;
-  --primary-hover: #4f46e5;
+  --primary-color: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+  
+  --primary-hover: #e68a22;
   --bg-color: #0f172a;
   --surface-color: #1e293b;
   --text-primary: #f8fafc;
@@ -9,10 +10,14 @@
   --accent-color: #10b981;
   --danger-color: #ef4444;
   --border-color: #334155;
-  
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.ss-btn-orange {
+  background-color: #e68a22 !important;
 }
 
 .storefront-container {
@@ -88,7 +93,7 @@
   height: 2px;
   bottom: -4px;
   left: 0;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   transition: width 0.3s ease;
 }
 
@@ -125,7 +130,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: white;
   font-size: 0.65rem;
   font-weight: 700;
@@ -142,8 +147,13 @@
 }
 
 @keyframes popIn {
-  0% { transform: translate(25%, -25%) scale(0); }
-  100% { transform: translate(25%, -25%) scale(1); }
+  0% {
+    transform: translate(25%, -25%) scale(0);
+  }
+
+  100% {
+    transform: translate(25%, -25%) scale(1);
+  }
 }
 
 .mobile-menu-btn {
@@ -278,7 +288,7 @@
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   border: none;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: white;
   font-weight: 600;
   cursor: pointer;

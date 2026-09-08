@@ -332,7 +332,7 @@
 
 .ai-panel__quick-item:hover {
   background: #fff7ed;
-  border-color: #ffedd5;
+  border-color: var(--primary-light);
   color: #ea580c;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(249, 115, 22, 0.08);

@@ -7,6 +7,8 @@ import com.example.otpauth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import com.example.otpauth.dto.OnboardingRequest;
 import java.util.Map;
 
 @RestController
@@ -50,6 +52,28 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Google Login failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/onboarding")
+    public ResponseEntity<?> completeOnboarding(@RequestBody OnboardingRequest request, Authentication authentication) {
+        try {
+            if (authentication == null) {
+                return ResponseEntity.status(401).body("Unauthorized");
+            }
+            AuthResponse response = authService.completeOnboarding(request, authentication.getName());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Onboarding failed: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/check-username")
+    public ResponseEntity<?> checkUsername(@RequestParam String username) {
+        try {
+            return ResponseEntity.ok(authService.checkUsername(username));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 }

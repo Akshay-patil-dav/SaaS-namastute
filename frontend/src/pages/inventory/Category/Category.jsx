@@ -285,7 +285,7 @@ const Category = () => {
                             {loading ? (
                                 <tr>
                                     <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
-                                        <Loader className="spin mx-auto mb-2" size={24} style={{ color: '#ff9b29' }} />
+                                        <Loader className="spin mx-auto mb-2" size={24} style={{ color: 'var(--primary-color)' }} />
                                         <p style={{ color: '#94a3b8', fontSize: '14px' }}>Loading categories...</p>
                                     </td>
                                 </tr>

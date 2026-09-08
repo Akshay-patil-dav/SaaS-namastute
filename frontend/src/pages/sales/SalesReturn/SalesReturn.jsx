@@ -230,11 +230,11 @@ export default function SalesReturn() {
                             <h4>Total Return Amount</h4>
                             <p>{money(totalAmount)}</p>
                         </div>
-                        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,#ff9b29,#ffbe76)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,var(--primary-color),#ffbe76)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
                             <DollarSign size={20} />
                         </div>
                     </div>
-                    <div className="ss-stat-bottom" style={{ color: '#ff9b29' }}>
+                    <div className="ss-stat-bottom" style={{ color: 'var(--primary-color)' }}>
                         <ChevronUp size={14} />
                         <span>Grand total of all returns</span>
                     </div>

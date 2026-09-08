@@ -25,7 +25,7 @@ import {
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './settings.css';
 import { ProfileSettings, SecuritySettings, Notifications, ConnectedApps } from '../../../components/settings/GeneralSettings/GeneralSettings';
-import { SystemSettings, CompanySettings, Localization, Prefixes, Preference, Appearance, SocialAuthentication, Language } from '../../../components/settings/WebsiteSettings/WebsiteSettings';
+import { SystemSettings, CompanySettings, Localization, Prefixes, Preference, SocialAuthentication, Language } from '../../../components/settings/WebsiteSettings/WebsiteSettings';
 import { InvoiceSettings, InvoiceTemplate, Printer, PosSettings, CustomFields } from '../../../components/settings/AppSettings/AppSettings';
 import { EmailSettings, EmailTemplate, SmsSettings, SmsTemplate, OtpSettings, GdprCookies } from '../../../components/settings/SystemSettings/SystemSettings';
 import { PaymentGateway, BankAccounts, TaxRates, Currencies } from '../../../components/settings/FinancialSettings/FinancialSettings';
@@ -34,7 +34,7 @@ import { AiHelperSettings } from '../../../components/settings/AiHelperSettings/
 
 const sectionMapping = {
     profile: 'general', security: 'general', notifications: 'general', connected_apps: 'general',
-    system_settings: 'website', company_settings: 'website', localization: 'website', prefixes: 'website', preference: 'website', appearance: 'website', social_authentication: 'website', language: 'website',
+    system_settings: 'website', company_settings: 'website', localization: 'website', prefixes: 'website', preference: 'website', social_authentication: 'website', language: 'website',
     invoice_settings: 'app', invoice_template: 'app', printer: 'app', pos_settings: 'app', custom_fields: 'app',
     email_settings: 'system', email_template: 'system', sms_settings: 'system', sms_template: 'system', otp: 'system', gdpr_cookies: 'system',
     payment_gateway: 'financial', bank_accounts: 'financial', tax_rates: 'financial', currencies: 'financial',
@@ -116,7 +116,7 @@ export default function Settings() {
                                 <li className={`settings-sidebar-item ${isActive('localization') ? 'active' : ''}`} onClick={() => navigate('/settings/localization')}>Localization</li>
                                 <li className={`settings-sidebar-item ${isActive('prefixes') ? 'active' : ''}`} onClick={() => navigate('/settings/prefixes')}>Prefixes</li>
                                 <li className={`settings-sidebar-item ${isActive('preference') ? 'active' : ''}`} onClick={() => navigate('/settings/preference')}>Preference</li>
-                                <li className={`settings-sidebar-item ${isActive('appearance') ? 'active' : ''}`} onClick={() => navigate('/settings/appearance')}>Appearance</li>
+
                                 <li className={`settings-sidebar-item ${isActive('social_authentication') ? 'active' : ''}`} onClick={() => navigate('/settings/social_authentication')}>Social Authentication</li>
                                 <li className={`settings-sidebar-item ${isActive('language') ? 'active' : ''}`} onClick={() => navigate('/settings/language')}>Language</li>
                             </ul>
@@ -246,7 +246,7 @@ export default function Settings() {
                         <Route path="localization" element={<Localization />} />
                         <Route path="prefixes" element={<Prefixes />} />
                         <Route path="preference" element={<Preference />} />
-                        <Route path="appearance" element={<Appearance />} />
+
                         <Route path="social_authentication" element={<SocialAuthentication />} />
                         <Route path="language" element={<Language />} />
                         

@@ -7,7 +7,7 @@ import { useCurrency } from '../../../../hooks/useCurrency';
 const statusStyle = s => {
     switch(s?.toLowerCase()) {
         case 'received': return { background:'#dcfce7', color:'#16a34a' };
-        case 'ordered': return { background:'#ffedd5', color:'#ea580c' };
+        case 'ordered': return { background:'var(--primary-light)', color:'#ea580c' };
         case 'pending': return { background:'#e0f2fe', color:'#0284c7' };
         default: return { background:'#f1f5f9', color:'#64748b' };
     }
