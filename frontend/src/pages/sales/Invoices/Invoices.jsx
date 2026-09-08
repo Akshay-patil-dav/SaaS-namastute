@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import apiClient, { ENV } from '@/api/config';
 import InvoiceModal from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
 import AddSalesModal from '../../../components/modals/sales/AddSalesModal/AddSalesModal';
+import EditPosModal from '../../../components/modals/sales/EditPosModal/EditPosModal';
+import EditSalesModal from '../../../components/modals/sales/EditSalesModal/EditSalesModal';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useSettings } from '../../../hooks/useSettings';
 import {
@@ -22,7 +24,8 @@ import {
     ChevronRight,
     TrendingUp,
     Receipt,
-    User
+    User,
+    Edit
 } from 'lucide-react';
 import './Invoices.css';
 
@@ -52,6 +55,8 @@ export default function Invoices() {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [selectedOrderType, setSelectedOrderType] = useState('ONLINE');
     const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+    const [isEditPosModalOpen, setIsEditPosModalOpen] = useState(false);
+    const [isEditSalesModalOpen, setIsEditSalesModalOpen] = useState(false);
 
     const fetchInvoices = async () => {
         setLoading(true);
@@ -131,6 +136,15 @@ export default function Invoices() {
         setSelectedOrder(inv);
         setSelectedOrderType(inv.invoiceType);
         setIsInvoiceOpen(true);
+    };
+
+    const handleEditInvoice = (inv) => {
+        setSelectedOrder(inv);
+        if (inv.invoiceType === 'POS') {
+            setIsEditPosModalOpen(true);
+        } else {
+            setIsEditSalesModalOpen(true);
+        }
     };
 
     const handleExportCSV = () => {
@@ -377,6 +391,14 @@ export default function Invoices() {
                                         <td>
                                             <div className="inv-action-wrap">
                                                 <button
+                                                    className="inv-action-btn edit-btn"
+                                                    onClick={() => handleEditInvoice(inv)}
+                                                    title="Edit Invoice"
+                                                    style={{ background: '#eef2ff', color: '#4f46e5', marginRight: '6px' }}
+                                                >
+                                                    <Edit size={14} /> Edit
+                                                </button>
+                                                <button
                                                     className="inv-action-btn"
                                                     onClick={() => handleViewInvoice(inv)}
                                                     title="View & Print Invoice"
@@ -476,6 +498,42 @@ export default function Invoices() {
                     onClose={() => {
                         setIsInvoiceOpen(false);
                         setSelectedOrder(null);
+                    }}
+                />
+            )}
+
+            {/* Edit POS Modal */}
+            {isEditPosModalOpen && selectedOrder && (
+                <EditPosModal
+                    isOpen={isEditPosModalOpen}
+                    order={selectedOrder}
+                    onClose={() => {
+                        setIsEditPosModalOpen(false);
+                        setSelectedOrder(null);
+                    }}
+                    onSuccess={() => {
+                        setIsEditPosModalOpen(false);
+                        setSelectedOrder(null);
+                        fetchInvoices();
+                        showToast('Invoice updated successfully');
+                    }}
+                />
+            )}
+
+            {/* Edit Sales Modal */}
+            {isEditSalesModalOpen && selectedOrder && (
+                <EditSalesModal
+                    isOpen={isEditSalesModalOpen}
+                    order={selectedOrder}
+                    onClose={() => {
+                        setIsEditSalesModalOpen(false);
+                        setSelectedOrder(null);
+                    }}
+                    onSuccess={() => {
+                        setIsEditSalesModalOpen(false);
+                        setSelectedOrder(null);
+                        fetchInvoices();
+                        showToast('Invoice updated successfully');
                     }}
                 />
             )}

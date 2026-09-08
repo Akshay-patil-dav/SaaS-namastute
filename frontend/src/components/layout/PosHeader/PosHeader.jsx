@@ -350,11 +350,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
             {/* Right side */}
             <div className="pos-header-actions">
-                <div className="pos-store-selector hide-on-mobile">
-                    <Store className="pos-store-icon" size={16} />
-                    <span>{companyInfo.name || 'My Store'}</span>
-                    <ChevronDown size={14} color="#888" />
-                </div>
+
 
                 {/* Quick POS Page Action Button */}
                 <Link
