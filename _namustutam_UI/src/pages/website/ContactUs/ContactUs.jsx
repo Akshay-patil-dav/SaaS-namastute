@@ -63,13 +63,13 @@ export default function ContactUs() {
                             </p>
 
                             <div className="contact-details">
-                                <div className="contact-detail-item">
+                                {/* <div className="contact-detail-item">
                                     <div className="contact-icon">📞</div>
                                     <div>
                                         <h4>Whatsapp No.</h4>
                                         <p>+91 82375 12742</p>
                                     </div>
-                                </div>
+                                </div> */}
                                 <div className="contact-detail-item">
                                     <div className="contact-icon">✉️</div>
                                     <div>
