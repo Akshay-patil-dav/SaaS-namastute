@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import '../Brands/Products.css';
 import '../Brands/inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
+import { usePermissions } from '../../../hooks/usePermissions';
 import apiClient, { API, ENV } from '@/api/config';
 import {
     FileText,
@@ -46,6 +47,7 @@ const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
 
 const Products = () => {
     const { currencySymbol } = useCurrency();
+    const { canManage } = usePermissions();
 
     const [dbProducts, setDbProducts]   = useState([]);
     const [loading, setLoading]         = useState(true);
@@ -292,26 +294,34 @@ const Products = () => {
                     </p>
                 </div>
                 <div className="ss-header-actions">
-                    <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF"><FileText size={16} /></button>
-                    <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel"><FileSpreadsheet size={16} /></button>
+                    {canManage('products') && (
+                        <>
+                            <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF"><FileText size={16} /></button>
+                            <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel"><FileSpreadsheet size={16} /></button>
+                        </>
+                    )}
                     <button className="ss-btn-icon-square" title="Refresh" onClick={fetchProducts}>
                         <RefreshCw size={16} className={loading ? 'spin' : ''} />
                     </button>
-                    {selectedIds.length > 0 && (
+                    {canManage('products') && selectedIds.length > 0 && (
                         <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
-                    <Link to="/create-product" className="ss-btn-orange" style={{ textDecoration: 'none' }}>
-                        <PlusCircle size={18} /> Add Product
-                    </Link>
-                    <button 
-                        className="ss-btn-orange" 
-                        style={{ background: '#5b6670', borderColor: '#5b6670' }}
-                        onClick={() => setShowImportModal(true)}
-                    >
-                        <Download size={18} /> Import Product
-                    </button>
+                    {canManage('products') && (
+                        <>
+                            <Link to="/create-product" className="ss-btn-orange" style={{ textDecoration: 'none' }}>
+                                <PlusCircle size={18} /> Add Product
+                            </Link>
+                            <button 
+                                className="ss-btn-orange" 
+                                style={{ background: '#5b6670', borderColor: '#5b6670' }}
+                                onClick={() => setShowImportModal(true)}
+                            >
+                                <Download size={18} /> Import Product
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -530,7 +540,7 @@ const Products = () => {
                                         <div className="empty-state">
                                             <Package size={48} strokeWidth={1} />
                                             <p>{searchTerm ? 'No products match your search.' : 'No products available.'}</p>
-                                            {!searchTerm && (
+                                            {!searchTerm && canManage('products') && (
                                                 <Link to="/create-product" className="btn-orange text-decoration-none" style={{ fontSize: '0.85rem', padding: '8px 18px' }}>
                                                     <PlusCircle size={16} /> Add Product
                                                 </Link>

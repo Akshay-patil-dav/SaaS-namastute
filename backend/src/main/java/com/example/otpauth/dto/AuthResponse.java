@@ -3,6 +3,7 @@ package com.example.otpauth.dto;
 import java.util.List;
 
 public class AuthResponse {
+    private Long id;
     private String token;
     private String email;
     private String fullName;
@@ -14,8 +15,11 @@ public class AuthResponse {
     private String plan;
     private boolean emailVerified;
     private boolean phoneVerified;
+    private Long activeProjectId;
+    private String projectPermissions;
 
-    public AuthResponse(String token, String email, String fullName, String firstName, String lastName, String username, String businessType, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified) {
+    public AuthResponse(Long id, String token, String email, String fullName, String firstName, String lastName, String username, String businessType, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified, Long activeProjectId, String projectPermissions) {
+        this.id = id;
         this.token = token;
         this.email = email;
         this.fullName = fullName;
@@ -27,7 +31,12 @@ public class AuthResponse {
         this.plan = plan;
         this.emailVerified = emailVerified;
         this.phoneVerified = phoneVerified;
+        this.activeProjectId = activeProjectId;
+        this.projectPermissions = projectPermissions;
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }
@@ -61,4 +70,10 @@ public class AuthResponse {
 
     public boolean isPhoneVerified() { return phoneVerified; }
     public void setPhoneVerified(boolean phoneVerified) { this.phoneVerified = phoneVerified; }
+
+    public Long getActiveProjectId() { return activeProjectId; }
+    public void setActiveProjectId(Long activeProjectId) { this.activeProjectId = activeProjectId; }
+
+    public String getProjectPermissions() { return projectPermissions; }
+    public void setProjectPermissions(String projectPermissions) { this.projectPermissions = projectPermissions; }
 }

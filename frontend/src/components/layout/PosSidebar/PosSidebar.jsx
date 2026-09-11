@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
-import TextLogo from '../../common/TextLogo/TextLogo';
+
 import {
     LayoutDashboard,
     Square,
@@ -78,6 +78,34 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
         sales: isSalesActive
     });
 
+    let permissions = {};
+    if (user?.projectPermissions) {
+        try {
+            permissions = JSON.parse(user.projectPermissions);
+            if (typeof permissions !== 'object' || permissions === null) {
+                permissions = {};
+            }
+        } catch (e) {
+            console.error("Failed to parse permissions", e);
+        }
+    }
+    
+    // If they are in their own workspace, or activeProjectId is not set, they have full access.
+    // If they are in someone else's workspace (activeProjectId != user.id), they ONLY have access to explicitly assigned permissions.
+    const hasFullAccess = !user?.activeProjectId || user?.activeProjectId === user?.id;
+
+    const canView = (module) => {
+        if (hasFullAccess) return true;
+        if (!permissions[module]) return false;
+        return permissions[module].includes('VIEW') || permissions[module].includes('MANAGE');
+    };
+
+    const canManage = (module) => {
+        if (hasFullAccess) return true;
+        if (!permissions[module]) return false;
+        return permissions[module].includes('MANAGE') || permissions[module].includes('CREATE') || permissions[module].includes('EDIT') || permissions[module].includes('DELETE');
+    };
+
     React.useEffect(() => {
         // When the route changes, ensure only the active section is open
         if (isDashboardActive) {
@@ -119,11 +147,10 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
             {/* Sidebar */}
             <aside className={`pos-sidebar`}>
-                <div className="pos-sidebar-header">
-                    <Link to="/dashboard" className="pos-sidebar-logo" style={{ textDecoration: 'none' }}>
-                        {companyInfo.logo
-                            ? <img src={companyInfo.logo} alt={companyInfo.name || 'Logo'} style={{ height: '32px', maxWidth: '120px', objectFit: 'contain' }} />
-                            : <TextLogo name={companyInfo.name} color="var(--primary-color)" />}
+                <div className="pos-sidebar-header" style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', borderBottom: '1px solid #f3f4f6' }}>
+                    <Link to="/dashboard" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ margin: 0, fontWeight: '900', fontSize: '24px', letterSpacing: '0.5px', color: '#111827', lineHeight: '1.2' }}>AKSHAY</span>
+                        <span style={{ margin: 0, fontWeight: '700', fontSize: '13px', letterSpacing: '1px', color: '#6B7280', textTransform: 'uppercase' }}>PATIL</span>
                     </Link>
                 </div>
 
@@ -200,7 +227,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                     )}
 
                     {/* Inventory Section — CLIENT + ADMIN only */}
-                    {isClientOrAdmin && (
+                    {isClientOrAdmin && (canView('inventory') || canView('products')) && (
                         <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Inventory</div>
@@ -222,11 +249,13 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                 Products List
                                             </NavLink>
                                         </li>
+                                        {(canManage('products') || canManage('inventory')) && (
                                         <li>
                                             <NavLink to="/create-product" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                 Create Product
                                             </NavLink>
                                         </li>
+                                        )}
                                         <li>
                                             <NavLink to="/expired-products" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                 Expired Products
@@ -293,7 +322,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                     )}
 
                     {/* Stock Section — CLIENT + ADMIN only */}
-                    {isClientOrAdmin && (
+                    {isClientOrAdmin && canView('inventory') && (
                         <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Stock</div>
@@ -325,7 +354,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
 
                             {/* Manufacturing Section */}
-                            {user?.businessType === 'Manufacturing' && (
+                            {user?.businessType === 'Manufacturing' && canView('manufacturing') && (
                                 <>
                                     <div className="pos-menu-divider"></div>
                                     <div className="pos-menu-section">Manufacturing</div>
@@ -359,6 +388,8 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             )}
 
                             {/* Sales Section */}
+                            {(canView('sales') || canView('pos')) && (
+                            <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Sales</div>
                             <ul className="pos-menu-list pb-4">
@@ -420,10 +451,12 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                      </NavLink>
                                  </li> */}
                             </ul>
-
-
+                            </>
+                            )}
 
                             {/* Purchases Section */}
+                            {canView('purchases') && (
+                            <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Purchases</div>
                             <ul className="pos-menu-list pb-4">
@@ -453,8 +486,12 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     </NavLink>
                                 </li>
                             </ul>
+                            </>
+                            )}
 
                             {/* Reports Section */}
+                            {canView('sales') && (
+                            <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Reports</div>
                             <ul className="pos-menu-list pb-4">
@@ -467,6 +504,8 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     </NavLink>
                                 </li>
                             </ul>
+                            </>
+                            )}
 
                         </>
                     )}

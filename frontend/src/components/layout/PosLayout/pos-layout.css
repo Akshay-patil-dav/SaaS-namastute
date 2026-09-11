@@ -1,10 +1,10 @@
 :root {
-  --pos-orange: var(--primary-color);
-  --pos-orange-light: #fff7ed; /* Softer orange light */
+  --pos-orange: #3b82f6; /* Changed to blue to match clean theme */
+  --pos-orange-light: #eff6ff; /* Soft blue light */
   --pos-dark-blue: #0f172a; /* Modern slate 900 */
-  --pos-text-main: #334155; /* Slate 700 */
+  --pos-text-main: #475569; /* Slate 600 */
   --pos-text-muted: #64748b; /* Slate 500 */
-  --pos-border: #e2e8f0; /* Slate 200 */
+  --pos-border: #f1f5f9; /* Slate 100 */
   --pos-sidebar-width: 270px;
 }
 

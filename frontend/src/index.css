@@ -19,16 +19,8 @@
   --accent-color: #10b981;
   --danger-color: #ef4444;
   --border-color: #334155;
-
-
 }
 
-*,
-body,
-.ss-btn-orange {
-  /* background-color: linear-gradient(135deg, #ff822d 0%, #ea580c 100%); */
-  /* ; */
-}
 
 body {
   margin: 0;

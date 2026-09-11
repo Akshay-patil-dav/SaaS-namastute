@@ -7,6 +7,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useSettings } from '../../../hooks/useSettings';
 import { ENV } from '@/api/config';
+import apiClient from '../../../api/config';
 import {
     ChevronsLeft,
     Search,
@@ -90,6 +91,8 @@ const searchablePages = [
     { title: 'Blog Posts', path: '/dashboard/blog-posts', icon: <FileText size={14} /> }
 ];
 
+import ProjectSwitcher from './ProjectSwitcher';
+
 export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
@@ -144,6 +147,34 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    const fetchMyInvitations = async () => {
+        try {
+            const { data } = await apiClient.get('/invitations/me');
+            const invNotis = data.map(inv => ({
+                id: `INV-${inv.id}`,
+                title: 'Project Invitation',
+                message: `You have been invited to join a workspace.`,
+                type: 'Invitation',
+                date: new Date().toISOString().split('T')[0],
+                unread: true,
+                invitationId: inv.id,
+                token: inv.token
+            }));
+            setNotifications(prev => {
+                const others = prev.filter(n => n.type !== 'Invitation');
+                return [...invNotis, ...others];
+            });
+        } catch (e) {
+            console.error("Failed to fetch invitations", e);
+        }
+    };
+
+    useEffect(() => {
+        if (user) {
+            fetchMyInvitations();
+        }
+    }, [user]);
+
     const handleLogout = () => {
         setProfileOpen(false);
         logout();
@@ -185,6 +216,25 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
         setNotifications(prev => prev.map(n => n.id === noti.id ? { ...n, unread: false } : n));
         setSelectedNotiPopup(noti);
         setNotiOpen(false);
+    };
+
+    const handleAcceptInvitation = async (token) => {
+        try {
+            await apiClient.post(`/invitations/${token}/accept`);
+            fetchMyInvitations();
+            window.location.reload();
+        } catch (e) {
+            console.error("Failed to accept", e);
+        }
+    };
+
+    const handleRejectInvitation = async (token) => {
+        try {
+            await apiClient.post(`/invitations/${token}/reject`);
+            fetchMyInvitations();
+        } catch (e) {
+            console.error("Failed to reject", e);
+        }
     };
 
     return (
@@ -261,6 +311,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         </div>
                     )}
                 </div>
+
+                <ProjectSwitcher />
 
                 {/* Sales Navbar Dropdown */}
                 <div className="d-none d-md-flex align-items-center ms-2" ref={salesRef} style={{ position: 'relative' }}>
@@ -460,6 +512,24 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                                         <div className="fw-bold text-dark text-truncate" style={{ fontSize: '12px' }}>{n.title}</div>
                                                         <div className="text-secondary text-truncate small" style={{ fontSize: '11px', opacity: 0.8 }}>{n.message}</div>
                                                         <div className="small text-muted" style={{ fontSize: '9px', marginTop: '2px' }}>{n.date}</div>
+                                                        {n.type === 'Invitation' && (
+                                                            <div className="d-flex gap-2 mt-2" onClick={e => e.stopPropagation()}>
+                                                                <button 
+                                                                    className="btn btn-sm text-white px-2 py-1" 
+                                                                    style={{ background: '#10b981', fontSize: '10px', border: 'none' }}
+                                                                    onClick={() => handleAcceptInvitation(n.token)}
+                                                                >
+                                                                    Accept
+                                                                </button>
+                                                                <button 
+                                                                    className="btn btn-sm text-white px-2 py-1" 
+                                                                    style={{ background: '#ef4444', fontSize: '10px', border: 'none' }}
+                                                                    onClick={() => handleRejectInvitation(n.token)}
+                                                                >
+                                                                    Reject
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="position-absolute end-0 top-50 translate-middle-y me-2 show-on-hover" style={{
                                                         color: 'var(--primary-color)'

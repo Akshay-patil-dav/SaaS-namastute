@@ -11,7 +11,23 @@ public class SecurityUtils {
     public static Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            return null; // Or throw an exception like AccessDeniedException
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof com.example.otpauth.config.UserDetailsImpl) {
+            User user = ((com.example.otpauth.config.UserDetailsImpl) principal).getUser();
+            return user.getActiveProjectId() != null ? user.getActiveProjectId() : user.getId();
+        }
+
+        return null;
+    }
+
+    public static Long getActualUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
         }
 
         Object principal = authentication.getPrincipal();
@@ -20,9 +36,6 @@ public class SecurityUtils {
             return ((com.example.otpauth.config.UserDetailsImpl) principal).getUser().getId();
         }
 
-        // If you're using a custom UserDetails object that exposes getId()
-        // we might need to cast to it here. Let's look for user details.
-        
         return null;
     }
 }

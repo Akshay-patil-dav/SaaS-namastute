@@ -99,4 +99,10 @@ public class User {
 
     public SubscriptionPlan getPlan() { return plan; }
     public void setPlan(SubscriptionPlan plan) { this.plan = plan; }
+
+    @Column(name = "active_project_id")
+    private Long activeProjectId;
+
+    public Long getActiveProjectId() { return activeProjectId; }
+    public void setActiveProjectId(Long activeProjectId) { this.activeProjectId = activeProjectId; }
 }

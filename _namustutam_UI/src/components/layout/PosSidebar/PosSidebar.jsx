@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
+
 import {
     LayoutDashboard,
     Square,
@@ -39,7 +40,9 @@ import {
     Users,
     Sparkles,
     Palette,
-    ShoppingCart
+    ShoppingCart,
+    Factory,
+    Boxes
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -52,23 +55,69 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
     const isDashboardActive = location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/dashboard/admin2' || location.pathname === '/dashboard/sales';
     const isSuperAdminActive = location.pathname.startsWith('/dashboard/super-');
-    const isSalesActive = location.pathname.startsWith('/dashboard/sales-') && !location.pathname.startsWith('/dashboard/sales-return');
+    const isSalesActive = (location.pathname.startsWith('/dashboard/sales-') && !location.pathname.startsWith('/dashboard/sales-return')) || location.pathname === '/dashboard/invoices';
+    const isInventoryActive = location.pathname.startsWith('/products') ||
+        location.pathname.startsWith('/create-product') ||
+        location.pathname.startsWith('/edit-product') ||
+        location.pathname.startsWith('/expired-products') ||
+        location.pathname.startsWith('/low-stocks') ||
+        location.pathname.startsWith('/category') ||
+        location.pathname.startsWith('/sub-category') ||
+        location.pathname.startsWith('/brands') ||
+        location.pathname.startsWith('/units') ||
+        location.pathname.startsWith('/warranties') ||
+        location.pathname.startsWith('/stores') ||
+        location.pathname.startsWith('/warehouses') ||
+        location.pathname.startsWith('/print-barcode') ||
+        location.pathname.startsWith('/print-qrcode');
+
     const [openMenus, setOpenMenus] = useState({
         dashboard: isDashboardActive,
         superAdmin: isSuperAdminActive,
+        inventory: isInventoryActive,
         sales: isSalesActive
     });
+
+    let permissions = {};
+    if (user?.projectPermissions) {
+        try {
+            permissions = JSON.parse(user.projectPermissions);
+            if (typeof permissions !== 'object' || permissions === null) {
+                permissions = {};
+            }
+        } catch (e) {
+            console.error("Failed to parse permissions", e);
+        }
+    }
+    
+    // If they are in their own workspace, or activeProjectId is not set, they have full access.
+    // If they are in someone else's workspace (activeProjectId != user.id), they ONLY have access to explicitly assigned permissions.
+    const hasFullAccess = !user?.activeProjectId || user?.activeProjectId === user?.id;
+
+    const canView = (module) => {
+        if (hasFullAccess) return true;
+        if (!permissions[module]) return false;
+        return permissions[module].includes('VIEW') || permissions[module].includes('MANAGE');
+    };
+
+    const canManage = (module) => {
+        if (hasFullAccess) return true;
+        if (!permissions[module]) return false;
+        return permissions[module].includes('MANAGE') || permissions[module].includes('CREATE') || permissions[module].includes('EDIT') || permissions[module].includes('DELETE');
+    };
 
     React.useEffect(() => {
         // When the route changes, ensure only the active section is open
         if (isDashboardActive) {
-            setOpenMenus({ dashboard: true, superAdmin: false, sales: false });
+            setOpenMenus({ dashboard: true, superAdmin: false, inventory: false, sales: false });
         } else if (isSuperAdminActive) {
-            setOpenMenus({ dashboard: false, superAdmin: true, sales: false });
+            setOpenMenus({ dashboard: false, superAdmin: true, inventory: false, sales: false });
+        } else if (isInventoryActive) {
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: true, sales: false });
         } else if (isSalesActive) {
-            setOpenMenus({ dashboard: false, superAdmin: false, sales: true });
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: true });
         }
-    }, [isDashboardActive, isSuperAdminActive, isSalesActive]);
+    }, [isDashboardActive, isSuperAdminActive, isInventoryActive, isSalesActive]);
 
     const toggleMenu = (menu) => {
         setOpenMenus(prev => {
@@ -77,6 +126,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
             const newState = {
                 dashboard: false,
                 superAdmin: false,
+                inventory: false,
                 sales: false
             };
             // If it wasn't open, open it (accordion effect)
@@ -97,14 +147,10 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
             {/* Sidebar */}
             <aside className={`pos-sidebar`}>
-                <div className="pos-sidebar-header">
-                    <Link to="/dashboard" className="pos-sidebar-logo">
-                        {companyInfo.logo
-                            ? <img src={companyInfo.logo} alt={companyInfo.name || 'Logo'} style={{ height: '32px', maxWidth: '120px', objectFit: 'contain' }} />
-                            : <ShoppingBag className="pos-logo-icon" />}
-                        <span style={{ color: '#1a1a1a', fontWeight: '800' }}>
-                            {companyInfo.name || 'Namustute'}
-                        </span>
+                <div className="pos-sidebar-header" style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', borderBottom: '1px solid #f3f4f6' }}>
+                    <Link to="/dashboard" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ margin: 0, fontWeight: '900', fontSize: '24px', letterSpacing: '0.5px', color: '#111827', lineHeight: '1.2' }}>AKSHAY</span>
+                        <span style={{ margin: 0, fontWeight: '700', fontSize: '13px', letterSpacing: '1px', color: '#6B7280', textTransform: 'uppercase' }}>PATIL</span>
                     </Link>
                 </div>
 
@@ -132,13 +178,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                 Dashboard
                                             </NavLink>
                                         </li>
-                                        {isClientOrAdmin && (
-                                            <li>
-                                                <NavLink to="/dashboard/sales" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                                    <BarChart2 size={16} className="me-2" /> Sales Dashboard
-                                                </NavLink>
-                                            </li>
-                                        )}
+
                                     </ul>
                                 </li>
                             </ul>
@@ -187,33 +227,102 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                     )}
 
                     {/* Inventory Section — CLIENT + ADMIN only */}
-                    {isClientOrAdmin && (
+                    {isClientOrAdmin && (canView('inventory') || canView('products')) && (
                         <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Inventory</div>
                             <ul className="pos-menu-list">
-                                <li className="pos-menu-item"><NavLink to="/products" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Package className="pos-menu-icon" /><span>Products</span></div></NavLink></li>
-
-                                {/* <li className="pos-menu-item"><NavLink to="/create-product" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><FilePlus className="pos-menu-icon" /><span>Create Product</span></div></NavLink></li> */}
-                                <li className="pos-menu-item"><NavLink to="/expired-products" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><CalendarX className="pos-menu-icon" /><span>Expired Products</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/low-stocks" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><TrendingDown className="pos-menu-icon" /><span>Low Stocks</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/category" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Folder className="pos-menu-icon" /><span>Category</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/sub-category" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><List className="pos-menu-icon" /><span>Sub Category</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/brands" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Tag className="pos-menu-icon" /><span>Brands</span></div></NavLink></li>
-                                <li className="pos-menu-item"><NavLink to="/units" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Scale className="pos-menu-icon" /><span>Units</span></div></NavLink></li>
-                                {/* <li className="pos-menu-item"><NavLink to="/variant-attributes" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Puzzle className="pos-menu-icon" /><span>Variant Attributes</span></div></NavLink></li> */}
-                                <li className="pos-menu-item"><NavLink to="/warranties" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><ShieldCheck className="pos-menu-icon" /><span>Warranties</span></div></NavLink></li>
-                                
-                                {/* Hidden for Starter Plan */}
-                                {user?.plan !== 'STARTER' && (
-                                    <li className="pos-menu-item"><NavLink to="/print-barcode" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}><div className="pos-menu-link-content"><Barcode className="pos-menu-icon" /><span>Print Barcode</span></div></NavLink></li>
-                                )}
+                                <li className="pos-menu-item">
+                                    <a
+                                        className={`pos-menu-link ${isInventoryActive ? 'active' : ''} ${openMenus.inventory ? 'open' : ''}`}
+                                        onClick={() => toggleMenu('inventory')}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <Boxes className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Inventory Management</span>
+                                        </div>
+                                        <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                    </a>
+                                    <ul className={`pos-submenu ${openMenus.inventory ? 'show' : ''}`}>
+                                        <li>
+                                            <NavLink to="/products" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Products List
+                                            </NavLink>
+                                        </li>
+                                        {(canManage('products') || canManage('inventory')) && (
+                                        <li>
+                                            <NavLink to="/create-product" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Create Product
+                                            </NavLink>
+                                        </li>
+                                        )}
+                                        <li>
+                                            <NavLink to="/expired-products" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Expired Products
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/low-stocks" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Low Stocks
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/category" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Category
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/sub-category" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Sub Category
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/brands" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Brands
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/units" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Units
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/warranties" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Warranties
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/stores" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Stores
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/warehouses" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Warehouses
+                                            </NavLink>
+                                        </li>
+                                        {user?.plan !== 'STARTER' && (
+                                            <li>
+                                                <NavLink to="/print-barcode" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                    Print Barcode
+                                                </NavLink>
+                                            </li>
+                                        )}
+                                        {user?.plan !== 'STARTER' && (
+                                            <li>
+                                                <NavLink to="/print-qrcode" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                    Print QR Code
+                                                </NavLink>
+                                            </li>
+                                        )}
+                                    </ul>
+                                </li>
                             </ul>
                         </>
                     )}
 
                     {/* Stock Section — CLIENT + ADMIN only */}
-                    {isClientOrAdmin && (
+                    {isClientOrAdmin && canView('inventory') && (
                         <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Stock</div>
@@ -244,7 +353,43 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 </li>
                             </ul>
 
+                            {/* Manufacturing Section */}
+                            {user?.businessType === 'Manufacturing' && canView('manufacturing') && (
+                                <>
+                                    <div className="pos-menu-divider"></div>
+                                    <div className="pos-menu-section">Manufacturing</div>
+                                    <ul className="pos-menu-list pb-4">
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/manufacturing/bom" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <Layers className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Bill of Materials (BOM)</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/manufacturing/work-orders" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <Cpu className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Work Orders (Production)</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/manufacturing/work-centers" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <Factory className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Work Centers</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </>
+                            )}
+
                             {/* Sales Section */}
+                            {(canView('sales') || canView('pos')) && (
+                            <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Sales</div>
                             <ul className="pos-menu-list pb-4">
@@ -271,6 +416,11 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         <li>
                                             <NavLink to="/dashboard/sales-pos" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                 POS Orders
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/dashboard/invoices" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Invoices
                                             </NavLink>
                                         </li>
 
@@ -301,22 +451,12 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                      </NavLink>
                                  </li> */}
                             </ul>
-
-                            {/* Orders Section */}
-                            <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Orders</div>
-                            <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/orders" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <ShoppingCart className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Orders</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                            </ul>
+                            </>
+                            )}
 
                             {/* Purchases Section */}
+                            {canView('purchases') && (
+                            <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Purchases</div>
                             <ul className="pos-menu-list pb-4">
@@ -346,53 +486,26 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     </NavLink>
                                 </li>
                             </ul>
+                            </>
+                            )}
 
-
-                              {/* Website Setting  Section */}
+                            {/* Reports Section */}
+                            {canView('sales') && (
+                            <>
                             <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Web App</div>
+                            <div className="pos-menu-section">Reports</div>
                             <ul className="pos-menu-list pb-4">
                                 <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/menus" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                    <NavLink to="/dashboard/financial-report" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                         <div className="pos-menu-link-content">
-                                            <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                                <line x1="3" y1="9" x2="21" y2="9"></line>
-                                                <line x1="9" y1="21" x2="9" y2="9"></line>
-                                            </svg>
-                                            <span>Menus</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-
-                                {/* <li className="pos-menu-item">
-                                    <NavLink to="/purchase-order" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                                <polyline points="14 2 14 8 20 8"></polyline>
-                                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                                <polyline points="10 9 9 9 8 9"></polyline>
-                                            </svg>
-                                            <span>Purchase Order</span>
-                                        </div>
-                                    </NavLink>
-                                </li> */}
-                                <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/blog-posts" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <svg className="pos-menu-icon" strokeWidth="1.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                                <polyline points="14 2 14 8 20 8"></polyline>
-                                                <polyline points="12 18 12 12 9 15"></polyline>
-                                                <polyline points="15 15 12 12"></polyline>
-                                            </svg>
-                                            <span>Blog posts</span>
+                                            <FileText className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Financial Report</span>
                                         </div>
                                     </NavLink>
                                 </li>
                             </ul>
+                            </>
+                            )}
 
                         </>
                     )}

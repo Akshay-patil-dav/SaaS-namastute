@@ -34,15 +34,17 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final com.example.otpauth.repository.ProjectMemberRepository memberRepository;
 
     public AuthService(UserRepository userRepository, RoleRepository roleRepository,
             PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-            JwtUtil jwtUtil) {
+            JwtUtil jwtUtil, com.example.otpauth.repository.ProjectMemberRepository memberRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.memberRepository = memberRepository;
     }
 
     private static final java.util.Set<String> DISPOSABLE_DOMAINS = java.util.Set.of(
@@ -80,12 +82,7 @@ public class AuthService {
         UserDetailsImpl userDetails = new UserDetailsImpl(user);
         String token = jwtUtil.generateToken(userDetails);
 
-        List<String> roles = user.getRoles().stream()
-                .map(r -> r.getName().name())
-                .collect(Collectors.toList());
-        String planStr = user.getPlan() != null ? user.getPlan().name()
-                : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+        return createAuthResponse(user, token);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -100,12 +97,7 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(userDetails);
 
-        List<String> roles = user.getRoles().stream()
-                .map(r -> r.getName().name())
-                .collect(Collectors.toList());
-        String planStr = user.getPlan() != null ? user.getPlan().name()
-                : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+        return createAuthResponse(user, token);
     }
 
     @Transactional
@@ -147,12 +139,7 @@ public class AuthService {
                 UserDetailsImpl userDetails = new UserDetailsImpl(user);
                 String token = jwtUtil.generateToken(userDetails);
 
-                List<String> roles = user.getRoles().stream()
-                        .map(r -> r.getName().name())
-                        .collect(Collectors.toList());
-                String planStr = user.getPlan() != null ? user.getPlan().name()
-                        : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-                return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+                return createAuthResponse(user, token);
             } else {
                 throw new RuntimeException("Invalid Google ID token.");
             }
@@ -185,13 +172,7 @@ public class AuthService {
         UserDetailsImpl userDetails = new UserDetailsImpl(user);
         String token = jwtUtil.generateToken(userDetails); // Optional: regenerate token if claims change
 
-        List<String> roles = user.getRoles().stream()
-                .map(r -> r.getName().name())
-                .collect(Collectors.toList());
-        String planStr = user.getPlan() != null ? user.getPlan().name()
-                : com.example.otpauth.model.SubscriptionPlan.NONE.name();
-        
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified());
+        return createAuthResponse(user, token);
     }
 
     public java.util.Map<String, Object> checkUsername(String username) {
@@ -211,5 +192,30 @@ public class AuthService {
             response.put("suggestions", suggestions);
         }
         return response;
+    }
+
+
+    private AuthResponse createAuthResponse(User user, String token) {
+        List<String> roles = user.getRoles().stream()
+                .map(r -> r.getName().name())
+                .collect(Collectors.toList());
+        String planStr = user.getPlan() != null ? user.getPlan().name()
+                : com.example.otpauth.model.SubscriptionPlan.NONE.name();
+
+        Long activeProjectId = user.getActiveProjectId();
+        String permissions = null;
+        if (activeProjectId != null && !activeProjectId.equals(user.getId())) {
+            permissions = memberRepository.findByProjectIdAndMemberUserId(activeProjectId, user.getId())
+                    .map(com.example.otpauth.model.ProjectMember::getPermissions)
+                    .orElse(null);
+        }
+
+        return new AuthResponse(user.getId(), token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified(), activeProjectId, permissions);
+    }
+
+    public AuthResponse getCurrentUser(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        // Token isn't re-issued on /me, frontend keeps the old one. We return empty string or null.
+        return createAuthResponse(user, null);
     }
 }

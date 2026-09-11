@@ -32,7 +32,7 @@ const ChatBot = () => {
 
         try {
             // Use the provided API key directly
-            const apiKey = "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";
+            const apiKey = "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";
 
             if (!apiKey || apiKey === 'YOUR_FREE_GEMINI_API_KEY_HERE') {
                 setMessages(prev => [...prev, {
