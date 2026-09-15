@@ -106,7 +106,7 @@ public class AuthService {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
                     new GsonFactory())
                     .setAudience(Collections
-                            .singletonList("167861187519-tad34cb9ben048eb4ddfbf70h4plhj91.apps.googleusercontent.com"))
+                            .singletonList("167861187519-fgnc1ardfst03sm0clbct5vo26d6h0iv.apps.googleusercontent.com"))
                     .build();
 
             GoogleIdToken idToken = verifier.verify(credential);
@@ -153,8 +153,8 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (userRepository.existsByUsername(request.getUsername()) && 
-            (user.getUsername() == null || !user.getUsername().equals(request.getUsername()))) {
+        if (userRepository.existsByUsername(request.getUsername()) &&
+                (user.getUsername() == null || !user.getUsername().equals(request.getUsername()))) {
             throw new RuntimeException("Username is already taken");
         }
 
@@ -166,7 +166,7 @@ public class AuthService {
         if (request.getFirstName() != null && request.getLastName() != null) {
             user.setFullName(request.getFirstName() + " " + request.getLastName());
         }
-        
+
         userRepository.save(user);
 
         UserDetailsImpl userDetails = new UserDetailsImpl(user);
@@ -194,7 +194,6 @@ public class AuthService {
         return response;
     }
 
-
     private AuthResponse createAuthResponse(User user, String token) {
         List<String> roles = user.getRoles().stream()
                 .map(r -> r.getName().name())
@@ -210,12 +209,15 @@ public class AuthService {
                     .orElse(null);
         }
 
-        return new AuthResponse(user.getId(), token, user.getEmail(), user.getFullName(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(), user.isPhoneVerified(), activeProjectId, permissions);
+        return new AuthResponse(user.getId(), token, user.getEmail(), user.getFullName(), user.getFirstName(),
+                user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(),
+                user.isPhoneVerified(), activeProjectId, permissions);
     }
 
     public AuthResponse getCurrentUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        // Token isn't re-issued on /me, frontend keeps the old one. We return empty string or null.
+        // Token isn't re-issued on /me, frontend keeps the old one. We return empty
+        // string or null.
         return createAuthResponse(user, null);
     }
 }
