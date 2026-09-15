@@ -106,7 +106,7 @@ public class AuthService {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
                     new GsonFactory())
                     .setAudience(Collections
-                            .singletonList("167861187519-fgnc1ardfst03sm0clbct5vo26d6h0iv.apps.googleusercontent.com"))
+                            .singletonList("167861187519-44s1h4e2mprdv7gur3l8ddli6sk2225b.apps.googleusercontent.com"))
                     .build();
 
             GoogleIdToken idToken = verifier.verify(credential);
