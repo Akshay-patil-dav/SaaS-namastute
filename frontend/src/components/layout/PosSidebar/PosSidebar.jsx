@@ -42,7 +42,8 @@ import {
     Palette,
     ShoppingCart,
     Factory,
-    Boxes
+    Boxes,
+    Settings
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -147,10 +148,38 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
             {/* Sidebar */}
             <aside className={`pos-sidebar`}>
-                <div className="pos-sidebar-header" style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', borderBottom: '1px solid #f3f4f6' }}>
-                    <Link to="/dashboard" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ margin: 0, fontWeight: '900', fontSize: '24px', letterSpacing: '0.5px', color: '#111827', lineHeight: '1.2' }}>AKSHAY</span>
-                        <span style={{ margin: 0, fontWeight: '700', fontSize: '13px', letterSpacing: '1px', color: '#6B7280', textTransform: 'uppercase' }}>PATIL</span>
+                <div className="pos-sidebar-header" style={{ padding: '24px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f3f4f6', backgroundColor: '#ffffff' }}>
+                    <Link to="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                        {companyInfo?.logo && (
+                            <img 
+                                src={companyInfo.logo} 
+                                alt="Company Logo" 
+                                style={{ width: '40px', height: '40px', objectFit: 'contain', marginRight: '12px', borderRadius: '4px', flexShrink: 0 }} 
+                            />
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                            {(() => {
+                                const companyName = companyInfo?.name || 'Company Name';
+                                const words = companyName.split(' ');
+                                const firstWord = words[0];
+                                const restOfWords = words.slice(1).join(' ');
+                                return (
+                                    <>
+                                        <span style={{ margin: 0, fontWeight: '900', fontSize: '24px', letterSpacing: '0.5px', color: '#111827', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={firstWord}>
+                                            {firstWord.toUpperCase()}
+                                        </span>
+                                        {restOfWords && (
+                                            <span style={{ margin: 0, fontWeight: '700', fontSize: '13px', letterSpacing: '1px', color: '#6B7280', textTransform: 'uppercase', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={restOfWords}>
+                                                {restOfWords}
+                                            </span>
+                                        )}
+                                    </>
+                                );
+                            })()}
+                        </div>
+                    </Link>
+                    <Link to="/settings" title="Company Settings" style={{ color: '#6B7280', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                        <Settings size={20} strokeWidth={1.5} />
                     </Link>
                 </div>
 

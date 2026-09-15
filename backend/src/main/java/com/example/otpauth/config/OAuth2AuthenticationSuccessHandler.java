@@ -15,10 +15,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final JwtUtil jwtUtil;
 
     // ─── Read from backend/.env → FRONTEND_URL ────────────────────────────
-    // To change the redirect URL: edit backend/.env  →  FRONTEND_URL=https://yourdomain.com
-    // application.yml maps: app.frontend-url = ${FRONTEND_URL:http://localhost:5173}
+    // To change the redirect URL: edit backend/.env →
+    // FRONTEND_URL=https://yourdomain.com
+    // application.yml maps: app.frontend-url =
+    // ${FRONTEND_URL:https://namustutamsaas.vercel.app}
 
-    
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
@@ -28,10 +29,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+            Authentication authentication) throws IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String token = jwtUtil.generateToken(userDetails);
-        
+
         // Redirect to React frontend with JWT token in URL query parameter
         // ✅ frontendUrl is read from backend/.env → FRONTEND_URL
         String targetUrl = frontendUrl + "/oauth2/redirect?token=" + token;

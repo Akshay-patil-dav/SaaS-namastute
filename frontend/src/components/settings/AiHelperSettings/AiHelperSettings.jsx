@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrency } from '../../../hooks/useCurrency';
+import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import {
   Bot, Key, Eye, EyeOff, Save, Trash2,
   CheckCircle2, AlertCircle, ExternalLink,
@@ -139,6 +141,16 @@ const PROVIDERS = [
 
 export const AiHelperSettings = () => {
     const { currencySymbol } = useCurrency();
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
+    const isMainUser = !user?.activeProjectId || user?.activeProjectId === user?.id || user?.role === 'SUPER_ADMIN';
+
+    useEffect(() => {
+        if (!isMainUser) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [isMainUser, navigate]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

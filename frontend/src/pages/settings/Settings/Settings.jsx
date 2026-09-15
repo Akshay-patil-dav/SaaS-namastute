@@ -22,6 +22,7 @@ import {
     CheckCircle2,
     Bot
 } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './settings.css';
 import { ProfileSettings, SecuritySettings, Notifications, ConnectedApps } from '../../../components/settings/GeneralSettings/GeneralSettings';
@@ -44,8 +45,11 @@ const sectionMapping = {
 };
 
 export default function Settings() {
+    const { user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+    
+    const isMainUser = !user?.activeProjectId || user?.activeProjectId === user?.id || user?.role === 'SUPER_ADMIN';
     
     const getInitialSection = () => {
         const path = location.pathname.split('/').pop();
@@ -215,23 +219,25 @@ export default function Settings() {
                     </div>
 
                     {/* AI Settings */}
-                    <div className="settings-sidebar-section">
-                        <div 
-                            className={`settings-sidebar-section-title ${openSection === 'ai' ? 'active' : ''}`}
-                            onClick={() => setOpenSection(openSection === 'ai' ? null : 'ai')}
-                        >
-                            <div className="settings-sidebar-section-icon">
-                                <Bot size={18} />
-                                <span>AI Settings</span>
+                    {isMainUser && (
+                        <div className="settings-sidebar-section">
+                            <div 
+                                className={`settings-sidebar-section-title ${openSection === 'ai' ? 'active' : ''}`}
+                                onClick={() => setOpenSection(openSection === 'ai' ? null : 'ai')}
+                            >
+                                <div className="settings-sidebar-section-icon">
+                                    <Bot size={18} />
+                                    <span>AI Settings</span>
+                                </div>
+                                {openSection === 'ai' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                             </div>
-                            {openSection === 'ai' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            {openSection === 'ai' && (
+                                <ul className="settings-sidebar-list">
+                                    <li className={`settings-sidebar-item ${isActive('ai_helper') ? 'active' : ''}`} onClick={() => navigate('/settings/ai_helper')}>AI Helper</li>
+                                </ul>
+                            )}
                         </div>
-                        {openSection === 'ai' && (
-                            <ul className="settings-sidebar-list">
-                                <li className={`settings-sidebar-item ${isActive('ai_helper') ? 'active' : ''}`} onClick={() => navigate('/settings/ai_helper')}>AI Helper</li>
-                            </ul>
-                        )}
-                    </div>
+                    )}
                 </div>
 
                 {/* Content */}

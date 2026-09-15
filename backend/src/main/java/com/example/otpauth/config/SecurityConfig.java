@@ -37,13 +37,13 @@ public class SecurityConfig {
 
     // ─── Read from backend/.env → CORS_EXTRA_ORIGINS ──────────────────────────
     // Optional: comma-separated extra origins (e.g. for dev ports, staging, etc.)
-    // Example: CORS_EXTRA_ORIGINS=http://localhost:5174,http://localhost:3000
+    // Example: CORS_EXTRA_ORIGINS=http://localhost:5174,103.190.93.133:3000
     @Value("${app.cors-extra-origins:}")
     private String corsExtraOrigins;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
-                          CustomOAuth2UserService customOAuth2UserService,
-                          OAuth2AuthenticationSuccessHandler successHandler) {
+            CustomOAuth2UserService customOAuth2UserService,
+            OAuth2AuthenticationSuccessHandler successHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.customOAuth2UserService = customOAuth2UserService;
         this.successHandler = successHandler;
@@ -55,15 +55,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/verification/**", "/oauth2/**", "/login/**", "/api/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands", "/api/units", "/api/warranties").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/verification/**", "/oauth2/**", "/login/**",
+                                "/api/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands",
+                                "/api/units", "/api/warranties")
+                        .permitAll()
                         // Allow public e-commerce storefront access
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**")
+                        .permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/sales").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/sales/*").permitAll()
-                        // AI Helper endpoints require a valid JWT — each user can only access their own data
+                        // AI Helper endpoints require a valid JWT — each user can only access their own
+                        // data
                         .requestMatchers("/api/ai/**").authenticated()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .exceptionHandling(e -> e
                         .defaultAuthenticationEntryPointFor(
                                 (request, response, authException) -> {
@@ -71,22 +75,19 @@ public class SecurityConfig {
                                     response.setContentType("application/json");
                                     response.getWriter().write("{\"error\": \"Unauthorized\"}");
                                 },
-                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/**")
-                        )
-                )
+                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/**")))
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
-                        )
-                        .successHandler(successHandler)
-                )
+                                .userService(customOAuth2UserService))
+                        .successHandler(successHandler))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
@@ -102,15 +103,17 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // ── CORS Allowed Origins ───────────────────────────────────────────────────
-        // ALL origins come from backend/.env via application.yml — zero hardcoding here.
+        // ALL origins come from backend/.env via application.yml — zero hardcoding
+        // here.
         //
-        //  backend/.env:
-        //    FRONTEND_URL=http://localhost:5173        ← your main allowed origin
-        //    CORS_EXTRA_ORIGINS=http://localhost:5174,https://saa-s-namustutam.vercel.app
+        // backend/.env:
+        // FRONTEND_URL=https://namustutamsaas.vercel.app ← your main allowed origin
+        // CORS_EXTRA_ORIGINS=http://localhost:5174,https://saa-s-namustutam.vercel.app
         //
         List<String> origins = new java.util.ArrayList<>();
 
-        // Strip trailing slash so "http://localhost:5173/" and "http://localhost:5173"
+        // Strip trailing slash so "https://namustutamsaas.vercel.app/" and
+        // "https://namustutamsaas.vercel.app"
         // both resolve to the same origin, preventing subtle CORS mismatches.
         String primary = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
         origins.add(primary);
@@ -119,8 +122,10 @@ public class SecurityConfig {
         if (corsExtraOrigins != null && !corsExtraOrigins.isBlank()) {
             for (String o : corsExtraOrigins.split(",")) {
                 String trimmed = o.trim();
-                if (trimmed.endsWith("/")) trimmed = trimmed.substring(0, trimmed.length() - 1);
-                if (!trimmed.isEmpty() && !origins.contains(trimmed)) origins.add(trimmed);
+                if (trimmed.endsWith("/"))
+                    trimmed = trimmed.substring(0, trimmed.length() - 1);
+                if (!trimmed.isEmpty() && !origins.contains(trimmed))
+                    origins.add(trimmed);
             }
         }
         configuration.setAllowedOrigins(origins);

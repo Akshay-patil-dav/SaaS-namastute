@@ -100,7 +100,7 @@ start "Namustutam App" jre\bin\java.exe -jar app.jar
 echo.
 echo ========================================================
 echo App and Database started successfully!
-echo The app should be accessible at http://localhost:3000
+echo The app should be accessible at 103.190.93.133:3000
 echo Close this window to keep them running in background.
 echo Use stop.bat to gracefully shutdown the application.
 echo ========================================================

@@ -73,14 +73,25 @@ public class AiController {
         return auth.getName(); // Spring Security principal = email
     }
 
+    private Optional<UserAiSettings> getMainUserAiSettings() {
+        String email = getCurrentUserEmail();
+        User currentUser = userRepository.findByEmail(email).orElse(null);
+        if (currentUser == null) return Optional.empty();
+
+        if (currentUser.getActiveProjectId() != null) {
+            User mainUser = userRepository.findById(currentUser.getActiveProjectId()).orElse(currentUser);
+            return aiSettingsRepo.findByUserEmail(mainUser.getEmail());
+        }
+        return aiSettingsRepo.findByUserEmail(email);
+    }
+
     // ────────────────────────────────────────────────────────────────────────
     // GET /api/ai/settings
     // ────────────────────────────────────────────────────────────────────────
 
     @GetMapping("/settings")
     public ResponseEntity<Map<String, Object>> getAiSettings() {
-        String email = getCurrentUserEmail();
-        Optional<UserAiSettings> opt = aiSettingsRepo.findByUserEmail(email);
+        Optional<UserAiSettings> opt = getMainUserAiSettings();
 
         Map<String, Object> result = new HashMap<>();
         if (opt.isPresent()) {
@@ -192,8 +203,8 @@ public class AiController {
 
     @GetMapping("/test")
     public ResponseEntity<Map<String, Object>> testApiKey() {
-        String email = getCurrentUserEmail();
-        Optional<UserAiSettings> opt = aiSettingsRepo.findByUserEmail(email);
+        String email = getCurrentUserEmail(); // for logging
+        Optional<UserAiSettings> opt = getMainUserAiSettings();
 
         if (opt.isEmpty() || !opt.get().hasKey()) {
             return ResponseEntity.ok(Map.of(
@@ -292,10 +303,10 @@ public class AiController {
      */
     @PostMapping("/chat")
     public ResponseEntity<Map<String, Object>> chat(@RequestBody Map<String, Object> body) {
-        String email = getCurrentUserEmail();
+        String email = getCurrentUserEmail(); // for logging
 
-        // 1. Load user's AI settings
-        UserAiSettings settings = aiSettingsRepo.findByUserEmail(email).orElse(null);
+        // 1. Load user's AI settings (from main user workspace)
+        UserAiSettings settings = getMainUserAiSettings().orElse(null);
         if (settings == null || !settings.hasKey()) {
             return ResponseEntity.badRequest().body(Map.of(
                 "error", "No API key configured. Go to Settings → AI Settings → AI Helper to add your key."
