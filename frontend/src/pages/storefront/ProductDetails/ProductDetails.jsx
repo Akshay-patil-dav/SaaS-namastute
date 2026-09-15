@@ -19,7 +19,7 @@ const ProductDetails = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://103.190.93.133:3000/api/products/${id}`)
+        axios.get(`http://http://103.190.93.133:3000/api/products/${id}`)
             .then(response => {
                 setProduct(response.data);
                 setLoading(false);

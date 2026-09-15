@@ -37,7 +37,7 @@ public class SecurityConfig {
 
     // ─── Read from backend/.env → CORS_EXTRA_ORIGINS ──────────────────────────
     // Optional: comma-separated extra origins (e.g. for dev ports, staging, etc.)
-    // Example: CORS_EXTRA_ORIGINS=http://localhost:5174,103.190.93.133:3000
+    // Example: CORS_EXTRA_ORIGINS=http://localhost:5174,http://103.190.93.133:3000
     @Value("${app.cors-extra-origins:}")
     private String corsExtraOrigins;
 
