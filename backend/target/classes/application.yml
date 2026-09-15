@@ -57,17 +57,17 @@ spring:
 server:
   port: 3000
 
-app:
-  base-url: ${APP_BASE_URL:103.190.93.133:3000}
-  frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
-  # frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
-  cors-extra-origins: ${CORS_EXTRA_ORIGINS:}
-
-
 # app:
-#   base-url: ${APP_BASE_URL:https://103.190.93.133}
+#   base-url: ${APP_BASE_URL:103.190.93.133:3000}
 #   frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
-#   cors-extra-origins: ${CORS_EXTRA_ORIGINS:}
+#   # frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
+#   cors-extra-origins: ${CORS_EXTRA_ORIGINS:http://localhost:5173}
+
+
+app:
+  base-url: ${APP_BASE_URL:https://103.190.93.133}
+  frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
+  cors-extra-origins: ${CORS_EXTRA_ORIGINS:}
 
 
 jwt:
