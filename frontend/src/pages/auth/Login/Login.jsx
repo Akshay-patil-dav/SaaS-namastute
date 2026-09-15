@@ -92,7 +92,7 @@ export default function Login() {
                         </div>
                     )}
 
-                    {/* <form onSubmit={handleLogin} className="login-v2-form">
+                    <form onSubmit={handleLogin} className="login-v2-form">
                         <div className="input-v2-group">
                             <label>Email Address</label>
                             <div className="input-v2-wrapper">
@@ -150,7 +150,7 @@ export default function Login() {
 
                     <div className="divider-v2">
                         <span>Or continue with</span>
-                    </div> */}
+                    </div>
 
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', marginBottom: '1.5rem' }}>
                         <GoogleLogin
@@ -161,6 +161,11 @@ export default function Login() {
                             text="signin_with"
                             shape="rectangular"
                         />
+                    </div>
+
+                    <div style={{ textAlign: 'center', marginTop: '1rem', marginBottom: '1rem' }}>
+                        <span style={{ color: 'var(--v2-text-muted)', fontSize: '0.9rem' }}>Don't have an account? </span>
+                        <Link to="/register" style={{ color: 'var(--v2-primary)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}>Sign up</Link>
                     </div>
 
                     <p className="login-v2-footer">© 2026 Namustute Inc. All rights reserved.</p>
