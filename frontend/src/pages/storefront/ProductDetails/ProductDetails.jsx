@@ -3,6 +3,7 @@ import { useCurrency } from '../../../hooks/useCurrency';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Star, ShieldCheck, Truck, RotateCcw, Minus, Plus, ShoppingCart, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
+import apiClient, { API } from '../../../api/config';
 import { useCartStore } from '../../../store/cartStore';
 import './ProductDetails.css';
 
@@ -19,7 +20,7 @@ const ProductDetails = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://103.190.93.133:3000/api/products/${id}`)
+        apiClient.get(`${API.PRODUCTS}/${id}`)
             .then(response => {
                 setProduct(response.data);
                 setLoading(false);
