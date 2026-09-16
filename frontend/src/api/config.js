@@ -21,11 +21,11 @@ const isProduction = import.meta.env.PROD === true;
 
 const DEFAULT_API_BASE_URL = isProduction
   ? 'https://springboot-app-pb1v.onrender.com/api'
-  : 'http://localhost:3000/api';
+  : 'http://103.190.93.133:3000/api';
 
 const DEFAULT_BACKEND_BASE_URL = isProduction
   ? 'https://springboot-app-pb1v.onrender.com'
-  : 'http://localhost:3000';
+  : 'http://103.190.93.133:3000';
 
 const DEFAULT_FRONTEND_URL = isProduction
   ? 'https://saa-s-namustutam.vercel.app'
