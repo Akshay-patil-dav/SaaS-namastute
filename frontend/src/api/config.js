@@ -136,10 +136,44 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// ── Response interceptor: handle 401 globally ───────────────────────────────
+// ── Response interceptor: handle 401 globally & API Fallback ───────────────
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // Fallback logic: if network error or 5xx error, switch to fallbacks
+    if (error.code === 'ERR_NETWORK' || (error.response && error.response.status >= 500)) {
+      originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+      
+      let fallbackApiUrl = null;
+      const currentUrlStr = originalRequest.url.startsWith('http') ? originalRequest.url : originalRequest.baseURL;
+      
+      // If IP failed, try localhost next
+      if (originalRequest._retryCount === 1 && currentUrlStr?.includes('103.190.93.133')) {
+        fallbackApiUrl = 'http://localhost:3000/api';
+      } 
+      // If localhost failed (either on retry 1 or retry 2), try production
+      else if ((originalRequest._retryCount === 1 && currentUrlStr?.includes('localhost')) || originalRequest._retryCount === 2) {
+        fallbackApiUrl = 'https://springboot-app-pb1v.onrender.com/api';
+      }
+
+      if (fallbackApiUrl) {
+        console.warn(`API request failed. Retrying with fallback: ${fallbackApiUrl}`);
+        
+        if (originalRequest.url.startsWith('http')) {
+          // Replace the base part of the absolute URL
+          const urlObj = new URL(originalRequest.url);
+          const oldOrigin = urlObj.origin + '/api';
+          originalRequest.url = originalRequest.url.replace(oldOrigin, fallbackApiUrl).replace(urlObj.origin, fallbackApiUrl.replace('/api', ''));
+        } else {
+          originalRequest.baseURL = fallbackApiUrl;
+        }
+        
+        return apiClient(originalRequest);
+      }
+    }
+
     if (error.response?.status === 401) {
       const publicPaths = ['/login', '/register', '/', '/blog'];
       const isPublic = publicPaths.some((p) => window.location.pathname.startsWith(p));
