@@ -383,7 +383,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
 
                             {/* Manufacturing Section */}
-                            {user?.businessType === 'Manufacturing' && canView('manufacturing') && (
+                            {user?.plan !== 'STARTER' && user?.businessType === 'Manufacturing' && canView('manufacturing') && (
                                 <>
                                     <div className="pos-menu-divider"></div>
                                     <div className="pos-menu-section">Manufacturing</div>
@@ -447,11 +447,13 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                 POS Orders
                                             </NavLink>
                                         </li>
-                                        <li>
-                                            <NavLink to="/dashboard/invoices" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                                Invoices
-                                            </NavLink>
-                                        </li>
+                                        {user?.plan !== 'STARTER' && (
+                                            <li>
+                                                <NavLink to="/dashboard/invoices" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                    Invoices
+                                                </NavLink>
+                                            </li>
+                                        )}
 
                                     </ul>
                                 </li>
@@ -484,7 +486,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             )}
 
                             {/* Purchases Section */}
-                            {canView('purchases') && (
+                            {user?.plan !== 'STARTER' && canView('purchases') && (
                             <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Purchases</div>
@@ -519,7 +521,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             )}
 
                             {/* Reports Section */}
-                            {canView('sales') && (
+                            {user?.plan !== 'STARTER' && canView('sales') && (
                             <>
                             <div className="pos-menu-divider"></div>
                             <div className="pos-menu-section">Reports</div>
