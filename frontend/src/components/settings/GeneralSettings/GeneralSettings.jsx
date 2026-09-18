@@ -3,7 +3,9 @@ import { User, Plus, MapPin, EyeOff, Shield, Phone, CheckCircle2, Mail, Key, Act
 import { useSettings } from '../../../hooks/useSettings';
 import { useCurrency } from '../../../hooks/useCurrency';
 import apiClient, { API, ENV } from '@/api/config';
+import Billing from './Billing';
 
+export { Billing };
 
 export const ProfileSettings = () => {
     const { currencySymbol } = useCurrency();

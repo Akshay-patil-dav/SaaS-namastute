@@ -25,7 +25,7 @@ import {
 import { useAuth } from '../../../context/AuthContext';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './settings.css';
-import { ProfileSettings, SecuritySettings, Notifications, ConnectedApps } from '../../../components/settings/GeneralSettings/GeneralSettings';
+import { ProfileSettings, SecuritySettings, Notifications, ConnectedApps, Billing } from '../../../components/settings/GeneralSettings/GeneralSettings';
 import TeamManagement from '../../../components/settings/GeneralSettings/TeamManagement';
 import { SystemSettings, CompanySettings, Localization, Prefixes, Preference, SocialAuthentication, Language } from '../../../components/settings/WebsiteSettings/WebsiteSettings';
 import { InvoiceSettings, InvoiceTemplate, Printer, PosSettings, CustomFields } from '../../../components/settings/AppSettings/AppSettings';
@@ -35,7 +35,7 @@ import { Storage, BanIp } from '../../../components/settings/OtherSettings/Other
 import { AiHelperSettings } from '../../../components/settings/AiHelperSettings/AiHelperSettings';
 
 const sectionMapping = {
-    profile: 'general', security: 'general', notifications: 'general', connected_apps: 'general', team_management: 'general',
+    profile: 'general', security: 'general', notifications: 'general', connected_apps: 'general', team_management: 'general', billing: 'general',
     system_settings: 'website', company_settings: 'website', localization: 'website', prefixes: 'website', preference: 'website', social_authentication: 'website', language: 'website',
     invoice_settings: 'app', invoice_template: 'app', printer: 'app', pos_settings: 'app', custom_fields: 'app',
     email_settings: 'system', email_template: 'system', sms_settings: 'system', sms_template: 'system', otp: 'system', gdpr_cookies: 'system',
@@ -99,6 +99,7 @@ export default function Settings() {
                                 <li className={`settings-sidebar-item ${isActive('notifications') ? 'active' : ''}`} onClick={() => navigate('/settings/notifications')}>Notifications</li>
                                 <li className={`settings-sidebar-item ${isActive('connected_apps') ? 'active' : ''}`} onClick={() => navigate('/settings/connected_apps')}>Connected Apps</li>
                                 <li className={`settings-sidebar-item ${isActive('team_management') ? 'active' : ''}`} onClick={() => navigate('/settings/team_management')}>Team Management</li>
+                                <li className={`settings-sidebar-item ${isActive('billing') ? 'active' : ''}`} onClick={() => navigate('/settings/billing')}>Billing & Plans</li>
                             </ul>
                         )}
                     </div>
@@ -249,6 +250,7 @@ export default function Settings() {
                         <Route path="notifications" element={<Notifications />} />
                         <Route path="connected_apps" element={<ConnectedApps />} />
                         <Route path="team_management" element={<TeamManagement />} />
+                        <Route path="billing" element={<Billing />} />
                         
                         <Route path="system_settings" element={<SystemSettings />} />
                         <Route path="company_settings" element={<CompanySettings />} />

@@ -211,7 +211,7 @@ public class AuthService {
 
         return new AuthResponse(user.getId(), token, user.getEmail(), user.getFullName(), user.getFirstName(),
                 user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(),
-                user.isPhoneVerified(), activeProjectId, permissions);
+                user.isPhoneVerified(), activeProjectId, permissions, user.getSubscriptionEndDate());
     }
 
     public AuthResponse getCurrentUser(String email) {

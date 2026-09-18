@@ -539,6 +539,61 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                         </>
                     )}
                 </div>
+                
+                {/* Subscription Widget */}
+                {!isSuperAdmin && (
+                    <div style={{ padding: '20px', borderTop: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+                        {(!user?.plan || user?.plan === 'NONE') ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: '500' }}>
+                                    Unlock more features
+                                </div>
+                                <Link 
+                                    to="/settings/billing" 
+                                    style={{ 
+                                        display: 'block', textAlign: 'center', background: 'var(--primary-color, #4f46e5)', 
+                                        color: 'white', padding: '8px 12px', borderRadius: '6px', 
+                                        textDecoration: 'none', fontSize: '14px', fontWeight: '600',
+                                        transition: 'opacity 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+                                    onMouseLeave={(e) => e.target.style.opacity = '1'}
+                                >
+                                    Upgrade Now
+                                </Link>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <div style={{ fontSize: '13px', color: '#111827', fontWeight: '600', textTransform: 'capitalize' }}>
+                                    {user.plan.toLowerCase()} Plan
+                                </div>
+                                {user.subscriptionEndDate && (
+                                    <>
+                                        <div style={{ width: '100%', backgroundColor: '#e5e7eb', borderRadius: '9999px', height: '6px', overflow: 'hidden' }}>
+                                            <div style={{ 
+                                                background: 'var(--primary-color, #10b981)', height: '100%', borderRadius: '9999px',
+                                                width: `${(() => {
+                                                    const end = new Date(user.subscriptionEndDate).getTime();
+                                                    const start = end - (30 * 24 * 60 * 60 * 1000); 
+                                                    const now = new Date().getTime();
+                                                    const total = end - start;
+                                                    const current = now - start;
+                                                    let percent = (current / total) * 100;
+                                                    if(percent > 100) percent = 100;
+                                                    if(percent < 0) percent = 0;
+                                                    return percent;
+                                                })()}%`
+                                            }}></div>
+                                        </div>
+                                        <div style={{ fontSize: '11px', color: '#6b7280' }}>
+                                            Ends on {new Date(user.subscriptionEndDate).toLocaleDateString()} at {new Date(user.subscriptionEndDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
             </aside>
         </>
     );

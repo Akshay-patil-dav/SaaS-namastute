@@ -100,6 +100,12 @@ public class User {
     public SubscriptionPlan getPlan() { return plan; }
     public void setPlan(SubscriptionPlan plan) { this.plan = plan; }
 
+    @Column(name = "subscription_end_date")
+    private java.time.LocalDateTime subscriptionEndDate;
+
+    public java.time.LocalDateTime getSubscriptionEndDate() { return subscriptionEndDate; }
+    public void setSubscriptionEndDate(java.time.LocalDateTime subscriptionEndDate) { this.subscriptionEndDate = subscriptionEndDate; }
+
     @Column(name = "active_project_id")
     private Long activeProjectId;
 

@@ -59,9 +59,9 @@ server:
 
 app:
   base-url: ${APP_BASE_URL:http://103.190.93.133:3000}
-  frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
+  frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app,http://localhost:5173,http://103.190.93.133:5173}
 #   # frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
-  cors-extra-origins: ${CORS_EXTRA_ORIGINS:https://namustutamsaas.vercel.app,http://localhost:5173}
+  cors-extra-origins: ${CORS_EXTRA_ORIGINS:https://namustutamsaas.vercel.app,http://localhost:5173,http://103.190.93.133:5173}
 
 
 # app:
@@ -82,3 +82,7 @@ security:
 
 ai:
   encryption-secret: ${AI_ENCRYPTION_SECRET:6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b}
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:rzp_test_YOUR_KEY_ID}
+  key-secret: ${RAZORPAY_KEY_SECRET:YOUR_KEY_SECRET}

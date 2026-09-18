@@ -36,11 +36,19 @@ public class PlanController {
             }
 
             user.setPlan(plan);
+            if (plan != SubscriptionPlan.NONE) {
+                user.setSubscriptionEndDate(java.time.LocalDateTime.now().plusDays(30));
+            } else {
+                user.setSubscriptionEndDate(null);
+            }
             userRepository.save(user);
 
-            Map<String, String> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             response.put("message", "Plan updated successfully");
             response.put("plan", plan.name());
+            if (user.getSubscriptionEndDate() != null) {
+                response.put("subscriptionEndDate", user.getSubscriptionEndDate().toString());
+            }
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {

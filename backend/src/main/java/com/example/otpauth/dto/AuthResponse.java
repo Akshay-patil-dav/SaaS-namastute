@@ -17,8 +17,9 @@ public class AuthResponse {
     private boolean phoneVerified;
     private Long activeProjectId;
     private String projectPermissions;
+    private java.time.LocalDateTime subscriptionEndDate;
 
-    public AuthResponse(Long id, String token, String email, String fullName, String firstName, String lastName, String username, String businessType, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified, Long activeProjectId, String projectPermissions) {
+    public AuthResponse(Long id, String token, String email, String fullName, String firstName, String lastName, String username, String businessType, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified, Long activeProjectId, String projectPermissions, java.time.LocalDateTime subscriptionEndDate) {
         this.id = id;
         this.token = token;
         this.email = email;
@@ -33,6 +34,7 @@ public class AuthResponse {
         this.phoneVerified = phoneVerified;
         this.activeProjectId = activeProjectId;
         this.projectPermissions = projectPermissions;
+        this.subscriptionEndDate = subscriptionEndDate;
     }
 
     public Long getId() { return id; }
@@ -76,4 +78,7 @@ public class AuthResponse {
 
     public String getProjectPermissions() { return projectPermissions; }
     public void setProjectPermissions(String projectPermissions) { this.projectPermissions = projectPermissions; }
+
+    public java.time.LocalDateTime getSubscriptionEndDate() { return subscriptionEndDate; }
+    public void setSubscriptionEndDate(java.time.LocalDateTime subscriptionEndDate) { this.subscriptionEndDate = subscriptionEndDate; }
 }
