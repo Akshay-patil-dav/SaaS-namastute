@@ -1,0 +1,857 @@
+/* ==========================================================================
+   KhataBook.css — Premium Digital Ledger Styling for Namustutam SaaS
+   ========================================================================== */
+
+.khata-container {
+    padding: 24px;
+    max-width: 1560px;
+    margin: 0 auto;
+    color: #1e293b;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── Top Header ─────────────────────────────────────────────────────────── */
+.khata-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.khata-title-area h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.02em;
+}
+
+.khata-title-area h1 .khata-icon-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+}
+
+.khata-title-area p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.khata-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ── KPI Summary Cards ─────────────────────────────────────────────────── */
+.khata-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.khata-kpi-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.khata-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.07);
+}
+
+.khata-kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.khata-kpi-card.kpi-get::before {
+    background: #10b981;
+}
+
+.khata-kpi-card.kpi-give::before {
+    background: #ef4444;
+}
+
+.khata-kpi-card.kpi-net::before {
+    background: #6366f1;
+}
+
+.khata-kpi-card.kpi-today::before {
+    background: #ea580c;
+}
+
+.kpi-info-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.kpi-value {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.kpi-value.text-get {
+    color: #059669;
+}
+
+.kpi-value.text-give {
+    color: #dc2626;
+}
+
+.kpi-value.text-net {
+    color: #4f46e5;
+}
+
+.kpi-value.text-today {
+    color: #ea580c;
+}
+
+.kpi-subtext {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.kpi-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.kpi-get .kpi-icon-wrap {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.kpi-give .kpi-icon-wrap {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.kpi-net .kpi-icon-wrap {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.kpi-today .kpi-icon-wrap {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+/* ── Main Tab Navigation ───────────────────────────────────────────────── */
+.khata-tabs-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.khata-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.khata-tab-btn:hover {
+    color: #1e293b;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.khata-tab-btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.khata-tab-btn .badge-count {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.khata-tab-btn.active .badge-count {
+    background: #ea580c;
+    color: #ffffff;
+}
+
+/* ── Split Layout: Parties List + Passbook Ledger ──────────────────────── */
+.khata-split-layout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 20px;
+    background: transparent;
+    min-height: 600px;
+}
+
+@media (max-width: 1024px) {
+    .khata-split-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Left Pane: Parties List Card ──────────────────────────────────────── */
+.khata-parties-pane {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 720px;
+}
+
+.khata-parties-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafafa;
+}
+
+.khata-search-input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.khata-search-input-wrap svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.khata-search-input {
+    width: 100%;
+    padding: 9px 12px 9px 36px;
+    font-size: 13px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.khata-search-input:focus {
+    border-color: #ea580c;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+}
+
+.khata-filter-chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.khata-chip {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #64748b;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+
+.khata-chip.active {
+    background: #ea580c;
+    border-color: #ea580c;
+    color: #ffffff;
+}
+
+.khata-parties-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.khata-party-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    border: 1px solid transparent;
+}
+
+.khata-party-row:hover {
+    background: #f8fafc;
+}
+
+.khata-party-row.selected {
+    background: #fff7ed;
+    border-color: #ffedd5;
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.08);
+}
+
+.khata-party-row-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.party-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.avatar-customer {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.avatar-supplier {
+    background: #fae8ff;
+    color: #86198f;
+}
+
+.party-name-meta {
+    min-width: 0;
+}
+
+.party-row-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.party-row-phone {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.khata-party-row-right {
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.party-bal-amount {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.party-bal-badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-top: 2px;
+}
+
+.bal-get {
+    color: #059669;
+}
+
+.bal-get .party-bal-badge {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.bal-give {
+    color: #dc2626;
+}
+
+.bal-give .party-bal-badge {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.bal-settled {
+    color: #64748b;
+}
+
+.bal-settled .party-bal-badge {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+/* ── Right Pane: Ledger Detail (Passbook View) ──────────────────────────── */
+.khata-ledger-pane {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 720px;
+}
+
+.ledger-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafafa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.ledger-party-profile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ledger-avatar-big {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ledger-title-text h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.ledger-party-contacts {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+
+.ledger-party-contacts span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ledger-balance-box {
+    text-align: right;
+    background: #ffffff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.ledger-balance-box .balance-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+}
+
+.ledger-balance-box .balance-val {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.ledger-action-bar {
+    padding: 12px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ledger-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Passbook Table Area ───────────────────────────────────────────────── */
+.ledger-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.ledger-table th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    z-index: 1;
+}
+
+.ledger-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    vertical-align: middle;
+}
+
+.ledger-table tr:hover td {
+    background: #fafbfc;
+}
+
+.amount-gave {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.amount-got {
+    color: #059669;
+    font-weight: 700;
+}
+
+.payment-mode-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #475569;
+    text-transform: uppercase;
+}
+
+/* ── Bottom Entry Bar (Big GAVE / GOT buttons) ─────────────────────────── */
+.ledger-entry-footer {
+    padding: 16px 24px;
+    background: #fafafa;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 16px;
+}
+
+.btn-gave {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-gave:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+}
+
+.btn-got {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-got:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+}
+
+/* ── Buttons & Standard Utilities ──────────────────────────────────────── */
+.khata-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    border: 1px solid transparent;
+}
+
+.khata-btn-primary {
+    background: #ea580c;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.2);
+}
+
+.khata-btn-primary:hover {
+    background: #c2410c;
+    color: #ffffff;
+}
+
+.khata-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+}
+
+.khata-btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.khata-btn-whatsapp {
+    background: #25d366;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
+}
+
+.khata-btn-whatsapp:hover {
+    background: #1eb956;
+    color: #ffffff;
+}
+
+/* ── Modals ────────────────────────────────────────────────────────────── */
+.khata-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    animation: khataFadeIn 0.2s ease-out;
+}
+
+.khata-modal-card {
+    background: #ffffff;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e2e8f0;
+    animation: khataScaleUp 0.2s ease-out;
+}
+
+.khata-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.khata-modal-header h4 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.khata-modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.khata-modal-footer {
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.khata-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.khata-form-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.khata-form-input, .khata-form-select, .khata-form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #0f172a;
+    outline: none;
+    transition: all 0.2s;
+    background: #ffffff;
+}
+
+.khata-form-input:focus, .khata-form-select:focus, .khata-form-textarea:focus {
+    border-color: #ea580c;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+}
+
+/* ── Daybook Specific Styles ───────────────────────────────────────────── */
+.daybook-panel {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+    overflow: hidden;
+}
+
+.daybook-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafafa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* ── Print Statement Mode ──────────────────────────────────────────────── */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .khata-printable-sheet, .khata-printable-sheet * {
+        visibility: visible;
+    }
+    .khata-printable-sheet {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        background: #ffffff;
+    }
+    .no-print {
+        display: none !important;
+    }
+}
+
+@keyframes khataFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes khataScaleUp {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}

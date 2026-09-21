@@ -51,7 +51,8 @@ import {
     SlidersHorizontal,
     ArrowRightLeft,
     ShoppingBag,
-    FileUp
+    FileUp,
+    BookOpen
 } from 'lucide-react';
 
 const initialNotifications = [
@@ -87,6 +88,10 @@ const searchablePages = [
     { title: 'Orders', path: '/dashboard/orders', icon: <ShoppingCart size={14} /> },
     { title: 'Purchase', path: '/purchases', icon: <ShoppingBag size={14} /> },
     { title: 'Purchase Return', path: '/purchase-return', icon: <FileUp size={14} /> },
+    { title: 'Khata Book', path: '/khata-book', icon: <BookOpen size={14} /> },
+    { title: 'Khata Customers', path: '/khata-book?tab=customers', icon: <BookOpen size={14} /> },
+    { title: 'Khata Suppliers', path: '/khata-book?tab=suppliers', icon: <BookOpen size={14} /> },
+    { title: 'Khata Day Book', path: '/khata-book?tab=daybook', icon: <BookOpen size={14} /> },
     { title: 'Web App Menus', path: '/dashboard/menus', icon: <List size={14} /> },
     { title: 'Blog Posts', path: '/dashboard/blog-posts', icon: <FileText size={14} /> }
 ];

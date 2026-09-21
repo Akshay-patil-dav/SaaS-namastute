@@ -82,6 +82,9 @@ export const API = {
   SETTINGS: `${ENV.API_BASE_URL}/settings`,
   UPLOAD: `${ENV.API_BASE_URL}/upload`,
 
+  // Khata Book (Digital Ledger)
+  KHATA: `${ENV.API_BASE_URL}/khata`,
+
   // AI Helper (per-user, JWT-protected)
   AI: `${ENV.API_BASE_URL}/ai`,
 

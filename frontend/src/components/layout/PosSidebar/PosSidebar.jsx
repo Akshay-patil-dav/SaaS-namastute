@@ -43,7 +43,8 @@ import {
     ShoppingCart,
     Factory,
     Boxes,
-    Settings
+    Settings,
+    BookOpen
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -71,12 +72,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
         location.pathname.startsWith('/warehouses') ||
         location.pathname.startsWith('/print-barcode') ||
         location.pathname.startsWith('/print-qrcode');
+    const isKhataActive = location.pathname.startsWith('/khata-book');
 
     const [openMenus, setOpenMenus] = useState({
         dashboard: isDashboardActive,
         superAdmin: isSuperAdminActive,
         inventory: isInventoryActive,
-        sales: isSalesActive
+        sales: isSalesActive,
+        khata: isKhataActive
     });
 
     let permissions = {};
@@ -110,15 +113,17 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     React.useEffect(() => {
         // When the route changes, ensure only the active section is open
         if (isDashboardActive) {
-            setOpenMenus({ dashboard: true, superAdmin: false, inventory: false, sales: false });
+            setOpenMenus({ dashboard: true, superAdmin: false, inventory: false, sales: false, khata: false });
         } else if (isSuperAdminActive) {
-            setOpenMenus({ dashboard: false, superAdmin: true, inventory: false, sales: false });
+            setOpenMenus({ dashboard: false, superAdmin: true, inventory: false, sales: false, khata: false });
         } else if (isInventoryActive) {
-            setOpenMenus({ dashboard: false, superAdmin: false, inventory: true, sales: false });
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: true, sales: false, khata: false });
         } else if (isSalesActive) {
-            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: true });
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: true, khata: false });
+        } else if (isKhataActive) {
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: false, khata: true });
         }
-    }, [isDashboardActive, isSuperAdminActive, isInventoryActive, isSalesActive]);
+    }, [isDashboardActive, isSuperAdminActive, isInventoryActive, isSalesActive, isKhataActive]);
 
     const toggleMenu = (menu) => {
         setOpenMenus(prev => {
@@ -128,7 +133,8 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                 dashboard: false,
                 superAdmin: false,
                 inventory: false,
-                sales: false
+                sales: false,
+                khata: false
             };
             // If it wasn't open, open it (accordion effect)
             if (!isCurrentlyOpen) {
@@ -519,6 +525,41 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
                             </>
                             )}
+
+                            {/* Khata Book Section — CLIENT + ADMIN */}
+                            <div className="pos-menu-divider"></div>
+                            <div className="pos-menu-section">Finance & Khata</div>
+                            <ul className="pos-menu-list pb-2">
+                                <li className="pos-menu-item">
+                                    <a
+                                        className={`pos-menu-link ${isKhataActive ? 'active' : ''} ${openMenus.khata ? 'open' : ''}`}
+                                        onClick={() => toggleMenu('khata')}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <BookOpen className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Khata Book</span>
+                                        </div>
+                                        <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                    </a>
+                                    <ul className={`pos-submenu ${openMenus.khata ? 'show' : ''}`}>
+                                        <li>
+                                            <NavLink to="/khata-book" end className={() => `pos-submenu-link ${location.pathname === '/khata-book' && (!location.search || location.search.includes('customers')) ? 'active' : ''}`}>
+                                                Customers Khata
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/khata-book?tab=suppliers" className={() => `pos-submenu-link ${location.pathname === '/khata-book' && location.search.includes('suppliers') ? 'active' : ''}`}>
+                                                Suppliers Khata
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/khata-book?tab=daybook" className={() => `pos-submenu-link ${location.pathname === '/khata-book' && location.search.includes('daybook') ? 'active' : ''}`}>
+                                                Day Book (Daily Ledger)
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
 
                             {/* Reports Section */}
                             {user?.plan !== 'STARTER' && canView('sales') && (

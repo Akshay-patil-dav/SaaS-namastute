@@ -49,6 +49,7 @@ const WorkOrders         = lazy(() => import('./pages/manufacturing/WorkOrders/W
 const WorkCenters        = lazy(() => import('./pages/manufacturing/WorkCenters/WorkCenters.jsx'));
 const Invoices           = lazy(() => import('./pages/sales/Invoices/Invoices.jsx'));
 const FinancialReport    = lazy(() => import('./pages/reports/FinancialReport/FinancialReport.jsx'));
+const KhataBook          = lazy(() => import('./pages/finance/KhataBook/KhataBook.jsx'));
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
@@ -263,6 +264,12 @@ function AppRoutes() {
                 <Route
                     path="/dashboard/financial-report"
                     element={<PosPage roles={ADMIN_ROLES}><FinancialReport /></PosPage>}
+                />
+
+                {/* Finance & Khata Book */}
+                <Route
+                    path="/khata-book"
+                    element={<PosPage roles={ADMIN_ROLES}><KhataBook /></PosPage>}
                 />
 
 
