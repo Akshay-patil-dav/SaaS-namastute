@@ -50,6 +50,13 @@
 }
 
 /* ── Main Layout Split ── */
+.pos-terminal-main-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
 .pos-terminal-main {
     display: flex;
     flex: 1;
@@ -75,17 +82,116 @@
     flex-shrink: 0;
 }
 
-@media (max-width: 1024px) {
-    .pos-terminal-main {
-        flex-direction: column;
-        overflow-y: auto;
-    }
+/* ── Mobile & Tablet Specific Elements (Hidden on Desktop > 1024px) ── */
+.pos-mobile-nav-bar {
+    display: none !important;
+}
+
+.pos-mobile-add-btn {
+    display: none !important;
+}
+
+.pos-mobile-cart-banner {
+    display: none !important;
+}
+
+@media (min-width: 1025px) {
     .pos-catalog-section {
-        border-right: none;
-        overflow-y: visible;
+        display: flex !important;
     }
     .pos-cart-section {
-        width: 100%;
+        display: flex !important;
+        width: 440px !important;
+    }
+}
+
+/* ── Responsive Mobile and Tablet View (<= 1024px) ── */
+@media (max-width: 1024px) {
+    .pos-terminal-container {
+        height: auto;
+        min-height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+
+    .pos-mobile-nav-bar {
+        display: flex !important;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 8px 16px;
+        gap: 8px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .pos-mobile-nav-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .pos-mobile-nav-btn:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .pos-mobile-nav-btn.active {
+        background: #fff7ed;
+        color: var(--primary-color, #ff9b29);
+        border-color: #fed7aa;
+        box-shadow: 0 1px 3px rgba(255, 155, 41, 0.15);
+    }
+
+    .pos-mobile-add-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pos-mobile-cart-banner {
+        display: block !important;
+        position: sticky;
+        bottom: 12px;
+        margin-top: 14px;
+        z-index: 10;
+    }
+
+    .pos-terminal-main {
+        flex-direction: column;
+        overflow-y: visible;
+    }
+
+    /* In responsive Mobile & Tablet view only, "All Items" list is hidden by default */
+    .pos-catalog-section.mobile-hidden {
+        display: none !important;
+    }
+
+    .pos-catalog-section.mobile-visible {
+        display: flex !important;
+        width: 100% !important;
+        border-right: none;
+        overflow-y: visible;
+        padding: 14px 16px;
+    }
+
+    .pos-cart-section.mobile-hidden {
+        display: none !important;
+    }
+
+    .pos-cart-section.mobile-visible {
+        display: flex !important;
+        width: 100% !important;
         border-left: none;
     }
 }

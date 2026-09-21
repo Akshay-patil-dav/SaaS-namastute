@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Search, Barcode, ShoppingCart, Trash2, Plus, Minus,
     CreditCard, DollarSign, QrCode, Building, CheckCircle,
-    User, RotateCcw, Printer, FileText, Sparkles, RefreshCw, X, ChevronRight, MonitorDot
+    User, RotateCcw, Printer, FileText, Sparkles, RefreshCw, X, ChevronRight, MonitorDot, Package
 } from 'lucide-react';
 import apiClient, { ENV } from '@/api/config';
 import { useCurrency } from '../../../hooks/useCurrency';
@@ -34,6 +34,9 @@ export default function PosTerminal() {
 
     // Mode Tab: 'terminal' | 'history'
     const [activeTab, setActiveTab] = useState('terminal');
+
+    // Responsive Mobile/Tablet View Tab: 'cart' (default: hides all items list) | 'catalog'
+    const [mobileView, setMobileView] = useState('cart');
 
     // Data States
     const [products, setProducts] = useState([]);
@@ -318,9 +321,30 @@ export default function PosTerminal() {
                     <PosOrders />
                 </div>
             ) : (
-                <div className="pos-terminal-main">
-                    {/* Left Catalog Area */}
-                    <div className="pos-catalog-section">
+                <div className="pos-terminal-main-wrapper">
+                    {/* Mobile & Tablet Segment Switcher (Hidden on Desktop > 1024px) */}
+                    <div className="pos-mobile-nav-bar">
+                        <button 
+                            type="button"
+                            className={`pos-mobile-nav-btn ${mobileView === 'cart' ? 'active' : ''}`}
+                            onClick={() => setMobileView('cart')}
+                        >
+                            <ShoppingCart size={15} />
+                            <span>Billing Cart {cart.length > 0 ? `(${cart.reduce((s, i) => s + i.quantity, 0)})` : ''}</span>
+                        </button>
+                        <button 
+                            type="button"
+                            className={`pos-mobile-nav-btn ${mobileView === 'catalog' ? 'active' : ''}`}
+                            onClick={() => setMobileView('catalog')}
+                        >
+                            <Package size={15} />
+                            <span>Browse Items ({products.length})</span>
+                        </button>
+                    </div>
+
+                    <div className="pos-terminal-main">
+                        {/* Left Catalog Area */}
+                        <div className={`pos-catalog-section ${mobileView === 'catalog' ? 'mobile-visible' : 'mobile-hidden'}`}>
                         {/* Search & Barcode Bar */}
                         <div className="pos-filter-bar">
                             <div className="pos-search-input-wrap">
@@ -414,10 +438,26 @@ export default function PosTerminal() {
                                 })}
                             </div>
                         )}
+
+                        {/* Mobile bottom bar to return to Cart when items selected */}
+                        {cart.length > 0 && (
+                            <div className="pos-mobile-cart-banner">
+                                <button
+                                    type="button"
+                                    className="btn btn-warning w-100 fw-bold d-flex align-items-center justify-content-between text-white shadow-sm py-2 px-3"
+                                    onClick={() => setMobileView('cart')}
+                                >
+                                    <span>{cart.reduce((s, i) => s + i.quantity, 0)} items in Cart ({currencySymbol}{grandTotal.toFixed(2)})</span>
+                                    <span className="d-flex align-items-center gap-1">
+                                        View Bill &amp; Checkout <ChevronRight size={16} />
+                                    </span>
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Billing & Cart Panel */}
-                    <div className="pos-cart-section">
+                    <div className={`pos-cart-section ${mobileView === 'cart' ? 'mobile-visible' : 'mobile-hidden'}`}>
                         {/* Cart Header */}
                         <div className="pos-cart-header">
                             <div className="pos-cust-select">
@@ -442,6 +482,13 @@ export default function PosTerminal() {
                                     <ShoppingCart size={40} className="opacity-30 mb-2 text-warning" />
                                     <h6>Cart is Empty</h6>
                                     <p className="small mb-0">Click products or scan barcode to add items to bill.</p>
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-warning mt-3 pos-mobile-add-btn"
+                                        onClick={() => setMobileView('catalog')}
+                                    >
+                                        <Plus size={14} className="me-1" /> Browse &amp; Add Products
+                                    </button>
                                 </div>
                             ) : (
                                 cart.map(item => (
@@ -636,7 +683,8 @@ export default function PosTerminal() {
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
+        )}
 
             {/* Customer Name Edit Modal */}
             {showCustModal && (

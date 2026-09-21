@@ -10,6 +10,7 @@ import { ENV } from '@/api/config';
 import apiClient from '../../../api/config';
 import {
     ChevronsLeft,
+    Menu,
     Search,
     Store,
     MonitorDot,
@@ -122,6 +123,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     // Sales Dropdown State
     const [salesOpen, setSalesOpen] = useState(false);
     const salesRef = useRef(null);
+    const [mobileSalesOpen, setMobileSalesOpen] = useState(false);
+    const mobileSalesRef = useRef(null);
 
     const filteredPages = searchablePages.filter(page =>
         page.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -134,6 +137,9 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
             }
             if (salesRef.current && !salesRef.current.contains(event.target)) {
                 setSalesOpen(false);
+            }
+            if (mobileSalesRef.current && !mobileSalesRef.current.contains(event.target)) {
+                setMobileSalesOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -245,9 +251,21 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     return (
         <header className="pos-header">
             {/* Left side */}
-            <div className="d-flex align-items-center gap-3">
-                <button className="pos-toggle-btn" onClick={() => setSidebarOpen(prev => !prev)}>
-                    <ChevronsLeft size={20} style={{ transform: sidebarOpen ? 'none' : 'rotate(180deg)', transition: 'transform 0.3s' }} />
+            <div className="d-flex align-items-center gap-2 gap-sm-3">
+                <button 
+                    className={`pos-toggle-btn ${sidebarOpen ? 'sidebar-is-open' : 'sidebar-is-closed'}`} 
+                    onClick={() => setSidebarOpen(prev => !prev)}
+                    title={sidebarOpen ? "Close navigation menu" : "Open navigation menu"}
+                    aria-label="Toggle navigation menu"
+                >
+                    {/* Desktop Icon (> 1024px) */}
+                    <span className="pos-desktop-toggle-icon">
+                        <ChevronsLeft size={20} style={{ transform: sidebarOpen ? 'none' : 'rotate(180deg)', transition: 'transform 0.3s' }} />
+                    </span>
+                    {/* Mobile & Tablet Icon (<= 1024px) */}
+                    <span className="pos-mobile-toggle-icon">
+                        {sidebarOpen ? <X size={19} strokeWidth={2.2} /> : <Menu size={19} strokeWidth={2.2} />}
+                    </span>
                 </button>
 
                 <div className="pos-search-bar hide-on-mobile" ref={searchRef} style={{ position: 'relative' }}>
@@ -319,8 +337,8 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
                 <ProjectSwitcher />
 
-                {/* Sales Navbar Dropdown */}
-                <div className="d-none d-md-flex align-items-center ms-2" ref={salesRef} style={{ position: 'relative' }}>
+                {/* Desktop Sales Navbar Dropdown (Hidden on Mobile & Tablet <= 1024px) */}
+                <div className="d-none d-lg-flex align-items-center ms-2" ref={salesRef} style={{ position: 'relative' }}>
                     <button
                         onClick={() => setSalesOpen(!salesOpen)}
                         className="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill border-0"
@@ -347,7 +365,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 top: '100%',
                                 left: 0,
                                 marginTop: '8px',
-                                width: '220px',
+                                width: '230px',
                                 zIndex: 1050,
                                 animation: 'fadeIn 0.15s ease-out'
                             }}
@@ -366,8 +384,23 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                     <MonitorDot size={15} />
                                 </div>
                                 <div>
-                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>POS Page</div>
+                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>POS Page (Sell)</div>
                                     <div className="text-muted" style={{ fontSize: '11px' }}>POS Terminal & Orders</div>
+                                </div>
+                            </Link>
+
+                            <Link
+                                to="/dashboard/invoices"
+                                className="d-flex align-items-center gap-2.5 px-3 py-2 text-decoration-none text-dark notification-feed-item"
+                                style={{ fontSize: '13px', fontWeight: '500' }}
+                                onClick={() => setSalesOpen(false)}
+                            >
+                                <div className="p-1.5 rounded" style={{ background: 'rgba(14, 165, 233, 0.12)', color: '#0ea5e9' }}>
+                                    <FileText size={15} />
+                                </div>
+                                <div>
+                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>Invoice Generate</div>
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>Create & Manage Invoices</div>
                                 </div>
                             </Link>
 
@@ -403,16 +436,105 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         </div>
                     )}
                 </div>
+
+                {/* Mobile & Tablet Sales Quick-Access Dropdown (Visible ONLY on Mobile & Tablet <= 1024px) */}
+                <div className="pos-mobile-sales-container" ref={mobileSalesRef}>
+                    <button
+                        type="button"
+                        onClick={() => setMobileSalesOpen(!mobileSalesOpen)}
+                        className={`pos-mobile-sales-trigger ${mobileSalesOpen ? 'active' : ''}`}
+                        aria-label="Sales and POS Menu"
+                    >
+                        <ShoppingCart size={15} className="pos-sales-icon" />
+                        <span>Sales</span>
+                        <ChevronDown size={13} className={`pos-sales-chevron ${mobileSalesOpen ? 'open' : ''}`} />
+                    </button>
+
+                    {mobileSalesOpen && (
+                        <div className="pos-mobile-sales-dropdown shadow-lg border rounded-3 bg-white py-2">
+                            <div className="px-3 py-1.5 text-muted small fw-bold border-bottom d-flex align-items-center justify-content-between" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>
+                                <span>SALES &amp; BILLING</span>
+                                <span className="badge bg-warning-subtle text-warning px-1.5 py-0.5" style={{ fontSize: '10px' }}>Quick Access</span>
+                            </div>
+
+                            {/* POS (Sell) */}
+                            <Link
+                                to="/dashboard/sales-pos"
+                                className="d-flex align-items-center gap-2.5 px-3 py-2.5 text-decoration-none text-dark notification-feed-item"
+                                onClick={() => setMobileSalesOpen(false)}
+                            >
+                                <div className="p-2 rounded-2 flex-shrink-0" style={{ background: 'rgba(255, 155, 41, 0.15)', color: 'var(--primary-color, #ff9b29)' }}>
+                                    <MonitorDot size={18} />
+                                </div>
+                                <div className="flex-grow-1 min-w-0">
+                                    <div className="d-flex align-items-center justify-content-between">
+                                        <div className="fw-bold" style={{ fontSize: '13px', color: '#1f2937' }}>POS (Sell)</div>
+                                        <span className="badge text-bg-warning text-white" style={{ fontSize: '9.5px', fontWeight: 600 }}>Live POS</span>
+                                    </div>
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>Direct Billing Terminal &amp; Orders</div>
+                                </div>
+                            </Link>
+
+                            {/* Generate Invoice */}
+                            <Link
+                                to="/dashboard/invoices"
+                                className="d-flex align-items-center gap-2.5 px-3 py-2.5 text-decoration-none text-dark notification-feed-item"
+                                onClick={() => setMobileSalesOpen(false)}
+                            >
+                                <div className="p-2 rounded-2 flex-shrink-0" style={{ background: 'rgba(14, 165, 233, 0.12)', color: '#0ea5e9' }}>
+                                    <FileText size={18} />
+                                </div>
+                                <div className="flex-grow-1 min-w-0">
+                                    <div className="d-flex align-items-center justify-content-between">
+                                        <div className="fw-bold" style={{ fontSize: '13px', color: '#1f2937' }}>Invoice Generate</div>
+                                        <span className="badge text-bg-info text-white" style={{ fontSize: '9.5px', fontWeight: 600 }}>Invoices</span>
+                                    </div>
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>Generate, print &amp; manage bills</div>
+                                </div>
+                            </Link>
+
+                            {/* Online Orders */}
+                            <Link
+                                to="/dashboard/sales-online"
+                                className="d-flex align-items-center gap-2.5 px-3 py-2.5 text-decoration-none text-dark notification-feed-item"
+                                onClick={() => setMobileSalesOpen(false)}
+                            >
+                                <div className="p-2 rounded-2 flex-shrink-0" style={{ background: 'rgba(99, 102, 241, 0.12)', color: '#6366f1' }}>
+                                    <ShoppingCart size={18} />
+                                </div>
+                                <div className="flex-grow-1 min-w-0">
+                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>Online Orders</div>
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>Web store &amp; e-commerce sales</div>
+                                </div>
+                            </Link>
+
+                            {/* Sales Return */}
+                            <Link
+                                to="/dashboard/sales-return"
+                                className="d-flex align-items-center gap-2.5 px-3 py-2.5 text-decoration-none text-dark notification-feed-item"
+                                onClick={() => setMobileSalesOpen(false)}
+                            >
+                                <div className="p-2 rounded-2 flex-shrink-0" style={{ background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444' }}>
+                                    <RotateCcw size={18} />
+                                </div>
+                                <div className="flex-grow-1 min-w-0">
+                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>Sales Return</div>
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>Returns &amp; refunds management</div>
+                                </div>
+                            </Link>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Right side */}
             <div className="pos-header-actions">
 
 
-                {/* Quick POS Page Action Button */}
+                {/* Quick POS Page Action Button (Desktop Only) */}
                 <Link
                     to="/dashboard/sales-pos"
-                    className="pos-btn-orange text-decoration-none hide-on-mobile"
+                    className="pos-btn-orange text-decoration-none pos-quick-pos-btn"
                     style={{
                         padding: '6px 14px',
                         borderRadius: '20px',
@@ -425,11 +547,11 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <MonitorDot size={16} />
                     <span>POS Page</span>
                 </Link>
-                <button className="pos-icon-btn hide-on-mobile">
+                <button className="pos-icon-btn hide-on-mobile pos-header-globe-btn" title="Language">
                     <Globe size={18} />
                 </button>
 
-                <button className="pos-icon-btn hide-on-mobile" onClick={toggleFullScreen} title="Toggle Fullscreen">
+                <button className="pos-icon-btn hide-on-mobile pos-header-fullscreen-btn" onClick={toggleFullScreen} title="Toggle Fullscreen">
                     {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
                 </button>
 
@@ -452,9 +574,10 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                             <div className="shadow-lg border rounded-3 p-3 bg-white" style={{
                                 position: 'absolute',
                                 top: '100%',
-                                right: 0,
+                                right: '-8px',
                                 marginTop: '10px',
-                                width: '330px',
+                                width: 'min(330px, calc(100vw - 20px))',
+                                maxWidth: 'calc(100vw - 20px)',
                                 zIndex: 1050,
                                 maxHeight: '420px',
                                 overflowY: 'auto',

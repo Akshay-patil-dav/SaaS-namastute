@@ -44,7 +44,8 @@ import {
     Factory,
     Boxes,
     Settings,
-    BookOpen
+    BookOpen,
+    X
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -54,6 +55,15 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const isClientOrAdmin = user?.role === 'ADMIN' || user?.role === 'CLIENT';
 
     const { companyInfo } = useCompany();
+
+    const handleSidebarNavClick = (e) => {
+        if (typeof window !== 'undefined' && window.innerWidth <= 991) {
+            const link = e.target.closest('a');
+            if (link && link.getAttribute('href')) {
+                setSidebarOpen(false);
+            }
+        }
+    };
 
     const isDashboardActive = location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/dashboard/admin2' || location.pathname === '/dashboard/sales';
     const isSuperAdminActive = location.pathname.startsWith('/dashboard/super-');
@@ -93,7 +103,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
             console.error("Failed to parse permissions", e);
         }
     }
-    
+
     // If they are in their own workspace, or activeProjectId is not set, they have full access.
     // If they are in someone else's workspace (activeProjectId != user.id), they ONLY have access to explicitly assigned permissions.
     const hasFullAccess = !user?.activeProjectId || user?.activeProjectId === user?.id;
@@ -157,10 +167,10 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                 <div className="pos-sidebar-header" style={{ padding: '24px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f3f4f6', backgroundColor: '#ffffff' }}>
                     <Link to="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
                         {companyInfo?.logo && (
-                            <img 
-                                src={companyInfo.logo} 
-                                alt="Company Logo" 
-                                style={{ width: '40px', height: '40px', objectFit: 'contain', marginRight: '12px', borderRadius: '4px', flexShrink: 0 }} 
+                            <img
+                                src={companyInfo.logo}
+                                alt="Company Logo"
+                                style={{ width: '40px', height: '40px', objectFit: 'contain', marginRight: '12px', borderRadius: '4px', flexShrink: 0 }}
                             />
                         )}
                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
@@ -184,12 +194,18 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             })()}
                         </div>
                     </Link>
-                    <Link to="/settings" title="Company Settings" style={{ color: '#6B7280', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                        <Settings size={20} strokeWidth={1.5} />
-                    </Link>
+                    <button
+                        className="pos-sidebar-mobile-close"
+                        onClick={() => setSidebarOpen(false)}
+                        title="Close menu"
+                        aria-label="Close navigation"
+                        type="button"
+                    >
+                        <X size={18} />
+                    </button>
                 </div>
 
-                <div className="pos-sidebar-content">
+                <div className="pos-sidebar-content" onClick={handleSidebarNavClick}>
                     {/* Main Section — CLIENT + ADMIN only */}
                     {!isSuperAdmin && (
                         <>
@@ -285,11 +301,11 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                             </NavLink>
                                         </li>
                                         {(canManage('products') || canManage('inventory')) && (
-                                        <li>
-                                            <NavLink to="/create-product" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                                Create Product
-                                            </NavLink>
-                                        </li>
+                                            <li>
+                                                <NavLink to="/create-product" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                    Create Product
+                                                </NavLink>
+                                            </li>
                                         )}
                                         <li>
                                             <NavLink to="/expired-products" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
@@ -424,54 +440,54 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
                             {/* Sales Section */}
                             {(canView('sales') || canView('pos')) && (
-                            <>
-                            <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Sales</div>
-                            <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <a
-                                        className={`pos-menu-link ${isSalesActive ? 'active' : ''} ${openMenus.sales ? 'open' : ''}`}
-                                        onClick={() => toggleMenu('sales')}
-                                    >
-                                        <div className="pos-menu-link-content">
-                                            <ShoppingCart className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Sales</span>
-                                        </div>
-                                        <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
-                                    </a>
-                                    <ul className={`pos-submenu ${openMenus.sales ? 'show' : ''}`}>
-                                        {/* Hidden for Starter Plan */}
-                                        {user?.plan !== 'STARTER' && (
-                                            <li>
-                                                <NavLink to="/dashboard/sales-online" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                                    Online Orders
-                                                </NavLink>
-                                            </li>
-                                        )}
-                                        <li>
-                                            <NavLink to="/dashboard/sales-pos" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                                POS Orders
+                                <>
+                                    <div className="pos-menu-divider"></div>
+                                    <div className="pos-menu-section">Sales</div>
+                                    <ul className="pos-menu-list pb-4">
+                                        <li className="pos-menu-item">
+                                            <a
+                                                className={`pos-menu-link ${isSalesActive ? 'active' : ''} ${openMenus.sales ? 'open' : ''}`}
+                                                onClick={() => toggleMenu('sales')}
+                                            >
+                                                <div className="pos-menu-link-content">
+                                                    <ShoppingCart className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Sales</span>
+                                                </div>
+                                                <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                            </a>
+                                            <ul className={`pos-submenu ${openMenus.sales ? 'show' : ''}`}>
+                                                {/* Hidden for Starter Plan */}
+                                                {user?.plan !== 'STARTER' && (
+                                                    <li>
+                                                        <NavLink to="/dashboard/sales-online" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                            Online Orders
+                                                        </NavLink>
+                                                    </li>
+                                                )}
+                                                <li>
+                                                    <NavLink to="/dashboard/sales-pos" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                        POS Orders
+                                                    </NavLink>
+                                                </li>
+                                                {user?.plan !== 'STARTER' && (
+                                                    <li>
+                                                        <NavLink to="/dashboard/invoices" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                            Invoices
+                                                        </NavLink>
+                                                    </li>
+                                                )}
+
+                                            </ul>
+                                        </li>
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/dashboard/sales-return" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <RotateCcw className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Sales Return</span>
+                                                </div>
                                             </NavLink>
                                         </li>
-                                        {user?.plan !== 'STARTER' && (
-                                            <li>
-                                                <NavLink to="/dashboard/invoices" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
-                                                    Invoices
-                                                </NavLink>
-                                            </li>
-                                        )}
-
-                                    </ul>
-                                </li>
-                                <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/sales-return" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <RotateCcw className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Sales Return</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                                {/* <li className="pos-menu-item">
+                                        {/* <li className="pos-menu-item">
                                     <a className="pos-menu-link">
                                         <div className="pos-menu-link-content">
                                             <Copy className="pos-menu-icon" strokeWidth={1.5} />
@@ -479,7 +495,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     </a>
                                 </li> */}
-                                {/* <li className="pos-menu-item">
+                                        {/* <li className="pos-menu-item">
                                      <NavLink to="/pos" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                          <div className="pos-menu-link-content">
                                              <Monitor className="pos-menu-icon" strokeWidth={1.5} />
@@ -487,26 +503,26 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                          </div>
                                      </NavLink>
                                  </li> */}
-                            </ul>
-                            </>
+                                    </ul>
+                                </>
                             )}
 
                             {/* Purchases Section */}
                             {user?.plan !== 'STARTER' && canView('purchases') && (
-                            <>
-                            <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Purchases</div>
-                            <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <NavLink to="/purchases" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <ShoppingBag className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Purchase</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
+                                <>
+                                    <div className="pos-menu-divider"></div>
+                                    <div className="pos-menu-section">Purchases</div>
+                                    <ul className="pos-menu-list pb-4">
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/purchases" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <ShoppingBag className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Purchase</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
 
-                                {/* <li className="pos-menu-item">
+                                        {/* <li className="pos-menu-item">
                                     <NavLink to="/purchase-order" className={({isActive}) => `pos-menu-link ${isActive ? 'active' : ''}`}>
                                         <div className="pos-menu-link-content">
                                             <FileText className="pos-menu-icon" strokeWidth={1.5} />
@@ -514,16 +530,16 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     </NavLink>
                                 </li> */}
-                                <li className="pos-menu-item">
-                                    <NavLink to="/purchase-return" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <FileUp className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Purchase Return</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                            </ul>
-                            </>
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/purchase-return" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <FileUp className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Purchase Return</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </>
                             )}
 
                             {/* Khata Book Section — CLIENT + ADMIN */}
@@ -563,26 +579,26 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
                             {/* Reports Section */}
                             {user?.plan !== 'STARTER' && canView('sales') && (
-                            <>
-                            <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Reports</div>
-                            <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <NavLink to="/dashboard/financial-report" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
-                                        <div className="pos-menu-link-content">
-                                            <FileText className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Financial Report</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
-                            </ul>
-                            </>
+                                <>
+                                    <div className="pos-menu-divider"></div>
+                                    <div className="pos-menu-section">Reports</div>
+                                    <ul className="pos-menu-list pb-4">
+                                        <li className="pos-menu-item">
+                                            <NavLink to="/dashboard/financial-report" className={({ isActive }) => `pos-menu-link ${isActive ? 'active' : ''}`}>
+                                                <div className="pos-menu-link-content">
+                                                    <FileText className="pos-menu-icon" strokeWidth={1.5} />
+                                                    <span>Financial Report</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </>
                             )}
 
                         </>
                     )}
                 </div>
-                
+
                 {/* Subscription Widget */}
                 {!isSuperAdmin && (
                     <div style={{ padding: '20px', borderTop: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
@@ -591,11 +607,11 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: '500' }}>
                                     Unlock more features
                                 </div>
-                                <Link 
-                                    to="/settings/billing" 
-                                    style={{ 
-                                        display: 'block', textAlign: 'center', background: 'var(--primary-color, #4f46e5)', 
-                                        color: 'white', padding: '8px 12px', borderRadius: '6px', 
+                                <Link
+                                    to="/settings/billing"
+                                    style={{
+                                        display: 'block', textAlign: 'center', background: 'var(--primary-color, #4f46e5)',
+                                        color: 'white', padding: '8px 12px', borderRadius: '6px',
                                         textDecoration: 'none', fontSize: '14px', fontWeight: '600',
                                         transition: 'opacity 0.2s'
                                     }}
@@ -613,23 +629,23 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 {user.subscriptionEndDate && (
                                     <>
                                         <div style={{ width: '100%', backgroundColor: '#e5e7eb', borderRadius: '9999px', height: '6px', overflow: 'hidden' }}>
-                                            <div style={{ 
+                                            <div style={{
                                                 background: 'var(--primary-color, #10b981)', height: '100%', borderRadius: '9999px',
                                                 width: `${(() => {
                                                     const end = new Date(user.subscriptionEndDate).getTime();
-                                                    const start = end - (30 * 24 * 60 * 60 * 1000); 
+                                                    const start = end - (30 * 24 * 60 * 60 * 1000);
                                                     const now = new Date().getTime();
                                                     const total = end - start;
                                                     const current = now - start;
                                                     let percent = (current / total) * 100;
-                                                    if(percent > 100) percent = 100;
-                                                    if(percent < 0) percent = 0;
+                                                    if (percent > 100) percent = 100;
+                                                    if (percent < 0) percent = 0;
                                                     return percent;
                                                 })()}%`
                                             }}></div>
                                         </div>
                                         <div style={{ fontSize: '11px', color: '#6b7280' }}>
-                                            Ends on {new Date(user.subscriptionEndDate).toLocaleDateString()} at {new Date(user.subscriptionEndDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                            Ends on {new Date(user.subscriptionEndDate).toLocaleDateString()} at {new Date(user.subscriptionEndDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                     </>
                                 )}

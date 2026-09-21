@@ -17,3 +17,169 @@
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
 }
+
+/* ── Mobile and Tablet Sales Quick-Access Navbar Dropdown (<= 1024px) ── */
+.pos-mobile-sales-container {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .pos-mobile-sales-container {
+        display: flex !important;
+        align-items: center;
+        position: relative;
+        margin-left: 2px;
+    }
+
+    .pos-mobile-sales-trigger {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        border: 1px solid #fed7aa;
+        border-radius: 20px;
+        color: #ea580c;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(234, 88, 12, 0.12);
+        white-space: nowrap;
+        outline: none;
+    }
+
+    .pos-mobile-sales-trigger:hover,
+    .pos-mobile-sales-trigger:active,
+    .pos-mobile-sales-trigger.active {
+        background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+        border-color: #fdba74;
+        box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+        color: #c2410c;
+    }
+
+    .pos-sales-icon {
+        color: #ea580c;
+        flex-shrink: 0;
+    }
+
+    .pos-sales-chevron {
+        transition: transform 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .pos-sales-chevron.open {
+        transform: rotate(180deg);
+    }
+
+    .pos-mobile-sales-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        width: 260px;
+        z-index: 1060;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        animation: fadeIn 0.15s ease-out;
+    }
+}
+
+@media (min-width: 1025px) {
+    .pos-mobile-sales-container {
+        display: none !important;
+    }
+    .pos-mobile-toggle-icon {
+        display: none !important;
+    }
+    .pos-desktop-toggle-icon {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* ── Sidebar Toggle Button Desktop vs Mobile ── */
+.pos-mobile-toggle-icon {
+    display: none !important;
+}
+
+.pos-desktop-toggle-icon {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 1024px) {
+    .pos-desktop-toggle-icon {
+        display: none !important;
+    }
+
+    .pos-mobile-toggle-icon {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Modern, Touch-Friendly Mobile & Tablet Toggle Button */
+    .pos-toggle-btn {
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 10px !important;
+        background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%) !important;
+        border: 1.5px solid #fed7aa !important;
+        color: #ea580c !important;
+        box-shadow: 0 2px 6px rgba(255, 155, 41, 0.16), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        outline: none !important;
+        flex-shrink: 0 !important;
+    }
+
+    .pos-toggle-btn:hover,
+    .pos-toggle-btn:active {
+        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%) !important;
+        border-color: #fdba74 !important;
+        box-shadow: 0 3px 8px rgba(255, 155, 41, 0.25) !important;
+        transform: scale(0.96) !important;
+    }
+
+    .pos-toggle-btn.sidebar-is-open {
+        background: linear-gradient(135deg, var(--primary-color, #ff9b29) 0%, #ea580c 100%) !important;
+        color: #ffffff !important;
+        border-color: #ea580c !important;
+        box-shadow: 0 3px 10px rgba(234, 88, 12, 0.35) !important;
+    }
+
+    /* Hide Quick POS Page Action Button on Mobile & Tablet (<= 1024px) */
+    .pos-quick-pos-btn {
+        display: none !important;
+    }
+
+    /* Hide Globe & Fullscreen Icon Buttons on Mobile & Tablet (<= 1024px) */
+    .pos-header-globe-btn,
+    .pos-header-fullscreen-btn {
+        display: none !important;
+    }
+}
+
+@media (min-width: 1025px) {
+    .pos-quick-pos-btn {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .pos-header-globe-btn,
+    .pos-header-fullscreen-btn {
+        display: flex !important;
+    }
+}
+
+
+
+
