@@ -254,10 +254,18 @@ function AppRoutes() {
                     element={<PosPage roles={ADMIN_ROLES}><WorkCenters /></PosPage>}
                 />
 
-                {/* Settings */}
+                {/* Settings & Connected Apps Direct Aliases */}
                 <Route
                     path="/settings/*"
                     element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
+                />
+                <Route
+                    path="/connected-apps"
+                    element={<Navigate to="/settings/connected_apps" replace />}
+                />
+                <Route
+                    path="/integrations"
+                    element={<Navigate to="/settings/connected_apps" replace />}
                 />
 
                 {/* Reports */}

@@ -41,18 +41,23 @@ export const SettingsProvider = ({ children }) => {
     const saveSettings = async (keysToSave, directData = null) => {
         try {
             setSaving(true);
-            let dataToSave;
-            if (directData) {
-                dataToSave = directData;
+            let dataToSave = {};
+
+            if (directData && typeof directData === 'object') {
+                dataToSave = { ...directData };
+                setSettings(prev => ({ ...prev, ...directData }));
+            } else if (keysToSave && typeof keysToSave === 'object' && !Array.isArray(keysToSave)) {
+                // Passed an object of key-value pairs directly: saveSettings({ whatsappConnected: 'true' })
+                dataToSave = { ...keysToSave };
+                setSettings(prev => ({ ...prev, ...keysToSave }));
             } else if (keysToSave && Array.isArray(keysToSave)) {
-                dataToSave = {};
                 keysToSave.forEach(key => {
                     if (settings[key] !== undefined) {
                         dataToSave[key] = settings[key];
                     }
                 });
             } else {
-                dataToSave = settings;
+                dataToSave = { ...settings };
             }
 
             await apiClient.post(API.SETTINGS, dataToSave);

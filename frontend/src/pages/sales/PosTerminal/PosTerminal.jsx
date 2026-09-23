@@ -7,8 +7,10 @@ import {
 import apiClient, { ENV } from '@/api/config';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useAuth } from '../../../context/AuthContext';
+import { useSettings } from '../../../hooks/useSettings';
 import InvoiceModal from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
 import PosOrders from '../PosOrders/PosOrders';
+import { sendWhatsAppMessage, compileWhatsAppTemplate } from '../../../services/whatsappService';
 import './pos-terminal.css';
 
 const BASE_URL = ENV.API_BASE_URL;
@@ -31,6 +33,7 @@ const getUpiQrUrl = (bankAccounts, user, grandTotal) => {
 export default function PosTerminal() {
     const { currencySymbol } = useCurrency();
     const { user } = useAuth();
+    const { settings } = useSettings();
 
     // Mode Tab: 'terminal' | 'history'
     const [activeTab, setActiveTab] = useState('terminal');
@@ -51,8 +54,10 @@ export default function PosTerminal() {
     // Cart & Customer States
     const [cart, setCart] = useState([]);
     const [customerName, setCustomerName] = useState('Walk-In Customer');
+    const [customerPhone, setCustomerPhone] = useState('');
     const [showCustModal, setShowCustModal] = useState(false);
     const [tempCustName, setTempCustName] = useState('');
+    const [tempCustPhone, setTempCustPhone] = useState('');
 
     // Summary & Payment States
     const [taxPercent, setTaxPercent] = useState(0);
@@ -255,6 +260,7 @@ export default function PosTerminal() {
                 ...created,
                 referenceNo: created.referenceNo || refNo,
                 customerName: payload.customerName,
+                customerPhone: customerPhone || payload.customerPhone || '',
                 grandTotal: grandTotal,
                 paidAmount: paidVal,
                 dueAmount: 0,
@@ -269,8 +275,82 @@ export default function PosTerminal() {
             setCompletedOrder(orderForInvoice);
             setInvoiceOpen(true);
 
+            // Trigger connected apps webhooks (Slack & Zapier)
+            if (settings?.slackConnected === 'true' && settings?.slackWebhookUrl) {
+                try {
+                    fetch(settings.slackWebhookUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            channel: settings.slackChannel || '#pos-orders',
+                            text: `*New POS Sale Completed!* :receipt:\n*Invoice:* ${orderForInvoice.referenceNo}\n*Customer:* ${payload.customerName}\n*Total:* ${currencySymbol}${grandTotal.toFixed(2)}\n*Payment:* ${paymentMethod}\n*Items:* ${cart.length} item(s)`
+                        })
+                    }).catch(() => {});
+                } catch (e) {}
+            }
+
+            if (settings?.zapierConnected === 'true' && settings?.zapierWebhookUrl) {
+                try {
+                    fetch(settings.zapierWebhookUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-Namustutam-Signature': settings.zapierSecret || ''
+                        },
+                        body: JSON.stringify({
+                            event: 'pos.sale_completed',
+                            timestamp: new Date().toISOString(),
+                            order: orderForInvoice
+                        })
+                    }).catch(() => {});
+                } catch (e) {}
+            }
+
+            // Auto-send WhatsApp receipt in background via Meta API if customer phone is available
+            const targetPhone = customerPhone || payload.customerPhone || '';
+            const isWhatsAppEnabled = settings?.whatsappConnected !== 'false';
+            const isBgAutoSend = settings?.whatsappBackgroundAutoSend !== 'false' || settings?.whatsappMode === 'cloud_api' || settings?.whatsappMode === 'gateway';
+
+            if (targetPhone && targetPhone.trim() && isWhatsAppEnabled && isBgAutoSend) {
+                try {
+                    const itemsSummary = cart.map(item => `• ${item.name || item.productName || 'Item'} (x${item.qty || 1}) - ${currencySymbol}${(parseFloat(item.price || item.unitPrice || 0) * (item.qty || 1)).toFixed(2)}`).join('\n');
+                    const storeName = settings?.companyName || user?.companyName || 'Namustutam Store';
+                    const compiledMsg = compileWhatsAppTemplate(settings?.whatsappTemplate, {
+                        customerName: payload.customerName || 'Valued Customer',
+                        customer_name: payload.customerName || 'Valued Customer',
+                        storeName: storeName,
+                        store_name: storeName,
+                        invoiceNo: orderForInvoice.referenceNo,
+                        invoice_no: orderForInvoice.referenceNo,
+                        amount: `${currencySymbol}${grandTotal.toFixed(2)}`,
+                        items: itemsSummary,
+                        paymentStatus: 'Paid',
+                        payment_status: 'Paid',
+                        date: new Date().toLocaleDateString()
+                    });
+
+                    // Send strictly in background without opening any window or browser tab
+                    sendWhatsAppMessage({
+                        phone: targetPhone,
+                        message: compiledMsg,
+                        settings: settings,
+                        forceWeb: false
+                    }).then(res => {
+                        console.log('Background WhatsApp receipt auto-sent to customer:', res);
+                    }).catch(err => {
+                        console.warn('Background WhatsApp receipt auto-send skipped/failed:', err.message);
+                    });
+                } catch (e) {
+                    console.warn('WhatsApp auto-send dispatch error:', e);
+                }
+            }
+
             // Reset cart
             setCart([]);
+            setCustomerName('Walk-In Customer');
+            setCustomerPhone('');
             setDiscountAmount(0);
             setCashTendered('');
             fetchCatalog(); // Refresh stock counts
@@ -462,10 +542,10 @@ export default function PosTerminal() {
                         <div className="pos-cart-header">
                             <div className="pos-cust-select">
                                 <User size={14} className="text-muted" />
-                                <span>{customerName}</span>
+                                <span>{customerName}{customerPhone ? ` (${customerPhone})` : ''}</span>
                                 <button 
                                     className="btn btn-sm btn-link p-0 text-warning text-decoration-none fw-bold ms-1"
-                                    onClick={() => { setTempCustName(customerName); setShowCustModal(true); }}
+                                    onClick={() => { setTempCustName(customerName); setTempCustPhone(customerPhone); setShowCustModal(true); }}
                                 >
                                     Edit
                                 </button>
@@ -696,14 +776,31 @@ export default function PosTerminal() {
                                 <button type="button" className="btn-close" onClick={() => setShowCustModal(false)} />
                             </div>
                             <div className="modal-body py-3">
-                                <label className="form-label small fw-bold">Customer Name / Phone</label>
-                                <input 
-                                    type="text" 
-                                    className="form-control"
-                                    value={tempCustName}
-                                    onChange={e => setTempCustName(e.target.value)}
-                                    placeholder="Enter customer name..."
-                                />
+                                <div className="mb-3">
+                                    <label className="form-label small fw-bold mb-1">Customer Name</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control form-control-sm"
+                                        value={tempCustName}
+                                        onChange={e => setTempCustName(e.target.value)}
+                                        placeholder="E.g. Ramesh Kumar"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="form-label small fw-bold mb-1">
+                                        WhatsApp / Mobile Number
+                                    </label>
+                                    <input 
+                                        type="tel" 
+                                        className="form-control form-control-sm"
+                                        value={tempCustPhone}
+                                        onChange={e => setTempCustPhone(e.target.value)}
+                                        placeholder="E.g. 9876543210"
+                                    />
+                                    <span className="text-muted" style={{ fontSize: '10px' }}>
+                                        Receipt will be sent via WhatsApp
+                                    </span>
+                                </div>
                             </div>
                             <div className="modal-footer py-2">
                                 <button className="btn btn-sm btn-secondary" onClick={() => setShowCustModal(false)}>Cancel</button>
@@ -711,6 +808,7 @@ export default function PosTerminal() {
                                     className="btn btn-sm btn-warning text-white fw-bold"
                                     onClick={() => {
                                         setCustomerName(tempCustName.trim() || 'Walk-In Customer');
+                                        setCustomerPhone(tempCustPhone.trim());
                                         setShowCustModal(false);
                                     }}
                                 >

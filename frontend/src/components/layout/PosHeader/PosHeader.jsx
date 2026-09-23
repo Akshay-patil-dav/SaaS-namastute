@@ -19,6 +19,7 @@ import {
     Minimize,
     Bell,
     Settings,
+    Puzzle,
     ChevronDown,
     PlusCircle,
     User,
@@ -777,6 +778,18 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                     }}
                                 >
                                     <Building size={15} color="#888" /> Company Settings
+                                </button>
+
+                                <button
+                                    style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#374151', textAlign: 'left', transition: 'background 0.15s' }}
+                                    onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
+                                    onMouseOut={(e) => e.currentTarget.style.background = 'white'}
+                                    onClick={() => {
+                                        setProfileOpen(false);
+                                        navigate('/settings/connected_apps');
+                                    }}
+                                >
+                                    <Puzzle size={15} color="#888" /> Connected Apps
                                 </button>
 
                                 <button

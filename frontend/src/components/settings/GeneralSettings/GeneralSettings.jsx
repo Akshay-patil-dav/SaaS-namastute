@@ -4,8 +4,9 @@ import { useSettings } from '../../../hooks/useSettings';
 import { useCurrency } from '../../../hooks/useCurrency';
 import apiClient, { API, ENV } from '@/api/config';
 import Billing from './Billing';
+import ConnectedApps from './ConnectedApps';
 
-export { Billing };
+export { Billing, ConnectedApps };
 
 export const ProfileSettings = () => {
     const { currencySymbol } = useCurrency();
@@ -515,79 +516,6 @@ export const Notifications = () => {
                     >
                         {saving ? 'Saving...' : 'Save Changes'}
                     </button>
-                </div>
-            </div>
-        </>
-    );
-};
-
-export const ConnectedApps = () => {
-    const { settings, loading, _saving, handleChange, saveSettings } = useSettings();
-
-    if (loading) return <div style={{ padding: '20px' }}>Loading settings...</div>;
-
-    return (
-        <>
-            <div className="settings-content-header">
-                <h3>Connected Apps</h3>
-            </div>
-            <div className="settings-content-body">
-                <div className="security-item">
-                    <div className="security-item-icon">
-                        <span style={{ fontSize: '18px', fontWeight: 'bold' }}>G</span>
-                    </div>
-                    <div className="security-item-content">
-                        <h4>Google Calendar</h4>
-                        <p>Sync your schedule with Google Calendar</p>
-                    </div>
-                    <div className="security-item-action">
-                        {settings.googleCalendarConnected === 'true' ? (
-                            <>
-                                <span className="status-text">Connected</span>
-                                <button className="btn-action dark" onClick={() => { handleChange('googleCalendarConnected', 'false'); saveSettings(['googleCalendarConnected']); }}>Disconnect</button>
-                            </>
-                        ) : (
-                            <button className="btn-action orange" onClick={() => { handleChange('googleCalendarConnected', 'true'); saveSettings(['googleCalendarConnected']); }}>Connect</button>
-                        )}
-                    </div>
-                </div>
-                <div className="security-item">
-                    <div className="security-item-icon">
-                        <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#1877F2' }}>f</span>
-                    </div>
-                    <div className="security-item-content">
-                        <h4>Facebook Ads</h4>
-                        <p>Manage ads from POS</p>
-                    </div>
-                    <div className="security-item-action">
-                        {settings.facebookAdsConnected === 'true' ? (
-                            <>
-                                <span className="status-text">Connected</span>
-                                <button className="btn-action dark" onClick={() => { handleChange('facebookAdsConnected', 'false'); saveSettings(['facebookAdsConnected']); }}>Disconnect</button>
-                            </>
-                        ) : (
-                            <button className="btn-action orange" onClick={() => { handleChange('facebookAdsConnected', 'true'); saveSettings(['facebookAdsConnected']); }}>Connect</button>
-                        )}
-                    </div>
-                </div>
-                <div className="security-item">
-                    <div className="security-item-icon">
-                        <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#25D366' }}>W</span>
-                    </div>
-                    <div className="security-item-content">
-                        <h4>WhatsApp Integration</h4>
-                        <p>Send invoices via WhatsApp</p>
-                    </div>
-                    <div className="security-item-action">
-                        {settings.whatsappConnected === 'true' ? (
-                            <>
-                                <span className="status-text">Connected</span>
-                                <button className="btn-action dark" onClick={() => { handleChange('whatsappConnected', 'false'); saveSettings(['whatsappConnected']); }}>Disconnect</button>
-                            </>
-                        ) : (
-                            <button className="btn-action orange" onClick={() => { handleChange('whatsappConnected', 'true'); saveSettings(['whatsappConnected']); }}>Connect</button>
-                        )}
-                    </div>
                 </div>
             </div>
         </>

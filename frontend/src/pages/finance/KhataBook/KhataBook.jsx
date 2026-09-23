@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import apiClient, { API } from '../../../api/config';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useCompany } from '../../../context/CompanyContext';
+import { useSettings } from '../../../hooks/useSettings';
 import {
     BookOpen,
     Users,
@@ -27,8 +28,14 @@ import {
     Download,
     CreditCard,
     DollarSign,
-    Sparkles
+    Sparkles,
+    Send,
+    MessageSquare,
+    ExternalLink,
+    RefreshCw,
+    Zap
 } from 'lucide-react';
+import { sendWhatsAppMessage, formatWhatsAppPhone } from '../../../services/whatsappService';
 import './KhataBook.css';
 
 // ── Initial Mock Data for graceful offline fallback ───────────────────────────
@@ -186,6 +193,7 @@ export default function KhataBook() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { formatCurrency, currencySymbol } = useCurrency();
     const { companyInfo } = useCompany();
+    const { settings } = useSettings();
 
     // Active tab from URL query param or state: 'customers' | 'suppliers' | 'daybook'
     const activeTabParam = searchParams.get('tab');
@@ -220,6 +228,24 @@ export default function KhataBook() {
     const [txType, setTxType] = useState('GAVE'); // 'GAVE' or 'GOT'
     const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
+    // Dynamic WhatsApp Messenger Modal States
+    const [bankAccounts, setBankAccounts] = useState([]);
+    const [isWaModalOpen, setIsWaModalOpen] = useState(false);
+    const [waParty, setWaParty] = useState(null);
+    const [waPhone, setWaPhone] = useState('');
+    const [waMessageType, setWaMessageType] = useState('reminder'); // 'reminder' | 'statement' | 'custom'
+    const [waIncludeUpi, setWaIncludeUpi] = useState(true);
+    const [waCustomMessage, setWaCustomMessage] = useState('');
+    const [waSending, setWaSending] = useState(false);
+    const [waStatus, setWaStatus] = useState(null);
+    const [sendTxWhatsApp, setSendTxWhatsApp] = useState(true);
+    const [khataToast, setKhataToast] = useState(null);
+
+    const showKhataToast = (msg) => {
+        setKhataToast(msg);
+        setTimeout(() => setKhataToast(null), 5000);
+    };
+
     // Form inputs: Party
     const [partyForm, setPartyForm] = useState({
         name: '',
@@ -245,6 +271,7 @@ export default function KhataBook() {
         setLoading(true);
         try {
             // Attempt to fetch from backend
+            apiClient.get('/bank-accounts').then(r => setBankAccounts(r.data || [])).catch(() => {});
             const [partiesRes, daybookRes] = await Promise.all([
                 apiClient.get('/khata/parties'),
                 apiClient.get('/khata/daybook')
@@ -518,6 +545,7 @@ export default function KhataBook() {
             return;
         }
         setTxType(type);
+        setSendTxWhatsApp(true);
         setTxForm({
             amount: '',
             paymentMode: 'CASH',
@@ -587,6 +615,71 @@ export default function KhataBook() {
         setSelectedParty(prev => ({ ...prev, netBalance: newBal }));
 
         setIsTxModalOpen(false);
+
+        // Auto WhatsApp notification if checked and phone available
+        if (sendTxWhatsApp && selectedParty.phone) {
+            const defaultCode = settings?.whatsappCountryCode || '91';
+            const cleanPhone = formatWhatsAppPhone(selectedParty.phone, defaultCode);
+            const bizName = companyInfo?.name || settings?.companyName || 'Namustutam Store';
+            const actionText = txType === 'GAVE' ? 'Given (Debit / Udhar)' : 'Received (Credit / Jama)';
+            const balSummary = newBal > 0 
+                ? `${formatCurrency(Math.abs(newBal))} (You'll Get)` 
+                : newBal < 0 
+                    ? `${formatCurrency(Math.abs(newBal))} (Advance Deposit)` 
+                    : 'Account Fully Settled (Nil)';
+
+            let upiPart = '';
+            if (newBal > 0) {
+                const primaryBank = bankAccounts[0];
+                const upiId = primaryBank
+                    ? `${primaryBank.accountNumber}@${primaryBank.branchIfsc}.ifsc.npci`
+                    : (settings?.upiId || 'namastute.pay@upi');
+                const numericAmt = Math.abs(newBal).toFixed(2);
+                const upiUri = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(bizName)}&am=${numericAmt}&cu=INR&tn=${encodeURIComponent(`Khata ${selectedParty.name}`)}`;
+                upiPart = `\n\n📲 *Pay Online via UPI (GPay/PhonePe):*\n${upiUri}`;
+            }
+
+            const txMsg = 
+`━━━━━━━━━━━━━━━━━━━━━━
+📖 *KHATA ENTRY UPDATE*
+🏪 *${bizName}*
+━━━━━━━━━━━━━━━━━━━━━━
+
+Namaste *${selectedParty.name}* ji,
+A new transaction has been recorded in your Khata passbook:
+
+💵 *Amount:* *${formatCurrency(amt)}* [${actionText}]
+💳 *Payment Mode:* ${txForm.paymentMode}
+📅 *Date:* ${txForm.transactionDate}
+${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : ''}${txForm.notes ? `📝 *Note:* ${txForm.notes}\n` : ''}
+━━━━━━━━━━━━━━━━━━━━━━
+📊 *UPDATED NET BALANCE:*
+*${balSummary}*
+━━━━━━━━━━━━━━━━━━━━━━${upiPart}
+
+✨ _Thank you for doing business with us!_
+🏪 *${bizName}*
+━━━━━━━━━━━━━━━━━━━━━━`;
+
+            const isBackgroundConfigured = settings?.whatsappBackgroundAutoSend === 'true' ||
+                settings?.whatsappMode === 'cloud_api' ||
+                settings?.whatsappMode === 'gateway' ||
+                (settings?.whatsappPhoneId && settings?.whatsappToken) ||
+                settings?.whatsappGatewayUrl;
+
+            sendWhatsAppMessage({
+                phone: cleanPhone,
+                message: txMsg,
+                settings,
+                forceWeb: !isBackgroundConfigured
+            }).then(res => {
+                if (res.background) {
+                    showKhataToast(`✓ WhatsApp entry update sent to ${selectedParty.name} in background!`);
+                }
+            }).catch(err => {
+                console.warn('Khata transaction WhatsApp auto-send error:', err);
+            });
+        }
     };
 
     const handleDeleteTx = async (tx) => {
@@ -619,31 +712,185 @@ export default function KhataBook() {
         setSelectedParty(prev => ({ ...prev, netBalance: reversedBal }));
     };
 
-    // ── WhatsApp Payment Reminder ─────────────────────────────────────────────
+    // ── Dynamic WhatsApp Messenger & Reminder Engine ────────────────────────
+    const openWhatsAppModal = (party) => {
+        const p = party || selectedParty;
+        if (!p) return;
+        setWaParty(p);
+        setWaPhone(p.phone || '');
+        setWaMessageType('reminder');
+        setWaIncludeUpi(true);
+        setWaCustomMessage('');
+        setWaStatus(null);
+        setIsWaModalOpen(true);
+    };
+
     const sendWhatsAppReminder = (party) => {
-        const bal = Number(party.netBalance || 0);
-        const cleanPhone = (party.phone || '').replace(/[^0-9]/g, '');
+        openWhatsAppModal(party);
+    };
+
+    const getCompiledKhataMessage = () => {
+        if (!waParty) return '';
+        const bal = Number(waParty.netBalance || 0);
+        const absBal = formatCurrency(Math.abs(bal));
+        const bizName = companyInfo?.name || settings?.companyName || 'Namustutam Store';
+        const partyTxs = transactions.filter(t => Number(t.partyId) === Number(waParty.id)).slice(0, 4);
+
+        let upiPart = '';
+        if (waIncludeUpi && bal > 0) {
+            const primaryBank = bankAccounts[0];
+            const upiId = primaryBank
+                ? `${primaryBank.accountNumber}@${primaryBank.branchIfsc}.ifsc.npci`
+                : (settings?.upiId || 'namastute.pay@upi');
+            const numericAmt = Math.abs(bal).toFixed(2);
+            const upiUri = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(bizName)}&am=${numericAmt}&cu=INR&tn=${encodeURIComponent(`Khata ${waParty.name}`)}`;
+            upiPart = `\n\n📲 *Pay Online via UPI (GPay/PhonePe):*\n${upiUri}`;
+        }
+
+        if (waMessageType === 'custom' && waCustomMessage.trim()) {
+            return waCustomMessage
+                .replace(/{party_name}/g, waParty.name)
+                .replace(/{customer_name}/g, waParty.name)
+                .replace(/{store_name}/g, bizName)
+                .replace(/{balance}/g, absBal)
+                .replace(/{date}/g, new Date().toLocaleDateString()) + upiPart;
+        }
+
+        if (waMessageType === 'statement') {
+            const txLines = partyTxs.map(t => {
+                const isGave = t.transactionType === 'GAVE';
+                const sign = isGave ? '(Debit / Given)' : '(Credit / Received)';
+                return `• ${new Date(t.transactionDate || t.createdAt).toLocaleDateString()}: ${formatCurrency(t.amount)} ${sign} [${t.paymentMode || 'CASH'}]`;
+            }).join('\n');
+
+            return `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `📋 *KHATA STATEMENT / PASSBOOK*\n` +
+                `🏪 *${bizName}*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `👤 *Account:* ${waParty.name} (${waParty.partyType})\n` +
+                `📅 *As of:* ${new Date().toLocaleDateString()}\n` +
+                `📊 *Current Net Balance:* *${bal > 0 ? `${absBal} (You'll Get / Due)` : bal < 0 ? `${absBal} (Advance Deposit)` : 'Settled (Nil)'}*\n\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `📝 *RECENT TRANSACTIONS:*\n` +
+                (txLines || '• No recent transactions') + `\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━` +
+                upiPart +
+                `\n\n✨ _Thank you for maintaining a clear account with us!_\n` +
+                `🏪 *${bizName}*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━`;
+        }
+
+        // Default: Payment Reminder
+        if (bal > 0) {
+            return `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `🔔 *PAYMENT REMINDER*\n` +
+                `🏪 *${bizName}*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `Namaste *${waParty.name}* ji,\n\n` +
+                `This is a polite reminder regarding your pending balance with *${bizName}*.\n\n` +
+                `💰 *Pending Due Balance:* *${absBal}*\n` +
+                `📅 *Date:* ${new Date().toLocaleDateString()}\n\n` +
+                `Kindly settle the outstanding payment at your earliest convenience.` +
+                upiPart +
+                `\n\n✨ _Thank you for your cooperation!_\n` +
+                `🏪 *${bizName}*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━`;
+        } else if (bal < 0) {
+            return `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `📋 *ACCOUNT BALANCE UPDATE*\n` +
+                `🏪 *${bizName}*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `Namaste *${waParty.name}* ji,\n\n` +
+                `Statement update from *${bizName}*:\n` +
+                `An advance deposit of *${absBal}* is recorded in your account.\n\n` +
+                `✨ _Thank you for your trusted partnership!_\n` +
+                `🏪 *${bizName}*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━`;
+        } else {
+            return `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `✅ *ACCOUNT FULLY SETTLED*\n` +
+                `🏪 *${bizName}*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `Namaste *${waParty.name}* ji,\n\n` +
+                `Your Khata account with *${bizName}* is fully settled (*Nil balance*).\n\n` +
+                `✨ _Thank you for doing business with us!_\n` +
+                `🏪 *${bizName}*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━`;
+        }
+    };
+
+    const handleSendKhataWhatsApp = async (forceWeb = false) => {
+        if (!waParty) return;
+        const defaultCode = settings?.whatsappCountryCode || '91';
+        let cleanPhone = formatWhatsAppPhone(waPhone, defaultCode);
 
         if (!cleanPhone) {
-            alert('Phone number is missing for this party. Please edit and add a valid mobile number.');
+            setWaStatus({ type: 'error', text: 'Please enter a valid mobile number for recipient.' });
             return;
         }
 
-        const phoneWithCountry = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-        const absBal = formatCurrency(Math.abs(bal));
-        const bizName = companyInfo?.name || 'our store';
-
-        let message = '';
-        if (bal > 0) {
-            message = `Namaste ${party.name} ji,\nThis is a polite reminder from ${bizName}. Your pending due balance is ${absBal}.\nKindly clear the payment via UPI or Cash at your earliest convenience.\nThank you!`;
-        } else if (bal < 0) {
-            message = `Namaste ${party.name} ji,\nStatement update from ${bizName}: An advance amount of ${absBal} is recorded in your account.\nThank you for doing business with us!`;
-        } else {
-            message = `Namaste ${party.name} ji,\nYour account with ${bizName} is fully settled (Nil balance). Thank you!`;
+        // Save updated phone to party if changed
+        if (waParty.phone !== waPhone) {
+            const updated = parties.map(p => p.id === waParty.id ? { ...p, phone: waPhone } : p);
+            setParties(updated);
+            localStorage.setItem('namustutam_khata_parties', JSON.stringify(updated));
+            if (selectedParty?.id === waParty.id) {
+                setSelectedParty(prev => ({ ...prev, phone: waPhone }));
+            }
         }
 
-        const waUrl = `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(message)}`;
-        window.open(waUrl, '_blank');
+        const message = getCompiledKhataMessage();
+        const isBackgroundConfigured = settings?.whatsappBackgroundAutoSend === 'true' ||
+            settings?.whatsappMode === 'cloud_api' ||
+            settings?.whatsappMode === 'gateway' ||
+            (settings?.whatsappPhoneId && settings?.whatsappToken) ||
+            settings?.whatsappGatewayUrl;
+
+        if (!forceWeb && isBackgroundConfigured) {
+            setWaSending(true);
+            setWaStatus(null);
+            try {
+                const res = await sendWhatsAppMessage({
+                    phone: cleanPhone,
+                    message,
+                    settings,
+                    forceWeb: false
+                });
+
+                if (res.background) {
+                    setWaStatus({
+                        type: 'success',
+                        text: `Dispatched directly to +${res.phone} in background (Zero windows opened)!`
+                    });
+                    showKhataToast(`✓ WhatsApp reminder sent to ${waParty.name} in background!`);
+                } else {
+                    setWaStatus({
+                        type: 'success',
+                        text: `Dispatched to +${cleanPhone}!`
+                    });
+                }
+            } catch (err) {
+                setWaStatus({
+                    type: 'error',
+                    text: `Background dispatch error: ${err.message}`,
+                    canFallback: true
+                });
+            } finally {
+                setWaSending(false);
+            }
+        } else {
+            sendWhatsAppMessage({
+                phone: cleanPhone,
+                message,
+                settings,
+                forceWeb: true
+            });
+            setWaStatus({
+                type: 'success',
+                text: `Opened WhatsApp Web for +${cleanPhone}!`
+            });
+            showKhataToast(`✓ Opened WhatsApp Web for ${waParty.name}`);
+        }
     };
 
     // ── Quick Print Statement ─────────────────────────────────────────────────
@@ -825,9 +1072,23 @@ export default function KhataBook() {
                                                     <span className="party-row-phone">{party.phone || 'No phone'}</span>
                                                 </div>
                                             </div>
-                                            <div className={`khata-party-row-right ${balClass}`}>
-                                                <div className="party-bal-amount">{formatCurrency(Math.abs(bal))}</div>
-                                                <span className="party-bal-badge">{balLabel}</span>
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <div className={`khata-party-row-right ${balClass}`}>
+                                                    <div className="party-bal-amount">{formatCurrency(Math.abs(bal))}</div>
+                                                    <span className="party-bal-badge">{balLabel}</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    className="party-quick-wa-btn"
+                                                    title={`Send WhatsApp message to ${party.name}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedParty(party);
+                                                        openWhatsAppModal(party);
+                                                    }}
+                                                >
+                                                    <Send size={12} />
+                                                </button>
                                             </div>
                                         </div>
                                     );
@@ -886,10 +1147,10 @@ export default function KhataBook() {
                                     <div className="ledger-action-buttons">
                                         <button
                                             className="khata-btn khata-btn-whatsapp"
-                                            onClick={() => sendWhatsAppReminder(selectedParty)}
+                                            onClick={() => openWhatsAppModal(selectedParty)}
                                             title="Send WhatsApp payment reminder / statement"
                                         >
-                                            <Share2 size={15} />
+                                            <Send size={15} />
                                             WhatsApp Reminder
                                         </button>
                                         <button
@@ -1347,6 +1608,28 @@ export default function KhataBook() {
                                         onChange={(e) => setTxForm({ ...txForm, notes: e.target.value })}
                                     />
                                 </div>
+
+                                <div style={{
+                                    background: '#f0fdf4',
+                                    padding: '10px 14px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #bbf7d0',
+                                    marginTop: '8px'
+                                }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '12.5px', color: '#14532d', fontWeight: '600' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={sendTxWhatsApp}
+                                            onChange={e => setSendTxWhatsApp(e.target.checked)}
+                                        />
+                                        <span>Send WhatsApp entry receipt to {selectedParty.name}</span>
+                                    </label>
+                                    <div style={{ fontSize: '11px', color: '#15803d', marginTop: '3px', marginLeft: '22px' }}>
+                                        {settings?.whatsappBackgroundAutoSend === 'true' 
+                                            ? '✓ Automatically dispatches receipt in background (Zero windows opened)' 
+                                            : 'Will open WhatsApp with entry confirmation receipt'}
+                                    </div>
+                                </div>
                             </div>
                             <div className="khata-modal-footer">
                                 <button
@@ -1450,6 +1733,239 @@ export default function KhataBook() {
                             <div style={{ fontSize: '11px', fontWeight: '700' }}>Authorized Signature</div>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* ── DYNAMIC WHATSAPP MESSENGER & REMINDER MODAL ── */}
+            {isWaModalOpen && waParty && (
+                <div className="khata-modal-overlay" onClick={e => e.target === e.currentTarget && setIsWaModalOpen(false)}>
+                    <div className="khata-modal-card khata-wa-modal-card">
+                        {/* Header */}
+                        <div className="khata-modal-header khata-wa-modal-header">
+                            <div className="khata-wa-header-info">
+                                <div className="khata-wa-logo-icon">
+                                    <Send size={18} />
+                                </div>
+                                <div>
+                                    <h4>Send WhatsApp to {waParty.name}</h4>
+                                    <span className="khata-wa-header-sub">
+                                        {settings?.whatsappBackgroundAutoSend === 'true' 
+                                            ? 'Background API Mode Active (Zero Windows Opened)' 
+                                            : 'WhatsApp Web & Background Dispatcher'}
+                                    </span>
+                                </div>
+                            </div>
+                            <button
+                                className="khata-modal-close-btn"
+                                onClick={() => setIsWaModalOpen(false)}
+                                type="button"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        {/* Body */}
+                        <div className="khata-modal-body khata-wa-modal-body">
+                            {/* Status Alert Banner */}
+                            {waStatus && (
+                                <div className={`khata-wa-alert-banner ${waStatus.type}`}>
+                                    {waStatus.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                                    <span>{waStatus.text}</span>
+                                    {waStatus.canFallback && (
+                                        <button
+                                            type="button"
+                                            className="khata-wa-fallback-btn"
+                                            onClick={() => handleSendKhataWhatsApp(true)}
+                                        >
+                                            <ExternalLink size={12} /> Open Web
+                                        </button>
+                                    )}
+                                    <button
+                                        type="button"
+                                        className="khata-wa-alert-close"
+                                        onClick={() => setWaStatus(null)}
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Recipient & Balance Summary Card */}
+                            <div className="khata-wa-party-summary">
+                                <div className="khata-wa-summary-left">
+                                    <div className={`party-avatar ${waParty.partyType === 'SUPPLIER' ? 'avatar-supplier' : 'avatar-customer'}`}>
+                                        {(waParty.name || 'U').slice(0, 2)}
+                                    </div>
+                                    <div>
+                                        <div className="khata-wa-party-name">{waParty.name}</div>
+                                        <div className="khata-wa-phone-row">
+                                            <Phone size={12} />
+                                            <input
+                                                type="tel"
+                                                className="khata-wa-phone-input"
+                                                value={waPhone}
+                                                onChange={e => setWaPhone(e.target.value)}
+                                                placeholder="Enter mobile (e.g. 9876543210)"
+                                                title="Recipient WhatsApp Number"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="khata-wa-summary-right">
+                                    <div className="khata-wa-bal-label">Current Balance</div>
+                                    <div className={`khata-wa-bal-val ${(waParty.netBalance || 0) > 0 ? 'text-get' : (waParty.netBalance || 0) < 0 ? 'text-give' : 'text-muted'}`}>
+                                        {formatCurrency(Math.abs(waParty.netBalance || 0))}
+                                    </div>
+                                    <span className="party-bal-badge" style={{ 
+                                        background: (waParty.netBalance || 0) > 0 ? '#ecfdf5' : '#fef2f2',
+                                        color: (waParty.netBalance || 0) > 0 ? '#059669' : '#dc2626' 
+                                    }}>
+                                        {(waParty.netBalance || 0) > 0 ? "You'll Get (Due)" : (waParty.netBalance || 0) < 0 ? "You'll Give (Advance)" : 'Settled'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Message Type Tabs */}
+                            <div className="khata-wa-tabs">
+                                <button
+                                    type="button"
+                                    className={`khata-wa-tab ${waMessageType === 'reminder' ? 'active' : ''}`}
+                                    onClick={() => setWaMessageType('reminder')}
+                                >
+                                    <Zap size={14} />
+                                    <span>Payment Reminder</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`khata-wa-tab ${waMessageType === 'statement' ? 'active' : ''}`}
+                                    onClick={() => setWaMessageType('statement')}
+                                >
+                                    <BookOpen size={14} />
+                                    <span>Passbook Statement</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`khata-wa-tab ${waMessageType === 'custom' ? 'active' : ''}`}
+                                    onClick={() => setWaMessageType('custom')}
+                                >
+                                    <MessageSquare size={14} />
+                                    <span>Custom Message</span>
+                                </button>
+                            </div>
+
+                            {/* Extra Options */}
+                            {(waParty.netBalance || 0) > 0 && (
+                                <div className="khata-wa-option-toggle">
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '12.5px', fontWeight: '600', color: '#1e293b' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={waIncludeUpi}
+                                            onChange={e => setWaIncludeUpi(e.target.checked)}
+                                        />
+                                        <span>Include Direct UPI Payment Link (GPay / PhonePe / Paytm / BHIM)</span>
+                                    </label>
+                                    <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: '500' }}>
+                                        ✓ Customer can tap to pay immediately in WhatsApp!
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Custom Message Field */}
+                            {waMessageType === 'custom' && (
+                                <div className="khata-form-group" style={{ marginTop: '10px' }}>
+                                    <label className="khata-form-label">Custom Message Text</label>
+                                    <textarea
+                                        rows="3"
+                                        className="khata-form-textarea"
+                                        placeholder="Write custom reminder text... Variables: {party_name}, {balance}, {store_name}, {date}"
+                                        value={waCustomMessage}
+                                        onChange={e => setWaCustomMessage(e.target.value)}
+                                    />
+                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
+                                        {['{party_name}', '{balance}', '{store_name}', '{date}'].map(tag => (
+                                            <button
+                                                key={tag}
+                                                type="button"
+                                                className="khata-chip"
+                                                onClick={() => setWaCustomMessage(prev => prev + ' ' + tag)}
+                                                style={{ fontSize: '10.5px', padding: '2px 8px' }}
+                                            >
+                                                +{tag}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Live WhatsApp Chat Bubble Preview */}
+                            <div className="khata-wa-preview-wrap">
+                                <div className="khata-wa-preview-topbar">
+                                    <div className="khata-wa-preview-avatar">
+                                        {(companyInfo?.name || settings?.companyName || 'N').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <div className="khata-wa-preview-store">
+                                            {companyInfo?.name || settings?.companyName || 'Namustutam Store'} (Official)
+                                        </div>
+                                        <div className="khata-wa-preview-status">Online • Verified Business</div>
+                                    </div>
+                                </div>
+                                <div className="khata-wa-chat-bg">
+                                    <div className="khata-wa-chat-bubble">
+                                        <pre className="khata-wa-bubble-text">{getCompiledKhataMessage()}</pre>
+                                        <div className="khata-wa-bubble-time">
+                                            <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span style={{ color: '#53bdeb' }}>✓✓</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer / Send Buttons */}
+                        <div className="khata-modal-footer khata-wa-modal-footer">
+                            <button
+                                type="button"
+                                className="khata-btn khata-btn-secondary"
+                                onClick={() => setIsWaModalOpen(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="khata-btn khata-btn-web-alt"
+                                onClick={() => handleSendKhataWhatsApp(true)}
+                                title="Open in WhatsApp Web browser tab"
+                            >
+                                <ExternalLink size={14} />
+                                Open Web (wa.me)
+                            </button>
+                            <button
+                                type="button"
+                                className="khata-btn khata-btn-whatsapp-primary"
+                                onClick={() => handleSendKhataWhatsApp(false)}
+                                disabled={waSending}
+                            >
+                                {waSending ? <RefreshCw size={15} className="spin" /> : <Send size={15} />}
+                                {waSending 
+                                    ? 'Dispatching...' 
+                                    : (settings?.whatsappBackgroundAutoSend === 'true' || settings?.whatsappMode === 'cloud_api' || settings?.whatsappMode === 'gateway'
+                                        ? 'Send in Background (No Window)' 
+                                        : 'Send WhatsApp Message')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── FLOATING TOAST NOTIFICATION ── */}
+            {khataToast && (
+                <div className="khata-floating-toast">
+                    <CheckCircle2 size={16} color="#10b981" />
+                    <span>{khataToast}</span>
+                    <button type="button" onClick={() => setKhataToast(null)}>
+                        <X size={14} />
+                    </button>
                 </div>
             )}
         </div>

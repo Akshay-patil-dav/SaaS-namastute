@@ -25,8 +25,10 @@ import {
     TrendingUp,
     Receipt,
     User,
-    Edit
+    Edit,
+    Send
 } from 'lucide-react';
+import { sendWhatsAppMessage, formatWhatsAppPhone, compileWhatsAppTemplate } from '../../../services/whatsappService';
 import './Invoices.css';
 
 export default function Invoices() {
@@ -35,6 +37,7 @@ export default function Invoices() {
     const prefix = settings?.invoicePrefix || 'INV-';
     
     const [invoices, setInvoices] = useState([]);
+    const [sendingWaId, setSendingWaId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -176,6 +179,89 @@ export default function Invoices() {
 
     const formatMoney = (amount) => {
         return `${currencySymbol}${Number(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+
+    const handleQuickWhatsApp = async (inv, forceWeb = false) => {
+        const defaultCode = settings?.whatsappCountryCode || '91';
+        let phone = formatWhatsAppPhone(inv.customerPhone || inv.phone || inv.customer?.phone || '', defaultCode);
+        if (!phone) {
+            const promptPhone = window.prompt(`Enter customer mobile number with country code (e.g. ${defaultCode}9876543210):`, defaultCode);
+            if (!promptPhone) return;
+            phone = formatWhatsAppPhone(promptPhone, defaultCode);
+        }
+        if (!phone) return;
+
+        let productsList = [];
+        if (Array.isArray(inv.products)) {
+            productsList = inv.products;
+        } else if (inv.productsJson) {
+            try { productsList = JSON.parse(inv.productsJson || '[]'); } catch {}
+        }
+
+        const itemsSummary = productsList.length > 0 
+            ? productsList.map(p => `• ${p.name || p.productName || 'Item'} (x${p.qty || p.quantity || 1}) - ${formatMoney((parseFloat(p.price || p.unitPrice) || 0) * (parseInt(p.qty || p.quantity) || 1))}`).join('\n')
+            : 'General Store Items';
+
+        const storeName = settings?.companyName || 'Namustutam Store';
+        const formattedAmount = formatMoney(inv.grandTotalNum);
+        const invDate = new Date(inv.formattedDate).toLocaleDateString();
+
+        const template = settings?.whatsappTemplate;
+        const msg = compileWhatsAppTemplate(template, {
+            customerName: inv.customerName || 'Valued Customer',
+            customer_name: inv.customerName || 'Valued Customer',
+            storeName: storeName,
+            store_name: storeName,
+            invoiceNo: inv.invoiceNo,
+            invoice_no: inv.invoiceNo,
+            amount: formattedAmount,
+            items: itemsSummary,
+            paymentStatus: inv.paymentStatusText || 'PAID',
+            payment_status: inv.paymentStatusText || 'PAID',
+            date: invDate
+        });
+
+        const isBackgroundConfigured = settings?.whatsappBackgroundAutoSend === 'true' ||
+            settings?.whatsappMode === 'cloud_api' ||
+            settings?.whatsappMode === 'gateway' ||
+            (settings?.whatsappPhoneId && settings?.whatsappToken) ||
+            settings?.whatsappGatewayUrl;
+
+        if (!forceWeb && isBackgroundConfigured) {
+            setSendingWaId(inv.id);
+            try {
+                const res = await sendWhatsAppMessage({
+                    phone,
+                    message: msg,
+                    settings,
+                    forceWeb: false
+                });
+
+                if (res.background) {
+                    showToast(`Invoice ${inv.invoiceNo} sent to WhatsApp (+${res.phone}) in background! Zero windows opened.`);
+                }
+            } catch (err) {
+                if (window.confirm(`Background dispatch failed: ${err.message}\n\nWould you like to open WhatsApp Web instead?`)) {
+                    sendWhatsAppMessage({
+                        phone,
+                        message: msg,
+                        settings,
+                        forceWeb: true
+                    });
+                    showToast(`Opened WhatsApp for +${phone}`);
+                }
+            } finally {
+                setSendingWaId(null);
+            }
+        } else {
+            sendWhatsAppMessage({
+                phone,
+                message: msg,
+                settings,
+                forceWeb: true
+            });
+            showToast(`Opened WhatsApp for +${phone}`);
+        }
     };
 
     return (
@@ -390,6 +476,15 @@ export default function Invoices() {
                                         </td>
                                         <td>
                                             <div className="inv-action-wrap">
+                                                <button
+                                                    className="inv-action-btn whatsapp-btn"
+                                                    onClick={() => handleQuickWhatsApp(inv)}
+                                                    title={settings?.whatsappBackgroundAutoSend === 'true' ? "Send in background without opening WhatsApp" : "Send Invoice on WhatsApp"}
+                                                    disabled={sendingWaId === inv.id}
+                                                    style={{ background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0', marginRight: '6px' }}
+                                                >
+                                                    {sendingWaId === inv.id ? <RefreshCw size={13} className="spin" /> : <Send size={13} />} WhatsApp
+                                                </button>
                                                 <button
                                                     className="inv-action-btn edit-btn"
                                                     onClick={() => handleEditInvoice(inv)}

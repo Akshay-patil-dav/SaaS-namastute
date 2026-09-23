@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { X, Printer, Download, ArrowLeft, FileText } from 'lucide-react';
+import { X, Printer, Download, ArrowLeft, FileText, Send, CheckCircle2, AlertCircle, RefreshCw, ExternalLink } from 'lucide-react';
+import { sendWhatsAppMessage, formatWhatsAppPhone, compileWhatsAppTemplate } from '../../../../services/whatsappService';
 import './invoice-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
 import { useCompany } from '../../../../context/CompanyContext';
@@ -83,6 +84,8 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
     const { settings } = useSettings();
     const printRef = useRef(null);
     const [bankAccounts, setBankAccounts] = useState([]);
+    const [whatsappSending, setWhatsappSending] = useState(false);
+    const [whatsappAlert, setWhatsappAlert] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -180,6 +183,109 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
         setTimeout(() => { w.focus(); w.print(); w.close(); }, 400);
     };
 
+    /* WhatsApp bill sender (Supports Background Dispatch Without Opening WhatsApp) */
+    const handleSendWhatsApp = async (forceWeb = false) => {
+        const defaultCode = settings?.whatsappCountryCode || '91';
+        const rawPhone = order.customerPhone || order.phone || order.customer?.phone || '';
+        let cleanPhone = formatWhatsAppPhone(rawPhone, defaultCode);
+
+        if (!cleanPhone) {
+            const promptPhone = window.prompt(`Enter customer mobile number with country code (e.g. ${defaultCode}9876543210):`, defaultCode);
+            if (!promptPhone) return;
+            cleanPhone = formatWhatsAppPhone(promptPhone, defaultCode);
+        }
+
+        if (!cleanPhone) return;
+
+        const itemsList = products.map(p => `• ${p.name || 'Item'} (x${p.qty || p.quantity || 1}) - ${fmtMoney((parseFloat(p.price || p.unitPrice) || 0) * (parseInt(p.qty || p.quantity) || 1))}`).join('\n');
+        const storeName = companyInfo?.name || settings?.companyName || 'Namustutam Store';
+        const custName = order.customerName || order.customer?.name || 'Valued Customer';
+        const formattedAmount = fmtMoney(grandTotal);
+        const orderDate = order.formattedDate || order.date || new Date().toLocaleDateString();
+        const payStatus = order.paymentStatus || 'PAID';
+
+        // UPI Intent Payment Link for pending amount
+        let upiUri = '';
+        if (due > 0 || String(payStatus).toUpperCase() !== 'PAID') {
+            const primaryBank = bankAccounts[0];
+            const upiId = primaryBank
+                ? `${primaryBank.accountNumber}@${primaryBank.branchIfsc}.ifsc.npci`
+                : (settings?.upiId || 'namastute.pay@upi');
+            const numericAmt = (due > 0 ? due : grandTotal).toFixed(2);
+            upiUri = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(storeName)}&am=${numericAmt}&cu=INR&tn=${encodeURIComponent(`Bill ${invoiceNo}`)}`;
+        }
+
+        const template = settings?.whatsappTemplate;
+        const msg = compileWhatsAppTemplate(template, {
+            customerName: custName,
+            customer_name: custName,
+            storeName: storeName,
+            store_name: storeName,
+            invoiceNo: invoiceNo,
+            invoice_no: invoiceNo,
+            amount: formattedAmount,
+            items: itemsList,
+            paymentStatus: payStatus,
+            payment_status: payStatus,
+            date: orderDate,
+            dueAmount: due > 0 ? fmtMoney(due) : '',
+            paymentLink: upiUri
+        });
+
+        // Determine if background API dispatch should be executed
+        const isBackgroundConfigured = settings?.whatsappBackgroundAutoSend === 'true' ||
+            settings?.whatsappMode === 'cloud_api' ||
+            settings?.whatsappMode === 'gateway' ||
+            (settings?.whatsappPhoneId && settings?.whatsappToken) ||
+            settings?.whatsappGatewayUrl;
+
+        if (!forceWeb && isBackgroundConfigured) {
+            setWhatsappSending(true);
+            setWhatsappAlert(null);
+            try {
+                const res = await sendWhatsAppMessage({
+                    phone: cleanPhone,
+                    message: msg,
+                    settings: settings,
+                    forceWeb: false
+                });
+
+                if (res.background) {
+                    setWhatsappAlert({
+                        type: 'success',
+                        message: `Receipt dispatched directly to +${res.phone} in background (Zero windows opened).`
+                    });
+                } else {
+                    setWhatsappAlert({
+                        type: 'info',
+                        message: `Dispatched WhatsApp receipt to +${cleanPhone}.`
+                    });
+                }
+            } catch (err) {
+                setWhatsappAlert({
+                    type: 'error',
+                    message: `Background dispatch error: ${err.message}`,
+                    canFallback: true,
+                    phone: cleanPhone
+                });
+            } finally {
+                setWhatsappSending(false);
+            }
+        } else {
+            // Direct Click-to-Chat / Web mode
+            sendWhatsAppMessage({
+                phone: cleanPhone,
+                message: msg,
+                settings: settings,
+                forceWeb: true
+            });
+            setWhatsappAlert({
+                type: 'info',
+                message: `Opened WhatsApp for +${cleanPhone}.`
+            });
+        }
+    };
+
     const isPOS = orderType === 'POS';
 
     return (
@@ -192,12 +298,38 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                     <div className="inv-topbar-actions">
                         <button className="inv-icon-btn pdf"   title="PDF"   onClick={handlePrint}><FileText size={14} /></button>
                         <button className="inv-icon-btn print" title="Print" onClick={handlePrint}><Printer  size={14} /></button>
+                        <button className="inv-icon-btn whatsapp" title="Send on WhatsApp" onClick={handleSendWhatsApp}><Send size={14} color="#25D366" /></button>
                         <button className="inv-icon-btn"       title="Close" onClick={onClose}><X size={14} /></button>
                         <button className="inv-back-btn" onClick={onClose}>
                             <ArrowLeft size={14} /> Back to {isPOS ? 'POS Orders' : 'Online Orders'}
                         </button>
                     </div>
                 </div>
+
+                {/* ── Background WhatsApp Dispatch Alert Banner ── */}
+                {whatsappAlert && (
+                    <div className={`inv-wa-banner ${whatsappAlert.type}`}>
+                        <div className="inv-wa-banner-left">
+                            {whatsappAlert.type === 'success' && <CheckCircle2 size={16} />}
+                            {whatsappAlert.type === 'error' && <AlertCircle size={16} />}
+                            <span>{whatsappAlert.message}</span>
+                        </div>
+                        <div className="inv-wa-banner-actions">
+                            {whatsappAlert.canFallback && (
+                                <button 
+                                    className="inv-wa-fallback-btn"
+                                    onClick={() => handleSendWhatsApp(true)}
+                                    type="button"
+                                >
+                                    <ExternalLink size={12} /> Open WhatsApp Web
+                                </button>
+                            )}
+                            <button className="inv-wa-banner-close" onClick={() => setWhatsappAlert(null)} type="button">
+                                <X size={14} />
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* ── Invoice document ─────────────────────── */}
                 <div className="inv-doc" ref={printRef}>
@@ -403,6 +535,27 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                     <button className="inv-btn-download" onClick={handlePrint}>
                         <Download size={15} /> Download PDF
                     </button>
+                    <button 
+                        className="inv-btn-whatsapp" 
+                        onClick={() => handleSendWhatsApp(false)}
+                        disabled={whatsappSending}
+                    >
+                        {whatsappSending ? <RefreshCw size={15} className="spin" /> : <Send size={15} />}
+                        {whatsappSending 
+                            ? 'Sending in Background...' 
+                            : (settings?.whatsappBackgroundAutoSend === 'true' || settings?.whatsappMode === 'cloud_api' || settings?.whatsappMode === 'gateway'
+                                ? 'Send WhatsApp (Background)' 
+                                : 'Send on WhatsApp')}
+                    </button>
+                    {(settings?.whatsappBackgroundAutoSend === 'true' || settings?.whatsappMode === 'cloud_api' || settings?.whatsappMode === 'gateway') && (
+                        <button 
+                            className="inv-btn-whatsapp-web-alt" 
+                            onClick={() => handleSendWhatsApp(true)}
+                            title="Open in WhatsApp Web"
+                        >
+                            <ExternalLink size={13} /> Open Web
+                        </button>
+                    )}
                 </div>
 
             </div>

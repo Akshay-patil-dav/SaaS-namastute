@@ -855,3 +855,394 @@
     from { opacity: 0; transform: scale(0.96); }
     to { opacity: 1; transform: scale(1); }
 }
+
+/* ── WhatsApp Messenger Modal & Components ────────────────────── */
+.party-quick-wa-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #ecfdf5;
+    color: #10b981;
+    border: 1px solid #a7f3d0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-left: 8px;
+}
+
+.party-quick-wa-btn:hover {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+    transform: scale(1.08);
+}
+
+.khata-wa-modal-card {
+    max-width: 580px;
+    width: 100%;
+}
+
+.khata-wa-modal-header {
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    border-bottom: 1px solid #bbf7d0;
+}
+
+.khata-wa-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.khata-wa-logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #25d366;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
+.khata-wa-modal-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #065f46;
+}
+
+.khata-wa-header-sub {
+    font-size: 11px;
+    color: #047857;
+    font-weight: 500;
+}
+
+.khata-wa-modal-body {
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Alert Banner */
+.khata-wa-alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+.khata-wa-alert-banner.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.khata-wa-alert-banner.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.khata-wa-fallback-btn {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #1e293b;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.khata-wa-alert-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+}
+
+/* Party Summary Card */
+.khata-wa-party-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+}
+
+.khata-wa-summary-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.khata-wa-party-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.khata-wa-phone-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+    color: #64748b;
+}
+
+.khata-wa-phone-input {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+    width: 140px;
+    background: #ffffff;
+}
+
+.khata-wa-phone-input:focus {
+    border-color: #25d366;
+    outline: none;
+}
+
+.khata-wa-summary-right {
+    text-align: right;
+}
+
+.khata-wa-bal-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.khata-wa-bal-val {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* Tabs */
+.khata-wa-tabs {
+    display: flex;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+
+.khata-wa-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.khata-wa-tab.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.khata-wa-option-toggle {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* WhatsApp Chat Preview */
+.khata-wa-preview-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-top: 14px;
+}
+
+.khata-wa-preview-topbar {
+    background: #075e54;
+    color: #ffffff;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.khata-wa-preview-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #25d366;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.khata-wa-preview-store {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.khata-wa-preview-status {
+    font-size: 10px;
+    color: #a7f3d0;
+}
+
+.khata-wa-chat-bg {
+    background: #efeae2;
+    padding: 14px;
+    min-height: 140px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.khata-wa-chat-bubble {
+    background: #ffffff;
+    border-radius: 8px 8px 8px 0;
+    padding: 8px 12px 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    max-width: 90%;
+    position: relative;
+}
+
+.khata-wa-bubble-text {
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #111b21;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+}
+
+.khata-wa-bubble-time {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
+    font-size: 10px;
+    color: #667781;
+    margin-top: 4px;
+}
+
+/* Footer Buttons */
+.khata-wa-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.khata-btn-web-alt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    color: #15803d;
+    border: 1.5px solid #22c55e;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.khata-btn-web-alt:hover {
+    background: #f0fdf4;
+    transform: translateY(-1px);
+}
+
+.khata-btn-whatsapp-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #25d366 0%, #16a34a 100%);
+    color: #ffffff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.35);
+    transition: all 0.18s ease;
+}
+
+.khata-btn-whatsapp-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.45);
+}
+
+/* Floating Toast */
+.khata-floating-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1e293b;
+    color: #ffffff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 3000;
+    animation: khataFadeIn 0.25s ease-out;
+}
+
+.khata-floating-toast button {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.khata-floating-toast button:hover {
+    color: #ffffff;
+}
+

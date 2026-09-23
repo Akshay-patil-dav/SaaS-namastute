@@ -83,13 +83,16 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
         location.pathname.startsWith('/print-barcode') ||
         location.pathname.startsWith('/print-qrcode');
     const isKhataActive = location.pathname.startsWith('/khata-book');
+    const isConnectedAppsActive = location.pathname === '/settings/connected_apps' || location.pathname === '/connected-apps' || location.pathname === '/integrations';
+    const isSystemSettingsActive = location.pathname.startsWith('/settings') && !isConnectedAppsActive;
 
     const [openMenus, setOpenMenus] = useState({
         dashboard: isDashboardActive,
         superAdmin: isSuperAdminActive,
         inventory: isInventoryActive,
         sales: isSalesActive,
-        khata: isKhataActive
+        khata: isKhataActive,
+        settings: isSystemSettingsActive
     });
 
     let permissions = {};
@@ -123,17 +126,21 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     React.useEffect(() => {
         // When the route changes, ensure only the active section is open
         if (isDashboardActive) {
-            setOpenMenus({ dashboard: true, superAdmin: false, inventory: false, sales: false, khata: false });
+            setOpenMenus({ dashboard: true, superAdmin: false, inventory: false, sales: false, khata: false, settings: false });
         } else if (isSuperAdminActive) {
-            setOpenMenus({ dashboard: false, superAdmin: true, inventory: false, sales: false, khata: false });
+            setOpenMenus({ dashboard: false, superAdmin: true, inventory: false, sales: false, khata: false, settings: false });
         } else if (isInventoryActive) {
-            setOpenMenus({ dashboard: false, superAdmin: false, inventory: true, sales: false, khata: false });
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: true, sales: false, khata: false, settings: false });
         } else if (isSalesActive) {
-            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: true, khata: false });
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: true, khata: false, settings: false });
         } else if (isKhataActive) {
-            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: false, khata: true });
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: false, khata: true, settings: false });
+        } else if (isSystemSettingsActive) {
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: false, khata: false, settings: true });
+        } else if (isConnectedAppsActive) {
+            setOpenMenus({ dashboard: false, superAdmin: false, inventory: false, sales: false, khata: false, settings: false });
         }
-    }, [isDashboardActive, isSuperAdminActive, isInventoryActive, isSalesActive, isKhataActive]);
+    }, [isDashboardActive, isSuperAdminActive, isInventoryActive, isSalesActive, isKhataActive, isSystemSettingsActive, isConnectedAppsActive]);
 
     const toggleMenu = (menu) => {
         setOpenMenus(prev => {
@@ -144,7 +151,8 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                 superAdmin: false,
                 inventory: false,
                 sales: false,
-                khata: false
+                khata: false,
+                settings: false
             };
             // If it wasn't open, open it (accordion effect)
             if (!isCurrentlyOpen) {
@@ -594,6 +602,73 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     </ul>
                                 </>
                             )}
+
+                            {/* Settings & Integrations Section */}
+                            <div className="pos-menu-divider"></div>
+                            <div className="pos-menu-section">Settings &amp; Integrations</div>
+                            <ul className="pos-menu-list pb-4">
+                                <li className="pos-menu-item">
+                                    <NavLink 
+                                        to="/settings/connected_apps" 
+                                        className={() => `pos-menu-link ${isConnectedAppsActive ? 'active' : ''}`}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <Puzzle className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>Connected Apps</span>
+                                        </div>
+                                        <span style={{ 
+                                            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                                            color: '#fff',
+                                            fontSize: '10px',
+                                            fontWeight: '700',
+                                            padding: '2px 7px',
+                                            borderRadius: '10px',
+                                            letterSpacing: '0.04em'
+                                        }}>
+                                            APPS
+                                        </span>
+                                    </NavLink>
+                                </li>
+                                <li className="pos-menu-item">
+                                    <a
+                                        className={`pos-menu-link ${isSystemSettingsActive ? 'active' : ''} ${openMenus.settings ? 'open' : ''}`}
+                                        onClick={() => toggleMenu('settings')}
+                                    >
+                                        <div className="pos-menu-link-content">
+                                            <Settings className="pos-menu-icon" strokeWidth={1.5} />
+                                            <span>System Settings</span>
+                                        </div>
+                                        <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                    </a>
+                                    <ul className={`pos-submenu ${openMenus.settings ? 'show' : ''}`}>
+                                        <li>
+                                            <NavLink to="/settings/profile" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Profile Settings
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/settings/company_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Company Settings
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/settings/payment_gateway" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Payment Gateway
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/settings/pos_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                POS Settings
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/settings/ai_helper" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                AI Helper
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
 
                         </>
                     )}
