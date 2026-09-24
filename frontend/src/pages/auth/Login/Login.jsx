@@ -79,7 +79,7 @@ export default function Login() {
                             <div className="logo-v2-icon-wrapper">
                                 <Zap className="logo-v2-icon" size={24} />
                             </div>
-                            <span>Namustute</span>
+                            <span>Samrajya Software</span>
                         </div>
                         <h1 className="login-v2-title">Welcome Back</h1>
                         <p className="login-v2-subtitle">Log in to your workspace to continue.</p>
@@ -168,7 +168,7 @@ export default function Login() {
                         <Link to="/register" style={{ color: 'var(--v2-primary)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}>Sign up</Link>
                     </div>
 
-                    <p className="login-v2-footer">© 2026 Namustute Inc. All rights reserved.</p>
+                    <p className="login-v2-footer">© 2026 Samrajya Software Inc. All rights reserved.</p>
                 </div>
             </div>
 
@@ -207,7 +207,7 @@ export default function Login() {
                 <div className="right-v2-content">
                     <div className="right-v2-badge">v2.0 Beta</div>
                     <h2>Powering Modern<br />Businesses</h2>
-                    <p>Join thousands of forward-thinking companies using Namustute to scale their operations, manage resources, and drive unprecedented growth.</p>
+                    <p>Join thousands of forward-thinking companies using Samrajya Software to scale their operations, manage resources, and drive unprecedented growth.</p>
 
                 </div>
             </div>

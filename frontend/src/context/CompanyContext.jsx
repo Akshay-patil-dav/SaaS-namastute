@@ -16,13 +16,13 @@ export function CompanyProvider({ children }) {
     const refreshCompany = useCallback(() => {
         if (!user) {
             setCompanyInfo({ 
-                name: 'Namastute Software', 
+                name: 'Samrajya Software', 
                 logo: '',
-                email: 'info@namastute.com',
+                email: 'info@samrajyasoftware.com',
                 phone: '+91-0000000000',
                 address: 'Business Avenue, Tech Park',
                 vat: '',
-                website: 'www.namastute.com'
+                website: 'www.samrajyasoftware.com'
             });
             return;
         }
@@ -35,13 +35,13 @@ export function CompanyProvider({ children }) {
                         const list = JSON.parse(data.companies_list);
                         if (Array.isArray(list) && list.length > 0) {
                             setCompanyInfo({
-                                name: list[0].companyName || 'Namastute Software',
+                                name: list[0].companyName || 'Samrajya Software',
                                 logo: list[0].companyLogo || '',
-                                email: list[0].companyEmail || 'info@namastute.com',
+                                email: list[0].companyEmail || 'info@samrajyasoftware.com',
                                 phone: list[0].companyPhone || '+91-0000000000',
                                 address: list[0].companyAddress || 'Business Avenue, Tech Park',
                                 vat: list[0].companyVat || '',
-                                website: list[0].companyWebsite || 'www.namastute.com'
+                                website: list[0].companyWebsite || 'www.samrajyasoftware.com'
                             });
                             return;
                         }
@@ -49,13 +49,13 @@ export function CompanyProvider({ children }) {
                 }
                 // No company configured → clear but use default placeholders
                 setCompanyInfo({ 
-                    name: 'Namastute Software', 
+                    name: 'Samrajya Software', 
                     logo: '',
-                    email: 'info@namastute.com',
+                    email: 'info@samrajyasoftware.com',
                     phone: '+91-0000000000',
                     address: 'Business Avenue, Tech Park',
                     vat: '',
-                    website: 'www.namastute.com'
+                    website: 'www.samrajyasoftware.com'
                 });
             })
             .catch(() => { /* ignore network errors */ });

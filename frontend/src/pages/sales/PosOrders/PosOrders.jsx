@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useConfirm } from '../../../context/ConfirmContext';
 import {
     Search, FileText, Download, RotateCcw,
@@ -8,18 +8,18 @@ import {
 import apiClient, { API, ENV } from '@/api/config';
 import '../OnlineOrders/online-orders.css';
 import '../../inventory/Brands/inventory-pages-custom.css';
-import AddPosModal        from '../../../components/modals/sales/AddPosModal/AddPosModal';
-import EditPosModal       from '../../../components/modals/sales/EditPosModal/EditPosModal';
-import ViewSalesModal     from '../../../components/modals/sales/ViewSalesModal/ViewSalesModal';
+import AddPosModal from '../../../components/modals/sales/AddPosModal/AddPosModal';
+import EditPosModal from '../../../components/modals/sales/EditPosModal/EditPosModal';
+import ViewSalesModal from '../../../components/modals/sales/ViewSalesModal/ViewSalesModal';
 import DeleteConfirmModal from '../../../components/modals/common/DeleteConfirmModal/DeleteConfirmModal';
-import InvoiceModal       from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
+import InvoiceModal from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
 import { useCurrency } from '../../../hooks/useCurrency';
 
 
-const BASE_URL     = ENV.API_BASE_URL;
+const BASE_URL = ENV.API_BASE_URL;
 const ROWS_OPTIONS = [10, 25, 50];
-const STATUSES     = ['Completed', 'Pending', 'Cancelled'];
-const PAYMENTS     = ['Paid', 'Unpaid', 'Overdue'];
+const STATUSES = ['Completed', 'Pending', 'Cancelled'];
+const PAYMENTS = ['Paid', 'Unpaid', 'Overdue'];
 
 export default function PosOrders() {
     const { currencySymbol } = useCurrency();
@@ -27,29 +27,29 @@ export default function PosOrders() {
     const { confirm } = useConfirm();
 
     /* ── data ────────────────────────────────────────────── */
-    const [orders,     setOrders]     = useState([]);
-    const [loading,    setLoading]    = useState(true);
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState('');
 
     /* ── filters ─────────────────────────────────────────── */
-    const [searchTerm,     setSearchTerm]     = useState('');
-    const [filterStatus,   setFilterStatus]   = useState('');
-    const [filterPayment,  setFilterPayment]  = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
+    const [filterPayment, setFilterPayment] = useState('');
     const [filterCustomer, setFilterCustomer] = useState('');
 
     /* ── table ───────────────────────────────────────────── */
     const [selectedRows, setSelectedRows] = useState([]);
-    const [rowsPerPage,  setRowsPerPage]  = useState(10);
-    const [currentPage,  setCurrentPage]  = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
 
     /* ── modals ──────────────────────────────────────────── */
-    const [addOpen,      setAddOpen]      = useState(false);
-    const [editOpen,     setEditOpen]     = useState(false);
-    const [viewOpen,     setViewOpen]     = useState(false);
-    const [deleteOpen,   setDeleteOpen]   = useState(false);
-    const [invoiceOpen,  setInvoiceOpen]  = useState(false);
-    const [activeOrder,  setActiveOrder]  = useState(null);
-    const [deleting,     setDeleting]     = useState(false);
+    const [addOpen, setAddOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
+    const [viewOpen, setViewOpen] = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [invoiceOpen, setInvoiceOpen] = useState(false);
+    const [activeOrder, setActiveOrder] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     /* ── fetch — hits its own /api/pos-sales table ───────── */
     const fetchOrders = useCallback(async () => {
@@ -71,22 +71,22 @@ export default function PosOrders() {
     const filtered = orders.filter(o => {
         const q = searchTerm.toLowerCase();
         if (q && !(
-            (o.customerName  || '').toLowerCase().includes(q) ||
-            (o.referenceNo   || '').toLowerCase().includes(q) ||
-            (o.status        || '').toLowerCase().includes(q) ||
+            (o.customerName || '').toLowerCase().includes(q) ||
+            (o.referenceNo || '').toLowerCase().includes(q) ||
+            (o.status || '').toLowerCase().includes(q) ||
             (o.paymentStatus || '').toLowerCase().includes(q) ||
-            (o.biller        || '').toLowerCase().includes(q)
+            (o.biller || '').toLowerCase().includes(q)
         )) return false;
-        if (filterStatus   && o.status        !== filterStatus)   return false;
-        if (filterPayment  && o.paymentStatus !== filterPayment)  return false;
-        if (filterCustomer && o.customerName  !== filterCustomer) return false;
+        if (filterStatus && o.status !== filterStatus) return false;
+        if (filterPayment && o.paymentStatus !== filterPayment) return false;
+        if (filterCustomer && o.customerName !== filterCustomer) return false;
         return true;
     });
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
-    const page       = Math.min(currentPage, totalPages);
-    const rows       = filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-    const resetPage  = () => setCurrentPage(1);
+    const page = Math.min(currentPage, totalPages);
+    const rows = filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+    const resetPage = () => setCurrentPage(1);
 
     /* ── selection ───────────────────────────────────────── */
     const toggleRow = id =>
@@ -101,7 +101,7 @@ export default function PosOrders() {
             message: `Are you sure you want to delete ${selectedRows.length} POS orders?`
         });
         if (!isConfirmed) return;
-        
+
         try {
             await apiClient.post(`${BASE_URL}/pos-sales/delete-bulk`, { ids: selectedRows });
             setSelectedRows([]);
@@ -116,11 +116,11 @@ export default function PosOrders() {
     const customers = [...new Set(orders.map(o => o.customerName).filter(Boolean))];
 
     /* ── modal helpers ───────────────────────────────────── */
-    const openView    = o => { setActiveOrder(o); setViewOpen(true);    };
-    const openEdit    = o => { setActiveOrder(o); setEditOpen(true);    };
-    const openDelete  = o => { setActiveOrder(o); setDeleteOpen(true);  };
+    const openView = o => { setActiveOrder(o); setViewOpen(true); };
+    const openEdit = o => { setActiveOrder(o); setEditOpen(true); };
+    const openDelete = o => { setActiveOrder(o); setDeleteOpen(true); };
     const openInvoice = o => { setActiveOrder(o); setInvoiceOpen(true); };
-    const closeAll    = () => {
+    const closeAll = () => {
         setViewOpen(false); setEditOpen(false); setDeleteOpen(false); setInvoiceOpen(false);
         setActiveOrder(null);
     };
@@ -140,14 +140,14 @@ export default function PosOrders() {
 
     /* ── export CSV ──────────────────────────────────────── */
     const exportCSV = () => {
-        const header = ['Reference','Customer','Date','Status','Grand Total','Paid','Due','Payment Status','Biller'];
-        const body   = filtered.map(o => [
+        const header = ['Reference', 'Customer', 'Date', 'Status', 'Grand Total', 'Paid', 'Due', 'Payment Status', 'Biller'];
+        const body = filtered.map(o => [
             o.referenceNo, o.customerName, o.formattedDate || o.date,
             o.status, o.grandTotal, o.paidAmount, o.dueAmount, o.paymentStatus, o.biller
         ]);
-        const csv  = [header, ...body].map(r => r.map(v => `"${v ?? ''}"`).join(',')).join('\n');
+        const csv = [header, ...body].map(r => r.map(v => `"${v ?? ''}"`).join(',')).join('\n');
         const link = Object.assign(document.createElement('a'), {
-            href:     URL.createObjectURL(new Blob([csv], { type: 'text/csv' })),
+            href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })),
             download: 'pos_orders.csv',
         });
         link.click();
@@ -157,10 +157,10 @@ export default function PosOrders() {
     const money = v => { const n = parseFloat(v); return isNaN(n) ? `${currencySymbol}0.00` : `${currencySymbol}${n.toFixed(2)}`; };
 
     const avatarSrc = name =>
-        `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name||'U')}&backgroundColor=e2e8f0&textColor=374151&fontSize=40`;
+        `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || 'U')}&backgroundColor=e2e8f0&textColor=374151&fontSize=40`;
 
-    const statusClass  = s => s==='Completed' ? 'oo-badge-completed' : s==='Cancelled' ? 'oo-badge-cancelled' : 'oo-badge-pending';
-    const paymentClass = p => p==='Paid' ? 'oo-pay-badge-paid' : p==='Overdue' ? 'oo-pay-badge-overdue' : 'oo-pay-badge-unpaid';
+    const statusClass = s => s === 'Completed' ? 'oo-badge-completed' : s === 'Cancelled' ? 'oo-badge-cancelled' : 'oo-badge-pending';
+    const paymentClass = p => p === 'Paid' ? 'oo-pay-badge-paid' : p === 'Overdue' ? 'oo-pay-badge-overdue' : 'oo-pay-badge-unpaid';
 
     /* ── smart page list ─────────────────────────────────── */
     const pageList = Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -318,10 +318,10 @@ export default function PosOrders() {
 
                                         <td>
                                             <div className="ss-actions-group" style={{ justifyContent: 'center' }}>
-                                                <button className="ss-action-btn view"    title="View Detail" onClick={() => openView(item)}><Eye     size={14} /></button>
-                                                <button className="ss-action-btn edit"    style={{ background: '#f8f9fa', color: '#5b6670' }} title="View Invoice" onClick={() => openInvoice(item)}><Receipt size={14} /></button>
-                                                <button className="ss-action-btn edit"    title="Edit"        onClick={() => openEdit(item)}><Edit    size={14} /></button>
-                                                <button className="ss-action-btn delete"  title="Delete"      onClick={() => openDelete(item)}><Trash2  size={14} /></button>
+                                                <button className="ss-action-btn view" title="View Detail" onClick={() => openView(item)}><Eye size={14} /></button>
+                                                <button className="ss-action-btn edit" style={{ background: '#f8f9fa', color: '#5b6670' }} title="View Invoice" onClick={() => openInvoice(item)}><Receipt size={14} /></button>
+                                                <button className="ss-action-btn edit" title="Edit" onClick={() => openEdit(item)}><Edit size={14} /></button>
+                                                <button className="ss-action-btn delete" title="Delete" onClick={() => openDelete(item)}><Trash2 size={14} /></button>
                                             </div>
                                         </td>
 
@@ -369,7 +369,7 @@ export default function PosOrders() {
                                 p === '…'
                                     ? <span key={`e${i}`} className="ss-page-btn" style={{ cursor: 'default' }}>…</span>
                                     : <button key={p} className={`ss-page-btn ${p === page ? 'active' : ''}`}
-                                              onClick={() => setCurrentPage(p)}>{p}</button>
+                                        onClick={() => setCurrentPage(p)}>{p}</button>
                             )}
                             <button className="ss-page-btn" disabled={page === totalPages} onClick={() => setCurrentPage(p => p + 1)}>
                                 <ChevronRight size={16} />
@@ -381,8 +381,8 @@ export default function PosOrders() {
 
             {/* Footer */}
             <footer className="oo-footer">
-                <div>2014 - 2026 © Namustutam. All Rights Reserved</div>
-                <div>Designed &amp; Developed by <span>Namustutam</span></div>
+                {/* <div>2014 - 2026 © Samrajya Software. All Rights Reserved</div>
+                <div>Designed &amp; Developed by <span>Samrajya Software</span></div> */}
             </footer>
 
             {/* ── Modals ────────────────────────────────────── */}

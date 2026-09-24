@@ -202,7 +202,7 @@ export default function Invoices() {
             ? productsList.map(p => `• ${p.name || p.productName || 'Item'} (x${p.qty || p.quantity || 1}) - ${formatMoney((parseFloat(p.price || p.unitPrice) || 0) * (parseInt(p.qty || p.quantity) || 1))}`).join('\n')
             : 'General Store Items';
 
-        const storeName = settings?.companyName || 'Namustutam Store';
+        const storeName = settings?.companyName || 'Samrajya Store';
         const formattedAmount = formatMoney(inv.grandTotalNum);
         const invDate = new Date(inv.formattedDate).toLocaleDateString();
 

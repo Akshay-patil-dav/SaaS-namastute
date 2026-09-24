@@ -14,13 +14,16 @@ public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final com.example.otpauth.repository.ProductRepository productRepository;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    private final DataUsageService dataUsageService;
 
     public PurchaseService(PurchaseRepository purchaseRepository, 
                            com.example.otpauth.repository.ProductRepository productRepository,
-                           com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
+                           com.fasterxml.jackson.databind.ObjectMapper objectMapper,
+                           DataUsageService dataUsageService) {
         this.purchaseRepository = purchaseRepository;
         this.productRepository = productRepository;
         this.objectMapper = objectMapper;
+        this.dataUsageService = dataUsageService;
     }
 
     public List<Purchase> getAllPurchases() {
@@ -46,6 +49,7 @@ public class PurchaseService {
     public Purchase createPurchase(PurchaseRequest request) {
         Purchase p = new Purchase();
         p.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+        dataUsageService.checkDataLimit(p.getUserId());
         mapRequestToEntity(request, p);
         
         // Adjust product quantity and selling prices

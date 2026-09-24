@@ -3,6 +3,7 @@ import AddCategoryModal from '../../../components/modals/inventory/AddCategoryMo
 import './CreateProduct.css';
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient, { API, ENV } from '@/api/config';
+import { dispatchUsageRefresh } from '../../../context/UsageContext';
 import {
     RefreshCw,
     ChevronUp,
@@ -371,6 +372,7 @@ const CreateProduct = () => {
             };
 
             await apiClient.post(API_BASE, payload);
+            dispatchUsageRefresh();
             showToast('success', `✓ Product "${form.name}" saved to database!`);
             setTimeout(() => navigate('/products'), 1800);
         } catch (err) {

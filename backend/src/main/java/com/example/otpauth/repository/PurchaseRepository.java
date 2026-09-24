@@ -29,4 +29,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
     @Query("SELECT COUNT(p) FROM Purchase p WHERE p.userId = :userId AND p.status IS NOT NULL AND LOWER(p.status) IN ('return', 'returned')")
     Long countPurchaseReturnsByUserId(@Param("userId") Long userId);
+
+    long countByUserId(Long userId);
 }

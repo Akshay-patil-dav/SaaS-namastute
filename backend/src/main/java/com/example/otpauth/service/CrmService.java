@@ -19,6 +19,9 @@ public class CrmService {
     @Autowired
     private InteractionRepository interactionRepository;
 
+    @Autowired
+    private DataUsageService dataUsageService;
+
     public List<Customer> getAllCustomers() {
         return customerRepository.findByUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
     }
@@ -28,7 +31,11 @@ public class CrmService {
     }
 
     public Customer saveCustomer(Customer customer) {
-        customer.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+        Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        if (customer.getId() == null) {
+            dataUsageService.checkDataLimit(userId);
+        }
+        customer.setUserId(userId);
         return customerRepository.save(customer);
     }
 

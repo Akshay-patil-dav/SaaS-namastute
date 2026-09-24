@@ -20,11 +20,16 @@ public class PosOrderService {
     private final PosOrderRepository repository;
     private final ObjectMapper objectMapper;
     private final com.example.otpauth.repository.ProductRepository productRepository;
+    private final DataUsageService dataUsageService;
 
-    public PosOrderService(PosOrderRepository repository, ObjectMapper objectMapper, com.example.otpauth.repository.ProductRepository productRepository) {
+    public PosOrderService(PosOrderRepository repository,
+                           ObjectMapper objectMapper,
+                           com.example.otpauth.repository.ProductRepository productRepository,
+                           DataUsageService dataUsageService) {
         this.repository = repository;
         this.objectMapper = objectMapper;
         this.productRepository = productRepository;
+        this.dataUsageService = dataUsageService;
     }
 
     public List<PosOrder> getAllOrders() {
@@ -64,6 +69,7 @@ public class PosOrderService {
     public PosOrder createOrder(PosOrderRequest request) throws JsonProcessingException {
         PosOrder order = new PosOrder();
         order.setUserId(com.example.otpauth.util.SecurityUtils.getCurrentUserId());
+        dataUsageService.checkDataLimit(order.getUserId());
         mapRequestToEntity(request, order);
         order.setReferenceNo("PO" + String.format("%06d", (long)(Math.random() * 1000000)));
         order.setBiller(request.getBiller() != null ? request.getBiller() : "Admin");

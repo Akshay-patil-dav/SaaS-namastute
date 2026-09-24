@@ -20,10 +20,14 @@ public class KhataService {
 
     private final KhataPartyRepository partyRepository;
     private final KhataTransactionRepository transactionRepository;
+    private final DataUsageService dataUsageService;
 
-    public KhataService(KhataPartyRepository partyRepository, KhataTransactionRepository transactionRepository) {
+    public KhataService(KhataPartyRepository partyRepository,
+                        KhataTransactionRepository transactionRepository,
+                        DataUsageService dataUsageService) {
         this.partyRepository = partyRepository;
         this.transactionRepository = transactionRepository;
+        this.dataUsageService = dataUsageService;
     }
 
     private Long getUserId() {
@@ -53,6 +57,7 @@ public class KhataService {
 
     public KhataParty createParty(KhataPartyRequest req) {
         Long userId = getUserId();
+        dataUsageService.checkDataLimit(userId);
         KhataParty party = new KhataParty();
         party.setUserId(userId);
         party.setName(req.getName());
@@ -105,6 +110,7 @@ public class KhataService {
 
     public KhataTransaction addTransaction(KhataTransactionRequest req) {
         Long userId = getUserId();
+        dataUsageService.checkDataLimit(userId);
         KhataParty party = partyRepository.findByIdAndUserId(req.getPartyId(), userId)
                 .orElseThrow(() -> new IllegalArgumentException("Khata party not found with ID: " + req.getPartyId()));
 

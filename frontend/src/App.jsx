@@ -6,6 +6,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute/ProtectedRoute';
 import GuestRoute from './components/auth/GuestRoute/GuestRoute';
 import { ConfirmProvider } from './context/ConfirmContext';
 import { SettingsProvider } from './context/SettingsContext';
+import { UsageProvider } from './context/UsageContext';
 import PosLayout from './components/layout/PosLayout/PosLayout';
 // ── Lazy-loaded Admin Pages (code splitting — each route loads its JS on demand) ──
 const Login              = lazy(() => import('./pages/auth/Login/Login.jsx'));
@@ -292,15 +293,17 @@ function AppRoutes() {
 export default function App() {
     return (
         <AuthProvider>
-            <SettingsProvider>
-                <CompanyProvider>
-                    <ConfirmProvider>
-                        <BrowserRouter>
-                            <AppRoutes />
-                        </BrowserRouter>
-                    </ConfirmProvider>
-                </CompanyProvider>
-            </SettingsProvider>
+            <UsageProvider>
+                <SettingsProvider>
+                    <CompanyProvider>
+                        <ConfirmProvider>
+                            <BrowserRouter>
+                                <AppRoutes />
+                            </BrowserRouter>
+                        </ConfirmProvider>
+                    </CompanyProvider>
+                </SettingsProvider>
+            </UsageProvider>
         </AuthProvider>
     );
 }

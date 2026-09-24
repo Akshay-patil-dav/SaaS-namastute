@@ -39,7 +39,7 @@ spring:
       client:
         registration:
           google:
-            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID:YOUR_GOOGLE_CLIENT_ID}
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID:167861187519-tad34cb9ben048eb4ddfbf70h4plhj91.apps.googleusercontent.com}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET:YOUR_GOOGLE_CLIENT_SECRET}
             scope: email, profile
 

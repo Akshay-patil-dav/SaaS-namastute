@@ -16,9 +16,30 @@ import java.util.Map;
 public class PlanController {
 
     private final UserRepository userRepository;
+    private final com.example.otpauth.service.DataUsageService dataUsageService;
 
-    public PlanController(UserRepository userRepository) {
+    public PlanController(UserRepository userRepository, com.example.otpauth.service.DataUsageService dataUsageService) {
         this.userRepository = userRepository;
+        this.dataUsageService = dataUsageService;
+    }
+
+    @GetMapping("/current/usage")
+    public ResponseEntity<?> getUsage(Authentication authentication) {
+        try {
+            Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+            if (userId == null && authentication != null) {
+                User u = userRepository.findByEmail(authentication.getName()).orElse(null);
+                if (u != null) {
+                    userId = u.getActiveProjectId() != null ? u.getActiveProjectId() : u.getId();
+                }
+            }
+            if (userId == null) {
+                userId = 1L;
+            }
+            return ResponseEntity.ok(dataUsageService.getUsageSummary(userId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PutMapping("/current/plan")

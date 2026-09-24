@@ -11,6 +11,7 @@ import { useSettings } from '../../../hooks/useSettings';
 import InvoiceModal from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
 import PosOrders from '../PosOrders/PosOrders';
 import { sendWhatsAppMessage, compileWhatsAppTemplate } from '../../../services/whatsappService';
+import { dispatchUsageRefresh } from '../../../context/UsageContext';
 import './pos-terminal.css';
 
 const BASE_URL = ENV.API_BASE_URL;
@@ -25,9 +26,9 @@ const getImageUrl = (url) => {
 
 const getUpiQrUrl = (bankAccounts, user, grandTotal) => {
     if (bankAccounts.length > 0) {
-        return `upi://pay?pa=${bankAccounts[0].accountNumber}@${bankAccounts[0].branchIfsc}.ifsc.npci&pn=${encodeURIComponent(user?.companyName || 'Namastute Store')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`;
+        return `upi://pay?pa=${bankAccounts[0].accountNumber}@${bankAccounts[0].branchIfsc}.ifsc.npci&pn=${encodeURIComponent(user?.companyName || 'Samrajya Store')}&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`;
     }
-    return `upi://pay?pa=namastute.pay@upi&pn=Namastute%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`;
+    return `upi://pay?pa=samrajya.pay@upi&pn=Samrajya%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`;
 };
 
 export default function PosTerminal() {
@@ -253,6 +254,7 @@ export default function PosTerminal() {
 
         try {
             const res = await apiClient.post(`${BASE_URL}/pos-sales`, payload);
+            dispatchUsageRefresh();
             const created = res.data || { ...payload, id: Date.now() };
 
             // Construct order object for Invoice Modal
@@ -316,7 +318,7 @@ export default function PosTerminal() {
             if (targetPhone && targetPhone.trim() && isWhatsAppEnabled && isBgAutoSend) {
                 try {
                     const itemsSummary = cart.map(item => `• ${item.name || item.productName || 'Item'} (x${item.qty || 1}) - ${currencySymbol}${(parseFloat(item.price || item.unitPrice || 0) * (item.qty || 1)).toFixed(2)}`).join('\n');
-                    const storeName = settings?.companyName || user?.companyName || 'Namustutam Store';
+                    const storeName = settings?.companyName || user?.companyName || 'Samrajya Store';
                     const compiledMsg = compileWhatsAppTemplate(settings?.whatsappTemplate, {
                         customerName: payload.customerName || 'Valued Customer',
                         customer_name: payload.customerName || 'Valued Customer',

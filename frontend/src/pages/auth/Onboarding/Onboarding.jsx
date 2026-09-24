@@ -105,7 +105,7 @@ export default function Onboarding() {
                 <div className="onboarding-navbar">
                      <div className="onboarding-logo">
                          <Zap className="logo-v2-icon" size={24} />
-                         <span>Namustute</span>
+                         <span>Samrajya Software</span>
                      </div>
                      <button onClick={handleLogout} className="logout-btn">
                          <LogOut size={16} />
@@ -296,7 +296,7 @@ export default function Onboarding() {
                 <div className="right-v2-content">
                     <div className="right-v2-badge">Getting Started</div>
                     <h2>Tailored To Your<br />Business Needs</h2>
-                    <p>Tell us a little bit about yourself and your business so we can customize your Namustute experience for maximum productivity.</p>
+                    <p>Tell us a little bit about yourself and your business so we can customize your Samrajya Software experience for maximum productivity.</p>
                 </div>
             </div>
         </div>

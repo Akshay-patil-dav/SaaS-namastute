@@ -11,13 +11,12 @@
  * Default Reference Meta Cloud API Credentials (From verified Meta Developer App)
  */
 export const DEFAULT_META_PHONE_ID = '1281932198343073';
-export const DEFAULT_META_TOKEN = 'EAAWchq3he7gBSsQZBZBCfZAL1TKtMxZCmrqZBba0Lc7fiaQZA7OZCOCbGkQXkZCCALUpTPMOTZAnxj8R5xbRbDs4QCg3gmhUmHmVTiDo3jNpf776T0rpWMmILodoSDxO9sZAI8RrXlsYqR7dh0dpHZBW9OPfJ3QVSaLFsL9T0pnLDueKUFWM3ppn7Dz3FUZAU7Wh7vS2R5nH2I7jmt3NurZCjd8MNQ0QZAlb0LFhJfTJYJANfs6XteAjvmI0Red5ZBOClaA3cUZCmFg1Y4mcUFtOuXofwAon';
-
+export const DEFAULT_META_TOKEN = 'EAAWchq3he7gBSsIMXKAurVGBIdKqNxHDI5bgZCkhxXpqiJAKx9zwsS18m8GmEZAWsobVmzZB8Iy1EdxbN6M4E12r9mSvfe8vqqBilL3oKuCnG65vVqAXLOpF8fhWUA3n9lCcG8dOnj9jjMvrhW4Fe2ztPPtRqNxVLcSRVcZCsbnvEx69voxP4GgDeUKp4KK5xGEYntZBzJbSikdlOnX0EqQkchyelqBRh1rNNp4n8HZB16sZCrMK9ZBBBGw0r3AuJyKYMq3AcEwLDJon1i3JZBVsJ';
 /**
  * Standard Professional Invoice / Receipt Template
  */
-export const DEFAULT_WHATSAPP_TEMPLATE = 
-`━━━━━━━━━━━━━━━━━━━━━━
+export const DEFAULT_WHATSAPP_TEMPLATE =
+    `━━━━━━━━━━━━━━━━━━━━━━
 🧾 *TAX INVOICE / RECEIPT*
 🏪 *{store_name}*
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -109,7 +108,7 @@ export const dispatchWhatsAppLink = (url) => {
                 if (document.body.contains(anchor)) {
                     document.body.removeChild(anchor);
                 }
-            } catch {}
+            } catch { }
         }, 300);
         return true;
     } catch {
@@ -126,8 +125,8 @@ export const compileWhatsAppTemplate = (template, data = {}) => {
     let tpl = template && template.trim() ? template : DEFAULT_WHATSAPP_TEMPLATE;
 
     const custName = data.customerName || data.customer_name || data.customer?.name || data.clientName || 'Valued Customer';
-    const store = data.storeName || data.store_name || data.companyName || 'Namustutam Store';
-    
+    const store = data.storeName || data.store_name || data.companyName || 'Samrajya Store';
+
     // Normalize invoice number (prevent duplicate ##)
     const rawInv = data.invoiceNo || data.invoice_no || data.referenceNo || data.billNo || 'INV-001';
     const invNo = String(rawInv).replace(/^#+/, '');
@@ -240,15 +239,15 @@ export const sendWhatsAppMessage = async ({
 
     const mode = settings.whatsappMode || 'cloud_api';
     const targetPhoneId = (phoneId || settings.whatsappPhoneId || DEFAULT_META_PHONE_ID).trim();
-    
+
     // Clean token: Remove any accidental "Bearer " prefix pasted from developer console
     let targetToken = (token || settings.whatsappToken || DEFAULT_META_TOKEN).trim();
     targetToken = targetToken.replace(/^Bearer\s+/i, '').trim();
 
     const apiVer = (apiVersion || settings.whatsappApiVersion || 'v22.0').trim().replace(/^\/+|\/+$/g, '');
 
-    const isBackgroundEnabled = settings.whatsappBackgroundAutoSend === 'true' || 
-        mode === 'cloud_api' || 
+    const isBackgroundEnabled = settings.whatsappBackgroundAutoSend === 'true' ||
+        mode === 'cloud_api' ||
         mode === 'gateway' ||
         !!(targetPhoneId && targetToken);
 
@@ -260,7 +259,7 @@ export const sendWhatsAppMessage = async ({
 
         // Dynamic Meta Graph API endpoint
         const url = `https://graph.facebook.com/${apiVer}/${targetPhoneId}/messages`;
-        
+
         let payload;
         if (templateName) {
             // Official Meta Template Message (e.g. hello_world demo template)

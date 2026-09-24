@@ -1,7 +1,7 @@
 import React from 'react';
 
 const TextLogo = ({ name, color = '#eab308' }) => {
-    const finalName = name || 'Namustutam';
+    const finalName = name || 'Samrajya Software';
     const parts = finalName.trim().split(' ');
     
     if (parts.length === 1) {

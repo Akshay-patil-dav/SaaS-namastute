@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
+import { useDataUsage } from '../../../context/UsageContext';
 
 import {
     LayoutDashboard,
@@ -45,14 +46,22 @@ import {
     Boxes,
     Settings,
     BookOpen,
-    X
+    X,
+    Database
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
     const { user } = useAuth();
+    const { usage } = useDataUsage();
     const isSuperAdmin = user?.role === 'SUPER_ADMIN';
     const isClientOrAdmin = user?.role === 'ADMIN' || user?.role === 'CLIENT';
+
+    const isSubscriber = Boolean(
+        user?.role === 'SUPER_ADMIN' ||
+        (user?.plan && user.plan !== 'NONE' && (!user.subscriptionEndDate || new Date(user.subscriptionEndDate) > new Date()))
+    );
+    const hasAdvancedPlan = isSubscriber && user?.plan !== 'STARTER';
 
     const { companyInfo } = useCompany();
 
@@ -183,7 +192,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                         )}
                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                             {(() => {
-                                const companyName = companyInfo?.name || 'Company Name';
+                                const companyName = companyInfo?.name || 'Samrajya Software';
                                 const words = companyName.split(' ');
                                 const firstWord = words[0];
                                 const restOfWords = words.slice(1).join(' ');
@@ -360,14 +369,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                 Warehouses
                                             </NavLink>
                                         </li>
-                                        {user?.plan !== 'STARTER' && (
+                                        {hasAdvancedPlan && (
                                             <li>
                                                 <NavLink to="/print-barcode" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                     Print Barcode
                                                 </NavLink>
                                             </li>
                                         )}
-                                        {user?.plan !== 'STARTER' && (
+                                        {hasAdvancedPlan && (
                                             <li>
                                                 <NavLink to="/print-qrcode" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                     Print QR Code
@@ -413,7 +422,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
 
                             {/* Manufacturing Section */}
-                            {user?.plan !== 'STARTER' && user?.businessType === 'Manufacturing' && canView('manufacturing') && (
+                            {hasAdvancedPlan && user?.businessType === 'Manufacturing' && canView('manufacturing') && (
                                 <>
                                     <div className="pos-menu-divider"></div>
                                     <div className="pos-menu-section">Manufacturing</div>
@@ -465,7 +474,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                             </a>
                                             <ul className={`pos-submenu ${openMenus.sales ? 'show' : ''}`}>
                                                 {/* Hidden for Starter Plan */}
-                                                {user?.plan !== 'STARTER' && (
+                                                {hasAdvancedPlan && (
                                                     <li>
                                                         <NavLink to="/dashboard/sales-online" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                             Online Orders
@@ -477,7 +486,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                         POS Orders
                                                     </NavLink>
                                                 </li>
-                                                {user?.plan !== 'STARTER' && (
+                                                {hasAdvancedPlan && (
                                                     <li>
                                                         <NavLink to="/dashboard/invoices" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                             Invoices
@@ -516,7 +525,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             )}
 
                             {/* Purchases Section */}
-                            {user?.plan !== 'STARTER' && canView('purchases') && (
+                            {hasAdvancedPlan && canView('purchases') && (
                                 <>
                                     <div className="pos-menu-divider"></div>
                                     <div className="pos-menu-section">Purchases</div>
@@ -586,7 +595,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                             </ul>
 
                             {/* Reports Section */}
-                            {user?.plan !== 'STARTER' && canView('sales') && (
+                            {hasAdvancedPlan && canView('sales') && (
                                 <>
                                     <div className="pos-menu-divider"></div>
                                     <div className="pos-menu-section">Reports</div>
@@ -605,30 +614,32 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
                             {/* Settings & Integrations Section */}
                             <div className="pos-menu-divider"></div>
-                            <div className="pos-menu-section">Settings &amp; Integrations</div>
+                            <div className="pos-menu-section">{isSubscriber ? 'Settings & Integrations' : 'System Settings'}</div>
                             <ul className="pos-menu-list pb-4">
-                                <li className="pos-menu-item">
-                                    <NavLink 
-                                        to="/settings/connected_apps" 
-                                        className={() => `pos-menu-link ${isConnectedAppsActive ? 'active' : ''}`}
-                                    >
-                                        <div className="pos-menu-link-content">
-                                            <Puzzle className="pos-menu-icon" strokeWidth={1.5} />
-                                            <span>Connected Apps</span>
-                                        </div>
-                                        <span style={{ 
-                                            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                                            color: '#fff',
-                                            fontSize: '10px',
-                                            fontWeight: '700',
-                                            padding: '2px 7px',
-                                            borderRadius: '10px',
-                                            letterSpacing: '0.04em'
-                                        }}>
-                                            APPS
-                                        </span>
-                                    </NavLink>
-                                </li>
+                                {isSubscriber && (
+                                    <li className="pos-menu-item">
+                                        <NavLink 
+                                            to="/settings/connected_apps" 
+                                            className={() => `pos-menu-link ${isConnectedAppsActive ? 'active' : ''}`}
+                                        >
+                                            <div className="pos-menu-link-content">
+                                                <Puzzle className="pos-menu-icon" strokeWidth={1.5} />
+                                                <span>Connected Apps</span>
+                                            </div>
+                                            <span style={{ 
+                                                background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                                                color: '#fff',
+                                                fontSize: '10px',
+                                                fontWeight: '700',
+                                                padding: '2px 7px',
+                                                borderRadius: '10px',
+                                                letterSpacing: '0.04em'
+                                            }}>
+                                                APPS
+                                            </span>
+                                        </NavLink>
+                                    </li>
+                                )}
                                 <li className="pos-menu-item">
                                     <a
                                         className={`pos-menu-link ${isSystemSettingsActive ? 'active' : ''} ${openMenus.settings ? 'open' : ''}`}
@@ -657,6 +668,21 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                             </NavLink>
                                         </li>
                                         <li>
+                                            <NavLink to="/settings/bank_accounts" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Bank Accounts
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/settings/tax_rates" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Tax Rates
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/settings/currencies" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
+                                                Currencies
+                                            </NavLink>
+                                        </li>
+                                        <li>
                                             <NavLink to="/settings/pos_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>
                                                 POS Settings
                                             </NavLink>
@@ -677,25 +703,138 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                 {/* Subscription Widget */}
                 {!isSuperAdmin && (
                     <div style={{ padding: '20px', borderTop: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
-                        {(!user?.plan || user?.plan === 'NONE') ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: '500' }}>
-                                    Unlock more features
-                                </div>
-                                <Link
-                                    to="/settings/billing"
-                                    style={{
-                                        display: 'block', textAlign: 'center', background: 'var(--primary-color, #4f46e5)',
-                                        color: 'white', padding: '8px 12px', borderRadius: '6px',
-                                        textDecoration: 'none', fontSize: '14px', fontWeight: '600',
-                                        transition: 'opacity 0.2s'
-                                    }}
-                                    onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-                                    onMouseLeave={(e) => e.target.style.opacity = '1'}
-                                >
-                                    Upgrade Now
-                                </Link>
-                            </div>
+                        {(!user?.plan || user?.plan === 'NONE' || !isSubscriber) ? (
+                            (() => {
+                                const freeLimit = usage?.limit && usage.limit > 0 ? usage.limit : 50;
+                                const freeUsed = usage?.totalUsed ?? 0;
+                                const freeRemaining = Math.max(0, freeLimit - freeUsed);
+                                const freePercent = Math.min(100, Math.round((freeUsed / freeLimit) * 100));
+
+                                // Project theme colors: #ff822d -> #ea580c (Namastute Primary Orange)
+                                let barColor = 'linear-gradient(90deg, #ff822d 0%, #ea580c 100%)';
+                                let badgeBg = 'var(--pos-orange-light, #fff7ed)';
+                                let badgeText = 'var(--pos-orange, #ea580c)';
+                                let statusText = `${freeRemaining} remaining`;
+
+                                if (freePercent >= 90) {
+                                    barColor = 'linear-gradient(90deg, #ef4444 0%, #b91c1c 100%)';
+                                    badgeBg = '#fef2f2';
+                                    badgeText = '#b91c1c';
+                                    statusText = freeRemaining === 0 ? '0 remaining (Limit reached)' : `${freeRemaining} remaining`;
+                                } else if (freePercent >= 70) {
+                                    barColor = 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)';
+                                    badgeBg = '#fffbeb';
+                                    badgeText = '#b45309';
+                                    statusText = `${freeRemaining} remaining`;
+                                }
+
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                        {/* Plan Header & Badge */}
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                                                <div style={{
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    borderRadius: '6px',
+                                                    background: 'var(--pos-orange-light, #fff7ed)',
+                                                    color: 'var(--pos-orange, #ea580c)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    border: '1px solid rgba(234, 88, 12, 0.15)'
+                                                }}>
+                                                    <Database size={13} />
+                                                </div>
+                                                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--pos-dark-blue, #0f172a)' }}>
+                                                    Free Plan
+                                                </span>
+                                            </div>
+                                            <span style={{
+                                                fontSize: '10px',
+                                                fontWeight: '700',
+                                                padding: '2px 8px',
+                                                borderRadius: '12px',
+                                                background: badgeBg,
+                                                color: badgeText,
+                                                border: '1px solid rgba(234, 88, 12, 0.2)',
+                                                letterSpacing: '0.02em'
+                                            }}>
+                                                {freeLimit} Records Max
+                                            </span>
+                                        </div>
+
+                                        {/* Counts: Used / Limit and Remaining */}
+                                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                                            <div>
+                                                <span style={{ fontSize: '15px', fontWeight: '800', color: 'var(--pos-dark-blue, #0f172a)' }}>{freeUsed}</span>
+                                                <span style={{ fontSize: '12px', fontWeight: '500', color: 'var(--pos-text-muted, #64748b)' }}> / {freeLimit} used</span>
+                                            </div>
+                                            <span style={{
+                                                fontSize: '11px',
+                                                fontWeight: '600',
+                                                color: freePercent >= 90 ? '#ef4444' : 'var(--pos-text-muted, #64748b)'
+                                            }}>
+                                                {statusText}
+                                            </span>
+                                        </div>
+
+                                        {/* Progress Bar */}
+                                        <div style={{
+                                            width: '100%',
+                                            backgroundColor: '#fed7aa44',
+                                            borderRadius: '9999px',
+                                            height: '7px',
+                                            overflow: 'hidden',
+                                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
+                                        }}>
+                                            <div style={{
+                                                background: barColor,
+                                                height: '100%',
+                                                borderRadius: '9999px',
+                                                width: `${freePercent}%`,
+                                                transition: 'width 0.4s ease, background 0.3s ease',
+                                                boxShadow: freePercent > 0 ? '0 0 6px rgba(234, 88, 12, 0.35)' : 'none'
+                                            }}></div>
+                                        </div>
+
+                                        {/* Upgrade Button */}
+                                        <Link
+                                            to="/settings/billing"
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '6px',
+                                                background: 'linear-gradient(135deg, #ff822d 0%, #ea580c 100%)',
+                                                color: '#ffffff',
+                                                padding: '9px 12px',
+                                                borderRadius: '7px',
+                                                textDecoration: 'none',
+                                                fontSize: '12px',
+                                                fontWeight: '700',
+                                                boxShadow: '0 3px 8px rgba(234, 88, 12, 0.28)',
+                                                transition: 'all 0.2s ease',
+                                                marginTop: '2px',
+                                                letterSpacing: '0.01em'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.filter = 'brightness(1.05)';
+                                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                                e.currentTarget.style.boxShadow = '0 5px 12px rgba(234, 88, 12, 0.4)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.filter = 'none';
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                e.currentTarget.style.boxShadow = '0 3px 8px rgba(234, 88, 12, 0.28)';
+                                            }}
+                                        >
+                                            <Sparkles size={13} />
+                                            <span>Upgrade to Pro</span>
+                                        </Link>
+                                    </div>
+                                );
+                            })()
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <div style={{ fontSize: '13px', color: '#111827', fontWeight: '600', textTransform: 'capitalize' }}>
@@ -703,9 +842,10 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 </div>
                                 {user.subscriptionEndDate && (
                                     <>
-                                        <div style={{ width: '100%', backgroundColor: '#e5e7eb', borderRadius: '9999px', height: '6px', overflow: 'hidden' }}>
+                                        <div style={{ width: '100%', backgroundColor: '#fed7aa44', borderRadius: '9999px', height: '6px', overflow: 'hidden' }}>
                                             <div style={{
-                                                background: 'var(--primary-color, #10b981)', height: '100%', borderRadius: '9999px',
+                                                background: 'linear-gradient(90deg, #ff822d 0%, #ea580c 100%)', height: '100%', borderRadius: '9999px',
+                                                boxShadow: '0 0 6px rgba(234, 88, 12, 0.35)',
                                                 width: `${(() => {
                                                     const end = new Date(user.subscriptionEndDate).getTime();
                                                     const start = end - (30 * 24 * 60 * 60 * 1000);

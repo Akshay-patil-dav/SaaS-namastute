@@ -5,9 +5,9 @@ export default function BlogPreviewSection() {
     const navigate = useNavigate();
 
     const blogs = [
-        { emoji: '📦', color: 'linear-gradient(135deg,#6366f1,#8b5cf6)', cat: 'Software',    title: 'How Namustutam Transformed Retail Inventory', slug: 'namustutam-retail-inventory' },
+        { emoji: '📦', color: 'linear-gradient(135deg,#6366f1,#8b5cf6)', cat: 'Software',    title: 'How Samrajya Software Transformed Retail Inventory', slug: 'samrajya-retail-inventory' },
         { emoji: '🏗️', color: 'linear-gradient(135deg,#10b981,#06b6d4)', cat: 'Development', title: 'Building a Multi-Tenant SaaS with Spring Boot',  slug: 'multi-tenant-saas-spring-boot' },
-        { emoji: '🚀', color: 'linear-gradient(135deg,#ff902f,#ff5f1f)', cat: 'Updates',     title: 'Namustutam v2.0 Launch: What\'s New',           slug: 'namustutam-v2-launch' },
+        { emoji: '🚀', color: 'linear-gradient(135deg,#ff902f,#ff5f1f)', cat: 'Updates',     title: 'Samrajya Software v2.0 Launch: What\'s New',           slug: 'samrajya-v2-launch' },
     ];
 
     return (
@@ -16,7 +16,7 @@ export default function BlogPreviewSection() {
                 <div className="bps-section-label">Blog</div>
                 <h2 className="bps-section-title">Latest from Our Team</h2>
                 <p className="bps-section-sub">
-                    Insights on software, development, and retail technology — straight from the Namustutam team.
+                    Insights on software, development, and retail technology — straight from the Samrajya Software team.
                 </p>
             </div>
             <div className="bps-grid">

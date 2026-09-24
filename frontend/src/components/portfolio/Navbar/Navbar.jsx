@@ -164,7 +164,7 @@ const Navbar = () => {
               <circle cx="16" cy="10" r="2" fill="rgba(255,255,255,0.8)" />
             </svg>
           </div>
-          <span className="navbar__logo-text">Namustutam</span>
+          <span className="navbar__logo-text">Samrajya Software</span>
         </a>
 
         {/* Desktop Nav */}

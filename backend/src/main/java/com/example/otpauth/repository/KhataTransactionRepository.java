@@ -34,4 +34,6 @@ public interface KhataTransactionRepository extends JpaRepository<KhataTransacti
                                               @Param("partyId") Long partyId,
                                               @Param("fromDate") LocalDate fromDate,
                                               @Param("toDate") LocalDate toDate);
+
+    long countByUserId(Long userId);
 }

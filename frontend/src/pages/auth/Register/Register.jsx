@@ -103,10 +103,10 @@ export default function Register() {
                             <div className="logo-v2-icon-wrapper">
                                 <Zap className="logo-v2-icon" size={24} />
                             </div>
-                            <span>Namustute</span>
+                            <span>Samrajya Software</span>
                         </div>
                         <h1 className="login-v2-title">Create Account</h1>
-                        <p className="login-v2-subtitle">Join Namustute POS and start managing your business smarter.</p>
+                        <p className="login-v2-subtitle">Join Samrajya Software and start managing your business smarter.</p>
                     </div>
 
                     {error && (
@@ -253,7 +253,7 @@ export default function Register() {
                         <Link to="/login" style={{ color: 'var(--v2-primary)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}>Sign in</Link>
                     </div>
 
-                    <p className="login-v2-footer">© 2026 Namustute Inc. All rights reserved.</p>
+                    <p className="login-v2-footer">© 2026 Samrajya Software Inc. All rights reserved.</p>
                 </div>
             </div>
 

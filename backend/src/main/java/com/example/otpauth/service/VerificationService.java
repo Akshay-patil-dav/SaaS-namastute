@@ -34,7 +34,7 @@ public class VerificationService {
             try {
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setTo(email);
-                message.setSubject("Your Verification Code - Namustutam");
+                message.setSubject("Your Verification Code - Samrajya Software");
                 message.setText("Your OTP code is: " + otp + "\n\nPlease enter this code to verify your account.");
                 mailSender.send(message);
                 System.out.println("Sent Email OTP to " + email);

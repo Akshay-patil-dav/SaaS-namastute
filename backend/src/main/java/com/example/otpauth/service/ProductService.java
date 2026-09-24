@@ -20,11 +20,15 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final com.example.otpauth.repository.UserRepository userRepository;
+    private final DataUsageService dataUsageService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ProductService(ProductRepository productRepository, com.example.otpauth.repository.UserRepository userRepository) {
+    public ProductService(ProductRepository productRepository,
+                          com.example.otpauth.repository.UserRepository userRepository,
+                          DataUsageService dataUsageService) {
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.dataUsageService = dataUsageService;
     }
 
     /** List all products */
@@ -135,6 +139,7 @@ public class ProductService {
     /** Create a new product */
     public Product createProduct(ProductRequest req) {
         Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+        dataUsageService.checkDataLimit(userId);
         
         com.example.otpauth.model.User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { User, Plus, MapPin, EyeOff, Shield, Phone, CheckCircle2, Mail, Key, Activity, Ban, Trash2 } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
 import { useCurrency } from '../../../hooks/useCurrency';
+import { useAuth } from '../../../context/AuthContext';
 import apiClient, { API, ENV } from '@/api/config';
 import Billing from './Billing';
 import ConnectedApps from './ConnectedApps';
@@ -9,6 +10,7 @@ import ConnectedApps from './ConnectedApps';
 export { Billing, ConnectedApps };
 
 export const ProfileSettings = () => {
+    const { user } = useAuth();
     const { currencySymbol } = useCurrency();
     const { settings, loading, saving, handleChange, saveSettings } = useSettings();
     const [isUploading, setIsUploading] = useState(false);
@@ -148,7 +150,7 @@ export const ProfileSettings = () => {
                         <input 
                             type="text" 
                             placeholder="e.g. John"
-                            value={settings.profileFirstName || ''}
+                            value={settings.profileFirstName !== undefined ? settings.profileFirstName : (user?.firstName || '')}
                             onChange={(e) => handleChange('profileFirstName', e.target.value)}
                         />
                     </div>
@@ -157,7 +159,7 @@ export const ProfileSettings = () => {
                         <input 
                             type="text" 
                             placeholder="e.g. Doe"
-                            value={settings.profileLastName || ''}
+                            value={settings.profileLastName !== undefined ? settings.profileLastName : (user?.lastName || '')}
                             onChange={(e) => handleChange('profileLastName', e.target.value)}
                         />
                     </div>
@@ -169,7 +171,7 @@ export const ProfileSettings = () => {
                         <input 
                             type="text" 
                             placeholder="e.g. johndoe"
-                            value={settings.profileUserName || ''}
+                            value={settings.profileUserName !== undefined ? settings.profileUserName : (user?.username || '')}
                             onChange={(e) => handleChange('profileUserName', e.target.value)}
                         />
                     </div>
@@ -193,7 +195,7 @@ export const ProfileSettings = () => {
                         <input 
                             type="text" 
                             placeholder="+1 (555) 000-0000"
-                            value={settings.profilePhone || ''}
+                            value={settings.profilePhone !== undefined ? settings.profilePhone : (user?.phone || '')}
                             onChange={(e) => handleChange('profilePhone', e.target.value)}
                         />
                     </div>
@@ -202,7 +204,7 @@ export const ProfileSettings = () => {
                         <input 
                             type="email" 
                             placeholder="john@example.com"
-                            value={settings.profileEmail || ''}
+                            value={settings.profileEmail !== undefined ? settings.profileEmail : (user?.email || '')}
                             onChange={(e) => handleChange('profileEmail', e.target.value)}
                         />
                     </div>

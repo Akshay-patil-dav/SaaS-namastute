@@ -10,6 +10,7 @@ import com.example.otpauth.model.RoleName;
 import com.example.otpauth.model.User;
 import com.example.otpauth.repository.RoleRepository;
 import com.example.otpauth.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,9 @@ import java.util.UUID;
 
 @Service
 public class AuthService {
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id:167861187519-tad34cb9ben048eb4ddfbf70h4plhj91.apps.googleusercontent.com}")
+    private String googleClientId;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -103,10 +107,13 @@ public class AuthService {
     @Transactional
     public AuthResponse googleLogin(String credential) {
         try {
+            String targetClientId = (googleClientId != null && !googleClientId.isBlank() && !googleClientId.startsWith("YOUR_"))
+                    ? googleClientId
+                    : "167861187519-tad34cb9ben048eb4ddfbf70h4plhj91.apps.googleusercontent.com";
+
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
                     new GsonFactory())
-                    .setAudience(Collections
-                            .singletonList("167861187519-44s1h4e2mprdv7gur3l8ddli6sk2225b.apps.googleusercontent.com"))
+                    .setAudience(Collections.singletonList(targetClientId))
                     .build();
 
             GoogleIdToken idToken = verifier.verify(credential);

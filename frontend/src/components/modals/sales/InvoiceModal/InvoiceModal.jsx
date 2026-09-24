@@ -32,7 +32,7 @@ function numToWords(amount) {
 }
 
 /* ── Direct UPI Scan & Pay QR Code Component ─────────────────── */
-function RealQRCode({ invoiceNo, amount, storeName = 'Namastute Store', upiId = 'namastute.pay@upi', bankAccount = null }) {
+function RealQRCode({ invoiceNo, amount, storeName = 'Samrajya Store', upiId = 'samrajya.pay@upi', bankAccount = null }) {
     const numericAmount = parseFloat(amount || 0).toFixed(2);
     const cleanInvoiceNo = invoiceNo || 'INV-SALES-BILLING';
     
@@ -198,7 +198,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
         if (!cleanPhone) return;
 
         const itemsList = products.map(p => `• ${p.name || 'Item'} (x${p.qty || p.quantity || 1}) - ${fmtMoney((parseFloat(p.price || p.unitPrice) || 0) * (parseInt(p.qty || p.quantity) || 1))}`).join('\n');
-        const storeName = companyInfo?.name || settings?.companyName || 'Namustutam Store';
+        const storeName = companyInfo?.name || settings?.companyName || 'Samrajya Store';
         const custName = order.customerName || order.customer?.name || 'Valued Customer';
         const formattedAmount = fmtMoney(grandTotal);
         const orderDate = order.formattedDate || order.date || new Date().toLocaleDateString();
@@ -210,7 +210,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
             const primaryBank = bankAccounts[0];
             const upiId = primaryBank
                 ? `${primaryBank.accountNumber}@${primaryBank.branchIfsc}.ifsc.npci`
-                : (settings?.upiId || 'namastute.pay@upi');
+                : (settings?.upiId || 'samrajya.pay@upi');
             const numericAmt = (due > 0 ? due : grandTotal).toFixed(2);
             upiUri = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(storeName)}&am=${numericAmt}&cu=INR&tn=${encodeURIComponent(`Bill ${invoiceNo}`)}`;
         }
@@ -343,7 +343,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                                 ) : (
                                     <div className="inv-logo-icon">{companyInfo.name ? companyInfo.name.charAt(0).toUpperCase() : 'N'}</div>
                                 )}
-                                {!companyInfo.logo && <span className="inv-company-name">{companyInfo.name || 'Namustutam'}</span>}
+                                {!companyInfo.logo && <span className="inv-company-name">{companyInfo.name || 'Samrajya Software'}</span>}
                             </div>
                             <div className="inv-company-addr">
                                 {companyInfo.address || '123 Business Park, Pune, MH 411001'}<br />
@@ -370,10 +370,10 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         {/* From */}
                         <div>
                             <div className="inv-party-label">From</div>
-                            <div className="inv-party-name">{order.biller || companyInfo.name || 'Namustutam Admin'}</div>
+                            <div className="inv-party-name">{order.biller || companyInfo.name || 'Samrajya Admin'}</div>
                             <div className="inv-party-detail">
                                 {companyInfo.address || '123 Business Park, Pune, MH 411001'}<br />
-                                Email : <a href={`mailto:${companyInfo.email || 'admin@namustutam.com'}`}>{companyInfo.email || 'admin@namustutam.com'}</a><br />
+                                Email : <a href={`mailto:${companyInfo.email || 'admin@samrajyasoftware.com'}`}>{companyInfo.email || 'admin@samrajyasoftware.com'}</a><br />
                                 Phone : {companyInfo.phone || '+91 98765 43210'}
                             </div>
                         </div>
@@ -507,10 +507,10 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                             ) : (
                                 <div className="inv-logo-icon" style={{ width: 24, height: 24, fontSize: 11 }}>{companyInfo.name ? companyInfo.name.charAt(0).toUpperCase() : 'N'}</div>
                             )}
-                            <span style={{ fontSize: 16, fontWeight: 800, color: '#1b2850' }}>{companyInfo.name || 'Namustutam'}</span>
+                            <span style={{ fontSize: 16, fontWeight: 800, color: '#1b2850' }}>{companyInfo.name || 'Samrajya Software'}</span>
                         </div>
                         <div className="inv-footer-pay">
-                            Payment Made Via <strong>bank transfer / UPI</strong> in the name of <span style={{ color: '#ff9f43', fontWeight: 600 }}>{companyInfo.name || 'Namustutam Pvt. Ltd.'}</span>
+                            Payment Made Via <strong>bank transfer / UPI</strong> in the name of <span style={{ color: '#ff9f43', fontWeight: 600 }}>{companyInfo.name || 'Samrajya Software Pvt. Ltd.'}</span>
                         </div>
                         <div className="inv-footer-bank">
                             {bankAccounts.length > 0 ? (

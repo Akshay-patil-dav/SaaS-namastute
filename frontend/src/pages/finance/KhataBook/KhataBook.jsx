@@ -4,6 +4,7 @@ import apiClient, { API } from '../../../api/config';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useCompany } from '../../../context/CompanyContext';
 import { useSettings } from '../../../hooks/useSettings';
+import { dispatchUsageRefresh } from '../../../context/UsageContext';
 import {
     BookOpen,
     Users,
@@ -500,7 +501,12 @@ export default function KhataBook() {
                 if (res.data && res.data.id) {
                     newParty.id = res.data.id;
                 }
-            } catch {
+                dispatchUsageRefresh();
+            } catch (err) {
+                if (err.response?.data?.limitExceeded || err.response?.status === 403) {
+                    alert(err.response?.data?.error || err.response?.data?.message || 'Free plan data limit reached (50 records). Please upgrade to add more records.');
+                    return;
+                }
                 // saved locally
             }
 
@@ -520,6 +526,7 @@ export default function KhataBook() {
 
         try {
             await apiClient.delete(`/khata/parties/${party.id}`);
+            dispatchUsageRefresh();
         } catch {
             // delete locally
         }
@@ -595,7 +602,12 @@ export default function KhataBook() {
             if (res.data && res.data.id) {
                 newTx.id = res.data.id;
             }
-        } catch {
+            dispatchUsageRefresh();
+        } catch (err) {
+            if (err.response?.data?.limitExceeded || err.response?.status === 403) {
+                alert(err.response?.data?.error || err.response?.data?.message || 'Free plan data limit reached (50 records). Please upgrade to add more records.');
+                return;
+            }
             // Local fallback
         }
 
@@ -620,7 +632,7 @@ export default function KhataBook() {
         if (sendTxWhatsApp && selectedParty.phone) {
             const defaultCode = settings?.whatsappCountryCode || '91';
             const cleanPhone = formatWhatsAppPhone(selectedParty.phone, defaultCode);
-            const bizName = companyInfo?.name || settings?.companyName || 'Namustutam Store';
+            const bizName = companyInfo?.name || settings?.companyName || 'Samrajya Store';
             const actionText = txType === 'GAVE' ? 'Given (Debit / Udhar)' : 'Received (Credit / Jama)';
             const balSummary = newBal > 0 
                 ? `${formatCurrency(Math.abs(newBal))} (You'll Get)` 
@@ -633,7 +645,7 @@ export default function KhataBook() {
                 const primaryBank = bankAccounts[0];
                 const upiId = primaryBank
                     ? `${primaryBank.accountNumber}@${primaryBank.branchIfsc}.ifsc.npci`
-                    : (settings?.upiId || 'namastute.pay@upi');
+                    : (settings?.upiId || 'samrajya.pay@upi');
                 const numericAmt = Math.abs(newBal).toFixed(2);
                 const upiUri = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(bizName)}&am=${numericAmt}&cu=INR&tn=${encodeURIComponent(`Khata ${selectedParty.name}`)}`;
                 upiPart = `\n\n📲 *Pay Online via UPI (GPay/PhonePe):*\n${upiUri}`;
@@ -689,6 +701,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
 
         try {
             await apiClient.delete(`/khata/transactions/${tx.id}`);
+            dispatchUsageRefresh();
         } catch {
             // Local delete
         }
@@ -733,7 +746,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
         if (!waParty) return '';
         const bal = Number(waParty.netBalance || 0);
         const absBal = formatCurrency(Math.abs(bal));
-        const bizName = companyInfo?.name || settings?.companyName || 'Namustutam Store';
+        const bizName = companyInfo?.name || settings?.companyName || 'Samrajya Store';
         const partyTxs = transactions.filter(t => Number(t.partyId) === Number(waParty.id)).slice(0, 4);
 
         let upiPart = '';
@@ -741,7 +754,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
             const primaryBank = bankAccounts[0];
             const upiId = primaryBank
                 ? `${primaryBank.accountNumber}@${primaryBank.branchIfsc}.ifsc.npci`
-                : (settings?.upiId || 'namastute.pay@upi');
+                : (settings?.upiId || 'samrajya.pay@upi');
             const numericAmt = Math.abs(bal).toFixed(2);
             const upiUri = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(bizName)}&am=${numericAmt}&cu=INR&tn=${encodeURIComponent(`Khata ${waParty.name}`)}`;
             upiPart = `\n\n📲 *Pay Online via UPI (GPay/PhonePe):*\n${upiUri}`;
@@ -1660,7 +1673,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                 <div className="khata-printable-sheet" style={{ display: 'none' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #0f172a', paddingBottom: '16px', marginBottom: '20px' }}>
                         <div>
-                            <h2 style={{ margin: '0 0 4px 0', fontSize: '24px', fontWeight: '900' }}>{companyInfo?.name || 'Namustutam Business'}</h2>
+                            <h2 style={{ margin: '0 0 4px 0', fontSize: '24px', fontWeight: '900' }}>{companyInfo?.name || 'Samrajya Business'}</h2>
                             <p style={{ margin: 0, color: '#64748b', fontSize: '13px' }}>Digital Ledger & Khata Statement</p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
@@ -1725,7 +1738,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '50px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
                         <div style={{ fontSize: '11px', color: '#64748b' }}>
-                            Generated automatically via Namustutam POS Khata Book.<br/>
+                            Generated automatically via Samrajya Software Khata Book.<br/>
                             This is a computer-generated statement.
                         </div>
                         <div style={{ textAlign: 'center', width: '180px' }}>
@@ -1901,11 +1914,11 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                             <div className="khata-wa-preview-wrap">
                                 <div className="khata-wa-preview-topbar">
                                     <div className="khata-wa-preview-avatar">
-                                        {(companyInfo?.name || settings?.companyName || 'N').charAt(0).toUpperCase()}
+                                        {(companyInfo?.name || settings?.companyName || 'S').charAt(0).toUpperCase()}
                                     </div>
                                     <div>
                                         <div className="khata-wa-preview-store">
-                                            {companyInfo?.name || settings?.companyName || 'Namustutam Store'} (Official)
+                                            {companyInfo?.name || settings?.companyName || 'Samrajya Store'} (Official)
                                         </div>
                                         <div className="khata-wa-preview-status">Online • Verified Business</div>
                                     </div>

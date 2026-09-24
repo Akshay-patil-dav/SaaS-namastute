@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
+import { useDataUsage } from '../../../context/UsageContext';
 import apiClient from '../../../api/config';
 import { useCurrency } from '../../../hooks/useCurrency';
 import {
@@ -85,6 +86,7 @@ function loadRazorpay() {
 
 export default function Billing() {
     const { user, updatePlanContext } = useAuth();
+    const { usage } = useDataUsage();
     const { currencySymbol } = useCurrency();
     const [billing, setBilling] = useState('monthly'); // 'monthly' | 'yearly'
     const [loading, setLoading] = useState(null);
@@ -116,7 +118,7 @@ export default function Billing() {
                 key: data.razorpayKeyId,
                 amount: data.amount * 100,
                 currency: data.currency,
-                name: 'Namastute',
+                name: 'Samrajya Software',
                 description: `${plan.name} Plan — 30 days`,
                 order_id: data.orderId,
                 prefill: { name: user?.name || '', email: user?.email || '' },
@@ -147,7 +149,38 @@ export default function Billing() {
     };
 
     const renderStatus = () => {
-        if (!user?.subscriptionEndDate || currentPlan === 'NONE') return null;
+        if (!user?.subscriptionEndDate || currentPlan === 'NONE') {
+            const used = usage?.totalUsed ?? 0;
+            const limit = usage?.limit && usage.limit > 0 ? usage.limit : 50;
+            const remaining = Math.max(0, limit - used);
+            const pct = Math.min(100, Math.round((used / limit) * 100));
+
+            return (
+                <div className="bp-status" style={{ borderColor: pct >= 90 ? '#fca5a5' : 'rgba(234, 88, 12, 0.2)', background: pct >= 90 ? '#fef2f2' : 'var(--pos-orange-light, #fff7ed)' }}>
+                    <div className="bp-status-left">
+                        <BadgeCheck size={20} className="bp-status-icon" style={{ color: pct >= 90 ? '#ef4444' : 'var(--pos-orange, #ea580c)' }} />
+                        <div>
+                            <div className="bp-status-name" style={{ color: 'var(--pos-dark-blue, #0f172a)' }}>Free Plan Active</div>
+                            <div className="bp-status-expires">
+                                <Clock size={12} />
+                                {used} of {limit} records stored · {remaining} remaining
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bp-status-progress-wrap">
+                        <div className="bp-status-bar" style={{ backgroundColor: 'rgba(234, 88, 12, 0.15)' }}>
+                            <div className="bp-status-fill" style={{
+                                width: `${pct}%`,
+                                background: pct >= 90 ? '#ef4444' : 'linear-gradient(90deg, #ff822d 0%, #ea580c 100%)',
+                                boxShadow: pct > 0 ? '0 0 6px rgba(234, 88, 12, 0.35)' : 'none'
+                            }} />
+                        </div>
+                        <div className="bp-status-pct" style={{ color: 'var(--pos-dark-blue, #0f172a)' }}>{pct}% used ({remaining} left)</div>
+                    </div>
+                </div>
+            );
+        }
+
         const end = new Date(user.subscriptionEndDate);
         const now = Date.now();
         const daysLeft = Math.max(0, Math.ceil((end - now) / 86400000));

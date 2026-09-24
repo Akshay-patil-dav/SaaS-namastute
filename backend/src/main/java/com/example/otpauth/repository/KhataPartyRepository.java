@@ -26,4 +26,6 @@ public interface KhataPartyRepository extends JpaRepository<KhataParty, Long> {
                                    @Param("query") String query);
 
     long countByUserIdAndPartyType(Long userId, String partyType);
+
+    long countByUserId(Long userId);
 }

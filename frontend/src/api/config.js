@@ -43,13 +43,14 @@ export const ENV = {
   FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || DEFAULT_FRONTEND_URL,
 
   /** App branding */
-  APP_NAME: import.meta.env.VITE_APP_NAME || 'Namustutam POS',
+  APP_NAME: import.meta.env.VITE_APP_NAME || 'Samrajya Software',
   APP_VERSION: import.meta.env.VITE_APP_VERSION || '1.0.0',
 
-  /** Feature flags */
+  /** Feature flags & credentials */
   ENABLE_GOOGLE_LOGIN: import.meta.env.VITE_ENABLE_GOOGLE_LOGIN !== 'false',
   ENABLE_FACEBOOK_LOGIN: import.meta.env.VITE_ENABLE_FACEBOOK_LOGIN !== 'false',
   ENABLE_BLOG: import.meta.env.VITE_ENABLE_BLOG !== 'false',
+  GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID || '167861187519-tad34cb9ben048eb4ddfbf70h4plhj91.apps.googleusercontent.com',
 };
 
 // ── Derived API endpoint groups ────────────────────────────────────────────

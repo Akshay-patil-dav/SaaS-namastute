@@ -7,7 +7,7 @@
 
 
 
-# 📦 Namastute — SaaS Inventory & POS Platform
+# 📦 Samrajya Software — SaaS Inventory & POS Platform
 > **Full Project Documentation** · v1.0 · May 2026
 
 ---
@@ -361,4 +361,4 @@ Password: Admin@12345
 
 ---
 
-*Namastute SaaS POS — Documentation v1.0 · May 2026*
+*Samrajya Software SaaS POS — Documentation v1.0 · May 2026*

@@ -811,6 +811,21 @@ input:checked + .toggle-slider:before {
     margin: 0;
 }
 
+@media (max-width: 991px) {
+    .settings-layout {
+        flex-direction: column;
+    }
+
+    .settings-sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .settings-content {
+        width: 100%;
+    }
+}
+
 @media (max-width: 768px) {
     .premium-grid-form, .premium-grid-form.three-cols {
         grid-template-columns: 1fr;

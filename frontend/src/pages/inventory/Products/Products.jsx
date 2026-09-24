@@ -4,6 +4,7 @@ import '../Brands/inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
 import { usePermissions } from '../../../hooks/usePermissions';
 import apiClient, { API, ENV } from '@/api/config';
+import { dispatchUsageRefresh } from '../../../context/UsageContext';
 import {
     FileText,
     FileSpreadsheet,
@@ -204,6 +205,7 @@ const Products = () => {
 
         try {
             await apiClient.delete(`${API_BASE}/${id}`);
+            dispatchUsageRefresh();
             setDbProducts(prev => prev.filter(p => p.id !== id));
             showToast('success', 'Product deleted successfully.');
         } catch {
@@ -221,6 +223,7 @@ const Products = () => {
 
         try {
             await apiClient.post(`${API_BASE}/delete-bulk`, { ids: selectedIds });
+            dispatchUsageRefresh();
             showToast('success', `${selectedIds.length} products deleted successfully.`);
             setSelectedIds([]);
             fetchProducts();

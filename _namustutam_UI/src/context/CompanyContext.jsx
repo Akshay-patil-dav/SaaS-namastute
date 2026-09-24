@@ -20,7 +20,7 @@ export function CompanyProvider({ children }) {
                         const list = JSON.parse(data.companies_list);
                         if (Array.isArray(list) && list.length > 0) {
                             setCompanyInfo({
-                                name: list[0].companyName || '',
+                                name: list[0].companyName || 'Samrajya Software',
                                 logo: list[0].companyLogo || '',
                             });
                             return;
@@ -28,7 +28,7 @@ export function CompanyProvider({ children }) {
                     } catch { /* ignore parse error */ }
                 }
                 // No company configured → clear
-                setCompanyInfo({ name: '', logo: '' });
+                setCompanyInfo({ name: 'Samrajya Software', logo: '' });
             })
             .catch(() => { /* ignore network errors */ });
     }, []);
