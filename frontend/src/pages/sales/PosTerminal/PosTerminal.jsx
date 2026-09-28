@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
     Search, Barcode, ShoppingCart, Trash2, Plus, Minus,
     CreditCard, DollarSign, QrCode, Building, CheckCircle,
@@ -16,6 +16,28 @@ import './pos-terminal.css';
 
 const BASE_URL = ENV.API_BASE_URL;
 
+// Cache keys for instant 0ms rendering
+const POS_CACHE_PRODUCTS_KEY = 'namustutam_pos_products';
+const POS_CACHE_CATEGORIES_KEY = 'namustutam_pos_categories';
+const POS_CACHE_BANKS_KEY = 'namustutam_pos_banks';
+
+const readPosCache = (key) => {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+    } catch {
+        return null;
+    }
+};
+
+const writePosCache = (key, data) => {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch {
+        // Safe fail for private browsing or quota limits
+    }
+};
+
 const getImageUrl = (url) => {
     if (!url) return '';
     const cleanUrl = url.split(',')[0]?.trim();
@@ -31,6 +53,41 @@ const getUpiQrUrl = (bankAccounts, user, grandTotal) => {
     return `upi://pay?pa=samrajya.pay@upi&pn=Samrajya%20Store&am=${grandTotal.toFixed(2)}&cu=INR&tn=POS%20Bill`;
 };
 
+// High-performance product image with skeleton placeholder & zero layout shift
+const PosProductImage = React.memo(function PosProductImage({ url, name }) {
+    const [imgStatus, setImgStatus] = useState(url ? 'loading' : 'fallback');
+
+    useEffect(() => {
+        setImgStatus(url ? 'loading' : 'fallback');
+    }, [url]);
+
+    if (!url || imgStatus === 'fallback') {
+        const initial = (name || 'P').trim().charAt(0).toUpperCase();
+        return (
+            <div className="pos-prod-img-box">
+                <span className="pos-prod-initials">{initial}</span>
+            </div>
+        );
+    }
+
+    return (
+        <div className="pos-prod-img-box">
+            {imgStatus === 'loading' && (
+                <div className="pos-skeleton-img pos-img-skeleton-overlay" />
+            )}
+            <img 
+                src={url} 
+                alt={name} 
+                loading="lazy"
+                decoding="async"
+                className={`pos-prod-img ${imgStatus === 'loaded' ? 'pos-img-loaded' : 'pos-img-loading'}`}
+                onLoad={() => setImgStatus('loaded')}
+                onError={() => setImgStatus('fallback')}
+            />
+        </div>
+    );
+});
+
 export default function PosTerminal() {
     const { currencySymbol } = useCurrency();
     const { user } = useAuth();
@@ -42,10 +99,17 @@ export default function PosTerminal() {
     // Responsive Mobile/Tablet View Tab: 'cart' (default: hides all items list) | 'catalog'
     const [mobileView, setMobileView] = useState('cart');
 
-    // Data States
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [loadingProducts, setLoadingProducts] = useState(true);
+    // Data States with Instant Cache Hydration
+    const cachedProducts = readPosCache(POS_CACHE_PRODUCTS_KEY) || [];
+    const cachedCategories = readPosCache(POS_CACHE_CATEGORIES_KEY) || [];
+    const cachedBanks = readPosCache(POS_CACHE_BANKS_KEY) || [];
+
+    const [products, setProducts] = useState(cachedProducts);
+    const [categories, setCategories] = useState(cachedCategories);
+    const [bankAccounts, setBankAccounts] = useState(cachedBanks);
+    const [loadingProducts, setLoadingProducts] = useState(cachedProducts.length === 0);
+    const [loadingBanks, setLoadingBanks] = useState(cachedBanks.length === 0);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     // Filter States
     const [searchQuery, setSearchQuery] = useState('');
@@ -71,30 +135,65 @@ export default function PosTerminal() {
     const [invoiceOpen, setInvoiceOpen] = useState(false);
     const [completedOrder, setCompletedOrder] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
-    const [bankAccounts, setBankAccounts] = useState([]);
 
     const barcodeRef = useRef(null);
 
-    // Load initial products and categories
-    const fetchCatalog = useCallback(async () => {
-        setLoadingProducts(true);
+    // Fast, resilient concurrent catalog fetch
+    const fetchCatalog = useCallback(async (isManualRefresh = false) => {
+        if (isManualRefresh) {
+            setIsRefreshing(true);
+        } else if (products.length === 0) {
+            setLoadingProducts(true);
+        }
+
         try {
-            const [prodRes, catRes] = await Promise.all([
-                apiClient.get(`${BASE_URL}/products`),
-                apiClient.get(`${BASE_URL}/category`).catch(() => ({ data: [] }))
+            const [prodRes, catRes, bankRes] = await Promise.allSettled([
+                apiClient.get('/products'),
+                apiClient.get('/categories'),
+                apiClient.get('/bank-accounts')
             ]);
-            setProducts(Array.isArray(prodRes.data) ? prodRes.data : []);
-            setCategories(Array.isArray(catRes.data) ? catRes.data : []);
+
+            let loadedProducts = [];
+            if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value?.data)) {
+                loadedProducts = prodRes.value.data;
+                setProducts(loadedProducts);
+                writePosCache(POS_CACHE_PRODUCTS_KEY, loadedProducts);
+            }
+
+            let loadedCategories = [];
+            if (catRes.status === 'fulfilled' && Array.isArray(catRes.value?.data) && catRes.value.data.length > 0) {
+                loadedCategories = catRes.value.data;
+            } else if (loadedProducts.length > 0) {
+                // Intelligent fallback: extract unique categories from products
+                const uniqueCatNames = Array.from(new Set(loadedProducts.map(p => {
+                    if (typeof p.category === 'string') return p.category.trim();
+                    if (p.category?.name) return p.category.name.trim();
+                    if (p.categoryName) return p.categoryName.trim();
+                    return '';
+                }).filter(Boolean)));
+                loadedCategories = uniqueCatNames.map((name, idx) => ({ id: `cat-dyn-${idx}`, name }));
+            }
+
+            if (loadedCategories.length > 0) {
+                setCategories(loadedCategories);
+                writePosCache(POS_CACHE_CATEGORIES_KEY, loadedCategories);
+            }
+
+            if (bankRes.status === 'fulfilled' && Array.isArray(bankRes.value?.data)) {
+                setBankAccounts(bankRes.value.data);
+                writePosCache(POS_CACHE_BANKS_KEY, bankRes.value.data);
+            }
         } catch (err) {
-            console.error('Failed to load catalog:', err);
+            console.error('Failed to load POS catalog:', err);
         } finally {
             setLoadingProducts(false);
+            setLoadingBanks(false);
+            setIsRefreshing(false);
         }
-    }, []);
+    }, [products.length]);
 
     useEffect(() => {
         fetchCatalog();
-        apiClient.get(`${BASE_URL}/bank-accounts`).then(res => setBankAccounts(res.data)).catch(console.error);
     }, [fetchCatalog]);
 
     // Barcode scanner trigger
@@ -181,19 +280,27 @@ export default function PosTerminal() {
         }
     };
 
-    // Filtered Products List
-    const filteredProducts = products.filter(p => {
-        const matchesCat = selectedCategory === 'ALL' || 
-            (p.categoryName && p.categoryName === selectedCategory) ||
-            (p.category && p.category.name === selectedCategory) ||
-            (p.categoryId && String(p.categoryId) === String(selectedCategory));
+    // Memoized Filtered Products List for ultra-fast responsiveness
+    const filteredProducts = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase();
+        const selCat = selectedCategory;
 
-        const matchesQuery = !searchQuery.trim() || 
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase()));
+        return products.filter(p => {
+            const matchesCat = selCat === 'ALL' || 
+                (typeof p.category === 'string' && p.category.toLowerCase() === selCat.toLowerCase()) ||
+                (p.categoryName && p.categoryName.toLowerCase() === selCat.toLowerCase()) ||
+                (p.category?.name && p.category.name.toLowerCase() === selCat.toLowerCase()) ||
+                (p.categoryId && String(p.categoryId) === String(selCat));
 
-        return matchesCat && matchesQuery;
-    });
+            if (!matchesCat) return false;
+            if (!q) return true;
+
+            return (p.name && p.name.toLowerCase().includes(q)) ||
+                (p.sku && p.sku.toLowerCase().includes(q)) ||
+                (p.barcode && p.barcode.toLowerCase().includes(q)) ||
+                (p.itemBarcode && p.itemBarcode.toLowerCase().includes(q));
+        });
+    }, [products, selectedCategory, searchQuery]);
 
     // Calculations
     const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
@@ -392,8 +499,14 @@ export default function PosTerminal() {
                     <span className="border-end pe-3">
                         Cashier: <strong className="text-dark">{user?.name || user?.identifier?.split('@')[0] || 'Admin'}</strong>
                     </span>
-                    <button className="btn btn-sm btn-light border d-flex align-items-center gap-1" onClick={fetchCatalog}>
-                        <RefreshCw size={13} /> Refresh
+                    <button 
+                        className="btn btn-sm btn-light border d-flex align-items-center gap-1" 
+                        onClick={() => fetchCatalog(true)}
+                        disabled={isRefreshing}
+                        title="Sync latest inventory and catalog"
+                    >
+                        <RefreshCw size={13} className={isRefreshing ? 'pos-spin-icon text-warning' : ''} />
+                        <span>{isRefreshing ? 'Syncing...' : 'Refresh'}</span>
                     </button>
                 </div>
             </div>
@@ -453,29 +566,56 @@ export default function PosTerminal() {
                         </div>
 
                         {/* Categories Pills */}
-                        <div className="d-flex align-items-center gap-2 mb-3 overflow-x-auto pb-1">
-                            <button 
-                                className={`pos-cat-pill ${selectedCategory === 'ALL' ? 'active' : ''}`}
-                                onClick={() => setSelectedCategory('ALL')}
-                            >
-                                All Items ({products.length})
-                            </button>
-                            {categories.map(cat => (
-                                <button
-                                    key={cat.id || cat.name}
-                                    className={`pos-cat-pill ${selectedCategory === cat.name ? 'active' : ''}`}
-                                    onClick={() => setSelectedCategory(cat.name)}
+                        {loadingProducts && categories.length === 0 ? (
+                            <div className="pos-skeleton-pills-row">
+                                <div className="pos-skeleton-pill" style={{ width: '85px' }} />
+                                <div className="pos-skeleton-pill" style={{ width: '105px' }} />
+                                <div className="pos-skeleton-pill" style={{ width: '75px' }} />
+                                <div className="pos-skeleton-pill" style={{ width: '120px' }} />
+                                <div className="pos-skeleton-pill" style={{ width: '90px' }} />
+                                <div className="pos-skeleton-pill" style={{ width: '100px' }} />
+                            </div>
+                        ) : (
+                            <div className="d-flex align-items-center gap-2 mb-3 overflow-x-auto pb-1">
+                                <button 
+                                    className={`pos-cat-pill ${selectedCategory === 'ALL' ? 'active' : ''}`}
+                                    onClick={() => setSelectedCategory('ALL')}
                                 >
-                                    {cat.name}
+                                    All Items ({products.length})
                                 </button>
-                            ))}
-                        </div>
+                                {categories.map((cat, idx) => {
+                                    const catName = typeof cat === 'string' ? cat : (cat.name || cat.title || 'Category');
+                                    const catId = typeof cat === 'object' && cat.id ? cat.id : `cat-${idx}-${catName}`;
+                                    return (
+                                        <button
+                                            key={catId}
+                                            className={`pos-cat-pill ${selectedCategory === catName ? 'active' : ''}`}
+                                            onClick={() => setSelectedCategory(catName)}
+                                        >
+                                            {catName}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
 
                         {/* Product Grid */}
                         {loadingProducts ? (
-                            <div className="d-flex align-items-center justify-content-center flex-column py-5 text-muted">
-                                <div className="spinner-border text-warning spinner-border-sm mb-2" role="status" />
-                                <span>Loading product catalog...</span>
+                            <div className="pos-prod-grid">
+                                {Array.from({ length: 12 }).map((_, idx) => (
+                                    <div key={idx} className="pos-skeleton-card">
+                                        <div className="pos-skeleton-img" />
+                                        <div className="pos-skeleton-title-box">
+                                            <div className="pos-skeleton-line w-90" />
+                                            <div className="pos-skeleton-line w-60" />
+                                        </div>
+                                        <div className="pos-skeleton-line w-40" style={{ height: '10px' }} />
+                                        <div className="pos-skeleton-footer">
+                                            <div className="pos-skeleton-pill-sm w-35" />
+                                            <div className="pos-skeleton-pill-sm w-45" />
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         ) : filteredProducts.length === 0 ? (
                             <div className="text-center py-5 text-muted bg-white rounded-3 border">
@@ -498,13 +638,7 @@ export default function PosTerminal() {
                                         >
                                             {inQty > 0 && <span className="pos-qty-badge">{inQty}</span>}
                                             
-                                            <div className="pos-prod-img-box">
-                                                {imgUrl ? (
-                                                    <img src={imgUrl} alt={prod.name} onError={e => e.target.style.display='none'} />
-                                                ) : (
-                                                    <span className="pos-prod-initials">{prod.name.charAt(0).toUpperCase()}</span>
-                                                )}
-                                            </div>
+                                            <PosProductImage url={imgUrl} name={prod.name} />
 
                                             <div className="pos-prod-title" title={prod.name}>{prod.name}</div>
                                             <div className="pos-prod-sku">SKU: {prod.sku || 'N/A'}</div>
@@ -729,8 +863,14 @@ export default function PosTerminal() {
                                     <div className="fw-bold text-dark mb-2" style={{ fontSize: '12px' }}>
                                         🏦 Bank Transfer Details
                                     </div>
-                                    {bankAccounts.length > 0 ? (
-                                        bankAccounts.map((b, idx) => (
+                                    {loadingBanks ? (
+                                        <div className="py-2">
+                                            <div className="pos-skeleton-line w-75 mb-2" />
+                                            <div className="pos-skeleton-line w-60 mb-2" />
+                                            <div className="pos-skeleton-line w-40" />
+                                        </div>
+                                    ) : bankAccounts.length > 0 ? (
+                                        bankAccounts.map((b) => (
                                             <div key={b.id} className="mb-2" style={{ fontSize: '11px', color: '#4b5563' }}>
                                                 <strong>{b.bankName}</strong><br/>
                                                 Name: {b.accountName}<br/>

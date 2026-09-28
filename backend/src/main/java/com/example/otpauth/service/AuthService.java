@@ -182,6 +182,29 @@ public class AuthService {
         return createAuthResponse(user, token);
     }
 
+    /**
+     * Updates only the businessType field for the authenticated user.
+     * Does NOT touch firstName, lastName, username — safe to call at any time.
+     */
+    @Transactional
+    public AuthResponse updateBusinessType(String businessType, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (businessType == null || businessType.isBlank()) {
+            throw new RuntimeException("Business type cannot be empty");
+        }
+
+        user.setBusinessType(businessType);
+        userRepository.save(user);
+
+        // Re-issue token so any JWT claims stay fresh
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
+        String token = jwtUtil.generateToken(userDetails);
+
+        return createAuthResponse(user, token);
+    }
+
     public java.util.Map<String, Object> checkUsername(String username) {
         boolean exists = userRepository.existsByUsername(username);
         java.util.Map<String, Object> response = new java.util.HashMap<>();

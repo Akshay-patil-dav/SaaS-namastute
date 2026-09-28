@@ -143,6 +143,33 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    /**
+     * updateBusinessType(newType)
+     * Calls PATCH /auth/business-type — only updates businessType.
+     * Does NOT touch firstName/lastName/username, no username-uniqueness risk.
+     * Persists the full updated user back to state + localStorage.
+     */
+    const updateBusinessType = async (newType) => {
+        try {
+            const res = await apiClient.patch(`${AUTH_API}/business-type`, { businessType: newType });
+            const {
+                id, token: jwt, email: userEmail, roles, fullName, plan,
+                emailVerified, phoneVerified, firstName, lastName, username,
+                businessType, activeProjectId, projectPermissions, subscriptionEndDate
+            } = res.data;
+            _persist(id, token || jwt, userEmail, roles, fullName, plan,
+                emailVerified, phoneVerified, firstName, lastName, username,
+                businessType, activeProjectId, projectPermissions, subscriptionEndDate);
+            return { success: true };
+        } catch (err) {
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data ||
+                'Failed to update business type.';
+            return { success: false, error: typeof msg === 'string' ? msg : 'Update failed.' };
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem(STORAGE_KEY);
         setToken(null);
@@ -189,6 +216,7 @@ export const AuthProvider = ({ children }) => {
                 register,
                 googleLogin,
                 completeOnboarding,
+                updateBusinessType,
                 logout,
                 fetchSession,
                 isSuperAdmin,

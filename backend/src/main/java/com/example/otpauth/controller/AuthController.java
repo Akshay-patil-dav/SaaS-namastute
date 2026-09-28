@@ -68,6 +68,23 @@ public class AuthController {
         }
     }
 
+    @PatchMapping("/business-type")
+    public ResponseEntity<?> updateBusinessType(@RequestBody Map<String, String> body, Authentication authentication) {
+        try {
+            if (authentication == null) {
+                return ResponseEntity.status(401).body("Unauthorized");
+            }
+            String businessType = body.get("businessType");
+            if (businessType == null || businessType.isBlank()) {
+                return ResponseEntity.badRequest().body("businessType is required");
+            }
+            AuthResponse response = authService.updateBusinessType(businessType, authentication.getName());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to update business type: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/check-username")
     public ResponseEntity<?> checkUsername(@RequestParam String username) {
         try {

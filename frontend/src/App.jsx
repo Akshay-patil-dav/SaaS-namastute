@@ -8,55 +8,56 @@ import { ConfirmProvider } from './context/ConfirmContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { UsageProvider } from './context/UsageContext';
 import PosLayout from './components/layout/PosLayout/PosLayout';
+import { Analytics } from "@vercel/analytics/next"
 // ── Lazy-loaded Admin Pages (code splitting — each route loads its JS on demand) ──
-const Login              = lazy(() => import('./pages/auth/Login/Login.jsx'));
-const Register           = lazy(() => import('./pages/auth/Register/Register.jsx'));
+const Login = lazy(() => import('./pages/auth/Login/Login.jsx'));
+const Register = lazy(() => import('./pages/auth/Register/Register.jsx'));
 
-const Onboarding           = lazy(() => import('./pages/auth/Onboarding/Onboarding.jsx'));
-const Unauthorized       = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
-const Dashboard          = lazy(() => import('./pages/dashboard/Dashboard/Dashboard.jsx'));
-const Dashboard2         = lazy(() => import('./pages/dashboard/Dashboard2/Dashboard2.jsx'));
-const ManageStock        = lazy(() => import('./pages/inventory/ManageStock/ManageStock.jsx'));
-const StockAdjustment    = lazy(() => import('./pages/inventory/StockAdjustment/StockAdjustment.jsx'));
-const StockTransfer      = lazy(() => import('./pages/inventory/StockTransfer/StockTransfer.jsx'));
-const OnlineOrders       = lazy(() => import('./pages/sales/OnlineOrders/OnlineOrders.jsx'));
-const PosOrders          = lazy(() => import('./pages/sales/PosOrders/PosOrders.jsx'));
-const PosTerminal        = lazy(() => import('./pages/sales/PosTerminal/PosTerminal.jsx'));
+const Onboarding = lazy(() => import('./pages/auth/Onboarding/Onboarding.jsx'));
+const Unauthorized = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard/Dashboard.jsx'));
+const Dashboard2 = lazy(() => import('./pages/dashboard/Dashboard2/Dashboard2.jsx'));
+const ManageStock = lazy(() => import('./pages/inventory/ManageStock/ManageStock.jsx'));
+const StockAdjustment = lazy(() => import('./pages/inventory/StockAdjustment/StockAdjustment.jsx'));
+const StockTransfer = lazy(() => import('./pages/inventory/StockTransfer/StockTransfer.jsx'));
+const OnlineOrders = lazy(() => import('./pages/sales/OnlineOrders/OnlineOrders.jsx'));
+const PosOrders = lazy(() => import('./pages/sales/PosOrders/PosOrders.jsx'));
+const PosTerminal = lazy(() => import('./pages/sales/PosTerminal/PosTerminal.jsx'));
 
-const SalesReturn        = lazy(() => import('./pages/sales/SalesReturn/SalesReturn.jsx'));
-const Products           = lazy(() => import('./pages/inventory/Products/Products.jsx'));
-const CreateProduct      = lazy(() => import('./pages/inventory/CreateProduct/CreateProduct.jsx'));
-const EditProduct        = lazy(() => import('./pages/inventory/EditProduct/EditProduct.jsx'));
-const ExpiredProducts    = lazy(() => import('./pages/inventory/ExpiredProducts/ExpiredProducts.jsx'));
-const LowStocks          = lazy(() => import('./pages/inventory/LowStocks/LowStocks.jsx'));
-const Category           = lazy(() => import('./pages/inventory/Category/Category.jsx'));
-const SubCategory        = lazy(() => import('./pages/inventory/SubCategory/SubCategory.jsx'));
-const Brands             = lazy(() => import('./pages/inventory/Brands/Brands.jsx'));
-const Units              = lazy(() => import('./pages/inventory/Units/Units.jsx'));
-const Warranties         = lazy(() => import('./pages/inventory/Warranties/Warranties.jsx'));
-const Store              = lazy(() => import('./pages/inventory/Store/Store.jsx'));
-const Warehouse          = lazy(() => import('./pages/inventory/Warehouse/Warehouse.jsx'));
-const PrintBarcode       = lazy(() => import('./pages/inventory/PrintBarcode/PrintBarcode.jsx'));
-const PrintQRCode        = lazy(() => import('./pages/inventory/PrintQRCode/PrintQRCode.jsx'));
-const Purchases          = lazy(() => import('./pages/purchases/Purchases/Purchases.jsx'));
-const AddPurchase        = lazy(() => import('./pages/purchases/AddPurchase/AddPurchase.jsx'));
-const EditPurchase       = lazy(() => import('./pages/purchases/EditPurchase/EditPurchase.jsx'));
-const PurchaseReturn     = lazy(() => import('./pages/purchases/PurchaseReturn/PurchaseReturn.jsx'));
-const AddPurchaseReturn  = lazy(() => import('./pages/purchases/AddPurchaseReturn/AddPurchaseReturn.jsx'));
+const SalesReturn = lazy(() => import('./pages/sales/SalesReturn/SalesReturn.jsx'));
+const Products = lazy(() => import('./pages/inventory/Products/Products.jsx'));
+const CreateProduct = lazy(() => import('./pages/inventory/CreateProduct/CreateProduct.jsx'));
+const EditProduct = lazy(() => import('./pages/inventory/EditProduct/EditProduct.jsx'));
+const ExpiredProducts = lazy(() => import('./pages/inventory/ExpiredProducts/ExpiredProducts.jsx'));
+const LowStocks = lazy(() => import('./pages/inventory/LowStocks/LowStocks.jsx'));
+const Category = lazy(() => import('./pages/inventory/Category/Category.jsx'));
+const SubCategory = lazy(() => import('./pages/inventory/SubCategory/SubCategory.jsx'));
+const Brands = lazy(() => import('./pages/inventory/Brands/Brands.jsx'));
+const Units = lazy(() => import('./pages/inventory/Units/Units.jsx'));
+const Warranties = lazy(() => import('./pages/inventory/Warranties/Warranties.jsx'));
+const Store = lazy(() => import('./pages/inventory/Store/Store.jsx'));
+const Warehouse = lazy(() => import('./pages/inventory/Warehouse/Warehouse.jsx'));
+const PrintBarcode = lazy(() => import('./pages/inventory/PrintBarcode/PrintBarcode.jsx'));
+const PrintQRCode = lazy(() => import('./pages/inventory/PrintQRCode/PrintQRCode.jsx'));
+const Purchases = lazy(() => import('./pages/purchases/Purchases/Purchases.jsx'));
+const AddPurchase = lazy(() => import('./pages/purchases/AddPurchase/AddPurchase.jsx'));
+const EditPurchase = lazy(() => import('./pages/purchases/EditPurchase/EditPurchase.jsx'));
+const PurchaseReturn = lazy(() => import('./pages/purchases/PurchaseReturn/PurchaseReturn.jsx'));
+const AddPurchaseReturn = lazy(() => import('./pages/purchases/AddPurchaseReturn/AddPurchaseReturn.jsx'));
 const EditPurchaseReturn = lazy(() => import('./pages/purchases/EditPurchaseReturn/EditPurchaseReturn.jsx'));
-const Settings           = lazy(() => import('./pages/settings/Settings/Settings.jsx'));
-const BillOfMaterials    = lazy(() => import('./pages/manufacturing/BillOfMaterials/BillOfMaterials.jsx'));
-const WorkOrders         = lazy(() => import('./pages/manufacturing/WorkOrders/WorkOrders.jsx'));
-const WorkCenters        = lazy(() => import('./pages/manufacturing/WorkCenters/WorkCenters.jsx'));
-const Invoices           = lazy(() => import('./pages/sales/Invoices/Invoices.jsx'));
-const FinancialReport    = lazy(() => import('./pages/reports/FinancialReport/FinancialReport.jsx'));
-const KhataBook          = lazy(() => import('./pages/finance/KhataBook/KhataBook.jsx'));
+const Settings = lazy(() => import('./pages/settings/Settings/Settings.jsx'));
+const BillOfMaterials = lazy(() => import('./pages/manufacturing/BillOfMaterials/BillOfMaterials.jsx'));
+const WorkOrders = lazy(() => import('./pages/manufacturing/WorkOrders/WorkOrders.jsx'));
+const WorkCenters = lazy(() => import('./pages/manufacturing/WorkCenters/WorkCenters.jsx'));
+const Invoices = lazy(() => import('./pages/sales/Invoices/Invoices.jsx'));
+const FinancialReport = lazy(() => import('./pages/reports/FinancialReport/FinancialReport.jsx'));
+const KhataBook = lazy(() => import('./pages/finance/KhataBook/KhataBook.jsx'));
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
 const CLIENT_ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
-const ADMIN_ROLES        = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
-const SUPER_ADMIN_ROLES  = ['SUPER_ADMIN'];
+const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN', 'CLIENT'];
+const SUPER_ADMIN_ROLES = ['SUPER_ADMIN'];
 
 // ── Global page loading fallback ─────────────────────────────────────────────
 function PageLoader() {
@@ -96,19 +97,21 @@ const PosPage = ({ roles, children }) => (
 // ── Routes ───────────────────────────────────────────────────────────────────
 function AppRoutes() {
     return (
+
         <Suspense fallback={<PageLoader />}>
+            <Analytics />
             <Routes>
                 {/* Public routes — guests only (logged-in users are redirected to dashboard) */}
-                <Route path="/"             element={<Navigate to="/login" replace />} />
-                <Route path="/login"        element={<GuestRoute><Login /></GuestRoute>} />
-                <Route path="/register"     element={<GuestRoute><Register /></GuestRoute>} />
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+                <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
 
                 <Route path="/unauthorized" element={<Unauthorized />} />
-                
+
                 {/* ── ONBOARDING ───────────────────────── */}
-                <Route 
-                    path="/onboarding" 
-                    element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'CLIENT']}><Onboarding /></ProtectedRoute>} 
+                <Route
+                    path="/onboarding"
+                    element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'CLIENT']}><Onboarding /></ProtectedRoute>}
                 />
 
                 {/* ── CLIENT + ADMIN ───────────────────────── */}

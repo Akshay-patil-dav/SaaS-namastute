@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { User, Plus, MapPin, EyeOff, Shield, Phone, CheckCircle2, Mail, Key, Activity, Ban, Trash2 } from 'lucide-react';
+import { User, Plus, MapPin, EyeOff, Shield, Phone, CheckCircle2, Mail, Key, Activity, Ban, Trash2, Store, Factory, ShoppingCart, Briefcase } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useAuth } from '../../../context/AuthContext';
@@ -10,11 +10,21 @@ import ConnectedApps from './ConnectedApps';
 export { Billing, ConnectedApps };
 
 export const ProfileSettings = () => {
-    const { user } = useAuth();
+    const { user, updateBusinessType } = useAuth();
     const { currencySymbol } = useCurrency();
     const { settings, loading, saving, handleChange, saveSettings } = useSettings();
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef(null);
+
+    // pendingBizType: null = no pending change, otherwise the type the user has clicked but not yet saved
+    const [pendingBizType, setPendingBizType] = useState(null);
+    const [bizTypeSaving, setBizTypeSaving] = useState(false);
+    const [bizTypeMsg, setBizTypeMsg] = useState(null); // { type: 'success'|'error', text }
+
+    // The "active" display selection: pending if user clicked a card, otherwise their saved type
+    const activeBizType = pendingBizType ?? (user?.businessType || '');
+    // Show save button only if they've picked something different from what's saved
+    const hasBizTypeChange = pendingBizType !== null && pendingBizType !== (user?.businessType || '');
 
     const handleFileUpload = async (event) => {
         const file = event.target.files?.[0];
@@ -279,6 +289,111 @@ export const ProfileSettings = () => {
                         />
                     </div>
                 </div>
+            </div>
+
+            {/* ── Business Type ────────────────────────────────────────────── */}
+            <div className="settings-divider"></div>
+            <div className="settings-section-title" style={{ padding: '0 24px', marginTop: '8px' }}>
+                <Briefcase size={18} />
+                <span>Business Type</span>
+            </div>
+            <div className="settings-content-body" style={{ paddingTop: '8px' }}>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '16px' }}>
+                    Choose the type that best describes your business. This instantly updates your sidebar navigation.
+                </p>
+                <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                    {[
+                        { value: 'Store',         label: 'Retail Store',   desc: 'POS, inventory & offline sales.',          Icon: Store },
+                        { value: 'Manufacturing', label: 'Manufacturing',  desc: 'BOM, Work Orders & Centres.',              Icon: Factory },
+                        { value: 'E-comm',        label: 'E-Commerce',     desc: 'Online sales & multi-channel fulfilment.',  Icon: ShoppingCart },
+                    ].map(({ value, label, desc, Icon }) => {
+                        const isSelected = activeBizType === value;
+                        const isSaved    = user?.businessType === value;
+                        return (
+                            <div
+                                key={value}
+                                onClick={() => { setPendingBizType(value); setBizTypeMsg(null); }}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: '14px',
+                                    padding: '14px 20px', borderRadius: '10px', cursor: 'pointer',
+                                    border: isSelected ? '2px solid #f97316' : '2px solid #e2e8f0',
+                                    background: isSelected
+                                        ? 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)'
+                                        : '#f8fafc',
+                                    transition: 'all 0.18s ease',
+                                    flex: '1 1 180px', minWidth: '180px',
+                                    boxShadow: isSelected ? '0 0 0 3px rgba(249,115,22,0.15)' : 'none',
+                                    position: 'relative',
+                                }}
+                            >
+                                {/* "Saved" badge on the currently-saved card */}
+                                {isSaved && !hasBizTypeChange && (
+                                    <span style={{
+                                        position: 'absolute', top: 8, right: 10,
+                                        fontSize: '10px', fontWeight: 700, letterSpacing: '0.03em',
+                                        background: '#dcfce7', color: '#16a34a',
+                                        padding: '2px 8px', borderRadius: '20px',
+                                    }}>Active</span>
+                                )}
+                                <div style={{
+                                    width: 42, height: 42, borderRadius: '10px', display: 'flex',
+                                    alignItems: 'center', justifyContent: 'center',
+                                    background: isSelected ? '#f97316' : '#e2e8f0',
+                                    color: isSelected ? '#fff' : '#64748b',
+                                    flexShrink: 0, transition: 'all 0.18s ease',
+                                }}>
+                                    <Icon size={20} />
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#1e293b' }}>{label}</div>
+                                    <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{desc}</div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {bizTypeMsg && (
+                    <div style={{
+                        marginTop: '12px', padding: '10px 16px', borderRadius: '8px', fontSize: '0.85rem',
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        background: bizTypeMsg.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                        color: bizTypeMsg.type === 'success' ? '#16a34a' : '#dc2626',
+                        border: `1px solid ${bizTypeMsg.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+                    }}>
+                        <span>{bizTypeMsg.type === 'success' ? '✓' : '✕'}</span>
+                        {bizTypeMsg.text}
+                    </div>
+                )}
+
+                {hasBizTypeChange && (
+                    <div style={{ marginTop: '16px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <button
+                            className="btn-save"
+                            disabled={bizTypeSaving}
+                            onClick={async () => {
+                                setBizTypeSaving(true);
+                                setBizTypeMsg(null);
+                                const result = await updateBusinessType(pendingBizType);
+                                setBizTypeSaving(false);
+                                if (result.success) {
+                                    setPendingBizType(null); // clear pending — card resets to saved state
+                                    setBizTypeMsg({ type: 'success', text: `Business type changed to "${pendingBizType}". Your sidebar has been updated.` });
+                                } else {
+                                    setBizTypeMsg({ type: 'error', text: result.error || 'Failed to update. Please try again.' });
+                                }
+                            }}
+                        >
+                            {bizTypeSaving ? 'Saving...' : 'Save Business Type'}
+                        </button>
+                        <button
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '0.85rem', textDecoration: 'underline' }}
+                            onClick={() => { setPendingBizType(null); setBizTypeMsg(null); }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                )}
             </div>
         </>
     );
