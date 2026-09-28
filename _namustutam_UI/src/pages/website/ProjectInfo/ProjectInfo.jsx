@@ -178,11 +178,11 @@ export default function ProjectInfo() {
                             <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="btn-solid sidebar-btn" style={{marginBottom: '10px'}}>
                                 Live Preview
                             </a>
-                            {project.githubLink && (
+                            {/* {project.githubLink && (
                                 <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="btn-outline sidebar-btn">
                                     View Source Code
                                 </a>
-                            )}
+                            )} */}
                         </div>
 
                         <div className="project-info-sidebar-section">

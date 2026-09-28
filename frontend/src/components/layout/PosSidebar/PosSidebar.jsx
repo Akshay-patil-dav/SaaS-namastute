@@ -266,7 +266,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                         return (
                             <>
                                 {/* ── Business-type mode indicator badge ── */}
-                                <div style={{
+                                {/* <div style={{
                                     margin: '12px 14px 4px',
                                     padding: '7px 12px',
                                     borderRadius: '8px',
@@ -280,7 +280,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                     <span style={{ fontSize: '11px', fontWeight: 700, color: modeConfig.color, letterSpacing: '0.02em' }}>
                                         {modeConfig.label}
                                     </span>
-                                </div>
+                                </div> */}
 
                                 {/* ── Dashboard ── (all types) */}
                                 <div className="pos-menu-divider" style={{ marginTop: '8px' }}></div>

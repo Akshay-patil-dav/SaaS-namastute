@@ -3,7 +3,7 @@ import '../Brands/Products.css';
 import '../Brands/inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
 import { usePermissions } from '../../../hooks/usePermissions';
-import apiClient, { API, ENV } from '@/api/config';
+import apiClient, { API, ENV, resolveImageUrl } from '@/api/config';
 import { dispatchUsageRefresh } from '../../../context/UsageContext';
 import {
     FileText,
@@ -448,7 +448,7 @@ const Products = () => {
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             {item.images && item.images.split(',')[0]?.trim() ? (
                                                 <img
-                                                    src={item.images.split(',')[0].trim()}
+                                                    src={resolveImageUrl(item.images.split(',')[0])}
                                                     alt={item.name}
                                                     style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
                                                     onError={(e) => {
@@ -604,7 +604,7 @@ const Products = () => {
                                 <div className="view-image-container">
                                     {viewProduct.images && viewProduct.images.split(',')[activeImgIndex]?.trim() ? (
                                         <img 
-                                            src={viewProduct.images.split(',')[activeImgIndex].trim()} 
+                                            src={resolveImageUrl(viewProduct.images.split(',')[activeImgIndex])} 
                                             alt={viewProduct.name} 
                                             className="view-main-img" 
                                         />
@@ -626,7 +626,7 @@ const Products = () => {
                                                 className={`view-thumb-item ${idx === activeImgIndex ? 'active' : ''}`}
                                                 onClick={() => setActiveImgIndex(idx)}
                                             >
-                                                <img src={imgUrl.trim()} alt="thumbnail" />
+                                                <img src={resolveImageUrl(imgUrl)} alt="thumbnail" />
                                             </div>
                                         ))}
                                     </div>

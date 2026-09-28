@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import AddCategoryModal from '../../../components/modals/inventory/AddCategoryModal/AddCategoryModal';
 import './CreateProduct.css';
 import { Link, useNavigate } from 'react-router-dom';
-import apiClient, { API, ENV } from '@/api/config';
+import apiClient, { API, ENV, resolveImageUrl, uploadImageFile } from '@/api/config';
 import { dispatchUsageRefresh } from '../../../context/UsageContext';
 import {
     RefreshCw,
@@ -73,6 +73,7 @@ const CreateProduct = () => {
     const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
     const [generatingSku, setGeneratingSku] = useState(false);
     const [generatingBarcode, setGeneratingBarcode] = useState(false);
+    const [imageUrl, setImageUrl] = useState('');
 
     // ── Variant Types state ────────────────────────────────────────────────────
     // variantTypes: [{ typeName: '', values: [{ value:'', price:'', sku:'', barcode:'', image:null }] }]
@@ -185,16 +186,9 @@ const CreateProduct = () => {
         setUploadingImages(true);
         try {
             const uploadPromises = files.map(async (file) => {
-                const formData = new FormData();
-                formData.append('file', file);
-                const res = await apiClient.post(
-                    `${ENV.API_BASE_URL}/upload`,
-                    formData,
-                    { headers: { 'Content-Type': 'multipart/form-data' } }
-                );
-                // Backend returns { url: '/uploads/uuid.ext' }
+                const finalUrl = await uploadImageFile(file);
                 return {
-                    url: `${ENV.API_BASE_URL.replace('/api', '')}${res.data.url}`,
+                    url: finalUrl,
                     name: file.name,
                 };
             });
@@ -211,6 +205,20 @@ const CreateProduct = () => {
 
     const removeImage = (index) => {
         setImages(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleUrlPaste = (e) => {
+        const val = e.target.value;
+        if (val.trim().startsWith('http')) {
+            if (images.length >= 7) {
+                showToast('error', 'Maximum 7 images allowed.');
+            } else {
+                setImages(prev => [...prev, { url: val.trim(), name: 'url-image' }]);
+            }
+            setImageUrl('');
+        } else {
+            setImageUrl(val);
+        }
     };
 
     // ── Variant Type helpers ────────────────────────────────────────────────────
@@ -255,15 +263,8 @@ const CreateProduct = () => {
         const key = `${tIdx}-${vIdx}`;
         setVtUploading(prev => ({ ...prev, [key]: true }));
         try {
-            const formData = new FormData();
-            formData.append('file', file);
-            const res = await apiClient.post(
-                `${ENV.API_BASE_URL}/upload`,
-                formData,
-                { headers: { 'Content-Type': 'multipart/form-data' } }
-            );
-            const url = `${ENV.API_BASE_URL.replace('/api', '')}${res.data.url}`;
-            updateVariantValue(tIdx, vIdx, 'image', url);
+            const finalUrl = await uploadImageFile(file);
+            updateVariantValue(tIdx, vIdx, 'image', finalUrl);
         } catch (err) {
             showToast('error', 'Image upload failed: ' + (err.response?.data?.error || err.message));
         } finally {
@@ -768,15 +769,18 @@ const CreateProduct = () => {
                         <ChevronDown size={18} className="text-muted" />
                     </div>
                     <div className="cp-card-body">
+                        <div className="d-flex mb-3">
+                            <input type="text" className="cp-input w-100" placeholder="Paste image URL here to add auto..." value={imageUrl} onChange={handleUrlPaste} />
+                        </div>
                         <div className="images-container">
-                            <label className="add-image-box" style={{ cursor: uploadingImages ? 'not-allowed' : 'pointer', opacity: uploadingImages ? 0.6 : 1 }}>
+                            <label className="add-image-box" style={{ cursor: uploadingImages || images.length >= 7 ? 'not-allowed' : 'pointer', opacity: uploadingImages || images.length >= 7 ? 0.6 : 1 }}>
                                 <input
                                     type="file"
                                     multiple
                                     accept="image/*"
                                     style={{ display: 'none' }}
                                     onChange={handleImageUpload}
-                                    disabled={uploadingImages}
+                                    disabled={uploadingImages || images.length >= 7}
                                 />
                                 {uploadingImages
                                     ? <><Loader size={20} className="spin text-muted" /><span>Uploading...</span></>

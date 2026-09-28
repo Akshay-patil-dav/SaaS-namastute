@@ -219,6 +219,7 @@ select.cp-input {
 /* Images block */
 .images-container {
     display: flex;
+    flex-wrap: wrap;
     gap: 16px;
 }
 

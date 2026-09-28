@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/verification/**", "/oauth2/**", "/login/**",
-                                "/api/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands",
+                                "/api/upload/**", "/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands",
                                 "/api/units", "/api/warranties")
                         .permitAll()
                         // Allow public e-commerce storefront access

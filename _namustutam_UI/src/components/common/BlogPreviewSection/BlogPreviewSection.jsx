@@ -1,42 +1,41 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiArrowRight, FiClock, FiCalendar } from 'react-icons/fi';
+import { DEFAULT_BLOGS } from '../../../data/blogData';
 import './BlogPreviewSection.css';
 
 export default function BlogPreviewSection() {
     const navigate = useNavigate();
+    const [blogs, setBlogs] = useState([]);
 
-    const blogs = [
-        { 
-            color: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)', 
-            cat: 'Software',    
-            title: 'How Namustutam Transformed Retail Inventory Management', 
-            desc: 'Discover the technical architecture behind our real-time inventory tracking system.',
-            slug: 'namustutam-retail-inventory',
-            date: 'Oct 12, 2023',
-            readTime: '5 min read',
-            author: 'Alex D.'
-        },
-        { 
-            color: 'linear-gradient(135deg, #4D4DFF 0%, #8A2BE2 100%)', 
-            cat: 'Development', 
-            title: 'Building a Scalable Multi-Tenant SaaS with Spring Boot',  
-            desc: 'A deep dive into tenant isolation, database routing, and security best practices.',
-            slug: 'multi-tenant-saas-spring-boot',
-            date: 'Nov 05, 2023',
-            readTime: '8 min read',
-            author: 'Sarah K.'
-        },
-        { 
-            color: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', 
-            cat: 'Updates',     
-            title: 'Namustutam v2.0 Launch: New Features & Enhancements',           
-            desc: 'Everything you need to know about our biggest platform update yet.',
-            slug: 'namustutam-v2-launch',
-            date: 'Dec 18, 2023',
-            readTime: '4 min read',
-            author: 'Product Team'
-        },
-    ];
+    useEffect(() => {
+        const mapBlog = (b) => ({
+            color: b.coverColor || 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+            cat: b.category || 'Updates',
+            title: b.title,
+            desc: b.excerpt,
+            slug: b.slug,
+            date: new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            readTime: typeof b.readTime === 'string' && b.readTime.includes('read') ? b.readTime : `${b.readTime} read`,
+            author: b.author || 'Namustutam Team',
+            originalBlog: b
+        });
+
+        try {
+            const saved = JSON.parse(localStorage.getItem('namustutam_blogs') || '[]');
+            const combined = [...saved, ...DEFAULT_BLOGS];
+            const seen = new Set();
+            const uniqueBlogs = combined.filter(b => { 
+                if (seen.has(b.id)) return false; 
+                seen.add(b.id); 
+                return true; 
+            });
+            
+            setBlogs(uniqueBlogs.slice(0, 3).map(mapBlog));
+        } catch {
+            setBlogs(DEFAULT_BLOGS.slice(0, 3).map(mapBlog));
+        }
+    }, []);
 
     return (
         <section className="bps-section" id="blog">
@@ -53,7 +52,7 @@ export default function BlogPreviewSection() {
                     <div
                         key={i}
                         className="bps-card group"
-                        onClick={() => navigate(`/blog/${b.slug}`)}
+                        onClick={() => navigate(`/blog/${b.slug}`, { state: { blog: b.originalBlog } })}
                     >
                         <div className="bps-card-img-wrapper">
                             <div className="bps-card-img" style={{ background: b.color }}>

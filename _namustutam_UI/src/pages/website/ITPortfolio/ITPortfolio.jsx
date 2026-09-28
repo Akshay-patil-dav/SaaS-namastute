@@ -210,30 +210,7 @@ export default function ITPortfolio() {
 
             {/* ── Progressive Growth Section ──────────────────────── */}
             <section className="portfolio-progressive-section" id="progressive-growth">
-                <div className="progressive-main-content">
-                    {/* Left Side: Curved Image */}
-                    <div className="progressive-image-wrapper reveal">
-                        <img src="https://images.unsplash.com/photo-1573164574572-cb89e39749b4?auto=format&fit=crop&q=80&w=1200" alt="Team discussing operational challenges" />
-                    </div>
-
-                    {/* Right Side: Content */}
-                    <div className="progressive-content reveal-right">
-                        <div className="progressive-label">SCALABLE INNOVATION</div>
-                        <h2 className="progressive-title">Solving Complex<br/>IT Challenges</h2>
-                        <p className="progressive-desc">
-                            We dig deep to identify the root of technological bottlenecks and focus on delivering tangible software solutions. Partner with us to modernize your operations and scale seamlessly.
-                        </p>
-                        <button className="progressive-btn" onClick={() => navigate('/contact')}>GET IN TOUCH</button>
-                        
-                        <div className="progressive-sparkle">
-                            <svg viewBox="0 0 100 100" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M50 0C50 27.6 72.4 50 100 50C72.4 50 50 72.4 50 100C50 72.4 27.6 50 0 50C27.6 50 50 27.6 50 0Z" />
-                            </svg>
-                        </div>
-                        {/* Little dot as seen in image near the curve */}
-                        <div className="progressive-dot"></div>
-                    </div>
-                </div>
+                
                 
                 {/* Bottom Marquee */}
                 <div className="progressive-marquee-container">

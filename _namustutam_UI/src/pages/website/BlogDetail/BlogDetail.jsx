@@ -32,6 +32,8 @@ const CATEGORY_COLORS = {
     All:         { bg: 'rgba(100,116,139,0.10)',color: '#475569' },
 };
 
+import { DEFAULT_BLOGS } from '../../../data/blogData';
+
 export default function BlogDetail() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -43,8 +45,11 @@ export default function BlogDetail() {
         try {
             const saved = JSON.parse(localStorage.getItem('namustutam_blogs') || '[]');
             // Also check default blogs if not found in saved
-            return saved.find(b => b.slug === slug) || null;
-        } catch { return null; }
+            const combined = [...saved, ...DEFAULT_BLOGS];
+            return combined.find(b => b.slug === slug) || null;
+        } catch { 
+            return DEFAULT_BLOGS.find(b => b.slug === slug) || null; 
+        }
     });
 
     // Related blogs

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import '../Brands/Products.css';
 import '../Brands/inventory-pages-custom.css';
 import { Link } from 'react-router-dom';
-import apiClient, { API, ENV } from '@/api/config';
+import apiClient, { API, ENV, resolveImageUrl } from '@/api/config';
 import { 
     FileText, 
     FileSpreadsheet, 
@@ -277,7 +277,7 @@ const LowStocks = () => {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                 {item.images && item.images.split(',')[0]?.trim() ? (
                                                     <img 
-                                                        src={item.images.split(',')[0].trim()} 
+                                                        src={resolveImageUrl(item.images.split(',')[0])} 
                                                         alt={item.name} 
                                                         style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }}
                                                     />

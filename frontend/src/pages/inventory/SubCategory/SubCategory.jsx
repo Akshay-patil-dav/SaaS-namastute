@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import apiClient, { API, ENV } from '@/api/config';
+import apiClient, { API, ENV, resolveImageUrl } from '@/api/config';
 import '../Brands/inventory-pages-custom.css';
 import { 
     FileText, 
@@ -314,7 +314,7 @@ const SubCategory = () => {
                                     <td>
                                         <div className="ss-table-img-wrapper">
                                             {item.image ? (
-                                                <img src={item.image} alt={item.name} className="ss-table-img" />
+                                                <img src={resolveImageUrl(item.image)} alt={item.name} className="ss-table-img" />
                                             ) : (
                                                 <div className="ss-table-img-placeholder">
                                                     <Folder size={16} />

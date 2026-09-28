@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './EditProduct.css';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import apiClient, { API, ENV } from '@/api/config';
+import apiClient, { API, ENV, resolveImageUrl, uploadImageFile } from '@/api/config';
 import {
     RefreshCw,
     ChevronUp,
@@ -74,6 +74,7 @@ const EditProduct = () => {
     const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
     const [generatingSku, setGeneratingSku] = useState(false);
     const [generatingBarcode, setGeneratingBarcode] = useState(false);
+    const [imageUrl, setImageUrl] = useState('');
 
     // ── Variant Types state ────────────────────────────────────────────────────
     const [variantTypes, setVariantTypes] = useState([]);
@@ -157,10 +158,13 @@ const EditProduct = () => {
                 });
 
                 if (p.images) {
-                    const imgList = p.images.split(',').filter(url => url.trim()).map(url => ({
-                        url: url.trim(),
-                        name: 'product-image'
-                    }));
+                    const imgList = p.images.split(',').filter(url => url.trim()).map(url => {
+                        const trimmed = url.trim();
+                        return {
+                            url: trimmed.startsWith('http') ? trimmed : `${ENV.BACKEND_BASE_URL}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`,
+                            name: 'product-image'
+                        };
+                    });
                     setImages(imgList);
                 }
 
@@ -178,7 +182,7 @@ const EditProduct = () => {
                                 price:   v.price   != null ? String(v.price) : '',
                                 sku:     v.sku     || '',
                                 barcode: v.barcode || '',
-                                image:   v.image   || null,
+                                image:   v.image ? (v.image.startsWith('http') ? v.image : `${ENV.BACKEND_BASE_URL}${v.image.startsWith('/') ? '' : '/'}${v.image}`) : null,
                                 quantity: v.quantity != null ? String(v.quantity) : '',
                                 isDefault: v.isDefault || false,
                             }))
@@ -202,7 +206,7 @@ const EditProduct = () => {
                                 price:   v.price   != null ? String(v.price) : '',
                                 sku:     v.sku     || '',
                                 barcode: v.barcode || '',
-                                image:   v.image   || null,
+                                image:   v.image ? (v.image.startsWith('http') ? v.image : `${ENV.BACKEND_BASE_URL}${v.image.startsWith('/') ? '' : '/'}${v.image}`) : null,
                                 quantity: v.quantity != null ? String(v.quantity) : '',
                                 isDefault: false,
                             }))
@@ -282,19 +286,20 @@ const EditProduct = () => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
 
+        if (images.length + files.length > 7) {
+            showToast('error', 'Maximum 7 images allowed.');
+            return;
+        }
+        const validFiles = files.filter(f => f.size <= 1048576);
+        if (validFiles.length < files.length) showToast('error', 'Images over 1MB skipped.');
+        if (validFiles.length === 0) return;
+
         setUploadingImages(true);
         try {
-            const uploadPromises = files.map(async (file) => {
-                const formData = new FormData();
-                formData.append('file', file);
-                const res = await apiClient.post(
-                    `${ENV.API_BASE_URL}/upload`,
-                    formData,
-                    { headers: { 'Content-Type': 'multipart/form-data' } }
-                );
-                // Backend returns { url: '/uploads/uuid.ext' }
+            const uploadPromises = validFiles.map(async (file) => {
+                const finalUrl = await uploadImageFile(file);
                 return {
-                    url: `${ENV.API_BASE_URL.replace('/api', '')}${res.data.url}`,
+                    url: finalUrl,
                     name: file.name,
                 };
             });
@@ -311,6 +316,20 @@ const EditProduct = () => {
 
     const removeImage = (index) => {
         setImages(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleUrlPaste = (e) => {
+        const val = e.target.value;
+        if (val.trim().startsWith('http')) {
+            if (images.length >= 7) {
+                showToast('error', 'Maximum 7 images allowed.');
+            } else {
+                setImages(prev => [...prev, { url: val.trim(), name: 'url-image' }]);
+            }
+            setImageUrl('');
+        } else {
+            setImageUrl(val);
+        }
     };
 
     // ── Variant Type helpers ────────────────────────────────────────────────────
@@ -355,15 +374,8 @@ const EditProduct = () => {
         const key = `${tIdx}-${vIdx}`;
         setVtUploading(prev => ({ ...prev, [key]: true }));
         try {
-            const formData = new FormData();
-            formData.append('file', file);
-            const res = await apiClient.post(
-                `${ENV.API_BASE_URL}/upload`,
-                formData,
-                { headers: { 'Content-Type': 'multipart/form-data' } }
-            );
-            const url = `${ENV.API_BASE_URL.replace('/api', '')}${res.data.url}`;
-            updateVariantValue(tIdx, vIdx, 'image', url);
+            const finalUrl = await uploadImageFile(file);
+            updateVariantValue(tIdx, vIdx, 'image', finalUrl);
         } catch (err) {
             showToast('error', 'Image upload failed: ' + (err.response?.data?.error || err.message));
         } finally {
@@ -876,6 +888,9 @@ const EditProduct = () => {
                         <ChevronDown size={18} className="text-muted" />
                     </div>
                     <div className="cp-card-body">
+                        <div className="d-flex mb-3">
+                            <input type="text" className="cp-input w-100" placeholder="Paste image URL here to add auto..." value={imageUrl} onChange={handleUrlPaste} />
+                        </div>
                         <div className="images-container">
                             <label className="add-image-box" style={{ cursor: uploadingImages ? 'not-allowed' : 'pointer', opacity: uploadingImages ? 0.6 : 1 }}>
                                 <input

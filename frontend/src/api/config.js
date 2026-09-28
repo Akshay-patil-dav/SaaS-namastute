@@ -81,7 +81,7 @@ export const API = {
   // Page Builder & Settings
   BUILDER: `${ENV.API_BASE_URL}/builder`,
   SETTINGS: `${ENV.API_BASE_URL}/settings`,
-  UPLOAD: `${ENV.API_BASE_URL}/upload`,
+  UPLOAD: '/upload',
 
   // Khata Book (Digital Ledger)
   KHATA: `${ENV.API_BASE_URL}/khata`,
@@ -95,6 +95,47 @@ export const API = {
   // OAuth2 redirect URLs (uses backend root, not /api prefix)
   OAUTH_GOOGLE: `${ENV.BACKEND_BASE_URL}/oauth2/authorization/google`,
   OAUTH_FACEBOOK: `${ENV.BACKEND_BASE_URL}/oauth2/authorization/facebook`,
+};
+
+// ── Helper to resolve relative image URLs to backend absolute URLs ─────────
+export const resolveImageUrl = (url, fallbackBase = null) => {
+  if (!url) return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (trimmed.startsWith('http')) return trimmed;
+  const base = fallbackBase || ENV.BACKEND_BASE_URL;
+  return `${base}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
+};
+
+// ── Smart Image Upload Helper (with Localhost Fallback) ────────────────────
+export const uploadImageFile = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  let res;
+  let usedBase = ENV.BACKEND_BASE_URL;
+  
+  try {
+      res = await apiClient.post(API.UPLOAD, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+      });
+  } catch (err) {
+      // If network error (ERR_CONNECTION_REFUSED, etc.) and primary isn't localhost
+      if (err.isAxiosError && !err.response && !ENV.API_BASE_URL.includes('localhost')) {
+          console.warn('Primary upload failed, falling back to localhost:3000...');
+          usedBase = 'http://localhost:3000';
+          const fallbackApi = 'http://localhost:3000/upload';
+          const token = localStorage.getItem('token');
+          const headers = { 'Content-Type': 'multipart/form-data' };
+          if (token) headers['Authorization'] = `Bearer ${token}`;
+          
+          res = await axios.post(fallbackApi, formData, { headers });
+      } else {
+          throw err;
+      }
+  }
+  
+  return resolveImageUrl(res.data.url, usedBase);
 };
 
 // ── Axios instance ─────────────────────────────────────────────────────────

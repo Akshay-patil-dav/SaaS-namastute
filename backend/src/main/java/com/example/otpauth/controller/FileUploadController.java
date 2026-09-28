@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/upload")
+@RequestMapping({"/api/upload", "/upload"})
 public class FileUploadController {
 
     private final String uploadDir = "uploads/";

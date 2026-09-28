@@ -8,7 +8,7 @@ import { ConfirmProvider } from './context/ConfirmContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { UsageProvider } from './context/UsageContext';
 import PosLayout from './components/layout/PosLayout/PosLayout';
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react"
 // ── Lazy-loaded Admin Pages (code splitting — each route loads its JS on demand) ──
 const Login = lazy(() => import('./pages/auth/Login/Login.jsx'));
 const Register = lazy(() => import('./pages/auth/Register/Register.jsx'));

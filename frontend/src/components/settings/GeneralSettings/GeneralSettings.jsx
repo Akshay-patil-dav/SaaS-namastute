@@ -39,13 +39,13 @@ export const ProfileSettings = () => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            
+
             const response = await apiClient.post(API.UPLOAD, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            
+
             const data = response.data;
-            
+
             if (data.url) {
                 handleChange('profileImage', data.url);
                 await saveSettings(['profileImage']);
@@ -81,11 +81,11 @@ export const ProfileSettings = () => {
                     <h3>Profile Information</h3>
                     <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b' }}>Update your personal details and public profile.</p>
                 </div>
-                <button 
+                <button
                     className="btn-save"
                     onClick={() => saveSettings([
-                        'profileFirstName', 'profileLastName', 'profileUserName', 
-                        'profilePhone', 'profileEmail', 'profileAddress', 
+                        'profileFirstName', 'profileLastName', 'profileUserName',
+                        'profilePhone', 'profileEmail', 'profileAddress',
                         'profileCountry', 'profileState', 'profileCity', 'profilePostalCode', 'currency'
                     ])}
                     disabled={saving}
@@ -96,7 +96,7 @@ export const ProfileSettings = () => {
 
             <div className="settings-content-body">
                 {/* Profile Image */}
-                <div className="settings-form-row">
+                {/* <div className="settings-form-row">
                     <div className="settings-form-group">
                         <label>Profile Picture</label>
                         <div className="profile-upload-section">
@@ -147,7 +147,7 @@ export const ProfileSettings = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="settings-section-title mt-4">
                     <User size={18} />
@@ -157,8 +157,8 @@ export const ProfileSettings = () => {
                 <div className="settings-form-row">
                     <div className="settings-form-group">
                         <label>First Name <span className="required">*</span></label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             placeholder="e.g. John"
                             value={settings.profileFirstName !== undefined ? settings.profileFirstName : (user?.firstName || '')}
                             onChange={(e) => handleChange('profileFirstName', e.target.value)}
@@ -166,8 +166,8 @@ export const ProfileSettings = () => {
                     </div>
                     <div className="settings-form-group">
                         <label>Last Name <span className="required">*</span></label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             placeholder="e.g. Doe"
                             value={settings.profileLastName !== undefined ? settings.profileLastName : (user?.lastName || '')}
                             onChange={(e) => handleChange('profileLastName', e.target.value)}
@@ -178,8 +178,8 @@ export const ProfileSettings = () => {
                 <div className="settings-form-row">
                     <div className="settings-form-group">
                         <label>User Name <span className="required">*</span></label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             placeholder="e.g. johndoe"
                             value={settings.profileUserName !== undefined ? settings.profileUserName : (user?.username || '')}
                             onChange={(e) => handleChange('profileUserName', e.target.value)}
@@ -202,8 +202,8 @@ export const ProfileSettings = () => {
                 <div className="settings-form-row">
                     <div className="settings-form-group">
                         <label>Phone Number <span className="required">*</span></label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             placeholder="+1 (555) 000-0000"
                             value={settings.profilePhone !== undefined ? settings.profilePhone : (user?.phone || '')}
                             onChange={(e) => handleChange('profilePhone', e.target.value)}
@@ -211,8 +211,8 @@ export const ProfileSettings = () => {
                     </div>
                     <div className="settings-form-group">
                         <label>Email Address <span className="required">*</span></label>
-                        <input 
-                            type="email" 
+                        <input
+                            type="email"
                             placeholder="john@example.com"
                             value={settings.profileEmail !== undefined ? settings.profileEmail : (user?.email || '')}
                             onChange={(e) => handleChange('profileEmail', e.target.value)}
@@ -230,8 +230,8 @@ export const ProfileSettings = () => {
                 <div className="settings-form-row">
                     <div className="settings-form-group">
                         <label>Street Address <span className="required">*</span></label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             placeholder="123 Main St, Apt 4B"
                             value={settings.profileAddress || ''}
                             onChange={(e) => handleChange('profileAddress', e.target.value)}
@@ -281,8 +281,8 @@ export const ProfileSettings = () => {
                     </div>
                     <div className="settings-form-group">
                         <label>Postal / Zip Code <span className="required">*</span></label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             placeholder="10001"
                             value={settings.profilePostalCode || ''}
                             onChange={(e) => handleChange('profilePostalCode', e.target.value)}
@@ -303,12 +303,12 @@ export const ProfileSettings = () => {
                 </p>
                 <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
                     {[
-                        { value: 'Store',         label: 'Retail Store',   desc: 'POS, inventory & offline sales.',          Icon: Store },
-                        { value: 'Manufacturing', label: 'Manufacturing',  desc: 'BOM, Work Orders & Centres.',              Icon: Factory },
-                        { value: 'E-comm',        label: 'E-Commerce',     desc: 'Online sales & multi-channel fulfilment.',  Icon: ShoppingCart },
+                        { value: 'Store', label: 'Retail Store', desc: 'POS, inventory & offline sales.', Icon: Store },
+                        { value: 'Manufacturing', label: 'Manufacturing', desc: 'BOM, Work Orders & Centres.', Icon: Factory },
+                        { value: 'E-comm', label: 'E-Commerce', desc: 'Online sales & multi-channel fulfilment.', Icon: ShoppingCart },
                     ].map(({ value, label, desc, Icon }) => {
                         const isSelected = activeBizType === value;
-                        const isSaved    = user?.businessType === value;
+                        const isSaved = user?.businessType === value;
                         return (
                             <div
                                 key={value}
@@ -433,8 +433,8 @@ export const SecuritySettings = () => {
                     </div>
                     <div className="security-item-action">
                         <label className="toggle-switch">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 checked={settings.twoFactorAuth !== 'false'}
                                 onChange={(e) => { handleChange('twoFactorAuth', e.target.checked ? 'true' : 'false'); saveSettings(['twoFactorAuth']); }}
                             />
@@ -456,8 +456,8 @@ export const SecuritySettings = () => {
                             <>
                                 <span className="status-text">Connected</span>
                                 <label className="toggle-switch">
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checked={true}
                                         onChange={(_e) => { handleChange('googleAuthConnected', 'false'); saveSettings(['googleAuthConnected']); }}
                                     />
@@ -468,8 +468,8 @@ export const SecuritySettings = () => {
                             <>
                                 <span className="status-text">Disconnected</span>
                                 <label className="toggle-switch">
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checked={false}
                                         onChange={(_e) => { handleChange('googleAuthConnected', 'true'); saveSettings(['googleAuthConnected']); }}
                                     />
@@ -584,8 +584,8 @@ export const Notifications = () => {
                     </div>
                     <div className="security-item-action">
                         <label className="toggle-switch">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 checked={settings.emailNotifications !== 'false'}
                                 onChange={(e) => handleChange('emailNotifications', e.target.checked ? 'true' : 'false')}
                             />
@@ -600,8 +600,8 @@ export const Notifications = () => {
                     </div>
                     <div className="security-item-action">
                         <label className="toggle-switch">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 checked={settings.smsNotifications === 'true'}
                                 onChange={(e) => handleChange('smsNotifications', e.target.checked ? 'true' : 'false')}
                             />
@@ -616,8 +616,8 @@ export const Notifications = () => {
                     </div>
                     <div className="security-item-action">
                         <label className="toggle-switch">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 checked={settings.pushNotifications !== 'false'}
                                 onChange={(e) => handleChange('pushNotifications', e.target.checked ? 'true' : 'false')}
                             />
@@ -626,7 +626,7 @@ export const Notifications = () => {
                     </div>
                 </div>
                 <div className="settings-actions">
-                    <button 
+                    <button
                         className="btn-save"
                         onClick={() => saveSettings(['emailNotifications', 'smsNotifications', 'pushNotifications'])}
                         disabled={saving}

@@ -10,7 +10,7 @@ import p7 from "../assets/project/p7.png"
 
 export const projectsData = [
     {
-        title: 'Krón',
+        title: 'Clothing E-commerce Design| Shopify ',
         author: 'Pranasari',
         category: 'NEW',
         filter: 'Business Page',
@@ -21,7 +21,7 @@ export const projectsData = [
         liveLink: '#', githubLink: '#'
     },
     {
-        title: 'Frentavo',
+        title: 'Shopify Web Design',
         author: 'Flow Design Agency',
         category: 'NEW',
         filter: 'Business Page',
@@ -32,10 +32,10 @@ export const projectsData = [
         liveLink: '#', githubLink: '#'
     },
     {
-        title: 'Safeers',
-        author: 'Weabers',
+        title: 'Clothing E-commerce Templates | Shopify Web Design',
+        author: 'Akshay Patil',
         category: 'NEW',
-        filter: 'SaaS Project',
+        filter: 'E-Commerce',
         price: '$99 USD',
         img: p3,
          techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
@@ -43,7 +43,7 @@ export const projectsData = [
         liveLink: '#', githubLink: '#'
     },
     {
-        title: 'Fullstack Studio',
+        title: 'MyITRDesk.com | Fullstack Studio',
         author: 'Div Supply',
         category: 'NEW',
         filter: 'E-Commerce',
@@ -54,10 +54,10 @@ export const projectsData = [
         liveLink: '#', githubLink: '#'
     },
     {
-        title: 'ORIGIN®',
-        author: 'Creative UI',
+        title: 'POS Software | SaaS',
+        author: 'Akshay Patil',
         category: 'NEW',
-        filter: 'Business Page',
+        filter: 'SaaS Project',
         price: '$49 USD',
         img: p5,
           techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
@@ -65,10 +65,10 @@ export const projectsData = [
         liveLink: '#', githubLink: '#'
     },
     {
-        title: 'ORVO',
+        title: 'NatureLink India .com | Shopify',
         author: 'Design Flow',
         category: 'NEW',
-        filter: 'SaaS Project',
+        filter: 'E-Commerce',
         price: '$89 USD',
         img: p7,
         techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],

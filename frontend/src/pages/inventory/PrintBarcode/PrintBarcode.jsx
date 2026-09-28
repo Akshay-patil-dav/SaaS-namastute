@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useCurrency } from '../../../hooks/useCurrency';
 import BarcodeModal from '../../../components/modals/inventory/BarcodeModal/BarcodeModal';
 import QRCodeModal from '../../../components/modals/inventory/QRCodeModal/QRCodeModal';
-import apiClient, { API, ENV } from '@/api/config';
+import apiClient, { API, ENV, resolveImageUrl } from '@/api/config';
 
 
 import '../Brands/Products.css';
@@ -257,7 +257,7 @@ const PrintBarcode = () => {
                                                     {/* Product tiny thumb */}
                                                     <div className="suggestion-img-wrapper">
                                                         {product.images && product.images.split(',')[0]?.trim() ? (
-                                                            <img src={product.images.split(',')[0].trim()} alt="" className="suggestion-thumb" />
+                                                            <img src={resolveImageUrl(product.images.split(',')[0])} alt="" className="suggestion-thumb" />
                                                         ) : (
                                                             <div className="suggestion-avatar" style={{ background: '#f1f5f9', color: '#64748b' }}>
                                                                 {product.name.charAt(0).toUpperCase()}
