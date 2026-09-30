@@ -32,7 +32,7 @@ const ChatBot = () => {
 
         try {
             // Use the provided API key directly
-            const apiKey = "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";
+            const apiKey = "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";
 
             if (!apiKey || apiKey === 'YOUR_FREE_GEMINI_API_KEY_HERE') {
                 setMessages(prev => [...prev, {
@@ -63,7 +63,7 @@ const ChatBot = () => {
                 const response = await axios.post(
                     '/api/groq/openai/v1/chat/completions',
                     {
-                        model: "groq/compound",
+                        model: "openai/gpt-oss-120b",
                         messages: groqMessages
                     },
                     {
