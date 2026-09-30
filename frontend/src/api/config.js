@@ -6,7 +6,7 @@
  * import.meta.env directly.
  *
  * Local dev  →  frontend/.env           →  points to http://103.190.93.133:3000
- * Production →  frontend/.env.production →  points to https://springboot-app-pb1v.onrender.com
+ * Production →  frontend/.env.production →  points to https://awhile-venus-unlearned.ngrok-free.dev
  *               (or override via Vercel Dashboard → Settings → Environment Variables)
  *
  * After changing .env files restart the dev server: npm run dev
@@ -20,11 +20,11 @@ import axios from 'axios';
 const isProduction = import.meta.env.PROD === true;
 
 const DEFAULT_API_BASE_URL = isProduction
-  ? 'https://springboot-app-pb1v.onrender.com/api'
+  ? 'https://awhile-venus-unlearned.ngrok-free.dev/api'
   : 'http://localhost:3000/api';
 
 const DEFAULT_BACKEND_BASE_URL = isProduction
-  ? 'https://springboot-app-pb1v.onrender.com'
+  ? 'https://awhile-venus-unlearned.ngrok-free.dev'
   : 'http://localhost:3000';
 
 const DEFAULT_FRONTEND_URL = isProduction
@@ -33,7 +33,7 @@ const DEFAULT_FRONTEND_URL = isProduction
 
 // ── Raw env values ─────────────────────────────────────────────────────────
 export const ENV = {
-  /** e.g.  http://103.190.93.133:3000/api   or   https://springboot-app-pb1v.onrender.com/api */
+  /** e.g.  http://103.190.93.133:3000/api   or   https://awhile-venus-unlearned.ngrok-free.dev/api */
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL,
 
   /** e.g.  http://103.190.93.133:3000  (no trailing slash) */
@@ -111,30 +111,30 @@ export const resolveImageUrl = (url, fallbackBase = null) => {
 export const uploadImageFile = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
-  
+
   let res;
   let usedBase = ENV.BACKEND_BASE_URL;
-  
+
   try {
-      res = await apiClient.post(API.UPLOAD, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-      });
+    res = await apiClient.post(API.UPLOAD, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
   } catch (err) {
-      // If network error (ERR_CONNECTION_REFUSED, etc.) and primary isn't localhost
-      if (err.isAxiosError && !err.response && !ENV.API_BASE_URL.includes('localhost')) {
-          console.warn('Primary upload failed, falling back to localhost:3000...');
-          usedBase = 'http://localhost:3000';
-          const fallbackApi = 'http://localhost:3000/upload';
-          const token = localStorage.getItem('token');
-          const headers = { 'Content-Type': 'multipart/form-data' };
-          if (token) headers['Authorization'] = `Bearer ${token}`;
-          
-          res = await axios.post(fallbackApi, formData, { headers });
-      } else {
-          throw err;
-      }
+    // If network error (ERR_CONNECTION_REFUSED, etc.) and primary isn't localhost
+    if (err.isAxiosError && !err.response && !ENV.API_BASE_URL.includes('localhost')) {
+      console.warn('Primary upload failed, falling back to localhost:3000...');
+      usedBase = 'http://localhost:3000';
+      const fallbackApi = 'http://localhost:3000/upload';
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'multipart/form-data' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      res = await axios.post(fallbackApi, formData, { headers });
+    } else {
+      throw err;
+    }
   }
-  
+
   return resolveImageUrl(res.data.url, usedBase);
 };
 
@@ -186,26 +186,26 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
+
     // Fallback logic: if network error or 5xx error, switch to fallbacks
     if (error.code === 'ERR_NETWORK' || (error.response && error.response.status >= 500)) {
       originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
-      
+
       let fallbackApiUrl = null;
       const currentUrlStr = originalRequest.url.startsWith('http') ? originalRequest.url : originalRequest.baseURL;
-      
+
       // If IP failed, try localhost next
       if (originalRequest._retryCount === 1 && currentUrlStr?.includes('103.190.93.133')) {
         fallbackApiUrl = 'http://localhost:3000/api';
-      } 
+      }
       // If localhost failed (either on retry 1 or retry 2), try production
       else if ((originalRequest._retryCount === 1 && currentUrlStr?.includes('localhost')) || originalRequest._retryCount === 2) {
-        fallbackApiUrl = 'https://springboot-app-pb1v.onrender.com/api';
+        fallbackApiUrl = 'https://awhile-venus-unlearned.ngrok-free.dev/api';
       }
 
       if (fallbackApiUrl) {
         console.warn(`API request failed. Retrying with fallback: ${fallbackApiUrl}`);
-        
+
         if (originalRequest.url.startsWith('http')) {
           // Replace the base part of the absolute URL
           const urlObj = new URL(originalRequest.url);
@@ -214,7 +214,7 @@ apiClient.interceptors.response.use(
         } else {
           originalRequest.baseURL = fallbackApiUrl;
         }
-        
+
         return apiClient(originalRequest);
       }
     }

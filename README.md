@@ -238,9 +238,9 @@ SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=root
 JWT_SECRET=<hex-key>
 JWT_EXPIRATION=86400000
-APP_BASE_URL=https://springboot-app-pb1v.onrender.com
+APP_BASE_URL=https://awhile-venus-unlearned.ngrok-free.dev
 FRONTEND_URL=https://saa-s-namastute.vercel.app
-CORS_EXTRA_ORIGINS=http://localhost:5174,https://springboot-app-pb1v.onrender.com
+CORS_EXTRA_ORIGINS=http://localhost:5174,https://awhile-venus-unlearned.ngrok-free.dev
 GOOGLE_CLIENT_ID=YOUR_ID
 GOOGLE_CLIENT_SECRET=YOUR_SECRET
 SUPER_ADMIN_EMAIL=admin@gmail.com
@@ -249,7 +249,7 @@ SUPER_ADMIN_PASSWORD=Admin@12345
 
 ### `frontend/.env`
 ```env
-VITE_API_URL=https://springboot-app-pb1v.onrender.com
+VITE_API_URL=https://awhile-venus-unlearned.ngrok-free.dev
 ```
 
 ---
