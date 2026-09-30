@@ -56,6 +56,18 @@ const AddPurchase = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toast, setToast] = useState(null); // { type: 'success', message: '' }
 
+    // KhataBook Suppliers State
+    const [khataSuppliers, setKhataSuppliers] = useState([]);
+    const [supplierSearchQuery, setSupplierSearchQuery] = useState('');
+    const [showSupplierDropdown, setShowSupplierDropdown] = useState(false);
+    const [selectedSupplierParty, setSelectedSupplierParty] = useState(null);
+
+    useEffect(() => {
+        apiClient.get(`${ENV.API_BASE_URL}/khata/parties?type=SUPPLIER`)
+            .then(res => setKhataSuppliers(res.data))
+            .catch(err => console.error('Failed to fetch KhataBook suppliers', err));
+    }, []);
+
     // ── Fetch Real Products ──────────────────────────────────────────────────
     useEffect(() => {
         const fetchProducts = async () => {
@@ -310,19 +322,59 @@ const AddPurchase = () => {
                     </div>
                     <div className="cp-card-body">
                         <div className="row">
-                            <div className="col-md-4 cp-form-group">
+                            <div className="col-md-4 cp-form-group position-relative">
                                 <label className="cp-label">Supplier Name <span className="required">*</span></label>
                                 <div className="cp-input-group">
-                                    <select className="cp-input" value={supplier} onChange={(e) => setSupplier(e.target.value)} required>
-                                        <option value="">Select</option>
-                                        <option>Electro Mart</option>
-                                        <option>Quantum Gadgets</option>
-                                        <option>Prime Bazaar</option>
-                                    </select>
-                                    <button type="button" className="btn-generate" style={{ background: '#1b2850' }}>
-                                        <Plus size={14} />
-                                    </button>
+                                    <input 
+                                        type="text" 
+                                        className="cp-input" 
+                                        value={supplierSearchQuery}
+                                        onChange={e => {
+                                            setSupplierSearchQuery(e.target.value);
+                                            setShowSupplierDropdown(true);
+                                            setSupplier(e.target.value);
+                                        }}
+                                        onFocus={() => setShowSupplierDropdown(true)}
+                                        placeholder="Search KhataBook Supplier..."
+                                        required 
+                                    />
                                 </div>
+                                {showSupplierDropdown && supplierSearchQuery.trim() && (
+                                    <div className="position-absolute w-100 bg-white border rounded shadow-sm mt-1" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
+                                        {khataSuppliers.filter(p => (
+                                            p.name?.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || 
+                                            p.phone?.includes(supplierSearchQuery) || 
+                                            p.gstin?.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || 
+                                            p.email?.toLowerCase().includes(supplierSearchQuery.toLowerCase())
+                                        )).map(p => (
+                                            <div 
+                                                key={p.id} 
+                                                className="p-2 border-bottom hover-bg-light"
+                                                style={{ cursor: 'pointer', fontSize: '13px' }}
+                                                onClick={() => {
+                                                    setSupplierSearchQuery(p.name);
+                                                    setSupplier(p.name);
+                                                    setSelectedSupplierParty(p);
+                                                    setShowSupplierDropdown(false);
+                                                }}
+                                            >
+                                                <div className="fw-bold">{p.name} {p.businessName && <span className="fw-normal text-muted">({p.businessName})</span>}</div>
+                                                <div className="text-muted small">
+                                                    {p.phone} {p.gstin && <span className="ms-2 text-primary">GST: {p.gstin}</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {selectedSupplierParty && (
+                                    <div className="mt-2 p-2 rounded" style={{ fontSize: '11px', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569' }}>
+                                        {selectedSupplierParty.businessName && <div><span className="fw-bold text-dark">Business:</span> {selectedSupplierParty.businessName}</div>}
+                                        {selectedSupplierParty.phone && <div><span className="fw-bold text-dark">Phone:</span> {selectedSupplierParty.phone}</div>}
+                                        {selectedSupplierParty.email && <div><span className="fw-bold text-dark">Email:</span> {selectedSupplierParty.email}</div>}
+                                        {selectedSupplierParty.gstin && <div><span className="fw-bold text-dark">GSTIN:</span> {selectedSupplierParty.gstin}</div>}
+                                        {selectedSupplierParty.address && <div><span className="fw-bold text-dark">Address:</span> {selectedSupplierParty.address}</div>}
+                                    </div>
+                                )}
                             </div>
                             <div className="col-md-4 cp-form-group">
                                 <label className="cp-label">Date <span className="required">*</span></label>

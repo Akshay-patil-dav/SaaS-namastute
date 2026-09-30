@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { X, Printer, Download, ArrowLeft, FileText, Send, CheckCircle2, AlertCircle, RefreshCw, ExternalLink } from 'lucide-react';
-import { sendWhatsAppMessage, formatWhatsAppPhone, compileWhatsAppTemplate } from '../../../../services/whatsappService';
+import { sendWhatsAppMessage, formatWhatsAppPhone, compileWhatsAppTemplate, isWhatsAppBackgroundReady } from '../../../../services/whatsappService';
 import './invoice-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
 import { useCompany } from '../../../../context/CompanyContext';
 import { useSettings } from '../../../../hooks/useSettings';
+import { useAuth } from '../../../../context/AuthContext';
 import apiClient from '../../../../api/config';
 function payBadgeClass(status) {
     if (status === 'Paid')    return 'inv-pay-badge inv-pay-paid';
@@ -79,6 +80,7 @@ function RealQRCode({ invoiceNo, amount, storeName = 'Samrajya Store', upiId = '
    InvoiceModal
 ════════════════════════════════════════════════════════════ */
 const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
+    const { user } = useAuth();
     const { currencySymbol } = useCurrency();
     const { companyInfo } = useCompany();
     const { settings } = useSettings();
@@ -124,6 +126,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
     /* invoice number */
     const prefix = settings?.invoicePrefix || 'INV-';
     const invoiceNo = order.invoiceNo || order.referenceNo ? `#${order.invoiceNo || order.referenceNo}` : `#${prefix}0001`;
+    const actualBillerName = order.biller || user?.name || user?.firstName || 'Admin';
 
     /* print handler */
     const handlePrint = () => {
@@ -233,11 +236,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
         });
 
         // Determine if background API dispatch should be executed
-        const isBackgroundConfigured = settings?.whatsappBackgroundAutoSend === 'true' ||
-            settings?.whatsappMode === 'cloud_api' ||
-            settings?.whatsappMode === 'gateway' ||
-            (settings?.whatsappPhoneId && settings?.whatsappToken) ||
-            settings?.whatsappGatewayUrl;
+        const isBackgroundConfigured = isWhatsAppBackgroundReady(settings);
 
         if (!forceWeb && isBackgroundConfigured) {
             setWhatsappSending(true);
@@ -360,7 +359,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                                 Type : <strong>{isPOS ? 'POS Sale' : 'Online Sale'}</strong>
                             </div>
                             <div className="inv-meta-row">
-                                Biller : <strong>{order.biller || 'Admin'}</strong>
+                                Biller : <strong>{actualBillerName}</strong>
                             </div>
                         </div>
                     </div>
@@ -370,7 +369,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         {/* From */}
                         <div>
                             <div className="inv-party-label">From</div>
-                            <div className="inv-party-name">{order.biller || companyInfo.name || 'Samrajya Admin'}</div>
+                            <div className="inv-party-name">{actualBillerName === 'Admin' ? companyInfo.name : actualBillerName}</div>
                             <div className="inv-party-detail">
                                 {companyInfo.address || '123 Business Park, Pune, MH 411001'}<br />
                                 Email : <a href={`mailto:${companyInfo.email || 'admin@samrajyasoftware.com'}`}>{companyInfo.email || 'admin@samrajyasoftware.com'}</a><br />
@@ -381,10 +380,15 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         {/* To */}
                         <div>
                             <div className="inv-party-label">To</div>
-                            <div className="inv-party-name">{order.customerName || '—'}</div>
+                            <div className="inv-party-name">
+                                {order.customerBusinessName ? order.customerBusinessName : order.customerName || '—'}
+                            </div>
                             <div className="inv-party-detail">
-                                {order.notes || 'Customer Address'}<br />
-                                Email : customer@example.com
+                                {order.customerBusinessName && <>{order.customerName}<br /></>}
+                                {order.customerAddress || 'Customer Address'}<br />
+                                {order.customerPhone && <>Phone : {order.customerPhone}<br /></>}
+                                {order.customerEmail && <>Email : {order.customerEmail}<br /></>}
+                                {order.customerGstin && <>GSTIN : {order.customerGstin}</>}
                             </div>
                         </div>
 
@@ -494,7 +498,7 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         </div>
                         <div className="inv-sig-area">
                             <div className="inv-sig-line" />
-                            <div className="inv-sig-name">{order.biller || 'Admin'}</div>
+                            <div className="inv-sig-name">{actualBillerName}</div>
                             <div className="inv-sig-role">Authorized Signatory</div>
                         </div>
                     </div>
@@ -543,11 +547,11 @@ const InvoiceModal = ({ isOpen, order, onClose, orderType = 'ONLINE' }) => {
                         {whatsappSending ? <RefreshCw size={15} className="spin" /> : <Send size={15} />}
                         {whatsappSending 
                             ? 'Sending in Background...' 
-                            : (settings?.whatsappBackgroundAutoSend === 'true' || settings?.whatsappMode === 'cloud_api' || settings?.whatsappMode === 'gateway'
+                            : (isWhatsAppBackgroundReady(settings)
                                 ? 'Send WhatsApp (Background)' 
                                 : 'Send on WhatsApp')}
                     </button>
-                    {(settings?.whatsappBackgroundAutoSend === 'true' || settings?.whatsappMode === 'cloud_api' || settings?.whatsappMode === 'gateway') && (
+                    {isWhatsAppBackgroundReady(settings) && (
                         <button 
                             className="inv-btn-whatsapp-web-alt" 
                             onClick={() => handleSendWhatsApp(true)}

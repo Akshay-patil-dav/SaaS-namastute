@@ -7,6 +7,8 @@ public class KhataPartyRequest {
     private String phone;
     private String email;
     private String address;
+    private String businessName;
+    private String gstin;
     private String partyType; // "CUSTOMER" or "SUPPLIER"
     private BigDecimal openingBalance;
     private String openingBalanceType; // "YOU_WILL_GET" or "YOU_WILL_GIVE"
@@ -23,6 +25,12 @@ public class KhataPartyRequest {
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    public String getBusinessName() { return businessName; }
+    public void setBusinessName(String businessName) { this.businessName = businessName; }
+
+    public String getGstin() { return gstin; }
+    public void setGstin(String gstin) { this.gstin = gstin; }
 
     public String getPartyType() { return partyType; }
     public void setPartyType(String partyType) { this.partyType = partyType; }

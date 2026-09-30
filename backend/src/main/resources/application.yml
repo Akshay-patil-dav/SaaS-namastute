@@ -58,10 +58,10 @@ server:
   port: 3000
 
 app:
-  base-url: ${APP_BASE_URL:http://103.190.93.133:3000}
-  frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app,http://localhost:5173,http://103.190.93.133:5173}
+  base-url: ${APP_BASE_URL:http://localhost:3000}
+  frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app,http://localhost:5173}
 #   # frontend-url: ${FRONTEND_URL:https://namustutamsaas.vercel.app}
-  cors-extra-origins: ${CORS_EXTRA_ORIGINS:https://namustutamsaas.vercel.app,http://localhost:5173,http://103.190.93.133:5173}
+  cors-extra-origins: ${CORS_EXTRA_ORIGINS:https://namustutamsaas.vercel.app,http://localhost:5173}
 
 
 # app:

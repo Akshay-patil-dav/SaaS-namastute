@@ -36,7 +36,7 @@ import {
     RefreshCw,
     Zap
 } from 'lucide-react';
-import { sendWhatsAppMessage, formatWhatsAppPhone } from '../../../services/whatsappService';
+import { sendWhatsAppMessage, formatWhatsAppPhone, isWhatsAppBackgroundReady } from '../../../services/whatsappService';
 import './KhataBook.css';
 
 // ── Initial Mock Data for graceful offline fallback ───────────────────────────
@@ -253,6 +253,8 @@ export default function KhataBook() {
         phone: '',
         email: '',
         address: '',
+        businessName: '',
+        gstin: '',
         partyType: 'CUSTOMER',
         openingBalance: '',
         openingBalanceType: 'YOU_WILL_GET'
@@ -272,7 +274,7 @@ export default function KhataBook() {
         setLoading(true);
         try {
             // Attempt to fetch from backend
-            apiClient.get('/bank-accounts').then(r => setBankAccounts(r.data || [])).catch(() => {});
+            apiClient.get('/bank-accounts').then(r => setBankAccounts(r.data || [])).catch(() => { });
             const [partiesRes, daybookRes] = await Promise.all([
                 apiClient.get('/khata/parties'),
                 apiClient.get('/khata/daybook')
@@ -418,9 +420,30 @@ export default function KhataBook() {
     // ── Selected Party Transactions ───────────────────────────────────────────
     const activePartyTransactions = useMemo(() => {
         if (!selectedParty) return [];
-        return transactions
-            .filter(t => Number(t.partyId) === Number(selectedParty.id))
-            .sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate) || b.id - a.id);
+
+        // 1. Get all transactions for this party
+        const partyTxs = transactions.filter(t => Number(t.partyId) === Number(selectedParty.id));
+
+        // 2. Sort chronologically (oldest first) to compute correct running balance
+        partyTxs.sort((a, b) => new Date(a.transactionDate) - new Date(b.transactionDate) || a.id - b.id);
+
+        // 3. Compute running balance starting from opening balance
+        let currentBal = selectedParty.openingBalanceType === 'YOU_WILL_GIVE'
+            ? -Number(selectedParty.openingBalance || 0)
+            : Number(selectedParty.openingBalance || 0);
+
+        const txsWithBal = partyTxs.map(tx => {
+            const amt = Number(tx.amount || 0);
+            if (tx.transactionType === 'GAVE') {
+                currentBal += amt;
+            } else {
+                currentBal -= amt;
+            }
+            return { ...tx, computedBalance: currentBal };
+        });
+
+        // 4. Sort descending for display (newest first)
+        return txsWithBal.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate) || b.id - a.id);
     }, [selectedParty, transactions]);
 
     // ── Daybook Transactions ──────────────────────────────────────────────────
@@ -634,10 +657,10 @@ export default function KhataBook() {
             const cleanPhone = formatWhatsAppPhone(selectedParty.phone, defaultCode);
             const bizName = companyInfo?.name || settings?.companyName || 'Samrajya Store';
             const actionText = txType === 'GAVE' ? 'Given (Debit / Udhar)' : 'Received (Credit / Jama)';
-            const balSummary = newBal > 0 
-                ? `${formatCurrency(Math.abs(newBal))} (You'll Get)` 
-                : newBal < 0 
-                    ? `${formatCurrency(Math.abs(newBal))} (Advance Deposit)` 
+            const balSummary = newBal > 0
+                ? `${formatCurrency(Math.abs(newBal))} (You'll Get)`
+                : newBal < 0
+                    ? `${formatCurrency(Math.abs(newBal))} (Advance Deposit)`
                     : 'Account Fully Settled (Nil)';
 
             let upiPart = '';
@@ -651,8 +674,8 @@ export default function KhataBook() {
                 upiPart = `\n\n📲 *Pay Online via UPI (GPay/PhonePe):*\n${upiUri}`;
             }
 
-            const txMsg = 
-`━━━━━━━━━━━━━━━━━━━━━━
+            const txMsg =
+                `━━━━━━━━━━━━━━━━━━━━━━
 📖 *KHATA ENTRY UPDATE*
 🏪 *${bizName}*
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -673,11 +696,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
 🏪 *${bizName}*
 ━━━━━━━━━━━━━━━━━━━━━━`;
 
-            const isBackgroundConfigured = settings?.whatsappBackgroundAutoSend === 'true' ||
-                settings?.whatsappMode === 'cloud_api' ||
-                settings?.whatsappMode === 'gateway' ||
-                (settings?.whatsappPhoneId && settings?.whatsappToken) ||
-                settings?.whatsappGatewayUrl;
+            const isBackgroundConfigured = isWhatsAppBackgroundReady(settings);
 
             sendWhatsAppMessage({
                 phone: cleanPhone,
@@ -853,11 +872,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
         }
 
         const message = getCompiledKhataMessage();
-        const isBackgroundConfigured = settings?.whatsappBackgroundAutoSend === 'true' ||
-            settings?.whatsappMode === 'cloud_api' ||
-            settings?.whatsappMode === 'gateway' ||
-            (settings?.whatsappPhoneId && settings?.whatsappToken) ||
-            settings?.whatsappGatewayUrl;
+        const isBackgroundConfigured = isWhatsAppBackgroundReady(settings);
 
         if (!forceWeb && isBackgroundConfigured) {
             setWaSending(true);
@@ -1081,7 +1096,9 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                                     {(party.name || 'U').slice(0, 2)}
                                                 </div>
                                                 <div className="party-name-meta">
-                                                    <span className="party-row-name" title={party.name}>{party.name}</span>
+                                                    <span className="party-row-name" title={party.name}>
+                                                        {party.name} {party.businessName && <span style={{ fontSize: '0.85em', fontWeight: 'normal', color: '#64748b' }}>({party.businessName})</span>}
+                                                    </span>
                                                     <span className="party-row-phone">{party.phone || 'No phone'}</span>
                                                 </div>
                                             </div>
@@ -1133,13 +1150,16 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                             {(selectedParty.name || 'U').slice(0, 2)}
                                         </div>
                                         <div className="ledger-title-text">
-                                            <h3>{selectedParty.name}</h3>
+                                            <h3>{selectedParty.name} {selectedParty.businessName && <span style={{ fontSize: '15px', color: '#64748b', fontWeight: '500' }}>({selectedParty.businessName})</span>}</h3>
                                             <div className="ledger-party-contacts">
                                                 {selectedParty.phone && (
                                                     <span><Phone size={13} /> {selectedParty.phone}</span>
                                                 )}
                                                 {selectedParty.address && (
                                                     <span><MapPin size={13} /> {selectedParty.address}</span>
+                                                )}
+                                                {selectedParty.gstin && (
+                                                    <span><span style={{ fontWeight: '700' }}>GSTIN:</span> {selectedParty.gstin}</span>
                                                 )}
                                                 <span><span style={{ textTransform: 'uppercase', fontWeight: '700', fontSize: '10px', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{selectedParty.partyType}</span></span>
                                             </div>
@@ -1203,8 +1223,8 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                                 <th style={{ width: '130px' }}>Date</th>
                                                 <th>Details / Bill Reference</th>
                                                 <th style={{ width: '110px' }}>Mode</th>
-                                                <th style={{ width: '130px', textAlign: 'right' }}>You Gave (Debit)</th>
-                                                <th style={{ width: '130px', textAlign: 'right' }}>You Got (Credit)</th>
+                                                <th style={{ width: '130px', textAlign: 'right' }}>{selectedParty.partyType === 'CUSTOMER' ? 'Gave (Udhar / Goods)' : 'Paid (To Supplier)'}</th>
+                                                <th style={{ width: '130px', textAlign: 'right' }}>{selectedParty.partyType === 'CUSTOMER' ? 'Got (Payment In)' : 'Got (Purchase / Goods)'}</th>
                                                 <th style={{ width: '130px', textAlign: 'right' }}>Balance</th>
                                                 <th style={{ width: '50px', textAlign: 'center' }}></th>
                                             </tr>
@@ -1243,7 +1263,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                                             </td>
                                                             <td>
                                                                 <div style={{ fontWeight: '600', color: '#0f172a' }}>
-                                                                    {tx.referenceNumber ? `Ref: ${tx.referenceNumber}` : (isGave ? 'Udhar Diya (Goods/Credit)' : 'Payment Received')}
+                                                                    {tx.referenceNumber ? `Ref: ${tx.referenceNumber}` : (isGave ? (selectedParty.partyType === 'CUSTOMER' ? 'Udhar Diya (Goods/Credit)' : 'Payment Paid') : (selectedParty.partyType === 'CUSTOMER' ? 'Payment Received' : 'Purchase (Credit)'))}
                                                                 </div>
                                                                 {tx.notes && (
                                                                     <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
@@ -1262,8 +1282,8 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                                             <td style={{ textAlign: 'right' }} className="amount-got">
                                                                 {!isGave ? formatCurrency(tx.amount) : '-'}
                                                             </td>
-                                                            <td style={{ textAlign: 'right', fontWeight: '700', color: (tx.runningBalance || 0) >= 0 ? '#059669' : '#dc2626' }}>
-                                                                {formatCurrency(Math.abs(tx.runningBalance || 0))}
+                                                            <td style={{ textAlign: 'right', fontWeight: '700', color: (tx.computedBalance || 0) >= 0 ? '#059669' : '#dc2626' }}>
+                                                                {formatCurrency(Math.abs(tx.computedBalance || 0))}
                                                             </td>
                                                             <td style={{ textAlign: 'center' }}>
                                                                 <button
@@ -1295,14 +1315,14 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                         onClick={() => openAddTxModal('GAVE')}
                                     >
                                         <ArrowDownRight size={20} />
-                                        <span>YOU GAVE ₹ (Debit)</span>
+                                        <span>{selectedParty.partyType === 'CUSTOMER' ? 'GAVE ₹ (Udhar / Goods)' : 'PAID ₹ (To Supplier)'}</span>
                                     </button>
                                     <button
                                         className="btn-got"
                                         onClick={() => openAddTxModal('GOT')}
                                     >
                                         <ArrowUpLeft size={20} />
-                                        <span>YOU GOT ₹ (Credit)</span>
+                                        <span>{selectedParty.partyType === 'CUSTOMER' ? 'GOT ₹ (Payment In)' : 'GOT ₹ (Purchase / Goods)'}</span>
                                     </button>
                                 </div>
                             </>
@@ -1439,15 +1459,37 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                 </div>
 
                                 <div className="khata-form-group">
-                                    <label className="khata-form-label">Party / Business Name *</label>
+                                    <label className="khata-form-label">Contact Person Name *</label>
                                     <input
                                         type="text"
                                         className="khata-form-input"
-                                        placeholder="E.g. Ramesh Kumar or Balaji Traders"
+                                        placeholder="E.g. Ramesh Kumar"
                                         value={partyForm.name}
                                         onChange={(e) => setPartyForm({ ...partyForm, name: e.target.value })}
                                         required
                                         autoFocus
+                                    />
+                                </div>
+
+                                <div className="khata-form-group">
+                                    <label className="khata-form-label">Business / Company Name (Optional)</label>
+                                    <input
+                                        type="text"
+                                        className="khata-form-input"
+                                        placeholder="E.g. Balaji Traders"
+                                        value={partyForm.businessName}
+                                        onChange={(e) => setPartyForm({ ...partyForm, businessName: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="khata-form-group">
+                                    <label className="khata-form-label">GSTIN / Tax ID (Optional)</label>
+                                    <input
+                                        type="text"
+                                        className="khata-form-input"
+                                        placeholder="E.g. 27AAAAA0000A1Z5"
+                                        value={partyForm.gstin}
+                                        onChange={(e) => setPartyForm({ ...partyForm, gstin: e.target.value })}
                                     />
                                 </div>
 
@@ -1638,8 +1680,8 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                         <span>Send WhatsApp entry receipt to {selectedParty.name}</span>
                                     </label>
                                     <div style={{ fontSize: '11px', color: '#15803d', marginTop: '3px', marginLeft: '22px' }}>
-                                        {settings?.whatsappBackgroundAutoSend === 'true' 
-                                            ? '✓ Automatically dispatches receipt in background (Zero windows opened)' 
+                                        {isWhatsAppBackgroundReady(settings)
+                                            ? '✓ Automatically dispatches receipt in background (Zero windows opened)'
                                             : 'Will open WhatsApp with entry confirmation receipt'}
                                     </div>
                                 </div>
@@ -1738,7 +1780,7 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '50px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
                         <div style={{ fontSize: '11px', color: '#64748b' }}>
-                            Generated automatically via Samrajya Software Khata Book.<br/>
+                            Generated automatically via Samrajya Software Khata Book.<br />
                             This is a computer-generated statement.
                         </div>
                         <div style={{ textAlign: 'center', width: '180px' }}>
@@ -1762,9 +1804,9 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                 <div>
                                     <h4>Send WhatsApp to {waParty.name}</h4>
                                     <span className="khata-wa-header-sub">
-                                        {settings?.whatsappBackgroundAutoSend === 'true' 
-                                            ? 'Background API Mode Active (Zero Windows Opened)' 
-                                            : 'WhatsApp Web & Background Dispatcher'}
+                                        {isWhatsAppBackgroundReady(settings)
+                                            ? 'Background API Mode Active (Zero Windows Opened)'
+                                            : 'WhatsApp Web & App Dispatcher'}
                                     </span>
                                 </div>
                             </div>
@@ -1829,9 +1871,9 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                     <div className={`khata-wa-bal-val ${(waParty.netBalance || 0) > 0 ? 'text-get' : (waParty.netBalance || 0) < 0 ? 'text-give' : 'text-muted'}`}>
                                         {formatCurrency(Math.abs(waParty.netBalance || 0))}
                                     </div>
-                                    <span className="party-bal-badge" style={{ 
+                                    <span className="party-bal-badge" style={{
                                         background: (waParty.netBalance || 0) > 0 ? '#ecfdf5' : '#fef2f2',
-                                        color: (waParty.netBalance || 0) > 0 ? '#059669' : '#dc2626' 
+                                        color: (waParty.netBalance || 0) > 0 ? '#059669' : '#dc2626'
                                     }}>
                                         {(waParty.netBalance || 0) > 0 ? "You'll Get (Due)" : (waParty.netBalance || 0) < 0 ? "You'll Give (Advance)" : 'Settled'}
                                     </span>
@@ -1960,10 +2002,10 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                 disabled={waSending}
                             >
                                 {waSending ? <RefreshCw size={15} className="spin" /> : <Send size={15} />}
-                                {waSending 
-                                    ? 'Dispatching...' 
-                                    : (settings?.whatsappBackgroundAutoSend === 'true' || settings?.whatsappMode === 'cloud_api' || settings?.whatsappMode === 'gateway'
-                                        ? 'Send in Background (No Window)' 
+                                {waSending
+                                    ? 'Dispatching...'
+                                    : (isWhatsAppBackgroundReady(settings)
+                                        ? 'Send in Background (No Window)'
                                         : 'Send WhatsApp Message')}
                             </button>
                         </div>

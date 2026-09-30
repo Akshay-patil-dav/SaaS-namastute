@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import apiClient, { API } from '../../../api/config';
-import { Zap, LogOut, CheckCircle, Store, Factory, ShoppingCart, User, ArrowRight, ArrowLeft, Activity, ShieldCheck } from 'lucide-react';
+import { Zap, LogOut, CheckCircle, Store, Factory, ShoppingCart, User, ArrowRight, ArrowLeft, Activity, ShieldCheck, FileText } from 'lucide-react';
 import './Onboarding.css';
 
 export default function Onboarding() {
@@ -242,6 +242,13 @@ export default function Onboarding() {
                                     <div className="card-content">
                                         <h3>E-Commerce</h3>
                                         <p>Optimized for online sales and multi-channel fulfillment.</p>
+                                    </div>
+                                </div>
+                                <div className={`business-card-v2 ${formData.businessType === 'Billing Invoice' ? 'selected' : ''}`} onClick={() => handleSelectBusiness('Billing Invoice')}>
+                                    <div className="card-icon"><FileText size={24} /></div>
+                                    <div className="card-content">
+                                        <h3>Billing Invoice</h3>
+                                        <p>Create and manage billing invoices for clients.</p>
                                     </div>
                                 </div>
                             </div>

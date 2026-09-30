@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import {
     Search, Barcode, ShoppingCart, Trash2, Plus, Minus,
     CreditCard, DollarSign, QrCode, Building, CheckCircle,
-    User, RotateCcw, Printer, FileText, Sparkles, RefreshCw, X, ChevronRight, MonitorDot, Package
+    User, RotateCcw, Printer, FileText, Sparkles, RefreshCw, X, ChevronRight, MonitorDot, Package, ImageOff
 } from 'lucide-react';
 import apiClient, { ENV } from '@/api/config';
 import { useCurrency } from '../../../hooks/useCurrency';
@@ -10,7 +10,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useSettings } from '../../../hooks/useSettings';
 import InvoiceModal from '../../../components/modals/sales/InvoiceModal/InvoiceModal';
 import PosOrders from '../PosOrders/PosOrders';
-import { sendWhatsAppMessage, compileWhatsAppTemplate } from '../../../services/whatsappService';
+import { sendWhatsAppMessage, compileWhatsAppTemplate, isWhatsAppBackgroundReady } from '../../../services/whatsappService';
 import { dispatchUsageRefresh } from '../../../context/UsageContext';
 import './pos-terminal.css';
 
@@ -55,35 +55,10 @@ const getUpiQrUrl = (bankAccounts, user, grandTotal) => {
 
 // High-performance product image with skeleton placeholder & zero layout shift
 const PosProductImage = React.memo(function PosProductImage({ url, name }) {
-    const [imgStatus, setImgStatus] = useState(url ? 'loading' : 'fallback');
-
-    useEffect(() => {
-        setImgStatus(url ? 'loading' : 'fallback');
-    }, [url]);
-
-    if (!url || imgStatus === 'fallback') {
-        const initial = (name || 'P').trim().charAt(0).toUpperCase();
-        return (
-            <div className="pos-prod-img-box">
-                <span className="pos-prod-initials">{initial}</span>
-            </div>
-        );
-    }
-
     return (
-        <div className="pos-prod-img-box">
-            {imgStatus === 'loading' && (
-                <div className="pos-skeleton-img pos-img-skeleton-overlay" />
-            )}
-            <img 
-                src={url} 
-                alt={name} 
-                loading="lazy"
-                decoding="async"
-                className={`pos-prod-img ${imgStatus === 'loaded' ? 'pos-img-loaded' : 'pos-img-loading'}`}
-                onLoad={() => setImgStatus('loaded')}
-                onError={() => setImgStatus('fallback')}
-            />
+        <div className="pos-prod-img-box pos-no-image">
+            <ImageOff size={24} className="pos-no-image-icon" />
+            <span className="pos-no-image-text">No Image</span>
         </div>
     );
 });
@@ -115,14 +90,34 @@ export default function PosTerminal() {
     const [searchQuery, setSearchQuery] = useState('');
     const [barcodeQuery, setBarcodeQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('ALL');
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 24;
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedCategory]);
 
     // Cart & Customer States
     const [cart, setCart] = useState([]);
     const [customerName, setCustomerName] = useState('Walk-In Customer');
     const [customerPhone, setCustomerPhone] = useState('');
+    const [customerEmail, setCustomerEmail] = useState('');
+    const [customerAddress, setCustomerAddress] = useState('');
+    const [customerBusinessName, setCustomerBusinessName] = useState('');
+    const [customerGstin, setCustomerGstin] = useState('');
     const [showCustModal, setShowCustModal] = useState(false);
     const [tempCustName, setTempCustName] = useState('');
     const [tempCustPhone, setTempCustPhone] = useState('');
+    const [tempCustEmail, setTempCustEmail] = useState('');
+    const [tempCustAddress, setTempCustAddress] = useState('');
+    const [tempCustBusinessName, setTempCustBusinessName] = useState('');
+    const [tempCustGstin, setTempCustGstin] = useState('');
+
+    // KhataBook States
+    const [khataParties, setKhataParties] = useState([]);
+    const [selectedKhataParty, setSelectedKhataParty] = useState(null);
+    const [khataSearchQuery, setKhataSearchQuery] = useState('');
+    const [showKhataDropdown, setShowKhataDropdown] = useState(false);
 
     // Summary & Payment States
     const [taxPercent, setTaxPercent] = useState(0);
@@ -147,10 +142,11 @@ export default function PosTerminal() {
         }
 
         try {
-            const [prodRes, catRes, bankRes] = await Promise.allSettled([
+            const [prodRes, catRes, bankRes, khataRes] = await Promise.allSettled([
                 apiClient.get('/products'),
                 apiClient.get('/categories'),
-                apiClient.get('/bank-accounts')
+                apiClient.get('/bank-accounts'),
+                apiClient.get('/khata/parties')
             ]);
 
             let loadedProducts = [];
@@ -182,6 +178,10 @@ export default function PosTerminal() {
             if (bankRes.status === 'fulfilled' && Array.isArray(bankRes.value?.data)) {
                 setBankAccounts(bankRes.value.data);
                 writePosCache(POS_CACHE_BANKS_KEY, bankRes.value.data);
+            }
+
+            if (khataRes && khataRes.status === 'fulfilled' && Array.isArray(khataRes.value?.data)) {
+                setKhataParties(khataRes.value.data.filter(p => p.partyType === 'CUSTOMER'));
             }
         } catch (err) {
             console.error('Failed to load POS catalog:', err);
@@ -302,6 +302,13 @@ export default function PosTerminal() {
         });
     }, [products, selectedCategory, searchQuery]);
 
+    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+    const paginatedProducts = useMemo(() => {
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        return filteredProducts.slice(start, end);
+    }, [filteredProducts, currentPage]);
+
     // Calculations
     const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
     const taxAmount = (subtotal * (parseFloat(taxPercent) || 0)) / 100;
@@ -370,6 +377,10 @@ export default function PosTerminal() {
                 referenceNo: created.referenceNo || refNo,
                 customerName: payload.customerName,
                 customerPhone: customerPhone || payload.customerPhone || '',
+                customerEmail: customerEmail || selectedKhataParty?.email || '',
+                customerAddress: customerAddress || selectedKhataParty?.address || '',
+                customerBusinessName: customerBusinessName || selectedKhataParty?.businessName || '',
+                customerGstin: customerGstin || selectedKhataParty?.gstin || '',
                 grandTotal: grandTotal,
                 paidAmount: paidVal,
                 dueAmount: 0,
@@ -420,7 +431,7 @@ export default function PosTerminal() {
             // Auto-send WhatsApp receipt in background via Meta API if customer phone is available
             const targetPhone = customerPhone || payload.customerPhone || '';
             const isWhatsAppEnabled = settings?.whatsappConnected !== 'false';
-            const isBgAutoSend = settings?.whatsappBackgroundAutoSend !== 'false' || settings?.whatsappMode === 'cloud_api' || settings?.whatsappMode === 'gateway';
+            const isBgAutoSend = isWhatsAppBackgroundReady(settings);
 
             if (targetPhone && targetPhone.trim() && isWhatsAppEnabled && isBgAutoSend) {
                 try {
@@ -455,11 +466,45 @@ export default function PosTerminal() {
                     console.warn('WhatsApp auto-send dispatch error:', e);
                 }
             }
+            // Sync with KhataBook if a Khata party is selected
+            if (selectedKhataParty) {
+                try {
+                    await apiClient.post('/khata/transactions', {
+                        partyId: selectedKhataParty.id,
+                        transactionType: 'GAVE',
+                        amount: grandTotal,
+                        paymentMode: paymentMethod,
+                        referenceNumber: orderForInvoice.referenceNo,
+                        notes: `POS Sale Bill`,
+                        transactionDate: new Date().toISOString().split('T')[0]
+                    });
+
+                    if (paidVal > 0) {
+                        await apiClient.post('/khata/transactions', {
+                            partyId: selectedKhataParty.id,
+                            transactionType: 'GOT',
+                            amount: Math.min(paidVal, grandTotal),
+                            paymentMode: paymentMethod,
+                            referenceNumber: orderForInvoice.referenceNo,
+                            notes: `POS Payment`,
+                            transactionDate: new Date().toISOString().split('T')[0]
+                        });
+                    }
+                } catch (e) {
+                    console.error('Failed to sync with KhataBook:', e);
+                }
+            }
 
             // Reset cart
             setCart([]);
             setCustomerName('Walk-In Customer');
             setCustomerPhone('');
+            setCustomerEmail('');
+            setCustomerAddress('');
+            setCustomerBusinessName('');
+            setCustomerGstin('');
+            setSelectedKhataParty(null);
+            setKhataSearchQuery('');
             setDiscountAmount(0);
             setCashTendered('');
             fetchCatalog(); // Refresh stock counts
@@ -576,7 +621,7 @@ export default function PosTerminal() {
                                 <div className="pos-skeleton-pill" style={{ width: '100px' }} />
                             </div>
                         ) : (
-                            <div className="d-flex align-items-center gap-2 mb-3 overflow-x-auto pb-1">
+                            <div className="pos-cat-pills-container">
                                 <button 
                                     className={`pos-cat-pill ${selectedCategory === 'ALL' ? 'active' : ''}`}
                                     onClick={() => setSelectedCategory('ALL')}
@@ -624,9 +669,10 @@ export default function PosTerminal() {
                                 <p className="small mb-0">Try matching another search keyword or category filter.</p>
                             </div>
                         ) : (
-                            <div className="pos-prod-grid">
-                                {filteredProducts.map(prod => {
-                                    const cartItem = cart.find(i => i.productId === prod.id);
+                            <>
+                                <div className="pos-prod-grid">
+                                    {paginatedProducts.map(prod => {
+                                        const cartItem = cart.find(i => i.productId === prod.id);
                                     const inQty = cartItem ? cartItem.quantity : 0;
                                     const imgUrl = getImageUrl(prod.images || prod.image);
 
@@ -652,7 +698,29 @@ export default function PosTerminal() {
                                         </div>
                                     );
                                 })}
-                            </div>
+                                </div>
+                                {totalPages > 1 && (
+                                    <div className="d-flex justify-content-center align-items-center gap-3 mt-4 mb-3">
+                                        <button 
+                                            className="btn btn-sm btn-outline-secondary"
+                                            disabled={currentPage === 1}
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                        >
+                                            Previous
+                                        </button>
+                                        <span className="text-muted small fw-medium">
+                                            Page {currentPage} of {totalPages}
+                                        </span>
+                                        <button 
+                                            className="btn btn-sm btn-outline-secondary"
+                                            disabled={currentPage === totalPages}
+                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         )}
 
                         {/* Mobile bottom bar to return to Cart when items selected */}
@@ -678,10 +746,21 @@ export default function PosTerminal() {
                         <div className="pos-cart-header">
                             <div className="pos-cust-select">
                                 <User size={14} className="text-muted" />
-                                <span>{customerName}{customerPhone ? ` (${customerPhone})` : ''}</span>
+                                <span>
+                                    {customerBusinessName ? `${customerBusinessName} (${customerName})` : customerName}
+                                    {customerPhone ? ` - ${customerPhone}` : ''}
+                                </span>
                                 <button 
                                     className="btn btn-sm btn-link p-0 text-warning text-decoration-none fw-bold ms-1"
-                                    onClick={() => { setTempCustName(customerName); setTempCustPhone(customerPhone); setShowCustModal(true); }}
+                                    onClick={() => { 
+                                        setTempCustName(customerName); 
+                                        setTempCustPhone(customerPhone); 
+                                        setTempCustEmail(customerEmail);
+                                        setTempCustAddress(customerAddress);
+                                        setTempCustBusinessName(customerBusinessName);
+                                        setTempCustGstin(customerGstin);
+                                        setShowCustModal(true); 
+                                    }}
                                 >
                                     Edit
                                 </button>
@@ -709,13 +788,9 @@ export default function PosTerminal() {
                             ) : (
                                 cart.map(item => (
                                     <div className="pos-cart-item" key={item.productId}>
-                                        {item.img ? (
-                                            <img src={item.img} alt="" className="pos-cart-item-img" />
-                                        ) : (
-                                            <div className="pos-cart-item-img d-flex align-items-center justify-content-center bg-light fw-bold text-secondary">
-                                                {item.name.charAt(0)}
-                                            </div>
-                                        )}
+                                        <div className="pos-cart-item-img d-flex align-items-center justify-content-center bg-light text-secondary">
+                                            <ImageOff size={16} className="opacity-50" />
+                                        </div>
                                         <div className="pos-cart-item-info">
                                             <div className="pos-cart-item-name">{item.name}</div>
                                             <div className="pos-cart-item-price">{currencySymbol}{item.unitPrice.toFixed(2)}</div>
@@ -918,17 +993,75 @@ export default function PosTerminal() {
                                 <button type="button" className="btn-close" onClick={() => setShowCustModal(false)} />
                             </div>
                             <div className="modal-body py-3">
+                                <div className="mb-3 position-relative">
+                                    <label className="form-label small fw-bold mb-1">Search Customer (KhataBook)</label>
+                                    <div className="input-group input-group-sm">
+                                        <span className="input-group-text bg-white"><Search size={14} className="text-muted"/></span>
+                                        <input 
+                                            type="text" 
+                                            className="form-control"
+                                            value={khataSearchQuery}
+                                            onChange={e => {
+                                                setKhataSearchQuery(e.target.value);
+                                                setShowKhataDropdown(true);
+                                                setTempCustName(e.target.value);
+                                            }}
+                                            onFocus={() => setShowKhataDropdown(true)}
+                                            placeholder="Search name or phone..."
+                                        />
+                                    </div>
+                                    {showKhataDropdown && khataSearchQuery.trim() && (
+                                        <div className="position-absolute w-100 bg-white border rounded shadow-sm mt-1" style={{ zIndex: 1000, maxHeight: '150px', overflowY: 'auto' }}>
+                                            {khataParties.filter(p => (p.name?.toLowerCase().includes(khataSearchQuery.toLowerCase()) || p.phone?.includes(khataSearchQuery))).length > 0 ? (
+                                                khataParties.filter(p => (p.name?.toLowerCase().includes(khataSearchQuery.toLowerCase()) || p.phone?.includes(khataSearchQuery))).map(p => (
+                                                    <div 
+                                                        key={p.id} 
+                                                        className="p-2 border-bottom cursor-pointer hover-bg-light"
+                                                        style={{ cursor: 'pointer', fontSize: '13px' }}
+                                                        onClick={() => {
+                                                            setTempCustName(p.name);
+                                                            setTempCustPhone(p.phone || '');
+                                                            setTempCustEmail(p.email || '');
+                                                            setTempCustAddress(p.address || '');
+                                                            setTempCustBusinessName(p.businessName || '');
+                                                            setTempCustGstin(p.gstin || '');
+                                                            setSelectedKhataParty(p);
+                                                            setKhataSearchQuery(p.name);
+                                                            setShowKhataDropdown(false);
+                                                        }}
+                                                    >
+                                                        <div className="fw-bold">
+                                                            {p.name} {p.businessName && <span className="fw-normal text-muted">({p.businessName})</span>}
+                                                        </div>
+                                                        <div className="text-muted small">
+                                                            {p.phone}
+                                                            {p.gstin && <span className="ms-2 text-primary">GST: {p.gstin}</span>}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="p-2 text-muted small">No matches found</div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                <hr className="my-2" />
                                 <div className="mb-3">
-                                    <label className="form-label small fw-bold mb-1">Customer Name</label>
+                                    <label className="form-label small fw-bold mb-1">Customer Name (For Bill)</label>
                                     <input 
                                         type="text" 
                                         className="form-control form-control-sm"
                                         value={tempCustName}
-                                        onChange={e => setTempCustName(e.target.value)}
+                                        onChange={e => {
+                                            setTempCustName(e.target.value);
+                                            if (selectedKhataParty && selectedKhataParty.name !== e.target.value) {
+                                                setSelectedKhataParty(null);
+                                            }
+                                        }}
                                         placeholder="E.g. Ramesh Kumar"
                                     />
                                 </div>
-                                <div>
+                                <div className="mb-3">
                                     <label className="form-label small fw-bold mb-1">
                                         WhatsApp / Mobile Number
                                     </label>
@@ -936,13 +1069,64 @@ export default function PosTerminal() {
                                         type="tel" 
                                         className="form-control form-control-sm"
                                         value={tempCustPhone}
-                                        onChange={e => setTempCustPhone(e.target.value)}
+                                        onChange={e => {
+                                            setTempCustPhone(e.target.value);
+                                            if (selectedKhataParty && selectedKhataParty.phone !== e.target.value) {
+                                                setSelectedKhataParty(null);
+                                            }
+                                        }}
                                         placeholder="E.g. 9876543210"
                                     />
                                     <span className="text-muted" style={{ fontSize: '10px' }}>
                                         Receipt will be sent via WhatsApp
                                     </span>
                                 </div>
+                                <div className="mb-3">
+                                    <label className="form-label small fw-bold mb-1">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        className="form-control form-control-sm"
+                                        value={tempCustEmail}
+                                        onChange={e => setTempCustEmail(e.target.value)}
+                                        placeholder="E.g. ramesh@example.com"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="form-label small fw-bold mb-1">Billing Address</label>
+                                    <textarea 
+                                        className="form-control form-control-sm"
+                                        rows="2"
+                                        value={tempCustAddress}
+                                        onChange={e => setTempCustAddress(e.target.value)}
+                                        placeholder="E.g. Main Bazaar, Sector 4"
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label small fw-bold mb-1">Business / Company Name</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control form-control-sm"
+                                        value={tempCustBusinessName}
+                                        onChange={e => setTempCustBusinessName(e.target.value)}
+                                        placeholder="E.g. Balaji Traders"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="form-label small fw-bold mb-1">GSTIN / Tax ID</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control form-control-sm"
+                                        value={tempCustGstin}
+                                        onChange={e => setTempCustGstin(e.target.value)}
+                                        placeholder="E.g. 27AAAAA0000A1Z5"
+                                    />
+                                </div>
+                                {selectedKhataParty && (
+                                    <div className="mt-2 text-success small fw-bold">
+                                        <CheckCircle size={12} className="me-1" />
+                                        Linked to KhataBook
+                                    </div>
+                                )}
                             </div>
                             <div className="modal-footer py-2">
                                 <button className="btn btn-sm btn-secondary" onClick={() => setShowCustModal(false)}>Cancel</button>
@@ -951,6 +1135,10 @@ export default function PosTerminal() {
                                     onClick={() => {
                                         setCustomerName(tempCustName.trim() || 'Walk-In Customer');
                                         setCustomerPhone(tempCustPhone.trim());
+                                        setCustomerEmail(tempCustEmail.trim());
+                                        setCustomerAddress(tempCustAddress.trim());
+                                        setCustomerBusinessName(tempCustBusinessName.trim());
+                                        setCustomerGstin(tempCustGstin.trim());
                                         setShowCustModal(false);
                                     }}
                                 >

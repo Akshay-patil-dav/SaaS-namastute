@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { CompanyProvider } from './context/CompanyContext';
 import ProtectedRoute from './components/auth/ProtectedRoute/ProtectedRoute';
 import GuestRoute from './components/auth/GuestRoute/GuestRoute';
@@ -96,6 +96,9 @@ const PosPage = ({ roles, children }) => (
 
 // ── Routes ───────────────────────────────────────────────────────────────────
 function AppRoutes() {
+    const { user } = useAuth();
+    const isBillingInvoice = user?.businessType === 'Billing Invoice';
+
     return (
 
         <Suspense fallback={<PageLoader />}>
@@ -128,15 +131,15 @@ function AppRoutes() {
                 />
                 <Route
                     path="/dashboard/manage-stock"
-                    element={<PosPage roles={ADMIN_ROLES}><ManageStock /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><ManageStock /></PosPage>}
                 />
                 <Route
                     path="/dashboard/stock-adjustment"
-                    element={<PosPage roles={ADMIN_ROLES}><StockAdjustment /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><StockAdjustment /></PosPage>}
                 />
                 <Route
                     path="/dashboard/stock-transfer"
-                    element={<PosPage roles={ADMIN_ROLES}><StockTransfer /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><StockTransfer /></PosPage>}
                 />
                 <Route
                     path="/dashboard/sales-online"
@@ -157,7 +160,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/dashboard/invoices"
-                    element={<PosPage roles={ADMIN_ROLES}><Invoices /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><Invoices /></PosPage>}
                 />
 
                 {/* Products */}
@@ -211,11 +214,11 @@ function AppRoutes() {
                 />
                 <Route
                     path="/print-barcode"
-                    element={<PosPage roles={ADMIN_ROLES}><PrintBarcode /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><PrintBarcode /></PosPage>}
                 />
                 <Route
                     path="/print-qrcode"
-                    element={<PosPage roles={ADMIN_ROLES}><PrintQRCode /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><PrintQRCode /></PosPage>}
                 />
 
                 {/* Purchases */}
@@ -275,7 +278,7 @@ function AppRoutes() {
                 {/* Reports */}
                 <Route
                     path="/dashboard/financial-report"
-                    element={<PosPage roles={ADMIN_ROLES}><FinancialReport /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><FinancialReport /></PosPage>}
                 />
 
                 {/* Finance & Khata Book */}

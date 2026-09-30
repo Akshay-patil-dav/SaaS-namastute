@@ -80,22 +80,24 @@ export const getWhatsAppDirectUrl = (phone, message, mode = 'direct') => {
     const encodedText = encodeURIComponent(message || '');
 
     if (mode === 'desktop') {
-        return `whatsapp://send?phone=${cleanPhone}&text=${encodedText}`;
+        return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
     }
 
-    if (isMobileDevice()) {
-        return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
-    }
-
-    // Direct WhatsApp Web compose on Desktop
-    return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
+    // Universal link: automatically prompts to open Desktop App, Mobile App, or Web
+    return `https://wa.me/${cleanPhone}?text=${encodedText}`;
 };
 
 /**
  * Dispatch WhatsApp URL safely without being blocked by browser popup blockers
  */
 export const dispatchWhatsAppLink = (url) => {
-    if (!url || typeof document === 'undefined') return false;
+    if (!url || typeof window === 'undefined') return false;
+
+    // window.open inside a synchronous click handler is rarely blocked
+    const win = window.open(url, '_blank', 'noopener,noreferrer');
+    if (win) return true;
+
+    // Fallback if window.open is blocked
     try {
         const anchor = document.createElement('a');
         anchor.href = url;
@@ -103,17 +105,10 @@ export const dispatchWhatsAppLink = (url) => {
         anchor.rel = 'noopener noreferrer';
         document.body.appendChild(anchor);
         anchor.click();
-        setTimeout(() => {
-            try {
-                if (document.body.contains(anchor)) {
-                    document.body.removeChild(anchor);
-                }
-            } catch { }
-        }, 300);
+        setTimeout(() => document.body.contains(anchor) && document.body.removeChild(anchor), 300);
         return true;
     } catch {
-        const win = window.open(url, '_blank', 'noopener,noreferrer');
-        return !!win;
+        return false;
     }
 };
 
@@ -161,7 +156,8 @@ export const compileWhatsAppTemplate = (template, data = {}) => {
     let paymentSection = '';
     const upiLink = data.paymentLink || data.upiUri || data.upiUrl;
     if (upiLink && payStatus !== 'PAID') {
-        paymentSection = `\n📲 *Pay Online via UPI (GPay/PhonePe):*\n${upiLink}\n`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
+        paymentSection = `\n📲 *Pay Online via UPI (GPay/PhonePe):*\nLink: ${upiLink}\n\n📷 *Scan QR Code to Pay:*\n${qrUrl}\n`;
     }
 
     let compiled = tpl
@@ -217,6 +213,13 @@ export const compileWhatsAppTemplate = (template, data = {}) => {
  * 2. Custom HTTP Gateway (UltraMsg, Maytapi, GreenAPI, Baileys gateway)
  * 3. Fallback to Click-to-Chat with popup-safe dispatcher
  */
+export const isWhatsAppBackgroundReady = (settings = {}) => {
+    const mode = settings.whatsappMode || 'cloud_api';
+    if (mode === 'cloud_api') return !!(settings.whatsappPhoneId && settings.whatsappToken);
+    if (mode === 'gateway') return !!settings.whatsappGatewayUrl;
+    return false;
+};
+
 export const sendWhatsAppMessage = async ({
     phone,
     message,
@@ -228,7 +231,7 @@ export const sendWhatsAppMessage = async ({
     templateName = null,
     templateLanguage = 'en_US',
     fallbackTemplateOn24h = true,
-    _fallbackReason = null  // internal: '24h_window' | 'sandbox_restriction' | null
+    _fallbackReason = null
 }) => {
     const defaultCountry = settings.whatsappCountryCode || '91';
     const cleanPhone = formatWhatsAppPhone(phone, defaultCountry);
@@ -238,6 +241,24 @@ export const sendWhatsAppMessage = async ({
     }
 
     const mode = settings.whatsappMode || 'cloud_api';
+
+    // Determine if custom settings are provided
+    const isCustomMetaSet = !!(settings.whatsappPhoneId && settings.whatsappToken);
+    const isCustomGatewaySet = !!settings.whatsappGatewayUrl;
+
+    let actualForceWeb = forceWeb;
+
+    // Automatically fallback to click-to-chat if background settings are missing
+    if (!actualForceWeb) {
+        if (mode === 'cloud_api' && !isCustomMetaSet && !phoneId) {
+            console.warn('[WhatsAppService] Dynamic Meta WhatsApp Cloud API Settings not set. Falling back to WhatsApp Web/Desktop.');
+            actualForceWeb = true;
+        } else if (mode === 'gateway' && !isCustomGatewaySet) {
+            console.warn('[WhatsAppService] Gateway URL not configured. Falling back to WhatsApp Web/Desktop.');
+            actualForceWeb = true;
+        }
+    }
+
     const targetPhoneId = (phoneId || settings.whatsappPhoneId || DEFAULT_META_PHONE_ID).trim();
 
     // Clean token: Remove any accidental "Bearer " prefix pasted from developer console
@@ -252,7 +273,7 @@ export const sendWhatsAppMessage = async ({
         !!(targetPhoneId && targetToken);
 
     // ── 1. Meta WhatsApp Cloud API (Background, zero windows) ──
-    if (!forceWeb && (mode === 'cloud_api' || (isBackgroundEnabled && targetPhoneId && targetToken))) {
+    if (!actualForceWeb && (mode === 'cloud_api' || (isBackgroundEnabled && targetPhoneId && targetToken))) {
         if (!targetPhoneId || !targetToken) {
             throw new Error('Meta WhatsApp Cloud API requires Phone Number ID and Permanent Access Token. Please configure them in Settings > Connected Apps.');
         }
@@ -275,16 +296,32 @@ export const sendWhatsAppMessage = async ({
                 }
             };
         } else {
-            // Standard Text Message (POS Invoice or Custom Alert)
-            payload = {
-                messaging_product: 'whatsapp',
-                to: cleanPhone,
-                type: 'text',
-                text: {
-                    preview_url: false,
-                    body: message
-                }
-            };
+            // Check for embedded QR code or image link
+            const qrMatch = message.match(/(https:\/\/api\.qrserver\.com\/[^\s]+)/);
+            if (qrMatch) {
+                const imgUrl = qrMatch[1];
+                const cleanMsg = message.replace(imgUrl, '').trim();
+                payload = {
+                    messaging_product: 'whatsapp',
+                    to: cleanPhone,
+                    type: 'image',
+                    image: {
+                        link: imgUrl,
+                        caption: cleanMsg
+                    }
+                };
+            } else {
+                // Standard Text Message
+                payload = {
+                    messaging_product: 'whatsapp',
+                    to: cleanPhone,
+                    type: 'text',
+                    text: {
+                        preview_url: true,
+                        body: message
+                    }
+                };
+            }
         }
 
         const res = await fetch(url, {
@@ -369,7 +406,7 @@ export const sendWhatsAppMessage = async ({
     }
 
     // ── 2. Custom HTTP Gateway (UltraMsg / GreenAPI / Maytapi / Local Gateway) ──
-    if (!forceWeb && (mode === 'gateway' || (isBackgroundEnabled && settings.whatsappGatewayUrl))) {
+    if (!actualForceWeb && (mode === 'gateway' || (isBackgroundEnabled && settings.whatsappGatewayUrl))) {
         const gatewayUrl = (settings.whatsappGatewayUrl || '').trim();
         const gatewayToken = (settings.whatsappGatewayToken || '').trim();
 
@@ -386,6 +423,14 @@ export const sendWhatsAppMessage = async ({
             token: gatewayToken,
             tokenSecret: gatewayToken
         };
+        
+        const qrMatch = message.match(/(https:\/\/api\.qrserver\.com\/[^\s]+)/);
+        if (qrMatch) {
+            payload.image = qrMatch[1];
+            payload.mediaUrl = qrMatch[1];
+            payload.message = message.replace(qrMatch[1], '').trim();
+            payload.body = payload.message;
+        }
 
         const headers = { 'Content-Type': 'application/json' };
         if (gatewayToken) {
@@ -415,7 +460,7 @@ export const sendWhatsAppMessage = async ({
     }
 
     // ── 3. Background Dispatch Guard ──
-    if (isBackgroundEnabled && !forceWeb) {
+    if (isBackgroundEnabled && !actualForceWeb) {
         throw new Error('Background sending without opening WhatsApp requires Meta Cloud API credentials or a Gateway URL. Please configure them in Settings > Connected Apps, or switch to Direct WhatsApp Web.');
     }
 

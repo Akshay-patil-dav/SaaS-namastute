@@ -4,6 +4,7 @@ import PosHeader from '../PosHeader/PosHeader';
 import './pos-layout.css';
 import AIHelper from '../../ai/AIHelper/AIHelper';
 import GlobalPrintHeader from '../GlobalPrintHeader/GlobalPrintHeader';
+import { useAuth } from '../../../context/AuthContext';
 
 // ── Safe initial sidebar state ───────────────────────────────────────────────
 // Guard against `window` being undefined in SSR / test environments.
@@ -14,6 +15,8 @@ function getInitialSidebarState() {
 }
 
 export default function PosLayout({ children }) {
+    const { user } = useAuth();
+    const isBillingInvoice = user?.businessType === 'Billing Invoice';
     const [sidebarOpen, setSidebarOpen] = useState(getInitialSidebarState);
 
     // Use matchMedia for efficient, event-driven breakpoint detection —
@@ -52,7 +55,7 @@ export default function PosLayout({ children }) {
                 </main>
             </div>
             {/* AI Helper — floats on all authenticated pages, per-user isolated */}
-            <AIHelper />
+            {!isBillingInvoice && <AIHelper />}
         </div>
     );
 }

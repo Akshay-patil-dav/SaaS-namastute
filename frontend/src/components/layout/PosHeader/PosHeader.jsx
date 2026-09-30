@@ -107,6 +107,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const { settings } = useSettings();
     const { companyInfo } = useCompany();
     const navigate = useNavigate();
+    const isBilling = user?.businessType === 'Billing Invoice';
 
     // Notifications & Alert States
     const [notiOpen, setNotiOpen] = useState(false);
@@ -780,17 +781,19 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                     <Building size={15} color="#888" /> Company Settings
                                 </button>
 
-                                <button
-                                    style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#374151', textAlign: 'left', transition: 'background 0.15s' }}
-                                    onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
-                                    onMouseOut={(e) => e.currentTarget.style.background = 'white'}
-                                    onClick={() => {
-                                        setProfileOpen(false);
-                                        navigate('/settings/connected_apps');
-                                    }}
-                                >
-                                    <Puzzle size={15} color="#888" /> Connected Apps
-                                </button>
+                                {!isBilling && (
+                                    <button
+                                        style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#374151', textAlign: 'left', transition: 'background 0.15s' }}
+                                        onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
+                                        onMouseOut={(e) => e.currentTarget.style.background = 'white'}
+                                        onClick={() => {
+                                            setProfileOpen(false);
+                                            navigate('/settings/connected_apps');
+                                        }}
+                                    >
+                                        <Puzzle size={15} color="#888" /> Connected Apps
+                                    </button>
+                                )}
 
                                 <button
                                     style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', borderTop: '1px solid #eaedf0', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#ef4444', textAlign: 'left', transition: 'background 0.15s' }}

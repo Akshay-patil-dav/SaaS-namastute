@@ -21,6 +21,12 @@ public class KhataParty {
     private String phone;
     private String email;
     private String address;
+    
+    @Column(name = "business_name")
+    private String businessName;
+    
+    @Column(name = "gstin")
+    private String gstin;
 
     /**
      * "CUSTOMER" or "SUPPLIER"
@@ -87,6 +93,12 @@ public class KhataParty {
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    public String getBusinessName() { return businessName; }
+    public void setBusinessName(String businessName) { this.businessName = businessName; }
+
+    public String getGstin() { return gstin; }
+    public void setGstin(String gstin) { this.gstin = gstin; }
 
     public String getPartyType() { return partyType; }
     public void setPartyType(String partyType) { this.partyType = partyType; }

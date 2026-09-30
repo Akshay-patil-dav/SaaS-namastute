@@ -51,7 +51,7 @@ export default function Dashboard() {
     const { currencySymbol } = useCurrency();
 
     const { user } = useAuth();
-    const name = user?.identifier?.split('@')[0] || 'Admin';
+    const name = user?.firstName || (user?.name && !user.name.includes('@') ? user.name : user?.email?.split('@')[0]) || 'Admin';
 
     // { onlineCount, posCount, total } — fetched from /api/sales/today/summary
     const [todaySummary, setTodaySummary] = useState(null);

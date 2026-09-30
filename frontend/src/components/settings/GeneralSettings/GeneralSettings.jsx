@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { User, Plus, MapPin, EyeOff, Shield, Phone, CheckCircle2, Mail, Key, Activity, Ban, Trash2, Store, Factory, ShoppingCart, Briefcase } from 'lucide-react';
+import { User, Plus, MapPin, EyeOff, Shield, Phone, CheckCircle2, Mail, Key, Activity, Ban, Trash2, Store, Factory, ShoppingCart, Briefcase, FileText } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useAuth } from '../../../context/AuthContext';
@@ -306,6 +306,7 @@ export const ProfileSettings = () => {
                         { value: 'Store', label: 'Retail Store', desc: 'POS, inventory & offline sales.', Icon: Store },
                         { value: 'Manufacturing', label: 'Manufacturing', desc: 'BOM, Work Orders & Centres.', Icon: Factory },
                         { value: 'E-comm', label: 'E-Commerce', desc: 'Online sales & multi-channel fulfilment.', Icon: ShoppingCart },
+                        { value: 'Billing Invoice', label: 'Billing Invoice', desc: 'Create and manage billing invoices for clients.', Icon: FileText },
                     ].map(({ value, label, desc, Icon }) => {
                         const isSelected = activeBizType === value;
                         const isSaved = user?.businessType === value;

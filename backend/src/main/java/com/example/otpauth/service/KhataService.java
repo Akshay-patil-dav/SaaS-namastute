@@ -64,6 +64,8 @@ public class KhataService {
         party.setPhone(req.getPhone());
         party.setEmail(req.getEmail());
         party.setAddress(req.getAddress());
+        party.setBusinessName(req.getBusinessName());
+        party.setGstin(req.getGstin());
         party.setPartyType(req.getPartyType() != null ? req.getPartyType().toUpperCase() : "CUSTOMER");
 
         BigDecimal opening = req.getOpeningBalance() != null ? req.getOpeningBalance() : BigDecimal.ZERO;
@@ -90,6 +92,8 @@ public class KhataService {
             party.setPhone(req.getPhone());
             party.setEmail(req.getEmail());
             party.setAddress(req.getAddress());
+            party.setBusinessName(req.getBusinessName());
+            party.setGstin(req.getGstin());
             if (req.getPartyType() != null) {
                 party.setPartyType(req.getPartyType().toUpperCase());
             }

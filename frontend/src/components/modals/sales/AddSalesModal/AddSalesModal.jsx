@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Search, Trash2, AlertTriangle } from 'lucide-react';
+import { X, Search, Trash2, AlertTriangle, User } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../AddPosModal/add-sales-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
@@ -18,19 +18,54 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
     const [results, setResults]     = useState([]);
     const [showDrop, setShowDrop]   = useState(false);
     const [activeIdx, setActiveIdx] = useState(-1);
+    
+    // Customer search states
+    const [customersList, setCustomersList] = useState([]);
+    const [custSearchQ, setCustSearchQ] = useState('');
+    const [showCustDrop, setShowCustDrop] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const custSearchRef = useRef(null);
+
     const [submitting, setSubmitting] = useState(false);
     const [error, setError]         = useState('');
     const [warningModalOpen, setWarningModalOpen] = useState(false);
     const [warningProducts, setWarningProducts] = useState([]);
     const searchRef = useRef(null);
 
-    useEffect(() => { if (isOpen) { setForm({ ...EMPTY, customerName: genCustName() }); setProducts([]); setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]); } }, [isOpen]);
+    useEffect(() => { if (isOpen) { setForm({ ...EMPTY, customerName: genCustName() }); setProducts([]); setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]); setCustSearchQ(''); setShowCustDrop(false); setSelectedCustomer(null); fetchCustomers(); } }, [isOpen]);
 
     useEffect(() => {
-        const h = e => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowDrop(false); };
+        const h = e => { 
+            if (searchRef.current && !searchRef.current.contains(e.target)) setShowDrop(false);
+            if (custSearchRef.current && !custSearchRef.current.contains(e.target)) setShowCustDrop(false); 
+        };
         document.addEventListener('mousedown', h);
         return () => document.removeEventListener('mousedown', h);
     }, []);
+
+    const fetchCustomers = async () => {
+        try {
+            const { data } = await apiClient.get(`${API.CRM}/customers`);
+            setCustomersList(Array.isArray(data) ? data : []);
+        } catch {
+            setCustomersList([]);
+        }
+    };
+
+    const filteredCustomers = customersList.filter(c => {
+        const q = custSearchQ.toLowerCase();
+        return (c.name || '').toLowerCase().includes(q) ||
+               (c.email || '').toLowerCase().includes(q) ||
+               (c.phone || '').toLowerCase().includes(q) ||
+               (c.company || '').toLowerCase().includes(q);
+    });
+
+    const selectCustomer = (c) => {
+        setSelectedCustomer(c);
+        setForm(f => ({ ...f, customerName: c.name }));
+        setCustSearchQ(c.name);
+        setShowCustDrop(false);
+    };
 
     useEffect(() => {
         if (!isOpen) return;
@@ -119,9 +154,58 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
                         )}
 
                         <div className="sm-form-grid-3">
-                            <div className="sm-form-group">
-                                <label>Customer Name <span className="sm-required">*</span></label>
-                                <input className="sm-input" type="text" placeholder="Enter customer name" value={form.customerName} onChange={e=>setForm(f=>({...f,customerName:e.target.value}))}/>
+                            <div className="sm-form-group" ref={custSearchRef}>
+                                <label>Customer Name / Search <span className="sm-required">*</span></label>
+                                <div className="sm-search-wrap">
+                                    <input className="sm-input" type="text" placeholder="Search by name, phone, GST, email..." 
+                                        value={custSearchQ || form.customerName} 
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            setCustSearchQ(val);
+                                            setForm(f => ({...f, customerName: val}));
+                                            if (selectedCustomer && val !== selectedCustomer.name) setSelectedCustomer(null);
+                                            setShowCustDrop(true);
+                                        }}
+                                        onFocus={() => setShowCustDrop(true)}
+                                    />
+                                    {showCustDrop && custSearchQ && (
+                                        <div className="sm-suggestions">
+                                            {filteredCustomers.length > 0 ? (
+                                                <ul className="sm-suggestion-list">
+                                                    {filteredCustomers.map((c) => (
+                                                        <li key={c.id} className="sm-suggestion-item" onClick={() => selectCustomer(c)}>
+                                                            <div className="sm-sug-img-wrap">
+                                                                <div className="sm-sug-placeholder"><User size={14}/></div>
+                                                            </div>
+                                                            <div>
+                                                                <div className="sm-sug-name">{c.name}</div>
+                                                                <div className="sm-sug-meta">
+                                                                    {[c.email, c.phone, c.company].filter(Boolean).join(' · ')}
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : <div className="sm-suggestions-empty">No matching customers</div>}
+                                        </div>
+                                    )}
+                                </div>
+                                {selectedCustomer && (
+                                    <div style={{
+                                        marginTop: '10px', padding: '12px', background: '#f8fafc', 
+                                        border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '0.85rem'
+                                    }}>
+                                        <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '4px'}}>Client Details</div>
+                                        <div style={{color: '#64748b'}}>
+                                            {selectedCustomer.email && <div><strong>Email:</strong> {selectedCustomer.email}</div>}
+                                            {selectedCustomer.phone && <div><strong>Phone:</strong> {selectedCustomer.phone}</div>}
+                                            {selectedCustomer.company && <div><strong>Company/GST:</strong> {selectedCustomer.company}</div>}
+                                            <div style={{marginTop: '4px', color: '#0f172a', fontWeight: '500'}}>
+                                                <strong>Lifetime Billing:</strong> {currencySymbol}{selectedCustomer.lifetimeValue}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <div className="sm-form-group">
                                 <label>Date <span className="sm-required">*</span></label>

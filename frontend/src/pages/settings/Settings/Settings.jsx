@@ -50,6 +50,7 @@ export default function Settings() {
     const location = useLocation();
     
     const isMainUser = !user?.activeProjectId || user?.activeProjectId === user?.id || user?.role === 'SUPER_ADMIN';
+    const isBilling = user?.businessType === 'Billing Invoice';
     
     const isSubscriber = Boolean(
         user?.role === 'SUPER_ADMIN' ||
@@ -66,9 +67,11 @@ export default function Settings() {
 
     useEffect(() => {
         const path = location.pathname.split('/').pop();
-        if (!isSubscriber) {
+        if (!isSubscriber || isBilling) {
             setOpenSection('system');
-            const allowed = ['profile', 'company_settings', 'payment_gateway', 'bank_accounts', 'tax_rates', 'currencies', 'pos_settings', 'ai_helper', 'billing'];
+            const allowed = isBilling 
+                ? ['profile', 'company_settings', 'bank_accounts', 'billing'] 
+                : ['profile', 'company_settings', 'payment_gateway', 'bank_accounts', 'tax_rates', 'currencies', 'pos_settings', 'ai_helper', 'billing'];
             if (!allowed.includes(path)) {
                 navigate('/settings/profile', { replace: true });
             }
@@ -91,8 +94,8 @@ export default function Settings() {
 
             <div className="settings-layout">
                 {/* Sidebar */}
-                {!isSubscriber ? (
-                    /* Non-subscriber view: ONLY System Settings + Billing */
+                {(!isSubscriber || isBilling) ? (
+                    /* Non-subscriber or Billing view: ONLY System Settings + Billing */
                     <div className="settings-sidebar">
                         <div className="settings-sidebar-section">
                             <div 
@@ -113,24 +116,30 @@ export default function Settings() {
                                     <li className={`settings-sidebar-item ${isActive('company_settings') ? 'active' : ''}`} onClick={() => navigate('/settings/company_settings')}>
                                         Company Settings
                                     </li>
-                                    <li className={`settings-sidebar-item ${isActive('payment_gateway') ? 'active' : ''}`} onClick={() => navigate('/settings/payment_gateway')}>
-                                        Payment Gateway
-                                    </li>
+                                    {!isBilling && (
+                                        <li className={`settings-sidebar-item ${isActive('payment_gateway') ? 'active' : ''}`} onClick={() => navigate('/settings/payment_gateway')}>
+                                            Payment Gateway
+                                        </li>
+                                    )}
                                     <li className={`settings-sidebar-item ${isActive('bank_accounts') ? 'active' : ''}`} onClick={() => navigate('/settings/bank_accounts')}>
                                         Bank Accounts
                                     </li>
-                                    <li className={`settings-sidebar-item ${isActive('tax_rates') ? 'active' : ''}`} onClick={() => navigate('/settings/tax_rates')}>
-                                        Tax Rates
-                                    </li>
-                                    <li className={`settings-sidebar-item ${isActive('currencies') ? 'active' : ''}`} onClick={() => navigate('/settings/currencies')}>
-                                        Currencies
-                                    </li>
-                                    <li className={`settings-sidebar-item ${isActive('pos_settings') ? 'active' : ''}`} onClick={() => navigate('/settings/pos_settings')}>
-                                        POS Settings
-                                    </li>
-                                    <li className={`settings-sidebar-item ${isActive('ai_helper') ? 'active' : ''}`} onClick={() => navigate('/settings/ai_helper')}>
-                                        AI Helper
-                                    </li>
+                                    {!isBilling && (
+                                        <>
+                                            <li className={`settings-sidebar-item ${isActive('tax_rates') ? 'active' : ''}`} onClick={() => navigate('/settings/tax_rates')}>
+                                                Tax Rates
+                                            </li>
+                                            <li className={`settings-sidebar-item ${isActive('currencies') ? 'active' : ''}`} onClick={() => navigate('/settings/currencies')}>
+                                                Currencies
+                                            </li>
+                                            <li className={`settings-sidebar-item ${isActive('pos_settings') ? 'active' : ''}`} onClick={() => navigate('/settings/pos_settings')}>
+                                                POS Settings
+                                            </li>
+                                            <li className={`settings-sidebar-item ${isActive('ai_helper') ? 'active' : ''}`} onClick={() => navigate('/settings/ai_helper')}>
+                                                AI Helper
+                                            </li>
+                                        </>
+                                    )}
                                 </ul>
                             )}
                         </div>
@@ -327,18 +336,22 @@ export default function Settings() {
 
                 {/* Content */}
                 <div className="settings-content">
-                    {!isSubscriber ? (
-                        /* Non-subscriber accessible routes */
+                    {(!isSubscriber || isBilling) ? (
+                        /* Non-subscriber or Billing accessible routes */
                         <Routes>
                             <Route path="/" element={<Navigate to="profile" replace />} />
                             <Route path="profile" element={<ProfileSettings />} />
                             <Route path="company_settings" element={<CompanySettings />} />
-                            <Route path="payment_gateway" element={<PaymentGateway />} />
+                            {!isBilling && <Route path="payment_gateway" element={<PaymentGateway />} />}
                             <Route path="bank_accounts" element={<BankAccounts />} />
-                            <Route path="tax_rates" element={<TaxRates />} />
-                            <Route path="currencies" element={<Currencies />} />
-                            <Route path="pos_settings" element={<PosSettings />} />
-                            <Route path="ai_helper" element={<AiHelperSettings />} />
+                            {!isBilling && (
+                                <>
+                                    <Route path="tax_rates" element={<TaxRates />} />
+                                    <Route path="currencies" element={<Currencies />} />
+                                    <Route path="pos_settings" element={<PosSettings />} />
+                                    <Route path="ai_helper" element={<AiHelperSettings />} />
+                                </>
+                            )}
                             <Route path="billing" element={<Billing />} />
                             <Route path="*" element={<Navigate to="profile" replace />} />
                         </Routes>

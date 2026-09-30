@@ -468,17 +468,20 @@ select.cp-input {
 }
 
 .vt-type-index {
-    min-width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #f97316, #fb923c);
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 700;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .vt-type-input {

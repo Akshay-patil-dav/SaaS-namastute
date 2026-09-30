@@ -22,6 +22,7 @@ export default function Header({ onMenuClick }) {
     const profileRef = useRef(null);
 
     const isClientOrAdmin = true;
+    const isBilling = user?.businessType === 'Billing Invoice';
 
     const fetchNotifications = useCallback(() => {
         setNotifLoading(true);
@@ -371,13 +372,15 @@ export default function Header({ onMenuClick }) {
                                 <span className="font-medium">Settings</span>
                             </button>
 
-                            <button
-                                onClick={() => { navigate('/settings/connected_apps'); setProfileOpen(false); }}
-                                className="w-[92%] mx-auto flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-indigo-50/60 hover:text-indigo-600 hover:translate-x-1 rounded-xl transition-all duration-200 group/item"
-                            >
-                                <Puzzle size={18} className="text-gray-400 group-hover/item:text-indigo-500 transition-colors" />
-                                <span className="font-medium">Connected Apps</span>
-                            </button>
+                            {!isBilling && (
+                                <button
+                                    onClick={() => { navigate('/settings/connected_apps'); setProfileOpen(false); }}
+                                    className="w-[92%] mx-auto flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-indigo-50/60 hover:text-indigo-600 hover:translate-x-1 rounded-xl transition-all duration-200 group/item"
+                                >
+                                    <Puzzle size={18} className="text-gray-400 group-hover/item:text-indigo-500 transition-colors" />
+                                    <span className="font-medium">Connected Apps</span>
+                                </button>
+                            )}
 
                             <div className="px-3 py-1.5">
                                 <button
