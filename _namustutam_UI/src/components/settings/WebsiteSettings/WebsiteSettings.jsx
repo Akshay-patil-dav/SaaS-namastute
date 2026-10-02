@@ -34,6 +34,7 @@ export const SystemSettings = () => {
         try {
             const response = await fetch(`${ENV.API_BASE_URL}/upload`, {
                 method: 'POST',
+                headers: { 'ngrok-skip-browser-warning': '69420' },
                 body: formData
             });
             const data = await response.json();
@@ -292,6 +293,7 @@ export const CompanySettings = () => {
         try {
             const response = await fetch(`${ENV.API_BASE_URL}/upload`, {
                 method: 'POST',
+                headers: { 'ngrok-skip-browser-warning': '69420' },
                 body: formData
             });
             const data = await response.json();
