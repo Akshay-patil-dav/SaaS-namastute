@@ -163,10 +163,7 @@ export const uploadImageFile = async (file) => {
  */
 const apiClient = axios.create({
   baseURL: ENV.API_BASE_URL,
-  headers: { 
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': '69420'
-  },
+  headers: { 'Content-Type': 'application/json' },
   timeout: 45_000, // 45 s — AI calls can take longer
 });
 
