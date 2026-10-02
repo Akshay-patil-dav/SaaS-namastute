@@ -5,8 +5,9 @@
  * files here. Pages/components should import from this file, NOT use
  * import.meta.env directly.
  *
- * Local dev  →  frontend/.env           →  points to http://103.190.93.133:3000
- * Production →  frontend/.env.production →  points to https://awhile-venus-unlearned.ngrok-free.dev
+ * Local dev  →  frontend/.env           →  points to http://103.190.93.133:3000 (server IP)
+ * Localhost   →  http://localhost:3000   →  fallback if server IP is unreachable
+ * Production  →  frontend/.env.production →  points to https://awhile-venus-unlearned.ngrok-free.dev
  *               (or override via Vercel Dashboard → Settings → Environment Variables)
  *
  * After changing .env files restart the dev server: npm run dev
@@ -21,11 +22,11 @@ const isProduction = import.meta.env.PROD === true;
 
 const DEFAULT_API_BASE_URL = isProduction
   ? 'https://awhile-venus-unlearned.ngrok-free.dev/api'
-  : 'http://localhost:3000/api';
+  : 'http://103.190.93.133:3000/api';
 
 const DEFAULT_BACKEND_BASE_URL = isProduction
   ? 'https://awhile-venus-unlearned.ngrok-free.dev'
-  : 'http://localhost:3000';
+  : 'http://103.190.93.133:3000';
 
 const DEFAULT_FRONTEND_URL = isProduction
   ? 'https://saa-s-namustutam.vercel.app'
@@ -120,7 +121,7 @@ export const uploadImageFile = async (file) => {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
   } catch (err) {
-    // If network error (ERR_CONNECTION_REFUSED, etc.) and primary isn't localhost
+    // If network error and primary isn't localhost, try localhost as fallback
     if (err.isAxiosError && !err.response && !ENV.API_BASE_URL.includes('localhost')) {
       console.warn('Primary upload failed, falling back to localhost:3000...');
       usedBase = 'http://localhost:3000';
@@ -194,11 +195,12 @@ apiClient.interceptors.response.use(
       let fallbackApiUrl = null;
       const currentUrlStr = originalRequest.url.startsWith('http') ? originalRequest.url : originalRequest.baseURL;
 
+      // Fallback chain: IP server → localhost → ngrok/production
       // If IP failed, try localhost next
       if (originalRequest._retryCount === 1 && currentUrlStr?.includes('103.190.93.133')) {
         fallbackApiUrl = 'http://localhost:3000/api';
       }
-      // If localhost failed (either on retry 1 or retry 2), try production
+      // If localhost failed, try production ngrok
       else if ((originalRequest._retryCount === 1 && currentUrlStr?.includes('localhost')) || originalRequest._retryCount === 2) {
         fallbackApiUrl = 'https://awhile-venus-unlearned.ngrok-free.dev/api';
       }
