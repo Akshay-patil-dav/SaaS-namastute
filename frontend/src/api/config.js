@@ -20,13 +20,18 @@ import axios from 'axios';
 // Vite sets import.meta.env.PROD = true during `vite build`, false in dev
 const isProduction = import.meta.env.PROD === true;
 
+const SERVER_API_URL     = 'http://103.190.93.133:3000/api';
+const SERVER_BACKEND_URL  = 'http://103.190.93.133:3000';
+const NGROK_API_URL      = 'https://awhile-venus-unlearned.ngrok-free.dev/api';
+const NGROK_BACKEND_URL  = 'https://awhile-venus-unlearned.ngrok-free.dev';
+
 const DEFAULT_API_BASE_URL = isProduction
-  ? 'https://awhile-venus-unlearned.ngrok-free.dev/api'
-  : 'http://103.190.93.133:3000/api';
+  ? NGROK_API_URL
+  : SERVER_API_URL;
 
 const DEFAULT_BACKEND_BASE_URL = isProduction
-  ? 'https://awhile-venus-unlearned.ngrok-free.dev'
-  : 'http://103.190.93.133:3000';
+  ? NGROK_BACKEND_URL
+  : SERVER_BACKEND_URL;
 
 const DEFAULT_FRONTEND_URL = isProduction
   ? 'https://saa-s-namustutam.vercel.app'
@@ -34,11 +39,11 @@ const DEFAULT_FRONTEND_URL = isProduction
 
 // ── Raw env values ─────────────────────────────────────────────────────────
 export const ENV = {
-  /** e.g.  http://103.190.93.133:3000/api   or   https://awhile-venus-unlearned.ngrok-free.dev/api */
-  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL,
+  /** Priority: .env → IP server → ngrok (fallback) */
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || SERVER_API_URL || NGROK_API_URL,
 
-  /** e.g.  http://103.190.93.133:3000  (no trailing slash) */
-  BACKEND_BASE_URL: import.meta.env.VITE_BACKEND_BASE_URL || DEFAULT_BACKEND_BASE_URL,
+  /** Priority: .env → IP server → ngrok (fallback) */
+  BACKEND_BASE_URL: import.meta.env.VITE_BACKEND_BASE_URL || SERVER_BACKEND_URL || NGROK_BACKEND_URL,
 
   /** e.g.  https://saa-s-namustutam.vercel.app  or  https://namustutamsaas.vercel.app */
   FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || DEFAULT_FRONTEND_URL,
