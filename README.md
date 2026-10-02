@@ -238,9 +238,9 @@ SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=root
 JWT_SECRET=<hex-key>
 JWT_EXPIRATION=86400000
-APP_BASE_URL=https://awhile-venus-unlearned.ngrok-free.dev
+APP_BASE_URL=http://103.190.93.133:3000
 FRONTEND_URL=https://saa-s-namastute.vercel.app
-CORS_EXTRA_ORIGINS=http://localhost:5174,https://awhile-venus-unlearned.ngrok-free.dev
+CORS_EXTRA_ORIGINS=http://localhost:5174,http://103.190.93.133:3000
 GOOGLE_CLIENT_ID=YOUR_ID
 GOOGLE_CLIENT_SECRET=YOUR_SECRET
 SUPER_ADMIN_EMAIL=admin@gmail.com
@@ -249,7 +249,7 @@ SUPER_ADMIN_PASSWORD=Admin@12345
 
 ### `frontend/.env`
 ```env
-VITE_API_URL=https://awhile-venus-unlearned.ngrok-free.dev
+VITE_API_URL=http://103.190.93.133:3000
 ```
 
 ---

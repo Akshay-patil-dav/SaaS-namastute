@@ -7,7 +7,7 @@
  *
  * Local dev  →  frontend/.env           →  points to http://103.190.93.133:3000 (server IP)
  * Localhost   →  http://localhost:3000   →  fallback if server IP is unreachable
- * Production  →  frontend/.env.production →  points to https://awhile-venus-unlearned.ngrok-free.dev
+ * Production  →  frontend/.env.production →  points to http://103.190.93.133:3000
  *               (or override via Vercel Dashboard → Settings → Environment Variables)
  *
  * After changing .env files restart the dev server: npm run dev
@@ -22,8 +22,8 @@ const isProduction = import.meta.env.PROD === true;
 
 const SERVER_API_URL = 'http://103.190.93.133:3000/api';
 const SERVER_BACKEND_URL = 'http://103.190.93.133:3000';
-const NGROK_API_URL = 'https://awhile-venus-unlearned.ngrok-free.dev/api';
-const NGROK_BACKEND_URL = 'https://awhile-venus-unlearned.ngrok-free.dev';
+const NGROK_API_URL = 'http://103.190.93.133:3000/api';
+const NGROK_BACKEND_URL = 'http://103.190.93.133:3000';
 
 const DEFAULT_API_BASE_URL = isProduction
   ? NGROK_API_URL
@@ -207,7 +207,7 @@ apiClient.interceptors.response.use(
       }
       // If localhost failed, try production ngrok
       else if ((originalRequest._retryCount === 1 && currentUrlStr?.includes('localhost')) || originalRequest._retryCount === 2) {
-        fallbackApiUrl = 'https://awhile-venus-unlearned.ngrok-free.dev/api';
+        fallbackApiUrl = 'http://103.190.93.133:3000/api';
       }
 
       if (fallbackApiUrl) {
