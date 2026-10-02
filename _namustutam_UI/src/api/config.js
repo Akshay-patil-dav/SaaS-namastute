@@ -28,7 +28,7 @@ const DEFAULT_BACKEND_BASE_URL = isProduction
   : 'http://localhost:3000';
 
 const DEFAULT_FRONTEND_URL = isProduction
-  ? 'https://saa-s-namustutam.vercel.app'
+  ? 'https://namustutamsaas.vercel.app'
   : 'https://namustutamsaas.vercel.app';
 
 // ── Raw env values ─────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ export const ENV = {
   /** e.g.  http://103.190.93.133:3000  (no trailing slash) */
   BACKEND_BASE_URL: import.meta.env.VITE_BACKEND_BASE_URL || DEFAULT_BACKEND_BASE_URL,
 
-  /** e.g.  https://saa-s-namustutam.vercel.app  or  https://namustutamsaas.vercel.app */
+  /** e.g.  https://namustutamsaas.vercel.app */
   FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || DEFAULT_FRONTEND_URL,
 
   /** App branding */

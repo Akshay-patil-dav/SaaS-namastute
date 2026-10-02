@@ -108,7 +108,7 @@ public class SecurityConfig {
         //
         // backend/.env:
         // FRONTEND_URL=https://namustutamsaas.vercel.app ← your main allowed origin
-        // CORS_EXTRA_ORIGINS=http://localhost:5174,https://saa-s-namustutam.vercel.app
+        // CORS_EXTRA_ORIGINS=http://localhost:5174,https://namustutamsaas.vercel.app
         //
         List<String> origins = new java.util.ArrayList<>();
 
