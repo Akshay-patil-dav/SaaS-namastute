@@ -280,11 +280,9 @@ export default function KhataBook() {
                 apiClient.get('/khata/daybook')
             ]);
 
-            if (partiesRes.data && Array.isArray(partiesRes.data) && partiesRes.data.length > 0) {
+            if (partiesRes.data && Array.isArray(partiesRes.data)) {
                 setParties(partiesRes.data);
                 localStorage.setItem('namustutam_khata_parties', JSON.stringify(partiesRes.data));
-            } else {
-                throw new Error('Empty backend data, use cached/fallback');
             }
 
             if (daybookRes.data && Array.isArray(daybookRes.data)) {
@@ -292,7 +290,7 @@ export default function KhataBook() {
                 localStorage.setItem('namustutam_khata_transactions', JSON.stringify(daybookRes.data));
             }
         } catch (err) {
-            // Graceful fallback to localStorage cache or initial demo dataset
+            // Graceful fallback to localStorage cache on network error
             const cachedParties = localStorage.getItem('namustutam_khata_parties');
             const cachedTxs = localStorage.getItem('namustutam_khata_transactions');
 
@@ -300,22 +298,20 @@ export default function KhataBook() {
                 try {
                     setParties(JSON.parse(cachedParties));
                 } catch {
-                    setParties(INITIAL_DEMO_PARTIES);
+                    setParties([]);
                 }
             } else {
-                setParties(INITIAL_DEMO_PARTIES);
-                localStorage.setItem('namustutam_khata_parties', JSON.stringify(INITIAL_DEMO_PARTIES));
+                setParties([]);
             }
 
             if (cachedTxs) {
                 try {
                     setTransactions(JSON.parse(cachedTxs));
                 } catch {
-                    setTransactions(INITIAL_DEMO_TRANSACTIONS);
+                    setTransactions([]);
                 }
             } else {
-                setTransactions(INITIAL_DEMO_TRANSACTIONS);
-                localStorage.setItem('namustutam_khata_transactions', JSON.stringify(INITIAL_DEMO_TRANSACTIONS));
+                setTransactions([]);
             }
         } finally {
             setLoading(false);

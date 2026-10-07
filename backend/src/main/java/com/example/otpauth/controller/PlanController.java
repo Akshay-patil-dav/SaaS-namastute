@@ -34,7 +34,8 @@ public class PlanController {
                 }
             }
             if (userId == null) {
-                userId = 1L;
+                return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "User not authenticated"));
             }
             return ResponseEntity.ok(dataUsageService.getUsageSummary(userId));
         } catch (Exception e) {

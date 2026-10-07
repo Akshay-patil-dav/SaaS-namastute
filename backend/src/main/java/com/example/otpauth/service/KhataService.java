@@ -33,7 +33,9 @@ public class KhataService {
     private Long getUserId() {
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            userId = 1L; // Fallback default tenant
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.UNAUTHORIZED, "User not authenticated"
+            );
         }
         return userId;
     }
