@@ -230,13 +230,6 @@ export default function Onboarding() {
                                         <p>Manage POS, inventory, categories, and offline sales.</p>
                                     </div>
                                 </div>
-                                <div className={`business-card-v2 ${formData.businessType === 'Manufacturing' ? 'selected' : ''}`} onClick={() => handleSelectBusiness('Manufacturing')}>
-                                    <div className="card-icon"><Factory size={24} /></div>
-                                    <div className="card-content">
-                                        <h3>Manufacturing</h3>
-                                        <p>Includes Bill of Materials, Work Orders, and Centers.</p>
-                                    </div>
-                                </div>
                                 <div className={`business-card-v2 ${formData.businessType === 'E-comm' ? 'selected' : ''}`} onClick={() => handleSelectBusiness('E-comm')}>
                                     <div className="card-icon"><ShoppingCart size={24} /></div>
                                     <div className="card-content">

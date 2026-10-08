@@ -12,7 +12,6 @@ import PlanSelectionModal from './PlanSelectionModal';
 
 export default function Register() {
     const [fullName, setFullName]         = useState('');
-    const [phoneNumber, setPhoneNumber]   = useState('');
     const [email, setEmail]               = useState('');
     const [password, setPassword]         = useState('');
     const [confirmPassword, setConfirm]   = useState('');
@@ -44,6 +43,11 @@ export default function Register() {
         e.preventDefault();
         setError('');
 
+        if (!agreed) {
+            setError('Please agree to the Terms & Conditions to create an account.');
+            return;
+        }
+
         if (password !== confirmPassword) {
             setError('Passwords do not match. Please try again.');
             return;
@@ -56,7 +60,7 @@ export default function Register() {
         setIsLoading(true);
 
         try {
-            const result = await register({ fullName, email, password, phoneNumber });
+            const result = await register({ fullName, email, password });
             if (!result.success) {
                 setError(result.error);
                 return;
@@ -133,20 +137,6 @@ export default function Register() {
                             </div>
                         </div>
 
-                        <div className="input-v2-group">
-                            <label>Phone Number <span>*</span></label>
-                            <div className="input-v2-wrapper">
-                                <span className="input-icon" style={{ fontSize: '14px', fontWeight: 'bold' }}>☎</span>
-                                <input
-                                    id="register-phone"
-                                    type="text"
-                                    placeholder="+91 9876543210"
-                                    required
-                                    value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                />
-                            </div>
-                        </div>
 
                         <div className="input-v2-group">
                             <label>Email Address <span>*</span></label>
@@ -213,7 +203,6 @@ export default function Register() {
                             <label className="checkbox-v2">
                                 <input
                                     type="checkbox"
-                                    required
                                     checked={agreed}
                                     onChange={(e) => setAgreed(e.target.checked)}
                                 />
@@ -289,13 +278,13 @@ export default function Register() {
                     </div>
                 </div>
 
-                <div className="login-v2-hero-text">
+                <div className="right-v2-content">
                     <h2>Everything You Need.<br />All in One Place.</h2>
                     <p>Join thousands of businesses managing their retail operations smarter, faster, and more securely.</p>
-                    <div className="login-v2-badges">
-                        <span className="badge-v2"><Crown size={14} /> Premium Features</span>
-                        <span className="badge-v2"><ShieldCheck size={14} /> Enterprise Security</span>
-                        <span className="badge-v2"><Zap size={14} /> 24/7 Support</span>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <span className="right-v2-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: 0, textTransform: 'none', letterSpacing: 'normal' }}><Crown size={14} /> Premium Features</span>
+                        <span className="right-v2-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: 0, textTransform: 'none', letterSpacing: 'normal' }}><ShieldCheck size={14} /> Enterprise Security</span>
+                        <span className="right-v2-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: 0, textTransform: 'none', letterSpacing: 'normal' }}><Zap size={14} /> 24/7 Support</span>
                     </div>
                 </div>
             </div>

@@ -304,7 +304,6 @@ export const ProfileSettings = () => {
                 <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
                     {[
                         { value: 'Store', label: 'Retail Store', desc: 'POS, inventory & offline sales.', Icon: Store },
-                        { value: 'Manufacturing', label: 'Manufacturing', desc: 'BOM, Work Orders & Centres.', Icon: Factory },
                         { value: 'E-comm', label: 'E-Commerce', desc: 'Online sales & multi-channel fulfilment.', Icon: ShoppingCart },
                         { value: 'Billing Invoice', label: 'Billing Invoice', desc: 'Create and manage billing invoices for clients.', Icon: FileText },
                     ].map(({ value, label, desc, Icon }) => {

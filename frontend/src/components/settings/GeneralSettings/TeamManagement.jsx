@@ -8,7 +8,6 @@ const MODULES = [
     { id: 'sales', name: 'Sales & Invoices' },
     { id: 'pos', name: 'POS Terminal' },
     { id: 'purchases', name: 'Purchases' },
-    { id: 'manufacturing', name: 'Manufacturing' },
     { id: 'settings', name: 'Settings' }
 ];
 

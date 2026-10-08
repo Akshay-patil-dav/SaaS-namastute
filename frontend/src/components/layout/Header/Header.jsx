@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient, { API, ENV } from '@/api/config';
 
 export default function Header({ onMenuClick }) {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const { settings } = useSettings();
     const navigate = useNavigate();
     const { triggerRefresh } = useWorkspace() || {};
@@ -405,6 +405,14 @@ export default function Header({ onMenuClick }) {
                             >
                                 <Users size={18} className="text-gray-400 group-hover/logout:text-indigo-500 transition-colors" />
                                 <span className="font-medium">Switch Account</span>
+                            </button>
+
+                            <button
+                                onClick={() => { logout(); navigate('/login'); setProfileOpen(false); }}
+                                className="w-[92%] mx-auto flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 hover:translate-x-1 rounded-xl transition-all duration-200 group/logoutbtn mt-1"
+                            >
+                                <LogOut size={18} className="text-red-400 group-hover/logoutbtn:text-red-500 transition-colors" />
+                                <span className="font-medium">Log out</span>
                             </button>
                         </div>
                     )}
