@@ -3,6 +3,7 @@ import { X, Search, Trash2, AlertTriangle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import './add-sales-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
+import { useAuth } from '../../../../context/AuthContext';
 
 
 const BASE_URL = ENV.API_BASE_URL;
@@ -11,9 +12,11 @@ const EMPTY = { customerName:'', date: new Date().toISOString().split('T')[0], s
 const genCustName = () => '#' + Math.floor(10000000 + Math.random() * 90000000);
 
 const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
+    const { user } = useAuth();
+    const loginUsername = user?.username || user?.name || user?.fullName || (user?.identifier ? user.identifier.split('@')[0] : '') || (user?.email ? user.email.split('@')[0] : '') || 'Admin';
     const { currencySymbol } = useCurrency();
 
-    const [form, setForm]           = useState({ ...EMPTY, customerName: genCustName() });
+    const [form, setForm]           = useState({ ...EMPTY, customerName: genCustName(), biller: loginUsername });
     const [products, setProducts]   = useState([]);
     const [searchQ, setSearchQ]     = useState('');
     const [results, setResults]     = useState([]);
@@ -25,7 +28,7 @@ const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
     const [warningProducts, setWarningProducts] = useState([]);
     const searchRef = useRef(null);
 
-    useEffect(() => { if (isOpen) { setForm({ ...EMPTY, customerName: genCustName() }); setProducts([]); setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]); } }, [isOpen]);
+    useEffect(() => { if (isOpen) { setForm({ ...EMPTY, customerName: genCustName(), biller: loginUsername }); setProducts([]); setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]); } }, [isOpen, loginUsername]);
 
     useEffect(() => {
         const h = e => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowDrop(false); };
@@ -101,7 +104,7 @@ const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
             }
 
             await apiClient.post(`${BASE_URL}/pos-sales`, {
-                ...form, orderTax:+form.orderTax, discount:+form.discount,
+                ...form, biller: form.biller || loginUsername, orderTax:+form.orderTax, discount:+form.discount,
                 shipping:+form.shipping, paidAmount:+form.paidAmount, products
             });
             onSuccess?.(); onClose();
@@ -156,7 +159,7 @@ const AddPosModal = ({ isOpen, onClose, onSuccess }) => {
                             </div>
                             <div className="sm-form-group">
                                 <label>Biller</label>
-                                <input className="sm-input" type="text" value={form.biller} onChange={e=>setForm(f=>({...f,biller:e.target.value}))}/>
+                                <input className="sm-input" type="text" value={form.biller || loginUsername} disabled readOnly />
                             </div>
                         </div>
 

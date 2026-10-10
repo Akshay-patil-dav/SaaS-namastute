@@ -16,7 +16,15 @@ import {
     Eye,
     Edit,
     Trash2,
-    Upload
+    Upload,
+    Check,
+    ChevronRight,
+    ChevronLeft,
+    AlertCircle,
+    Sparkles,
+    ShieldCheck,
+    ArrowRight,
+    Loader2
 } from 'lucide-react';
 
 export const SystemSettings = () => {
@@ -184,6 +192,15 @@ export const SystemSettings = () => {
     );
 };
 
+const COUNTRIES_LIST = [
+    'India', 'United States', 'United Kingdom', 'Canada', 'Australia',
+    'United Arab Emirates', 'Saudi Arabia', 'Singapore', 'Germany', 'France',
+    'Netherlands', 'Japan', 'South Africa', 'New Zealand', 'Brazil',
+    'Mexico', 'Italy', 'Spain', 'Switzerland', 'Ireland', 'Sweden',
+    'Norway', 'Denmark', 'Malaysia', 'Philippines', 'Indonesia',
+    'Thailand', 'Vietnam', 'Turkey', 'Egypt', 'Nigeria', 'Kenya', 'Other'
+];
+
 export const CompanySettings = () => {
     const { settings, loading, saving, handleChange: _handleChange, saveSettings } = useSettings();
     const { refreshCompany } = useCompany();
@@ -193,6 +210,23 @@ export const CompanySettings = () => {
     const [editingIndex, setEditingIndex] = useState(null);
     const [viewCompany, setViewCompany] = useState(null); // for view modal
     const [viewIndex, setViewIndex] = useState(null);
+    const [activeModalTab, setActiveModalTab] = useState('general');
+    const [formError, setFormError] = useState('');
+    const [uploadingField, setUploadingField] = useState(null);
+    const [logoDragOver, setLogoDragOver] = useState(false);
+    const [faviconDragOver, setFaviconDragOver] = useState(false);
+
+    // Escape key listener for clean closing
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                if (isModalOpen) setIsModalOpen(false);
+                if (viewCompany) setViewCompany(null);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isModalOpen, viewCompany]);
 
     // Sync companies list from DB settings whenever settings loads or updates
     useEffect(() => {
@@ -235,8 +269,11 @@ export const CompanySettings = () => {
     }, [loading, settings.companies_list]);
 
     const handleOpenModal = (company = null, index = null) => {
+        setFormError('');
+        setActiveModalTab('general');
+        setUploadingField(null);
         if (company) {
-            setCurrentCompany(company);
+            setCurrentCompany({ ...company });
             setEditingIndex(index);
         } else {
             setCurrentCompany({
@@ -252,7 +289,7 @@ export const CompanySettings = () => {
                 companyCity: '',
                 companyState: '',
                 companyZipCode: '',
-                companyCountry: '',
+                companyCountry: 'India',
                 companyTaxId: '',
                 companyRegNumber: '',
                 companyLogo: '',
@@ -277,13 +314,16 @@ export const CompanySettings = () => {
         setCurrentCompany(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleImageUpload = async (e, field) => {
-        const file = e.target.files[0];
+    const handleImageUpload = async (fileOrEvent, field) => {
+        let file = null;
+        if (fileOrEvent?.target?.files?.[0]) {
+            file = fileOrEvent.target.files[0];
+        } else if (fileOrEvent instanceof File) {
+            file = fileOrEvent;
+        }
         if (!file) return;
 
-        const formData = new FormData();
-        formData.append('file', file);
-
+        setUploadingField(field);
         try {
             const absoluteUrl = await uploadImageFile(file);
             if (absoluteUrl) {
@@ -292,6 +332,8 @@ export const CompanySettings = () => {
         } catch (error) {
             console.error('Upload failed:', error);
             alert('Failed to upload image. Please try again.');
+        } finally {
+            setUploadingField(null);
         }
     };
 
@@ -309,9 +351,11 @@ export const CompanySettings = () => {
 
     const handleSaveCompany = () => {
         if (!currentCompany.companyName?.trim()) {
-            alert('Company Name is required.');
+            setFormError('Company Name is required to save.');
+            setActiveModalTab('general');
             return;
         }
+        setFormError('');
         let updatedCompanies;
         if (editingIndex !== null) {
             updatedCompanies = companies.map((c, i) => i === editingIndex ? currentCompany : c);
@@ -669,320 +713,583 @@ export const CompanySettings = () => {
                 </div>
             )}
 
-            {/* Edit Modal */}
+            {/* Edit / Add Modal */}
             {isModalOpen && (
-                <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <div className="modal-content" style={{ backgroundColor: '#fff', borderRadius: '12px', width: '800px', maxWidth: '95%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
-                        <div className="modal-header d-flex justify-content-between align-items-center" style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
-                            <div className="d-flex align-items-center">
-                                <Building size={20} className="text-orange me-2" />
-                                <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: '#1e293b' }}>
-                                    {editingIndex !== null ? 'Edit Company' : 'Add New Company'}
-                                </h4>
+                <div className="company-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setIsModalOpen(false); }}>
+                    <div className="company-modal-dialog">
+                        {/* Modal Header */}
+                        <div className="company-modal-header">
+                            <div className="company-modal-header-left">
+                                <div className="company-modal-icon-badge">
+                                    <Building size={22} />
+                                </div>
+                                <div className="company-modal-title-wrap">
+                                    <div className="company-modal-title-row">
+                                        <h4 className="company-modal-title">
+                                            {editingIndex !== null ? 'Edit Company Profile' : 'Add New Company'}
+                                        </h4>
+                                        <span className={`company-modal-status-pill ${editingIndex !== null ? 'edit' : 'new'}`}>
+                                            {editingIndex !== null ? 'Editing Profile' : 'New Profile'}
+                                        </span>
+                                    </div>
+                                    <p className="company-modal-subtitle">
+                                        Configure official business credentials, address, compliance, and branding.
+                                    </p>
+                                </div>
                             </div>
-                            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '4px' }} onClick={() => setIsModalOpen(false)}>
-                                <X size={24} />
+                            <button className="company-modal-close-btn" onClick={() => setIsModalOpen(false)} title="Close (Esc)">
+                                <X size={18} />
                             </button>
                         </div>
-                        <div className="modal-body" style={{ padding: '24px', overflow: "scroll" }}>
-                            {/* Basic Information */}
-                            <div className="settings-section-title">
-                                <Building size={18} />
-                                <span>Basic Information</span>
-                            </div>
 
-                            <div className="settings-form-row">
-                                <div className="settings-form-group">
-                                    <label><Building size={14} className="me-2" /> Company Name <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyName || ''}
-                                        placeholder="Dreamguys Technologies"
-                                        onChange={(e) => handleFormChange('companyName', e.target.value)}
-                                    />
+                        {/* Modal Tabs Navigation */}
+                        <div className="company-modal-tabs">
+                            {[
+                                { id: 'general', label: 'General Info', icon: <Building size={14} />, isComplete: !!currentCompany.companyName },
+                                { id: 'address', label: 'Address & Location', icon: <MapPin size={14} />, isComplete: !!(currentCompany.companyAddress1 || currentCompany.companyCity) },
+                                { id: 'legal', label: 'Legal & Tax', icon: <FileText size={14} />, isComplete: !!(currentCompany.companyTaxId || currentCompany.companyRegNumber) },
+                                { id: 'branding', label: 'Branding Assets', icon: <ImageIcon size={14} />, isComplete: !!(currentCompany.companyLogo || currentCompany.companyFavicon) },
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    type="button"
+                                    className={`company-modal-tab-btn ${activeModalTab === tab.id ? 'active' : ''}`}
+                                    onClick={() => setActiveModalTab(tab.id)}
+                                >
+                                    {tab.icon}
+                                    <span>{tab.label}</span>
+                                    {tab.isComplete && (
+                                        <span className="company-tab-check">✓</span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="company-modal-body">
+                            {/* Validation error banner if any */}
+                            {formError && (
+                                <div className="company-modal-error-banner">
+                                    <AlertCircle size={16} />
+                                    <span>{formError}</span>
+                                    <button type="button" onClick={() => setFormError('')} title="Dismiss">
+                                        <X size={14} />
+                                    </button>
                                 </div>
-                                <div className="settings-form-group">
-                                    <label><Mail size={14} className="me-2" /> Company Email <span className="required">*</span></label>
-                                    <input
-                                        type="email"
-                                        value={currentCompany.companyEmail || ''}
-                                        placeholder="info@dreamguys.co.in"
-                                        onChange={(e) => handleFormChange('companyEmail', e.target.value)}
-                                    />
-                                </div>
-                            </div>
+                            )}
 
-                            <div className="settings-form-row">
-                                <div className="settings-form-group">
-                                    <label><Phone size={14} className="me-2" /> Company Phone <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyPhone || ''}
-                                        placeholder="+1 234 567 890"
-                                        onChange={(e) => handleFormChange('companyPhone', e.target.value)}
-                                    />
-                                </div>
-                                <div className="settings-form-group">
-                                    <label><Smartphone size={14} className="me-2" /> Company Mobile</label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyMobile || ''}
-                                        placeholder="+1 987 654 321"
-                                        onChange={(e) => handleFormChange('companyMobile', e.target.value)}
-                                    />
-                                </div>
-                            </div>
+                            {/* TAB 1: General Info */}
+                            {activeModalTab === 'general' && (
+                                <div>
+                                    <div className="company-section-banner">
+                                        <div className="company-section-title">
+                                            <Building size={16} color="#f97316" />
+                                            <span>Basic Business Information</span>
+                                        </div>
+                                        <span className="company-section-subtitle">Official entity & communication channels</span>
+                                    </div>
 
-                            <div className="settings-form-row">
-                                <div className="settings-form-group">
-                                    <label><Hash size={14} className="me-2" /> Company Fax</label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyFax || ''}
-                                        placeholder="+1 234 567 891"
-                                        onChange={(e) => handleFormChange('companyFax', e.target.value)}
-                                    />
-                                </div>
-                                <div className="settings-form-group">
-                                    <label><Globe size={14} className="me-2" /> Website <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyWebsite || ''}
-                                        placeholder="www.example.com"
-                                        onChange={(e) => handleFormChange('companyWebsite', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="settings-divider"></div>
-
-                            {/* Address Information */}
-                            <div className="settings-section-title">
-                                <MapPin size={18} />
-                                <span>Address Information</span>
-                            </div>
-
-                            <div className="settings-form-row">
-                                <div className="settings-form-group">
-                                    <label><MapPin size={14} className="me-2" /> Address Line 1 <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyAddress1 || ''}
-                                        placeholder="123 Street Name"
-                                        onChange={(e) => handleFormChange('companyAddress1', e.target.value)}
-                                    />
-                                </div>
-                                <div className="settings-form-group">
-                                    <label><MapPin size={14} className="me-2" /> Address Line 2</label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyAddress2 || ''}
-                                        placeholder="Suite, Apartment, etc."
-                                        onChange={(e) => handleFormChange('companyAddress2', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="settings-form-row">
-                                <div className="settings-form-group">
-                                    <label><Globe size={14} className="me-2" /> City <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyCity || ''}
-                                        placeholder="City"
-                                        onChange={(e) => handleFormChange('companyCity', e.target.value)}
-                                    />
-                                </div>
-                                <div className="settings-form-group">
-                                    <label><Globe size={14} className="me-2" /> State / Province <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyState || ''}
-                                        placeholder="State / Province"
-                                        onChange={(e) => handleFormChange('companyState', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="settings-form-row">
-                                <div className="settings-form-group">
-                                    <label><Hash size={14} className="me-2" /> Zip / Postal Code <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyZipCode || ''}
-                                        placeholder="Zip / Postal Code"
-                                        onChange={(e) => handleFormChange('companyZipCode', e.target.value)}
-                                    />
-                                </div>
-                                <div className="settings-form-group">
-                                    <label><Globe size={14} className="me-2" /> Country <span className="required">*</span></label>
-                                    <select
-                                        value={currentCompany.companyCountry || ''}
-                                        onChange={(e) => handleFormChange('companyCountry', e.target.value)}
-                                    >
-                                        <option value="">Select Country</option>
-                                        <option value="USA">USA</option>
-                                        <option value="UK">UK</option>
-                                        <option value="India">India</option>
-                                        <option value="Canada">Canada</option>
-                                        <option value="Australia">Australia</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="settings-divider"></div>
-
-                            {/* Legal & Tax Information */}
-                            <div className="settings-section-title">
-                                <FileText size={18} />
-                                <span>Legal & Tax Information</span>
-                            </div>
-
-                            <div className="settings-form-row">
-                                <div className="settings-form-group">
-                                    <label><Hash size={14} className="me-2" /> Tax ID / VAT Number</label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyTaxId || ''}
-                                        placeholder="TAX-123456"
-                                        onChange={(e) => handleFormChange('companyTaxId', e.target.value)}
-                                    />
-                                </div>
-                                <div className="settings-form-group">
-                                    <label><FileText size={14} className="me-2" /> Registration Number</label>
-                                    <input
-                                        type="text"
-                                        value={currentCompany.companyRegNumber || ''}
-                                        placeholder="REG-789012"
-                                        onChange={(e) => handleFormChange('companyRegNumber', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="settings-divider"></div>
-
-                            {/* Branding Information */}
-                            <div className="settings-section-title">
-                                <ImageIcon size={18} />
-                                <span>Branding Information</span>
-                            </div>
-
-                            <div className="settings-form-row">
-                                {/* Logo Upload */}
-                                <div className="settings-form-group">
-                                    <label><ImageIcon size={14} className="me-2" /> Company Logo</label>
-                                    <div
-                                        className="image-upload-wrapper"
-                                        style={{
-                                            border: '2px dashed #e2e8f0',
-                                            borderRadius: '12px',
-                                            padding: '20px',
-                                            textAlign: 'center',
-                                            background: '#f8fafc',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s',
-                                            position: 'relative',
-                                            overflow: 'hidden'
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-color)'}
-                                        onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
-                                        onClick={() => document.getElementById('logo-upload-input').click()}
-                                    >
-                                        <input
-                                            id="logo-upload-input"
-                                            type="file"
-                                            accept="image/*"
-                                            style={{ display: 'none' }}
-                                            onChange={(e) => handleImageUpload(e, 'companyLogo')}
-                                        />
-
-                                        {currentCompany.companyLogo ? (
-                                            <div style={{ position: 'relative' }}>
-                                                <img
-                                                    src={currentCompany.companyLogo}
-                                                    alt="Logo Preview"
-                                                    style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }}
+                                    <div className="company-form-grid">
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Building size={13} color="#f97316" />
+                                                <span>Company Name</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyName || ''}
+                                                    placeholder="e.g. Dreamguys Technologies Pvt Ltd"
+                                                    onChange={(e) => {
+                                                        handleFormChange('companyName', e.target.value);
+                                                        if (formError) setFormError('');
+                                                    }}
                                                 />
-                                                <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleFormChange('companyLogo', ''); }}>
-                                                    <X size={14} />
-                                                </div>
                                             </div>
-                                        ) : (
-                                            <div className="text-muted">
-                                                <Upload size={24} className="mb-2 opacity-40" />
-                                                <p style={{ margin: 0, fontSize: '12px', fontWeight: '500' }}>Click to upload Logo</p>
-                                                <p style={{ margin: 0, fontSize: '10px', opacity: 0.6 }}>PNG, JPG or SVG (Max 2MB)</p>
+                                            <span className="company-field-hint">Primary trade name appearing on invoices and reports.</span>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Mail size={13} color="#f97316" />
+                                                <span>Company Email</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="email"
+                                                    className="company-input"
+                                                    value={currentCompany.companyEmail || ''}
+                                                    placeholder="info@dreamguys.co.in"
+                                                    onChange={(e) => handleFormChange('companyEmail', e.target.value)}
+                                                />
                                             </div>
-                                        )}
+                                            <span className="company-field-hint">Used for system alerts, notices, and customer contact.</span>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Phone size={13} color="#f97316" />
+                                                <span>Company Phone</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyPhone || ''}
+                                                    placeholder="+1 234 567 890"
+                                                    onChange={(e) => handleFormChange('companyPhone', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Smartphone size={13} color="#f97316" />
+                                                <span>Company Mobile</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyMobile || ''}
+                                                    placeholder="+1 987 654 321"
+                                                    onChange={(e) => handleFormChange('companyMobile', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Globe size={13} color="#f97316" />
+                                                <span>Website URL</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyWebsite || ''}
+                                                    placeholder="https://www.example.com"
+                                                    onChange={(e) => handleFormChange('companyWebsite', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Hash size={13} color="#f97316" />
+                                                <span>Fax Number</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyFax || ''}
+                                                    placeholder="+1 234 567 891"
+                                                    onChange={(e) => handleFormChange('companyFax', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            )}
 
-                                {/* Favicon Upload */}
-                                <div className="settings-form-group">
-                                    <label><ImageIcon size={14} className="me-2" /> Company Favicon</label>
-                                    <div
-                                        className="image-upload-wrapper"
-                                        style={{
-                                            border: '2px dashed #e2e8f0',
-                                            borderRadius: '12px',
-                                            padding: '20px',
-                                            textAlign: 'center',
-                                            background: '#f8fafc',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s',
-                                            position: 'relative',
-                                            overflow: 'hidden',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            minHeight: '144px'
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-color)'}
-                                        onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
-                                        onClick={() => document.getElementById('favicon-upload-input').click()}
-                                    >
-                                        <input
-                                            id="favicon-upload-input"
-                                            type="file"
-                                            accept="image/*"
-                                            style={{ display: 'none' }}
-                                            onChange={(e) => handleImageUpload(e, 'companyFavicon')}
-                                        />
+                            {/* TAB 2: Address */}
+                            {activeModalTab === 'address' && (
+                                <div>
+                                    <div className="company-section-banner">
+                                        <div className="company-section-title">
+                                            <MapPin size={16} color="#f97316" />
+                                            <span>Registered Address & Location</span>
+                                        </div>
+                                        <span className="company-section-subtitle">Corporate headquarters for invoices and tax filing</span>
+                                    </div>
 
-                                        {currentCompany.companyFavicon ? (
-                                            <div style={{ position: 'relative' }}>
-                                                <div style={{ width: '64px', height: '64px', background: '#fff', borderRadius: '12px', padding: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9' }}>
-                                                    <img
-                                                        src={currentCompany.companyFavicon}
-                                                        alt="Favicon Preview"
-                                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                                    />
-                                                </div>
-                                                <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} onClick={(e) => { e.stopPropagation(); handleFormChange('companyFavicon', ''); }}>
-                                                    <X size={12} />
-                                                </div>
+                                    <div className="company-form-grid">
+                                        <div className="company-field full-width">
+                                            <label className="company-label">
+                                                <MapPin size={13} color="#f97316" />
+                                                <span>Address Line 1</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyAddress1 || ''}
+                                                    placeholder="Building 4, Business Park, Tech Avenue"
+                                                    onChange={(e) => handleFormChange('companyAddress1', e.target.value)}
+                                                />
                                             </div>
-                                        ) : (
-                                            <div className="text-muted">
-                                                <Upload size={24} className="mb-2 opacity-40" />
-                                                <p style={{ margin: 0, fontSize: '12px', fontWeight: '500' }}>Upload Favicon</p>
-                                                <p style={{ margin: 0, fontSize: '10px', opacity: 0.6 }}>Best size: 32x32</p>
+                                        </div>
+
+                                        <div className="company-field full-width">
+                                            <label className="company-label">
+                                                <MapPin size={13} color="#f97316" />
+                                                <span>Address Line 2 (Optional)</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyAddress2 || ''}
+                                                    placeholder="Suite, Floor, Landmark"
+                                                    onChange={(e) => handleFormChange('companyAddress2', e.target.value)}
+                                                />
                                             </div>
-                                        )}
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Globe size={13} color="#f97316" />
+                                                <span>City</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyCity || ''}
+                                                    placeholder="e.g. Mumbai, New York"
+                                                    onChange={(e) => handleFormChange('companyCity', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Globe size={13} color="#f97316" />
+                                                <span>State / Province</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyState || ''}
+                                                    placeholder="e.g. Maharashtra, NY"
+                                                    onChange={(e) => handleFormChange('companyState', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Hash size={13} color="#f97316" />
+                                                <span>Zip / Postal Code</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyZipCode || ''}
+                                                    placeholder="e.g. 400001 or 10001"
+                                                    onChange={(e) => handleFormChange('companyZipCode', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Globe size={13} color="#f97316" />
+                                                <span>Country</span>
+                                                <span className="required-star">*</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <select
+                                                    className="company-select"
+                                                    value={currentCompany.companyCountry || ''}
+                                                    onChange={(e) => handleFormChange('companyCountry', e.target.value)}
+                                                >
+                                                    <option value="">Select Country</option>
+                                                    {COUNTRIES_LIST.map(country => (
+                                                        <option key={country} value={country}>{country}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
+
+                            {/* TAB 3: Legal & Tax */}
+                            {activeModalTab === 'legal' && (
+                                <div>
+                                    <div className="company-section-banner">
+                                        <div className="company-section-title">
+                                            <FileText size={16} color="#f97316" />
+                                            <span>Corporate Legal & Tax Information</span>
+                                        </div>
+                                        <span className="company-section-subtitle">Tax compliance codes shown on statutory invoices</span>
+                                    </div>
+
+                                    <div className="company-form-grid">
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Hash size={13} color="#f97316" />
+                                                <span>Tax ID / VAT / GSTIN Number</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyTaxId || ''}
+                                                    placeholder="e.g. 27AADCB2230M1ZT or VAT-987654"
+                                                    onChange={(e) => handleFormChange('companyTaxId', e.target.value)}
+                                                />
+                                            </div>
+                                            <span className="company-field-hint">Prints on commercial invoices & tax receipts.</span>
+                                        </div>
+
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <FileText size={13} color="#f97316" />
+                                                <span>Company Registration Number</span>
+                                            </label>
+                                            <div className="company-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    className="company-input"
+                                                    value={currentCompany.companyRegNumber || ''}
+                                                    placeholder="e.g. CIN: U72200MH2020PTC123456"
+                                                    onChange={(e) => handleFormChange('companyRegNumber', e.target.value)}
+                                                />
+                                            </div>
+                                            <span className="company-field-hint">Official government business certificate identifier.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* TAB 4: Branding */}
+                            {activeModalTab === 'branding' && (
+                                <div>
+                                    <div className="company-section-banner">
+                                        <div className="company-section-title">
+                                            <ImageIcon size={16} color="#f97316" />
+                                            <span>Brand Assets & Visual Identity</span>
+                                        </div>
+                                        <span className="company-section-subtitle">Logos used in navigation, receipts, and print templates</span>
+                                    </div>
+
+                                    <div className="company-form-grid">
+                                        {/* Company Logo Card */}
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <ImageIcon size={13} color="#f97316" />
+                                                <span>Company Logo</span>
+                                            </label>
+                                            
+                                            <input
+                                                id="cmp-logo-file-input"
+                                                type="file"
+                                                accept="image/*"
+                                                style={{ display: 'none' }}
+                                                onChange={(e) => handleImageUpload(e, 'companyLogo')}
+                                            />
+
+                                            {currentCompany.companyLogo ? (
+                                                <div className="company-preview-box">
+                                                    <div className="company-preview-img-wrap">
+                                                        <img src={currentCompany.companyLogo} alt="Logo preview" />
+                                                    </div>
+                                                    <div className="company-preview-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="btn-company-sub"
+                                                            onClick={() => document.getElementById('cmp-logo-file-input').click()}
+                                                            disabled={uploadingField === 'companyLogo'}
+                                                        >
+                                                            {uploadingField === 'companyLogo' ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                                                            Change Logo
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="btn-company-sub danger"
+                                                            onClick={() => handleFormChange('companyLogo', '')}
+                                                        >
+                                                            <Trash2 size={12} /> Remove
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className={`company-upload-card ${logoDragOver ? 'dragover' : ''}`}
+                                                    onDragOver={(e) => { e.preventDefault(); setLogoDragOver(true); }}
+                                                    onDragLeave={() => setLogoDragOver(false)}
+                                                    onDrop={(e) => {
+                                                        e.preventDefault();
+                                                        setLogoDragOver(false);
+                                                        if (e.dataTransfer.files?.[0]) handleImageUpload(e.dataTransfer.files[0], 'companyLogo');
+                                                    }}
+                                                    onClick={() => document.getElementById('cmp-logo-file-input').click()}
+                                                >
+                                                    <div className="company-upload-icon-circle">
+                                                        {uploadingField === 'companyLogo' ? (
+                                                            <Loader2 size={22} className="animate-spin" />
+                                                        ) : (
+                                                            <Upload size={22} />
+                                                        )}
+                                                    </div>
+                                                    <h5 className="company-upload-title">Upload Company Logo</h5>
+                                                    <p className="company-upload-desc">Drag & drop or click to browse</p>
+                                                    <p className="company-field-hint" style={{ marginTop: '6px' }}>PNG, JPG, SVG, WebP up to 5MB</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Company Favicon Card */}
+                                        <div className="company-field">
+                                            <label className="company-label">
+                                                <Globe size={13} color="#f97316" />
+                                                <span>Company Favicon & Tab Preview</span>
+                                            </label>
+
+                                            <input
+                                                id="cmp-favicon-file-input"
+                                                type="file"
+                                                accept="image/*"
+                                                style={{ display: 'none' }}
+                                                onChange={(e) => handleImageUpload(e, 'companyFavicon')}
+                                            />
+
+                                            {currentCompany.companyFavicon ? (
+                                                <div className="company-preview-box">
+                                                    {/* Realistic Browser Tab Mockup */}
+                                                    <div className="browser-tab-preview">
+                                                        <div className="browser-tab-bar">
+                                                            <div className="browser-dots">
+                                                                <div className="browser-dot" style={{ backgroundColor: '#ef4444' }} />
+                                                                <div className="browser-dot" style={{ backgroundColor: '#f59e0b' }} />
+                                                                <div className="browser-dot" style={{ backgroundColor: '#10b981' }} />
+                                                            </div>
+                                                            <div className="browser-tab">
+                                                                <img
+                                                                    src={currentCompany.companyFavicon}
+                                                                    alt="Favicon"
+                                                                    className="browser-tab-icon"
+                                                                />
+                                                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                                    {currentCompany.companyName || 'My Company'} - POS
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="browser-body-dummy">
+                                                            <span>🌐 https://{currentCompany.companyWebsite?.replace(/^https?:\/\//, '') || 'app.namustutam.com'}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="company-preview-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="btn-company-sub"
+                                                            onClick={() => document.getElementById('cmp-favicon-file-input').click()}
+                                                            disabled={uploadingField === 'companyFavicon'}
+                                                        >
+                                                            {uploadingField === 'companyFavicon' ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                                                            Change Favicon
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="btn-company-sub danger"
+                                                            onClick={() => handleFormChange('companyFavicon', '')}
+                                                        >
+                                                            <Trash2 size={12} /> Remove
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className={`company-upload-card ${faviconDragOver ? 'dragover' : ''}`}
+                                                    onDragOver={(e) => { e.preventDefault(); setFaviconDragOver(true); }}
+                                                    onDragLeave={() => setFaviconDragOver(false)}
+                                                    onDrop={(e) => {
+                                                        e.preventDefault();
+                                                        setFaviconDragOver(false);
+                                                        if (e.dataTransfer.files?.[0]) handleImageUpload(e.dataTransfer.files[0], 'companyFavicon');
+                                                    }}
+                                                    onClick={() => document.getElementById('cmp-favicon-file-input').click()}
+                                                >
+                                                    <div className="company-upload-icon-circle">
+                                                        {uploadingField === 'companyFavicon' ? (
+                                                            <Loader2 size={22} className="animate-spin" />
+                                                        ) : (
+                                                            <Globe size={22} />
+                                                        )}
+                                                    </div>
+                                                    <h5 className="company-upload-title">Upload Browser Favicon</h5>
+                                                    <p className="company-upload-desc">Drag & drop or click to browse</p>
+                                                    <p className="company-field-hint" style={{ marginTop: '6px' }}>Recommended: 32x32px or 64x64px ICO/PNG</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                        <div className="modal-footer" style={{ padding: '20px 24px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: '12px', position: 'sticky', bottom: 0, backgroundColor: '#fff' }}>
-                            <button className="btn-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                            <button
-                                className="btn-save"
-                                onClick={handleSaveCompany}
-                                disabled={saving}
-                            >
-                                {saving ? 'Saving...' : (editingIndex !== null ? 'Update Company' : 'Add Company')}
-                            </button>
+
+                        {/* Modal Footer */}
+                        <div className="company-modal-footer">
+                            <div className="company-modal-footer-left">
+                                <button
+                                    type="button"
+                                    className="btn-cmp-secondary"
+                                    onClick={() => setIsModalOpen(false)}
+                                >
+                                    Cancel
+                                </button>
+                                {activeModalTab !== 'general' && (
+                                    <button
+                                        type="button"
+                                        className="btn-cmp-secondary"
+                                        onClick={() => {
+                                            const tabOrder = ['general', 'address', 'legal', 'branding'];
+                                            const currentIndex = tabOrder.indexOf(activeModalTab);
+                                            if (currentIndex > 0) setActiveModalTab(tabOrder[currentIndex - 1]);
+                                        }}
+                                    >
+                                        <ChevronLeft size={15} /> Previous
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="company-modal-footer-right">
+                                {activeModalTab !== 'branding' && (
+                                    <button
+                                        type="button"
+                                        className="btn-cmp-step"
+                                        onClick={() => {
+                                            const tabOrder = ['general', 'address', 'legal', 'branding'];
+                                            const currentIndex = tabOrder.indexOf(activeModalTab);
+                                            if (currentIndex < tabOrder.length - 1) setActiveModalTab(tabOrder[currentIndex + 1]);
+                                        }}
+                                    >
+                                        Next Step <ChevronRight size={15} />
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    className="btn-cmp-primary"
+                                    onClick={handleSaveCompany}
+                                    disabled={saving}
+                                >
+                                    {saving ? (
+                                        <>
+                                            <Loader2 size={15} className="animate-spin" /> Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Check size={16} />
+                                            {editingIndex !== null ? 'Update Company Profile' : 'Add Company'}
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

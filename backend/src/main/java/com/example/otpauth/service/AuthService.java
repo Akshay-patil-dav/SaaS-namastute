@@ -224,7 +224,41 @@ public class AuthService {
         return response;
     }
 
+    public boolean promoteQueuedPlanIfExpired(User user) {
+        if (user == null || user.getNextPlan() == null) return false;
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        if (user.getSubscriptionEndDate() == null || now.isAfter(user.getSubscriptionEndDate())) {
+            java.time.LocalDateTime newEndDate = user.getNextSubscriptionEndDate();
+            if (newEndDate == null || newEndDate.isBefore(now)) {
+                int queuedDays = (user.getNextSubscriptionDays() != null && user.getNextSubscriptionDays() > 0)
+                        ? user.getNextSubscriptionDays() : 30;
+                newEndDate = now.plusDays(queuedDays);
+            }
+            user.setPlan(user.getNextPlan());
+            user.setSubscriptionEndDate(newEndDate);
+            user.setNextPlan(null);
+            user.setNextSubscriptionEndDate(null);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    @org.springframework.scheduling.annotation.Scheduled(fixedDelay = 60000)
+    public void autoPromoteExpiredQueuedSubscriptions() {
+        try {
+            List<User> queuedUsers = userRepository.findByNextPlanIsNotNull();
+            for (User u : queuedUsers) {
+                promoteQueuedPlanIfExpired(u);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     private AuthResponse createAuthResponse(User user, String token) {
+        // Automatically promote queued plan if active plan has expired
+        promoteQueuedPlanIfExpired(user);
+
         List<String> roles = user.getRoles().stream()
                 .map(r -> r.getName().name())
                 .collect(Collectors.toList());
@@ -239,9 +273,12 @@ public class AuthService {
                     .orElse(null);
         }
 
+        String nextPlanStr = user.getNextPlan() != null ? user.getNextPlan().name() : null;
+        Integer nextDays = user.getNextSubscriptionDays(); // derived from nextSubscriptionEndDate
+
         return new AuthResponse(user.getId(), token, user.getEmail(), user.getFullName(), user.getFirstName(),
                 user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(),
-                user.isPhoneVerified(), activeProjectId, permissions, user.getSubscriptionEndDate());
+                user.isPhoneVerified(), activeProjectId, permissions, user.getSubscriptionEndDate(), nextPlanStr, nextDays);
     }
 
     public AuthResponse getCurrentUser(String email) {

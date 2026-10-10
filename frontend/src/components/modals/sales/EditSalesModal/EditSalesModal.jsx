@@ -1,13 +1,16 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Trash2, AlertTriangle } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../AddPosModal/add-sales-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
+import { useAuth } from '../../../../context/AuthContext';
 
 
 const BASE_URL = ENV.API_BASE_URL;
 
 const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
+    const { user } = useAuth();
+    const loginUsername = user?.username || user?.name || user?.fullName || (user?.identifier ? user.identifier.split('@')[0] : '') || (user?.email ? user.email.split('@')[0] : '') || 'Admin';
     const { currencySymbol } = useCurrency();
 
     const [form, setForm]           = useState({});
@@ -33,7 +36,7 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
                 discount:     order.discount  || 0,
                 shipping:     order.shipping  || 0,
                 paidAmount:   order.paidAmount || 0,
-                biller:       order.biller || 'Admin',
+                biller:       (order.biller && order.biller !== 'Admin') ? order.biller : loginUsername,
                 notes:        order.notes  || '',
             });
             try { setProducts(JSON.parse(order.productsJson || '[]').map(p => ({
@@ -43,7 +46,7 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
             }))); } catch { setProducts([]); }
             setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]);
         }
-    }, [isOpen, order]);
+    }, [isOpen, order, loginUsername]);
 
     useEffect(() => {
         const h = e => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowDrop(false); };
@@ -118,7 +121,7 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
                 return;
             }
 
-            await apiClient.put(`${BASE_URL}/sales/${order.id}`, { ...form, orderTax:+form.orderTax, discount:+form.discount, shipping:+form.shipping, paidAmount:+form.paidAmount, products });
+            await apiClient.put(`${BASE_URL}/sales/${order.id}`, { ...form, biller: form.biller || loginUsername, orderTax:+form.orderTax, discount:+form.discount, shipping:+form.shipping, paidAmount:+form.paidAmount, products });
             onSuccess?.(); onClose();
         } catch (err) { setError(err.response?.data?.error || 'Failed to update sale.'); }
         finally { setSubmitting(false); }
@@ -171,7 +174,7 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
                                 <input className="sm-input" type="date" value={form.date||''} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/>
                             </div>
                             <div className="sm-form-group"><label>Biller</label>
-                                <input className="sm-input" type="text" value={form.biller||''} onChange={e=>setForm(f=>({...f,biller:e.target.value}))}/>
+                                <input className="sm-input" type="text" value={form.biller || loginUsername} disabled readOnly />
                             </div>
                         </div>
 

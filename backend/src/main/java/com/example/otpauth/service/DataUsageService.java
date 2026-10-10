@@ -63,6 +63,9 @@ public class DataUsageService {
         }
 
         if (user.getSubscriptionEndDate() != null && user.getSubscriptionEndDate().isBefore(LocalDateTime.now())) {
+            if (user.getNextPlan() != null) {
+                return false;
+            }
             return true;
         }
 

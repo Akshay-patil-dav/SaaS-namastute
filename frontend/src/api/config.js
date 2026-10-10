@@ -95,8 +95,12 @@ export const API = {
   // AI Helper (per-user, JWT-protected)
   AI: `${ENV.API_BASE_URL}/ai`,
 
+  // Notes and Users
   NOTES: `${ENV.API_BASE_URL}/notes`,
   USERS: `${ENV.API_BASE_URL}/users`,
+
+  // Payments
+  PAYMENTS: `${ENV.API_BASE_URL}/payments`,
 
   // OAuth2 redirect URLs (uses backend root, not /api prefix)
   OAUTH_GOOGLE: `${ENV.BACKEND_BASE_URL}/oauth2/authorization/google`,
@@ -235,6 +239,17 @@ apiClient.interceptors.response.use(
       if (!isPublic) {
         localStorage.removeItem('namustutam_auth');
         window.location.href = '/login';
+      }
+    }
+
+    if (error.response?.status === 403) {
+      const data = error.response.data;
+      if (data?.limitExceeded || (typeof data?.error === 'string' && data.error.toLowerCase().includes('limit')) || (typeof data?.message === 'string' && data.message.toLowerCase().includes('limit'))) {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('open-upgrade-plan-modal', {
+            detail: data
+          }));
+        }
       }
     }
     return Promise.reject(error);

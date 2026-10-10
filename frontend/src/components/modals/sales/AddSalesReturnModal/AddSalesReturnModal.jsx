@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Calendar, Barcode, Trash2 } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import './add-sales-return-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
+import { useAuth } from '../../../../context/AuthContext';
 
 
 const BASE_URL = ENV.API_BASE_URL;
@@ -21,6 +22,8 @@ const EMPTY = {
 const genRef = () => 'SR' + Math.floor(100000 + Math.random() * 900000);
 
 const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
+    const { user } = useAuth();
+    const loginUsername = user?.username || user?.name || user?.fullName || (user?.identifier ? user.identifier.split('@')[0] : '') || (user?.email ? user.email.split('@')[0] : '') || 'Admin';
     const { currencySymbol } = useCurrency();
 
     const [form, setForm]             = useState({ ...EMPTY, referenceNo: genRef() });
@@ -134,7 +137,7 @@ const AddSalesReturnModal = ({ isOpen, onClose, onSuccess }) => {
                 discount:      +form.discount,
                 shipping:      +form.shipping,
                 paidAmount:    0,
-                biller:        'Admin',
+                biller:        loginUsername,
                 products,
             });
             onSuccess?.();

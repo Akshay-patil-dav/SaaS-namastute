@@ -57,7 +57,8 @@ body {
   .pos-layout-wrapper.sidebar-closed .pos-menu-link-content span,
   .pos-layout-wrapper.sidebar-closed .pos-menu-chevron,
   .pos-layout-wrapper.sidebar-closed .pos-menu-section,
-  .pos-layout-wrapper.sidebar-closed .pos-submenu {
+  .pos-layout-wrapper.sidebar-closed .pos-submenu,
+  .pos-layout-wrapper.sidebar-closed .pos-sidebar-brand-text {
     display: none !important;
   }
   
@@ -74,7 +75,25 @@ body {
   
   .pos-layout-wrapper.sidebar-closed .pos-sidebar-header {
     justify-content: center;
-    padding: 0;
+    padding: 0 8px !important;
+  }
+
+  .pos-layout-wrapper.sidebar-closed .pos-sidebar-brand-link {
+    justify-content: center;
+    gap: 0;
+  }
+
+  .pos-layout-wrapper.sidebar-closed .pos-sidebar-brand-logo,
+  .pos-layout-wrapper.sidebar-closed .pos-sidebar-brand-badge {
+    margin: 0 !important;
+  }
+
+  .pos-layout-wrapper.sidebar-closed .pos-sub-widget-expanded {
+    display: none !important;
+  }
+
+  .pos-layout-wrapper.sidebar-closed .pos-sub-widget-collapsed {
+    display: flex !important;
   }
 }
 
@@ -82,9 +101,632 @@ body {
   height: 70px;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 16px;
   border-bottom: 1px solid var(--pos-border);
-  transition: padding 0.3s ease;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+}
+
+.pos-sidebar-brand-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.pos-sidebar-brand-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.pos-sidebar-brand-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.pos-sidebar-brand-link:hover .pos-sidebar-brand-badge {
+  transform: scale(1.04);
+}
+
+.pos-sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pos-sidebar-brand-title {
+  margin: 0;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  color: #111827;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pos-sidebar-brand-subtitle {
+  margin: 0;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Subscription Widget Container */
+.pos-sidebar-subscription-container {
+  border-top: 1px solid var(--pos-border, #f1f5f9);
+  background: #ffffff;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Default / Open State Visibility */
+.pos-sub-widget-collapsed {
+  display: none;
+}
+
+.pos-sub-widget-expanded {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 14px 16px;
+}
+
+/* Collapsed Mini Widget Styles */
+.pos-sub-widget-collapsed {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 4px 16px;
+  gap: 6px;
+  position: relative;
+  width: 100%;
+}
+
+.pos-mini-gauge-container {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.pos-mini-gauge-container:hover {
+  transform: scale(1.06);
+}
+
+.pos-mini-gauge-svg {
+  transform: rotate(-90deg);
+}
+
+.pos-mini-gauge-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pos-mini-percent-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.pos-mini-pro-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 46px;
+  height: 28px;
+  background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+  color: #ffffff;
+  border-radius: 7px;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 7px rgba(234, 88, 12, 0.3);
+  transition: all 0.2s ease;
+  margin-top: 2px;
+}
+
+.pos-mini-pro-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.45);
+  color: #ffffff;
+}
+
+.pos-mini-paid-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid rgba(234, 88, 12, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pos-mini-paid-btn {
+  background: #f1f5f9;
+  color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.pos-mini-paid-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover Flyout Card (Tooltip for Collapsed State) */
+.pos-sub-flyout-card {
+  position: fixed;
+  left: 82px;
+  bottom: 14px;
+  width: 250px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.15), 0 4px 10px -2px rgba(15, 23, 42, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-6px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pos-sub-widget-collapsed:hover .pos-sub-flyout-card {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.pos-flyout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pos-flyout-plan-info {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pos-flyout-icon-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #fff7ed;
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(234, 88, 12, 0.18);
+}
+
+.pos-flyout-paid-icon {
+  background: #fefce8;
+  color: #ca8a04;
+  border-color: rgba(202, 138, 4, 0.2);
+}
+
+.pos-flyout-plan-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.pos-flyout-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(234, 88, 12, 0.2);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.pos-flyout-stats {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.pos-flyout-used {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.pos-flyout-used strong {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.pos-flyout-status {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pos-flyout-progress-track {
+  width: 100%;
+  background-color: #fed7aa33;
+  border-radius: 9999px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.pos-flyout-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.pos-flyout-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 7px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(234, 88, 12, 0.28);
+  transition: all 0.2s ease;
+}
+
+.pos-flyout-upgrade-btn:hover {
+  filter: brightness(1.05);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(234, 88, 12, 0.4);
+}
+
+.pos-flyout-manage-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #f8fafc;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  padding: 7px 12px;
+  border-radius: 7px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.pos-flyout-manage-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.pos-flyout-expiry-text {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.pos-badge-active {
+  background: #f0fdf4 !important;
+  color: #16a34a !important;
+  border: 1px solid #bbf7d0 !important;
+}
+
+/* Expanded Card Styles */
+.pos-sub-expanded-card {
+  background: #ffffff;
+  border: 1px solid rgba(234, 88, 12, 0.15);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  transition: border-color 0.2s ease;
+}
+
+.pos-sub-expanded-card:hover {
+  border-color: rgba(234, 88, 12, 0.28);
+}
+
+.pos-sub-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pos-sub-plan-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pos-sub-plan-icon-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #fff7ed;
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(234, 88, 12, 0.15);
+}
+
+.pos-sub-paid-icon {
+  background: #fefce8;
+  color: #ca8a04;
+  border-color: rgba(202, 138, 4, 0.2);
+}
+
+.pos-sub-plan-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.pos-sub-limit-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(234, 88, 12, 0.2);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.pos-sub-limit-badge--alert,
+.pos-flyout-badge--alert {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border-color: #fca5a5 !important;
+}
+
+.pos-sub-expanded-card--alert {
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  background: #fffcfc !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.08) !important;
+}
+
+/* 50 Records Limit Reached Notification Banner */
+.pos-sub-limit-notification {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pos-sub-limit-notification:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+  transform: translateY(-1px);
+}
+
+.pos-sub-notification-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #b91c1c;
+}
+
+.pos-sub-notification-sub {
+  font-size: 10px;
+  color: #991b1b;
+  line-height: 1.35;
+}
+
+.pos-sub-alert-pulse {
+  animation: posAlertPulse 1.6s infinite;
+}
+
+@keyframes posAlertPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.18); opacity: 0.6; }
+}
+
+.pos-mini-alert-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+  animation: posDotPulse 1.4s infinite;
+  z-index: 2;
+}
+
+@keyframes posDotPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.7; }
+}
+
+.pos-mini-pro-btn--alert {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.45) !important;
+}
+
+.pos-flyout-limit-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pos-flyout-limit-alert:hover {
+  background: #fee2e2;
+}
+
+.pos-flyout-upgrade-btn--alert {
+  background: linear-gradient(135deg, #ef4444 0%, #ea580c 100%) !important;
+  box-shadow: 0 3px 10px rgba(239, 68, 68, 0.35) !important;
+  border: none;
+  cursor: pointer;
+}
+
+.pos-sub-card-counts {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.pos-sub-count-left {
+  display: flex;
+  align-items: baseline;
+}
+
+.pos-sub-count-num {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.pos-sub-count-total {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.pos-sub-remaining-text {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pos-sub-progress-track {
+  width: 100%;
+  background-color: #fed7aa33;
+  border-radius: 9999px;
+  height: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.pos-sub-progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease, background 0.3s ease;
+}
+
+.pos-sub-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 7px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(234, 88, 12, 0.25);
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+  margin-top: 2px;
+  border: none;
+  cursor: pointer;
+}
+
+.pos-sub-upgrade-btn--alert {
+  background: linear-gradient(135deg, #ef4444 0%, #ea580c 100%) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.38) !important;
+}
+
+.pos-sub-upgrade-btn:hover {
+  filter: brightness(1.05);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(234, 88, 12, 0.38);
+}
+
+.pos-sub-manage-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  border-radius: 7px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  margin-top: 2px;
+}
+
+.pos-sub-manage-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.pos-sub-expiry-info {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.4;
 }
 
 .pos-sidebar-mobile-close {
@@ -113,6 +755,12 @@ body {
 @media (max-width: 991px) {
   .pos-sidebar-mobile-close {
     display: flex;
+  }
+  .pos-sub-widget-collapsed {
+    display: none !important;
+  }
+  .pos-sub-widget-expanded {
+    display: flex !important;
   }
 }
 

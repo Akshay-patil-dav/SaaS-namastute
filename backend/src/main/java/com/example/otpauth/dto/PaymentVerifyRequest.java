@@ -5,6 +5,8 @@ public class PaymentVerifyRequest {
     private String razorpayPaymentId;
     private String razorpaySignature;
     private String plan;
+    private String billingCycle;
+    private Double amount;
 
     public String getRazorpayOrderId() { return razorpayOrderId; }
     public void setRazorpayOrderId(String razorpayOrderId) { this.razorpayOrderId = razorpayOrderId; }
@@ -14,4 +16,8 @@ public class PaymentVerifyRequest {
     public void setRazorpaySignature(String razorpaySignature) { this.razorpaySignature = razorpaySignature; }
     public String getPlan() { return plan; }
     public void setPlan(String plan) { this.plan = plan; }
+    public String getBillingCycle() { return billingCycle; }
+    public void setBillingCycle(String billingCycle) { this.billingCycle = billingCycle; }
+    public Double getAmount() { return amount; }
+    public void setAmount(Double amount) { this.amount = amount; }
 }

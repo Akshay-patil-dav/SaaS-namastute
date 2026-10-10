@@ -25,7 +25,8 @@ import {
 import { useAuth } from '../../../context/AuthContext';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './settings.css';
-import { ProfileSettings, SecuritySettings, Notifications, ConnectedApps, Billing } from '../../../components/settings/GeneralSettings/GeneralSettings';
+import { ProfileSettings, SecuritySettings, Notifications, ConnectedApps } from '../../../components/settings/GeneralSettings/GeneralSettings';
+import Billing from '../../../components/settings/GeneralSettings/Billing';
 import TeamManagement from '../../../components/settings/GeneralSettings/TeamManagement';
 import { SystemSettings, CompanySettings, Localization, Prefixes, Preference, SocialAuthentication, Language } from '../../../components/settings/WebsiteSettings/WebsiteSettings';
 import { InvoiceSettings, InvoiceTemplate, Printer, PosSettings, CustomFields } from '../../../components/settings/AppSettings/AppSettings';
@@ -57,18 +58,22 @@ export default function Settings() {
         (user?.plan && user.plan !== 'NONE' && (!user.subscriptionEndDate || new Date(user.subscriptionEndDate) > new Date()))
     );
 
+    const getPathSegment = () => {
+        const segments = location.pathname.split('/').filter(Boolean);
+        return segments[segments.length - 1] || 'profile';
+    };
+
     const getInitialSection = () => {
-        if (!isSubscriber) return 'system';
-        const path = location.pathname.split('/').pop();
-        return sectionMapping[path] || 'general';
+        const path = getPathSegment();
+        if (sectionMapping[path]) return sectionMapping[path];
+        return (!isSubscriber || isBilling) ? 'system' : 'general';
     };
 
     const [openSection, setOpenSection] = useState(getInitialSection());
 
     useEffect(() => {
-        const path = location.pathname.split('/').pop();
+        const path = getPathSegment();
         if (!isSubscriber || isBilling) {
-            setOpenSection('system');
             const allowed = isBilling 
                 ? ['profile', 'company_settings', 'bank_accounts', 'billing'] 
                 : ['profile', 'company_settings', 'payment_gateway', 'bank_accounts', 'tax_rates', 'currencies', 'pos_settings', 'ai_helper', 'billing'];
@@ -78,7 +83,7 @@ export default function Settings() {
         } else if (sectionMapping[path]) {
             setOpenSection(sectionMapping[path]);
         }
-    }, [location.pathname, isSubscriber, navigate]);
+    }, [location.pathname, isSubscriber, isBilling, navigate]);
     
     // Helper to check if a tab is active
     const isActive = (path) => location.pathname.includes(`/settings/${path}`);
@@ -344,14 +349,10 @@ export default function Settings() {
                             <Route path="company_settings" element={<CompanySettings />} />
                             {!isBilling && <Route path="payment_gateway" element={<PaymentGateway />} />}
                             <Route path="bank_accounts" element={<BankAccounts />} />
-                            {!isBilling && (
-                                <>
-                                    <Route path="tax_rates" element={<TaxRates />} />
-                                    <Route path="currencies" element={<Currencies />} />
-                                    <Route path="pos_settings" element={<PosSettings />} />
-                                    <Route path="ai_helper" element={<AiHelperSettings />} />
-                                </>
-                            )}
+                            {!isBilling && <Route path="tax_rates" element={<TaxRates />} />}
+                            {!isBilling && <Route path="currencies" element={<Currencies />} />}
+                            {!isBilling && <Route path="pos_settings" element={<PosSettings />} />}
+                            {!isBilling && <Route path="ai_helper" element={<AiHelperSettings />} />}
                             <Route path="billing" element={<Billing />} />
                             <Route path="*" element={<Navigate to="profile" replace />} />
                         </Routes>

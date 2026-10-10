@@ -4,6 +4,7 @@ import PosHeader from '../PosHeader/PosHeader';
 import './pos-layout.css';
 import AIHelper from '../../ai/AIHelper/AIHelper';
 import GlobalPrintHeader from '../GlobalPrintHeader/GlobalPrintHeader';
+import UpgradePlanModal from '../../modals/UpgradePlanModal/UpgradePlanModal';
 import { useAuth } from '../../../context/AuthContext';
 
 // ── Safe initial sidebar state ───────────────────────────────────────────────
@@ -56,6 +57,8 @@ export default function PosLayout({ children }) {
             </div>
             {/* AI Helper — floats on all authenticated pages, per-user isolated */}
             {!isBillingInvoice && <AIHelper />}
+            {/* Upgrade Plan Modal — pops up on 50 records limit completion or upgrade trigger */}
+            <UpgradePlanModal />
         </div>
     );
 }

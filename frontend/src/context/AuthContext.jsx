@@ -49,12 +49,19 @@ export const AuthProvider = ({ children }) => {
      * _persist(...)
      * Save to state + localStorage + axios headers.
      */
-    const _persist = (id, jwtToken, email, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate) => {
-        const role = pickRole(roles);
-        const userData = { id, email, name: fullName ?? email, role, roles, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate };
+    const _persist = (data, jwtToken) => {
+        const role = pickRole(data.roles);
+        const activeToken = jwtToken || token || data.token;
+        const userData = {
+            ...data,
+            name: data.fullName ?? data.name ?? data.email,
+            role,
+            nextPlan: data.nextPlan || null,
+            nextSubscriptionDays: data.nextSubscriptionDays || 0
+        };
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: jwtToken, user: userData }));
-        setToken(jwtToken);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: activeToken, user: userData }));
+        if (activeToken) setToken(activeToken);
         setUser(userData);
 
         return { user: userData, role };
@@ -63,9 +70,7 @@ export const AuthProvider = ({ children }) => {
     const fetchSession = async () => {
         try {
             const res = await apiClient.get(`${AUTH_API}/me`);
-            const { id, token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate } = res.data;
-            // The /me endpoint returns a null token. We preserve the existing token.
-            _persist(id, token || jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate);
+            _persist(res.data, token);
         } catch (err) {
             console.error("Failed to fetch session", err);
         }
@@ -78,8 +83,7 @@ export const AuthProvider = ({ children }) => {
     const login = async ({ email, password }) => {
         try {
             const res = await apiClient.post(`${AUTH_API}/login`, { email, password });
-            const { id, token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate } = res.data;
-            const { role } = _persist(id, jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate);
+            const { role } = _persist(res.data, res.data.token);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -97,8 +101,7 @@ export const AuthProvider = ({ children }) => {
     const register = async ({ fullName, email, password, phoneNumber }) => {
         try {
             const res = await apiClient.post(`${AUTH_API}/register`, { fullName, email, password, phoneNumber });
-            const { id, token: jwt, email: userEmail, roles, fullName: returnedFullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate } = res.data;
-            const { role } = _persist(id, jwt, userEmail, roles, returnedFullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate);
+            const { role } = _persist(res.data, res.data.token);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -116,8 +119,7 @@ export const AuthProvider = ({ children }) => {
     const googleLogin = async (credential) => {
         try {
             const res = await apiClient.post(`${AUTH_API}/google`, { credential });
-            const { id, token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate } = res.data;
-            const { role } = _persist(id, jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate);
+            const { role } = _persist(res.data, res.data.token);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -131,8 +133,7 @@ export const AuthProvider = ({ children }) => {
     const completeOnboarding = async (onboardingData) => {
         try {
             const res = await apiClient.post(`${AUTH_API}/onboarding`, onboardingData);
-            const { id, token: jwt, email: userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate } = res.data;
-            const { role } = _persist(id, jwt, userEmail, roles, fullName, plan, emailVerified, phoneVerified, firstName, lastName, username, businessType, activeProjectId, projectPermissions, subscriptionEndDate);
+            const { role } = _persist(res.data, res.data.token);
             return { success: true, role };
         } catch (err) {
             const msg =
@@ -143,23 +144,10 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    /**
-     * updateBusinessType(newType)
-     * Calls PATCH /auth/business-type — only updates businessType.
-     * Does NOT touch firstName/lastName/username, no username-uniqueness risk.
-     * Persists the full updated user back to state + localStorage.
-     */
     const updateBusinessType = async (newType) => {
         try {
             const res = await apiClient.patch(`${AUTH_API}/business-type`, { businessType: newType });
-            const {
-                id, token: jwt, email: userEmail, roles, fullName, plan,
-                emailVerified, phoneVerified, firstName, lastName, username,
-                businessType, activeProjectId, projectPermissions, subscriptionEndDate
-            } = res.data;
-            _persist(id, token || jwt, userEmail, roles, fullName, plan,
-                emailVerified, phoneVerified, firstName, lastName, username,
-                businessType, activeProjectId, projectPermissions, subscriptionEndDate);
+            _persist(res.data, token);
             return { success: true };
         } catch (err) {
             const msg =
@@ -176,12 +164,10 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
-    const updatePlanContext = (newPlan, subscriptionEndDate = null) => {
+    const updatePlanContext = (newPlan, subscriptionEndDate = null, nextPlan = null, nextSubscriptionDays = 0) => {
         if (user) {
-            const updatedUser = { ...user, plan: newPlan };
-            if (subscriptionEndDate !== null) {
-                updatedUser.subscriptionEndDate = subscriptionEndDate;
-            }
+            const updatedUser = { ...user, plan: newPlan, nextPlan, nextSubscriptionDays };
+            if (subscriptionEndDate !== null) updatedUser.subscriptionEndDate = subscriptionEndDate;
             localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, user: updatedUser }));
             setUser(updatedUser);
         }

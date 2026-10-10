@@ -47,13 +47,15 @@ import {
     Settings,
     BookOpen,
     X,
-    Database
+    Database,
+    Crown,
+    AlertTriangle
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
     const { user } = useAuth();
-    const { usage } = useDataUsage();
+    const { usage, openUpgradeModal } = useDataUsage();
     const isSuperAdmin = user?.role === 'SUPER_ADMIN';
     const isClientOrAdmin = user?.role === 'ADMIN' || user?.role === 'CLIENT';
 
@@ -180,29 +182,43 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
             ></div>
 
             {/* Sidebar */}
-            <aside className={`pos-sidebar`}>
-                <div className="pos-sidebar-header" style={{ padding: '24px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f3f4f6', backgroundColor: '#ffffff' }}>
-                    <Link to="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
-                        {companyInfo?.logo && (
+            <aside className={`pos-sidebar ${sidebarOpen ? 'pos-sidebar-open' : 'pos-sidebar-closed'}`}>
+                <div className="pos-sidebar-header">
+                    <Link to="/dashboard" className="pos-sidebar-brand-link">
+                        {companyInfo?.logo ? (
                             <img
                                 src={companyInfo.logo}
                                 alt="Company Logo"
-                                style={{ width: '40px', height: '40px', objectFit: 'contain', marginRight: '12px', borderRadius: '4px', flexShrink: 0 }}
+                                className="pos-sidebar-brand-logo"
                             />
+                        ) : (
+                            <div 
+                                className="pos-sidebar-brand-badge" 
+                                title={companyInfo?.name || 'Samrajya Software'}
+                            >
+                                {(() => {
+                                    const companyName = companyInfo?.name || 'Samrajya Software';
+                                    const words = companyName.trim().split(/\s+/);
+                                    if (words.length > 1 && words[0] && words[1]) {
+                                        return (words[0][0] + words[1][0]).toUpperCase();
+                                    }
+                                    return (companyName.slice(0, 2) || 'SS').toUpperCase();
+                                })()}
+                            </div>
                         )}
-                        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                        <div className="pos-sidebar-brand-text">
                             {(() => {
                                 const companyName = companyInfo?.name || 'Samrajya Software';
-                                const words = companyName.split(' ');
-                                const firstWord = words[0];
+                                const words = companyName.trim().split(/\s+/);
+                                const firstWord = words[0] || 'Samrajya';
                                 const restOfWords = words.slice(1).join(' ');
                                 return (
                                     <>
-                                        <span style={{ margin: 0, fontWeight: '900', fontSize: '24px', letterSpacing: '0.5px', color: '#111827', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={firstWord}>
+                                        <span className="pos-sidebar-brand-title" title={firstWord}>
                                             {firstWord.toUpperCase()}
                                         </span>
                                         {restOfWords && (
-                                            <span style={{ margin: 0, fontWeight: '700', fontSize: '13px', letterSpacing: '1px', color: '#6B7280', textTransform: 'uppercase', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={restOfWords}>
+                                            <span className="pos-sidebar-brand-subtitle" title={restOfWords}>
                                                 {restOfWords}
                                             </span>
                                         )}
@@ -601,169 +617,311 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
 
                 {/* Subscription Widget */}
                 {!isSuperAdmin && (
-                    <div style={{ padding: '20px', borderTop: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+                    <div className="pos-sidebar-subscription-container">
                         {(!user?.plan || user?.plan === 'NONE' || !isSubscriber) ? (
                             (() => {
                                 const freeLimit = usage?.limit && usage.limit > 0 ? usage.limit : 50;
                                 const freeUsed = usage?.totalUsed ?? 0;
                                 const freeRemaining = Math.max(0, freeLimit - freeUsed);
                                 const freePercent = Math.min(100, Math.round((freeUsed / freeLimit) * 100));
+                                const isLimitReached = freeUsed >= freeLimit;
 
                                 // Project theme colors: #ff822d -> #ea580c (Namastute Primary Orange)
                                 let barColor = 'linear-gradient(90deg, #ff822d 0%, #ea580c 100%)';
-                                let badgeBg = 'var(--pos-orange-light, #fff7ed)';
-                                let badgeText = 'var(--pos-orange, #ea580c)';
+                                let strokeColor = '#ea580c';
+                                let badgeBg = '#fff7ed';
+                                let badgeText = '#ea580c';
                                 let statusText = `${freeRemaining} remaining`;
 
-                                if (freePercent >= 90) {
+                                if (isLimitReached) {
                                     barColor = 'linear-gradient(90deg, #ef4444 0%, #b91c1c 100%)';
+                                    strokeColor = '#ef4444';
                                     badgeBg = '#fef2f2';
                                     badgeText = '#b91c1c';
-                                    statusText = freeRemaining === 0 ? '0 remaining (Limit reached)' : `${freeRemaining} remaining`;
+                                    statusText = '50 Max Completed';
+                                } else if (freePercent >= 90) {
+                                    barColor = 'linear-gradient(90deg, #ef4444 0%, #b91c1c 100%)';
+                                    strokeColor = '#ef4444';
+                                    badgeBg = '#fef2f2';
+                                    badgeText = '#b91c1c';
+                                    statusText = `${freeRemaining} remaining`;
                                 } else if (freePercent >= 70) {
                                     barColor = 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)';
+                                    strokeColor = '#f59e0b';
                                     badgeBg = '#fffbeb';
                                     badgeText = '#b45309';
                                     statusText = `${freeRemaining} remaining`;
                                 }
 
+                                const circumference = 106.8;
+                                const strokeDashoffset = circumference - (freePercent / 100) * circumference;
+
                                 return (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        {/* Plan Header & Badge */}
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-                                                <div style={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    borderRadius: '6px',
-                                                    background: 'var(--pos-orange-light, #fff7ed)',
-                                                    color: 'var(--pos-orange, #ea580c)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    border: '1px solid rgba(234, 88, 12, 0.15)'
-                                                }}>
-                                                    <Database size={13} />
+                                    <>
+                                        {/* 1) Collapsed Mini View (for mini/collapsed sidebar) */}
+                                        <div className="pos-sub-widget-collapsed">
+                                            <div 
+                                                className="pos-mini-gauge-container" 
+                                                onClick={() => isLimitReached && openUpgradeModal('50 Records Max Completed')}
+                                                title={`Free Plan: ${freeUsed}/${freeLimit} used (${isLimitReached ? 'Limit Completed' : `${freeRemaining} remaining`})`}
+                                            >
+                                                {isLimitReached && <span className="pos-mini-alert-dot" />}
+                                                <svg className="pos-mini-gauge-svg" width="44" height="44" viewBox="0 0 44 44">
+                                                    <circle
+                                                        cx="22"
+                                                        cy="22"
+                                                        r="17"
+                                                        fill="none"
+                                                        stroke="rgba(234, 88, 12, 0.15)"
+                                                        strokeWidth="3.5"
+                                                    />
+                                                    <circle
+                                                        cx="22"
+                                                        cy="22"
+                                                        r="17"
+                                                        fill="none"
+                                                        stroke={strokeColor}
+                                                        strokeWidth="3.5"
+                                                        strokeDasharray={circumference}
+                                                        strokeDashoffset={strokeDashoffset}
+                                                        strokeLinecap="round"
+                                                        style={{ transition: 'stroke-dashoffset 0.5s ease, stroke 0.3s ease' }}
+                                                    />
+                                                </svg>
+                                                <div className="pos-mini-gauge-icon" style={{ color: strokeColor }}>
+                                                    {isLimitReached ? <AlertTriangle size={15} className="pos-sub-alert-pulse" /> : <Database size={15} />}
                                                 </div>
-                                                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--pos-dark-blue, #0f172a)' }}>
-                                                    Free Plan
-                                                </span>
                                             </div>
-                                            <span style={{
-                                                fontSize: '10px',
-                                                fontWeight: '700',
-                                                padding: '2px 8px',
-                                                borderRadius: '12px',
-                                                background: badgeBg,
-                                                color: badgeText,
-                                                border: '1px solid rgba(234, 88, 12, 0.2)',
-                                                letterSpacing: '0.02em'
-                                            }}>
-                                                {freeLimit} Records Max
-                                            </span>
-                                        </div>
-
-                                        {/* Counts: Used / Limit and Remaining */}
-                                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                                            <div>
-                                                <span style={{ fontSize: '15px', fontWeight: '800', color: 'var(--pos-dark-blue, #0f172a)' }}>{freeUsed}</span>
-                                                <span style={{ fontSize: '12px', fontWeight: '500', color: 'var(--pos-text-muted, #64748b)' }}> / {freeLimit} used</span>
+                                            <div 
+                                                className="pos-mini-percent-label" 
+                                                style={{ color: freePercent >= 90 ? '#ef4444' : '#64748b' }}
+                                            >
+                                                {freePercent}%
                                             </div>
-                                            <span style={{
-                                                fontSize: '11px',
-                                                fontWeight: '600',
-                                                color: freePercent >= 90 ? '#ef4444' : 'var(--pos-text-muted, #64748b)'
-                                            }}>
-                                                {statusText}
-                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => openUpgradeModal('50 Records Max Completed')}
+                                                className={`pos-mini-pro-btn ${isLimitReached ? 'pos-mini-pro-btn--alert' : ''}`}
+                                                title={`Upgrade Plan (${freeUsed}/${freeLimit} used)`}
+                                            >
+                                                <Sparkles size={11} />
+                                                <span>{isLimitReached ? 'UPG' : 'PRO'}</span>
+                                            </button>
+
+                                            {/* Hover Flyout Card */}
+                                            <div className="pos-sub-flyout-card">
+                                                <div className="pos-flyout-header">
+                                                    <div className="pos-flyout-plan-info">
+                                                        <div className="pos-flyout-icon-box" style={{ background: isLimitReached ? '#fef2f2' : '#fff7ed', color: isLimitReached ? '#ef4444' : '#ea580c' }}>
+                                                            {isLimitReached ? <AlertTriangle size={13} /> : <Database size={13} />}
+                                                        </div>
+                                                        <span className="pos-flyout-plan-name">Free Plan</span>
+                                                    </div>
+                                                    <span className={`pos-flyout-badge ${isLimitReached ? 'pos-flyout-badge--alert' : ''}`} style={{ background: badgeBg, color: badgeText }}>
+                                                        {freeLimit} Records Max {isLimitReached ? '· Full' : ''}
+                                                    </span>
+                                                </div>
+
+                                                {isLimitReached && (
+                                                    <div className="pos-flyout-limit-alert" onClick={() => openUpgradeModal('50 Records Max Completed')}>
+                                                        <AlertTriangle size={13} className="pos-sub-alert-pulse" />
+                                                        <span>50 Records limit completed! Click to upgrade.</span>
+                                                    </div>
+                                                )}
+
+                                                <div className="pos-flyout-stats">
+                                                    <div className="pos-flyout-used">
+                                                        <strong>{freeUsed}</strong> / {freeLimit} used
+                                                    </div>
+                                                    <span className="pos-flyout-status" style={{ color: freePercent >= 90 ? '#ef4444' : '#64748b' }}>
+                                                        {statusText}
+                                                    </span>
+                                                </div>
+
+                                                <div className="pos-flyout-progress-track">
+                                                    <div
+                                                        className="pos-flyout-progress-fill"
+                                                        style={{ width: `${freePercent}%`, background: barColor }}
+                                                    />
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openUpgradeModal('50 Records Max Completed')}
+                                                    className={`pos-flyout-upgrade-btn ${isLimitReached ? 'pos-flyout-upgrade-btn--alert' : ''}`}
+                                                >
+                                                    <Sparkles size={13} />
+                                                    <span>{isLimitReached ? 'Upgrade Plan Now' : 'Upgrade to Pro'}</span>
+                                                </button>
+                                            </div>
                                         </div>
 
-                                        {/* Progress Bar */}
-                                        <div style={{
-                                            width: '100%',
-                                            backgroundColor: '#fed7aa44',
-                                            borderRadius: '9999px',
-                                            height: '7px',
-                                            overflow: 'hidden',
-                                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
-                                        }}>
-                                            <div style={{
-                                                background: barColor,
-                                                height: '100%',
-                                                borderRadius: '9999px',
-                                                width: `${freePercent}%`,
-                                                transition: 'width 0.4s ease, background 0.3s ease',
-                                                boxShadow: freePercent > 0 ? '0 0 6px rgba(234, 88, 12, 0.35)' : 'none'
-                                            }}></div>
-                                        </div>
+                                        {/* 2) Expanded View (for open sidebar) */}
+                                        <div className="pos-sub-widget-expanded">
+                                            <div className={`pos-sub-expanded-card ${isLimitReached ? 'pos-sub-expanded-card--alert' : ''}`}>
+                                                <div className="pos-sub-card-header">
+                                                    <div className="pos-sub-plan-title-wrap">
+                                                        <div className="pos-sub-plan-icon-box" style={{ background: isLimitReached ? '#fef2f2' : '#fff7ed', color: isLimitReached ? '#ef4444' : '#ea580c' }}>
+                                                            {isLimitReached ? <AlertTriangle size={13} /> : <Database size={13} />}
+                                                        </div>
+                                                        <span className="pos-sub-plan-name">Free Plan</span>
+                                                    </div>
+                                                    <span
+                                                        className={`pos-sub-limit-badge ${isLimitReached ? 'pos-sub-limit-badge--alert' : ''}`}
+                                                        style={{ background: badgeBg, color: badgeText }}
+                                                    >
+                                                        {freeLimit} Records Max {isLimitReached ? '· Reached' : ''}
+                                                    </span>
+                                                </div>
 
-                                        {/* Upgrade Button */}
-                                        <Link
-                                            to="/settings/billing"
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '6px',
-                                                background: 'linear-gradient(135deg, #ff822d 0%, #ea580c 100%)',
-                                                color: '#ffffff',
-                                                padding: '9px 12px',
-                                                borderRadius: '7px',
-                                                textDecoration: 'none',
-                                                fontSize: '12px',
-                                                fontWeight: '700',
-                                                boxShadow: '0 3px 8px rgba(234, 88, 12, 0.28)',
-                                                transition: 'all 0.2s ease',
-                                                marginTop: '2px',
-                                                letterSpacing: '0.01em'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.filter = 'brightness(1.05)';
-                                                e.currentTarget.style.transform = 'translateY(-1px)';
-                                                e.currentTarget.style.boxShadow = '0 5px 12px rgba(234, 88, 12, 0.4)';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.filter = 'none';
-                                                e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = '0 3px 8px rgba(234, 88, 12, 0.28)';
-                                            }}
-                                        >
-                                            <Sparkles size={13} />
-                                            <span>Upgrade to Pro</span>
-                                        </Link>
-                                    </div>
+                                                {/* Notification Banner right here on 50 records completed */}
+                                                {isLimitReached && (
+                                                    <div
+                                                        className="pos-sub-limit-notification"
+                                                        onClick={() => openUpgradeModal('50 Records Max Limit Reached')}
+                                                    >
+                                                        <div className="pos-sub-notification-title">
+                                                            <AlertTriangle size={13} className="pos-sub-alert-pulse" />
+                                                            <span>Limit Completed (50/50)</span>
+                                                        </div>
+                                                        <div className="pos-sub-notification-sub">
+                                                            Free 50 records quota completed! Upgrade to add more records.
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="pos-sub-card-counts">
+                                                    <div className="pos-sub-count-left">
+                                                        <span className="pos-sub-count-num">{freeUsed}</span>
+                                                        <span className="pos-sub-count-total"> / {freeLimit} used</span>
+                                                    </div>
+                                                    <span
+                                                        className="pos-sub-remaining-text"
+                                                        style={{ color: freePercent >= 90 ? '#ef4444' : '#64748b' }}
+                                                    >
+                                                        {statusText}
+                                                    </span>
+                                                </div>
+
+                                                <div className="pos-sub-progress-track">
+                                                    <div
+                                                        className="pos-sub-progress-bar"
+                                                        style={{
+                                                            width: `${freePercent}%`,
+                                                            background: barColor,
+                                                            boxShadow: isLimitReached ? '0 0 8px rgba(239, 68, 68, 0.45)' : freePercent > 0 ? '0 0 6px rgba(234, 88, 12, 0.35)' : 'none'
+                                                        }}
+                                                    />
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openUpgradeModal('50 Records Max Limit Reached')}
+                                                    className={`pos-sub-upgrade-btn ${isLimitReached ? 'pos-sub-upgrade-btn--alert' : ''}`}
+                                                >
+                                                    <Sparkles size={13} />
+                                                    <span>{isLimitReached ? 'Upgrade Plan Now' : 'Upgrade to Pro'}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
                                 );
                             })()
                         ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <div style={{ fontSize: '13px', color: '#111827', fontWeight: '600', textTransform: 'capitalize' }}>
-                                    {user.plan.toLowerCase()} Plan
-                                </div>
-                                {user.subscriptionEndDate && (
+                            (() => {
+                                const end = user.subscriptionEndDate ? new Date(user.subscriptionEndDate).getTime() : 0;
+                                const start = end - (30 * 24 * 60 * 60 * 1000);
+                                const now = new Date().getTime();
+                                const total = Math.max(1, end - start);
+                                const current = now - start;
+                                let paidPercent = Math.min(100, Math.max(0, Math.round((current / total) * 100)));
+
+                                return (
                                     <>
-                                        <div style={{ width: '100%', backgroundColor: '#fed7aa44', borderRadius: '9999px', height: '6px', overflow: 'hidden' }}>
-                                            <div style={{
-                                                background: 'linear-gradient(90deg, #ff822d 0%, #ea580c 100%)', height: '100%', borderRadius: '9999px',
-                                                boxShadow: '0 0 6px rgba(234, 88, 12, 0.35)',
-                                                width: `${(() => {
-                                                    const end = new Date(user.subscriptionEndDate).getTime();
-                                                    const start = end - (30 * 24 * 60 * 60 * 1000);
-                                                    const now = new Date().getTime();
-                                                    const total = end - start;
-                                                    const current = now - start;
-                                                    let percent = (current / total) * 100;
-                                                    if (percent > 100) percent = 100;
-                                                    if (percent < 0) percent = 0;
-                                                    return percent;
-                                                })()}%`
-                                            }}></div>
+                                        {/* Collapsed Paid View */}
+                                        <div className="pos-sub-widget-collapsed">
+                                            <div className="pos-mini-paid-badge" title={`${user.plan} Plan - Active`}>
+                                                <Crown size={16} />
+                                            </div>
+                                            <div className="pos-mini-percent-label" style={{ color: '#16a34a' }}>
+                                                ACTIVE
+                                            </div>
+                                            <Link
+                                                to="/settings/billing"
+                                                className="pos-mini-pro-btn pos-mini-paid-btn"
+                                                title="Manage Subscription"
+                                            >
+                                                <Sparkles size={11} />
+                                                <span>PLAN</span>
+                                            </Link>
+
+                                            {/* Hover Flyout Card */}
+                                            <div className="pos-sub-flyout-card">
+                                                <div className="pos-flyout-header">
+                                                    <div className="pos-flyout-plan-info">
+                                                        <div className="pos-flyout-icon-box pos-flyout-paid-icon">
+                                                            <Crown size={13} />
+                                                        </div>
+                                                        <span className="pos-flyout-plan-name" style={{ textTransform: 'capitalize' }}>
+                                                            {user.plan?.toLowerCase()} Plan
+                                                        </span>
+                                                    </div>
+                                                    <span className="pos-flyout-badge pos-badge-active">
+                                                        Active
+                                                    </span>
+                                                </div>
+                                                {user.subscriptionEndDate && (
+                                                    <div className="pos-flyout-expiry-text">
+                                                        Expires: {new Date(user.subscriptionEndDate).toLocaleDateString()}
+                                                    </div>
+                                                )}
+                                                <Link to="/settings/billing" className="pos-flyout-manage-btn">
+                                                    <span>Manage Billing</span>
+                                                </Link>
+                                            </div>
                                         </div>
-                                        <div style={{ fontSize: '11px', color: '#6b7280' }}>
-                                            Ends on {new Date(user.subscriptionEndDate).toLocaleDateString()} at {new Date(user.subscriptionEndDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+                                        {/* Expanded Paid View */}
+                                        <div className="pos-sub-widget-expanded">
+                                            <div className="pos-sub-expanded-card">
+                                                <div className="pos-sub-card-header">
+                                                    <div className="pos-sub-plan-title-wrap">
+                                                        <div className="pos-sub-plan-icon-box pos-sub-paid-icon">
+                                                            <Crown size={13} />
+                                                        </div>
+                                                        <span className="pos-sub-plan-name" style={{ textTransform: 'capitalize' }}>
+                                                            {user.plan?.toLowerCase()} Plan
+                                                        </span>
+                                                    </div>
+                                                    <span className="pos-sub-limit-badge pos-badge-active">
+                                                        Active
+                                                    </span>
+                                                </div>
+                                                {user.subscriptionEndDate && (
+                                                    <>
+                                                        <div className="pos-sub-progress-track" style={{ marginTop: '2px' }}>
+                                                            <div
+                                                                className="pos-sub-progress-bar"
+                                                                style={{
+                                                                    width: `${paidPercent}%`,
+                                                                    background: 'linear-gradient(90deg, #ff822d 0%, #ea580c 100%)',
+                                                                    boxShadow: '0 0 6px rgba(234, 88, 12, 0.35)'
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="pos-sub-expiry-info">
+                                                            Ends on {new Date(user.subscriptionEndDate).toLocaleDateString()} at {new Date(user.subscriptionEndDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </div>
+                                                    </>
+                                                )}
+                                                <Link to="/settings/billing" className="pos-sub-manage-btn">
+                                                    <span>Manage Subscription</span>
+                                                </Link>
+                                            </div>
                                         </div>
                                     </>
-                                )}
-                            </div>
+                                );
+                            })()
                         )}
                     </div>
                 )}

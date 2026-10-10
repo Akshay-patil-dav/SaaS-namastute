@@ -3,6 +3,7 @@ import { X, Search, Trash2, AlertTriangle, User } from 'lucide-react';
 import apiClient, { API, ENV } from '@/api/config';
 import '../AddPosModal/add-sales-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
+import { useAuth } from '../../../../context/AuthContext';
 
 
 const BASE_URL = ENV.API_BASE_URL;
@@ -10,9 +11,11 @@ const EMPTY = { customerName:'', date: new Date().toISOString().split('T')[0], s
 const genCustName = () => '#' + Math.floor(10000000 + Math.random() * 90000000);
 
 const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
+    const { user } = useAuth();
+    const loginUsername = user?.username || user?.name || user?.fullName || (user?.identifier ? user.identifier.split('@')[0] : '') || (user?.email ? user.email.split('@')[0] : '') || 'Admin';
     const { currencySymbol } = useCurrency();
 
-    const [form, setForm]           = useState({ ...EMPTY, customerName: genCustName() });
+    const [form, setForm]           = useState({ ...EMPTY, customerName: genCustName(), biller: loginUsername });
     const [products, setProducts]   = useState([]);
     const [searchQ, setSearchQ]     = useState('');
     const [results, setResults]     = useState([]);
@@ -32,7 +35,7 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
     const [warningProducts, setWarningProducts] = useState([]);
     const searchRef = useRef(null);
 
-    useEffect(() => { if (isOpen) { setForm({ ...EMPTY, customerName: genCustName() }); setProducts([]); setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]); setCustSearchQ(''); setShowCustDrop(false); setSelectedCustomer(null); fetchCustomers(); } }, [isOpen]);
+    useEffect(() => { if (isOpen) { setForm({ ...EMPTY, customerName: genCustName(), biller: loginUsername }); setProducts([]); setSearchQ(''); setError(''); setWarningModalOpen(false); setWarningProducts([]); setCustSearchQ(''); setShowCustDrop(false); setSelectedCustomer(null); fetchCustomers(); } }, [isOpen, loginUsername]);
 
     useEffect(() => {
         const h = e => { 
@@ -111,7 +114,7 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
         if (!products.length) return setError('Add at least one product.');
         setError(''); setSubmitting(true);
         try {
-            await apiClient.post(`${BASE_URL}/sales`, { ...form, orderTax:+form.orderTax, discount:+form.discount, shipping:+form.shipping, paidAmount:+form.paidAmount, products });
+            await apiClient.post(`${BASE_URL}/sales`, { ...form, biller: form.biller || loginUsername, orderTax:+form.orderTax, discount:+form.discount, shipping:+form.shipping, paidAmount:+form.paidAmount, products });
             onSuccess?.(); onClose();
         } catch (err) { setError(err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to create sale.'); }
         finally { setSubmitting(false); }
@@ -213,7 +216,7 @@ const AddSalesModal = ({ isOpen, onClose, onSuccess }) => {
                             </div>
                             <div className="sm-form-group">
                                 <label>Biller</label>
-                                <input className="sm-input" type="text" value={form.biller} onChange={e=>setForm(f=>({...f,biller:e.target.value}))}/>
+                                <input className="sm-input" type="text" value={form.biller || loginUsername} disabled readOnly />
                             </div>
                         </div>
 

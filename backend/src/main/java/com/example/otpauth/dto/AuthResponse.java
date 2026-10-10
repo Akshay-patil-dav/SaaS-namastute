@@ -18,8 +18,10 @@ public class AuthResponse {
     private Long activeProjectId;
     private String projectPermissions;
     private java.time.LocalDateTime subscriptionEndDate;
+    private String nextPlan;
+    private Integer nextSubscriptionDays;
 
-    public AuthResponse(Long id, String token, String email, String fullName, String firstName, String lastName, String username, String businessType, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified, Long activeProjectId, String projectPermissions, java.time.LocalDateTime subscriptionEndDate) {
+    public AuthResponse(Long id, String token, String email, String fullName, String firstName, String lastName, String username, String businessType, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified, Long activeProjectId, String projectPermissions, java.time.LocalDateTime subscriptionEndDate, String nextPlan, Integer nextSubscriptionDays) {
         this.id = id;
         this.token = token;
         this.email = email;
@@ -35,6 +37,8 @@ public class AuthResponse {
         this.activeProjectId = activeProjectId;
         this.projectPermissions = projectPermissions;
         this.subscriptionEndDate = subscriptionEndDate;
+        this.nextPlan = nextPlan;
+        this.nextSubscriptionDays = nextSubscriptionDays;
     }
 
     public Long getId() { return id; }
@@ -81,4 +85,10 @@ public class AuthResponse {
 
     public java.time.LocalDateTime getSubscriptionEndDate() { return subscriptionEndDate; }
     public void setSubscriptionEndDate(java.time.LocalDateTime subscriptionEndDate) { this.subscriptionEndDate = subscriptionEndDate; }
+
+    public String getNextPlan() { return nextPlan; }
+    public void setNextPlan(String nextPlan) { this.nextPlan = nextPlan; }
+
+    public Integer getNextSubscriptionDays() { return nextSubscriptionDays; }
+    public void setNextSubscriptionDays(Integer nextSubscriptionDays) { this.nextSubscriptionDays = nextSubscriptionDays; }
 }

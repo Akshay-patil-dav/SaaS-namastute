@@ -23,6 +23,17 @@ export function UsageProvider({ children }) {
         breakdown: {}
     });
     const [loading, setLoading] = useState(false);
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+    const [upgradeModalReason, setUpgradeModalReason] = useState('');
+
+    const openUpgradeModal = useCallback((reason = '') => {
+        setUpgradeModalReason(reason);
+        setIsUpgradeModalOpen(true);
+    }, []);
+
+    const closeUpgradeModal = useCallback(() => {
+        setIsUpgradeModalOpen(false);
+    }, []);
 
     const fetchUsage = useCallback(async () => {
         if (!user?.id && !user?.email) return;
@@ -52,8 +63,42 @@ export function UsageProvider({ children }) {
         return () => window.removeEventListener('data-usage-refresh', handleRefresh);
     }, [fetchUsage]);
 
+    // Listen for custom event triggered globally (e.g. from axios interceptor or actions)
+    useEffect(() => {
+        const handleOpenModal = (event) => {
+            const reason = event?.detail?.message || event?.detail?.error || '50 Records Max limit reached! Please upgrade your plan.';
+            openUpgradeModal(reason);
+        };
+
+        window.addEventListener('open-upgrade-plan-modal', handleOpenModal);
+        return () => window.removeEventListener('open-upgrade-plan-modal', handleOpenModal);
+    }, [openUpgradeModal]);
+
+    // Auto-open modal on first detection of 50 records max limit completion
+    useEffect(() => {
+        const isFree = !user?.plan || user?.plan === 'NONE';
+        const limit = usage?.limit && usage.limit > 0 ? usage.limit : 50;
+        const isLimitReached = isFree && usage?.totalUsed >= limit;
+
+        if (isLimitReached) {
+            const alreadyShown = sessionStorage.getItem('upgrade_modal_auto_shown_50');
+            if (!alreadyShown) {
+                sessionStorage.setItem('upgrade_modal_auto_shown_50', 'true');
+                openUpgradeModal(`You have completed the ${limit} Records Max free plan limit. Upgrade your plan to continue adding records.`);
+            }
+        }
+    }, [usage?.totalUsed, usage?.limit, user?.plan, openUpgradeModal]);
+
     return (
-        <UsageContext.Provider value={{ usage, loading, refreshUsage: fetchUsage }}>
+        <UsageContext.Provider value={{
+            usage,
+            loading,
+            refreshUsage: fetchUsage,
+            isUpgradeModalOpen,
+            openUpgradeModal,
+            closeUpgradeModal,
+            upgradeModalReason
+        }}>
             {children}
         </UsageContext.Provider>
     );
@@ -73,7 +118,11 @@ export function useDataUsage() {
                 breakdown: {}
             },
             loading: false,
-            refreshUsage: () => {}
+            refreshUsage: () => {},
+            isUpgradeModalOpen: false,
+            openUpgradeModal: () => {},
+            closeUpgradeModal: () => {},
+            upgradeModalReason: ''
         };
     }
     return context;

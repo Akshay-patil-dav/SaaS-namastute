@@ -274,6 +274,10 @@ function AppRoutes() {
                     path="/integrations"
                     element={<Navigate to="/settings/connected_apps" replace />}
                 />
+                <Route
+                    path="/billing"
+                    element={<Navigate to="/settings/billing" replace />}
+                />
 
                 {/* Reports */}
                 <Route
