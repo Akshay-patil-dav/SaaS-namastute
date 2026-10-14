@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "settings", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"user_id", "key"})
+    @UniqueConstraint(columnNames = {"user_id", "setting_key"})
 })
 public class Setting {
 
@@ -18,7 +18,7 @@ public class Setting {
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
 
-    @Column(nullable = false)
+    @Column(name = "setting_key", nullable = false)
     private String settingKey;
 
     @Column(columnDefinition = "TEXT")

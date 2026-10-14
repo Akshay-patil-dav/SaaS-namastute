@@ -1,22 +1,31 @@
 package com.example.otpauth.config;
 
 import com.example.otpauth.model.Product;
+import com.example.otpauth.model.User;
 import com.example.otpauth.repository.ProductRepository;
+import com.example.otpauth.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 public class DummyDataSeeder {
 
     @Bean
-    public CommandLineRunner initDummyData(ProductRepository productRepository) {
+    public CommandLineRunner initDummyData(ProductRepository productRepository, UserRepository userRepository) {
         return args -> {
             if (productRepository.count() == 0) {
                 System.out.println("No products found in DB. Seeding dummy data for ecomm storefront...");
+
+                Long adminId = null;
+                Optional<User> adminOpt = userRepository.findByEmail("admin@gmail.com");
+                if (adminOpt.isPresent()) {
+                    adminId = adminOpt.get().getId();
+                }
 
                 Product p1 = new Product();
                 p1.setName("Quantum Wireless Headphones");
@@ -30,6 +39,7 @@ public class DummyDataSeeder {
                 p1.setCategory("Audio");
                 p1.setBrand("Quantum");
                 p1.setManufacturer("Quantum Audio Inc.");
+                p1.setUserId(adminId);
                 
                 Product p2 = new Product();
                 p2.setName("Nebula Smartwatch Pro");
@@ -42,6 +52,7 @@ public class DummyDataSeeder {
                 p2.setQuantity(50);
                 p2.setCategory("Wearables");
                 p2.setBrand("Nebula");
+                p2.setUserId(adminId);
                 
                 Product p3 = new Product();
                 p3.setName("Aero Mechanical Keyboard");
@@ -54,11 +65,10 @@ public class DummyDataSeeder {
                 p3.setQuantity(200);
                 p3.setCategory("Peripherals");
                 p3.setBrand("Aero");
+                p3.setUserId(adminId);
                 
                 productRepository.saveAll(List.of(p1, p2, p3));
-                System.out.println("Dummy products seeded successfully.");
-            } else {
-                System.out.println("Products already exist in DB. Skipping seeder.");
+                System.out.println("Dummy products seeded successfully with admin user ID.");
             }
         };
     }

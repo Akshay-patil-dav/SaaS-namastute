@@ -116,6 +116,7 @@ C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\StockRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\SubscriptionTransaction.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\NoteRequest.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\config\DatabaseAutoCreator.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\ProductService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\WorkCenterRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\UnitService.java
