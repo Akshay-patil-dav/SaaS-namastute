@@ -25,36 +25,38 @@ const loadRazorpayScript = () => {
 };
 
 const PLANS = [
-    {
-        id: 'STARTER',
-        name: 'Starter',
-        icon: Zap,
-        monthlyPrice: 299,
-        tagline: 'Essential features for single-store retailers.',
-        color: '#6366f1',
-        gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-        features: [
-            { text: '1 Store Location', included: true },
-            { text: 'Up to 1,000 Products', included: true },
-            { text: 'POS Billing & Basic Inventory', included: true },
-            { text: 'Basic Sales Analytics', included: true },
-            { text: 'WhatsApp & Email Support', included: true },
-            { text: 'Barcode Printing', included: false },
-            { text: 'Multi-role Access', included: false },
-            { text: 'API Access', included: false },
-        ],
-    },
+    // {
+    //     id: 'STARTER',
+    //     name: 'Starter',
+    //     icon: Zap,
+    //     monthlyPrice: 299,
+    //     tagline: 'Essential features for single-store retailers.',
+    //     color: '#6366f1',
+    //     gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+    //     features: [
+    //         { text: '1 Store Location', included: true },
+    //         { text: 'Up to 1,000 Products', included: true },
+    //         { text: 'POS Billing & Basic Inventory', included: true },
+    //         { text: 'Basic Sales Analytics', included: true },
+    //         { text: 'WhatsApp & Email Support', included: true },
+    //         { text: 'Barcode Printing', included: false },
+    //         { text: 'Multi-role Access', included: false },
+    //         { text: 'API Access', included: false },
+    //     ],
+    // },
     {
         id: 'GROWTH',
         name: 'Growth',
         icon: TrendingUp,
-        monthlyPrice: 499,
+        originalPrice: 399,
+        monthlyPrice: 259,
         tagline: 'Advanced tools for growing businesses.',
         popular: true,
         color: '#ea580c',
         gradient: 'linear-gradient(135deg, #ff822d 0%, #ea580c 100%)',
         features: [
-            { text: 'Up to 3 Store Locations', included: true },
+            // { text: 'Up to 3 Store Locations', included: true },
+              { text: '1 Store Location', included: true },
             { text: 'Unlimited Products', included: true },
             { text: 'POS & Online Order Management', included: true },
             { text: 'Advanced Analytics & Reports', included: true },
@@ -68,7 +70,8 @@ const PLANS = [
         id: 'PREMIUM',
         name: 'Premium',
         icon: Crown,
-        monthlyPrice: 899,
+        originalPrice: 699,
+        monthlyPrice: 499,
         tagline: 'Complete control for multi-store chains.',
         color: '#0284c7',
         gradient: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
@@ -508,12 +511,29 @@ export default function Billing() {
 
                             {/* Price */}
                             <div className="bp-card-pricing-box">
+                                {plan.originalPrice && plan.originalPrice > price && (
+                                    <div className="bp-card-discount-row">
+                                        <span className="bp-original-price">
+                                            {currencySymbol}{plan.originalPrice.toLocaleString()}
+                                        </span>
+                                        <span className="bp-discount-badge">
+                                            {Math.round(((plan.originalPrice - price) / plan.originalPrice) * 100)}% OFF
+                                        </span>
+                                    </div>
+                                )}
                                 <div className="bp-card-price">
                                     <span className="bp-curr">{currencySymbol}</span>
                                     <span className="bp-amount">{price.toLocaleString()}</span>
                                     <span className="bp-period">/month</span>
                                 </div>
-                                <div className="bp-monthly-note">Billed on a monthly cycle</div>
+                                <div className="bp-monthly-note">
+                                    <span>Billed on a monthly cycle</span>
+                                    {plan.originalPrice && plan.originalPrice > price && (
+                                        <span className="bp-save-highlight">
+                                            Save {currencySymbol}{(plan.originalPrice - price).toLocaleString()}/mo
+                                        </span>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="bp-divider" />

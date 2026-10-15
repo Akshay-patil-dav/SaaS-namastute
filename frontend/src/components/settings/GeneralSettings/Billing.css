@@ -506,6 +506,37 @@
     margin-bottom: 18px;
 }
 
+.bp-card-discount-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.bp-original-price {
+    font-size: 15px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: #cbd5e1;
+    letter-spacing: -0.2px;
+}
+
+.bp-discount-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+}
+
 .bp-card-price {
     display: flex;
     align-items: baseline;
@@ -555,7 +586,24 @@
 .bp-monthly-note {
     font-size: 11.5px;
     color: #94a3b8;
-    margin-top: 6px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.bp-save-highlight {
+    font-size: 11px;
+    font-weight: 700;
+    color: #16a34a;
+    background: #f0fdf4;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid #dcfce7;
+    display: inline-flex;
+    align-items: center;
 }
 
 .bp-divider {
