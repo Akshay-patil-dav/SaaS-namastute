@@ -35,13 +35,51 @@ public class PermissionInterceptor implements HandlerInterceptor {
         // Fetch permissions for the active project
         Optional<ProjectMember> memberOpt = projectMemberRepository.findByProjectIdAndMemberUserId(currentTenantId, actualUserId);
         if (memberOpt.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not a member of this project.");
-            return false;
+            return sendForbidden(response, "You are not a member of this project.");
         }
 
         ProjectMember member = memberOpt.get();
+        if ("INACTIVE".equalsIgnoreCase(member.getStatus())) {
+            return sendForbidden(response, "Your staff account has been deactivated by the owner.");
+        }
+
         String path = request.getRequestURI();
         String method = request.getMethod();
+
+        // Self-actions: Accepting/rejecting invitations, checking own invites, or switching projects
+        boolean isSelfProjectAction = path.startsWith("/api/project/invite/accept")
+                || path.startsWith("/api/project/invite/reject")
+                || path.equals("/api/project/invitations/me")
+                || path.equals("/api/project/my-workspaces")
+                || path.startsWith("/api/project/switch")
+                || path.startsWith("/api/invitations");
+
+        if (isSelfProjectAction) {
+            return true;
+        }
+
+        // Project management (adding/editing staff, sending invites) is strictly owner-only unless given 'users' perm
+        if (path.startsWith("/api/project")) {
+            JsonNode perms = null;
+            try {
+                if (member.getPermissions() != null && !member.getPermissions().isBlank()) {
+                    perms = objectMapper.readTree(member.getPermissions());
+                }
+            } catch (Exception ignored) {}
+            if (perms == null || perms.get("users") == null) {
+                return sendForbidden(response, "Only the workspace owner can manage team members.");
+            }
+        }
+
+        // Notes and Workspace Announcements are open to all active members
+        if (path.startsWith("/api/notes")) {
+            return true;
+        }
+
+        // Dashboard overview and summary statistics are readable by all active workspace members
+        if ("GET".equalsIgnoreCase(method) && (path.startsWith("/api/dashboard") || path.endsWith("/summary"))) {
+            return true;
+        }
 
         // Determine module based on path
         String module = determineModule(path);
@@ -50,19 +88,27 @@ public class PermissionInterceptor implements HandlerInterceptor {
         }
 
         // Parse permissions JSON
-        // Structure: {"products": ["VIEW", "CREATE", "EDIT", "DELETE"]}
         try {
             if (member.getPermissions() == null || member.getPermissions().isBlank()) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "No permissions assigned.");
-                return false;
+                return sendForbidden(response, "No permissions assigned.");
             }
 
             JsonNode perms = objectMapper.readTree(member.getPermissions());
-            JsonNode modulePerms = perms.get(module);
 
+            // Special convenience: Cashiers/Sales staff need to view products & categories & CRM customers during checkout
+            if ("GET".equalsIgnoreCase(method)) {
+                if (("products".equals(module) || "crm".equals(module)) && 
+                    (perms.has("pos") || perms.has("sales"))) {
+                    return true;
+                }
+                if ("reports".equals(module) && (perms.has("reports") || perms.has("pos") || perms.has("sales"))) {
+                    return true;
+                }
+            }
+
+            JsonNode modulePerms = perms.get(module);
             if (modulePerms == null || !modulePerms.isArray()) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "No access to " + module + " module.");
-                return false;
+                return sendForbidden(response, "No access to " + module + " module.");
             }
 
             // Check specific action
@@ -76,27 +122,43 @@ public class PermissionInterceptor implements HandlerInterceptor {
             }
 
             if (!hasAccess) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Missing " + requiredAction + " permission for " + module + " module.");
-                return false;
+                return sendForbidden(response, "Missing " + requiredAction + " permission for " + module + " module.");
             }
 
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to evaluate permissions.");
-            return false;
+            return sendForbidden(response, "Failed to evaluate permissions: " + e.getMessage());
         }
 
         return true;
     }
 
+    private boolean sendForbidden(HttpServletResponse response, String message) throws Exception {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"error\": \"" + message + "\", \"message\": \"" + message + "\", \"status\": 403}");
+        response.getWriter().flush();
+        return false;
+    }
+
     private String determineModule(String path) {
-        if (path.startsWith("/api/products")) return "products";
-        if (path.startsWith("/api/pos")) return "pos";
+        if (path.startsWith("/api/products") || 
+            path.startsWith("/api/categories") || 
+            path.startsWith("/api/sub-categories") || 
+            path.startsWith("/api/brands") || 
+            path.startsWith("/api/units") || 
+            path.startsWith("/api/warranties")) {
+            return "products";
+        }
+        if (path.startsWith("/api/pos") || path.startsWith("/api/pos-sales")) return "pos";
         if (path.startsWith("/api/crm")) return "crm";
-        if (path.startsWith("/api/bom") || path.startsWith("/api/work-centers") || path.startsWith("/api/work-orders")) return "manufacturing";
-        if (path.startsWith("/api/purchases")) return "purchases";
-        if (path.startsWith("/api/sales")) return "sales";
-        if (path.startsWith("/api/inventory")) return "inventory";
-        if (path.startsWith("/api/stores") || path.startsWith("/api/warehouses")) return "settings";
+        if (path.startsWith("/api/manufacturing") || path.startsWith("/api/bom") || path.startsWith("/api/work-centers") || path.startsWith("/api/work-orders")) return "manufacturing";
+        if (path.startsWith("/api/purchases") || path.startsWith("/api/purchase-returns")) return "purchases";
+        if (path.startsWith("/api/sales") || path.startsWith("/api/sales-returns")) return "sales";
+        if (path.startsWith("/api/stocks") || path.startsWith("/api/stock-transfers") || path.startsWith("/api/inventory")) return "inventory";
+        if (path.startsWith("/api/khata")) return "khata";
+        if (path.startsWith("/api/reports") || path.startsWith("/api/dashboard")) return "reports";
+        if (path.startsWith("/api/stores") || path.startsWith("/api/warehouses") || path.startsWith("/api/settings") || path.startsWith("/api/bank-accounts")) return "settings";
         return null;
     }
 

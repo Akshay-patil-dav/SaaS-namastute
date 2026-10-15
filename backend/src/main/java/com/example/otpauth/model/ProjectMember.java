@@ -20,6 +20,12 @@ public class ProjectMember {
     @Column(name = "permissions", columnDefinition = "TEXT")
     private String permissions; // JSON string of assigned permissions
 
+    @Column(name = "role_title")
+    private String roleTitle = "Staff";
+
+    @Column(name = "status")
+    private String status = "ACTIVE";
+
     @Column(name = "joined_at", updatable = false)
     private LocalDateTime joinedAt = LocalDateTime.now();
 
@@ -29,6 +35,17 @@ public class ProjectMember {
         this.projectId = projectId;
         this.memberUserId = memberUserId;
         this.permissions = permissions;
+        this.roleTitle = "Staff";
+        this.status = "ACTIVE";
+        this.joinedAt = LocalDateTime.now();
+    }
+
+    public ProjectMember(Long projectId, Long memberUserId, String permissions, String roleTitle, String status) {
+        this.projectId = projectId;
+        this.memberUserId = memberUserId;
+        this.permissions = permissions;
+        this.roleTitle = roleTitle != null ? roleTitle : "Staff";
+        this.status = status != null ? status : "ACTIVE";
         this.joinedAt = LocalDateTime.now();
     }
 
@@ -43,6 +60,12 @@ public class ProjectMember {
 
     public String getPermissions() { return permissions; }
     public void setPermissions(String permissions) { this.permissions = permissions; }
+
+    public String getRoleTitle() { return roleTitle; }
+    public void setRoleTitle(String roleTitle) { this.roleTitle = roleTitle; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public LocalDateTime getJoinedAt() { return joinedAt; }
     public void setJoinedAt(LocalDateTime joinedAt) { this.joinedAt = joinedAt; }

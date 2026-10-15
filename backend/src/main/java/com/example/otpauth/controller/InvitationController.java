@@ -23,35 +23,23 @@ public class InvitationController {
         return ResponseEntity.ok(projectService.getMyInvitations());
     }
 
-    @GetMapping("/accepted")
-    public ResponseEntity<?> getAcceptedProjects() {
-        return ResponseEntity.ok(projectService.getAcceptedProjects());
-    }
-
     @PostMapping("/{token}/accept")
-    public ResponseEntity<?> acceptInvitation(@PathVariable String token) {
-        if (projectService.acceptInvitation(token)) {
-            return ResponseEntity.ok(Map.of("message", "Invitation accepted"));
+    public ResponseEntity<?> accept(@PathVariable String token) {
+        boolean ok = projectService.acceptInvitation(token);
+        if (ok) {
+            return ResponseEntity.ok(Map.of("success", true, "message", "Invitation accepted successfully"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid or expired invitation token"));
         }
-        return ResponseEntity.badRequest().body(Map.of("error", "Failed to accept invitation"));
     }
 
     @PostMapping("/{token}/reject")
-    public ResponseEntity<?> rejectInvitation(@PathVariable String token) {
-        if (projectService.rejectInvitation(token)) {
-            return ResponseEntity.ok(Map.of("message", "Invitation rejected"));
-        }
-        return ResponseEntity.badRequest().body(Map.of("error", "Failed to reject invitation"));
-    }
-
-    @PostMapping("/switch-project/{projectId}")
-    public ResponseEntity<?> switchProject(@PathVariable Long projectId) {
-        try {
-            // Passing 0 or matching actual userId switches back to personal workspace
-            projectService.switchActiveProject(projectId == 0 ? null : projectId);
-            return ResponseEntity.ok(Map.of("message", "Switched active project"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    public ResponseEntity<?> reject(@PathVariable String token) {
+        boolean ok = projectService.rejectInvitation(token);
+        if (ok) {
+            return ResponseEntity.ok(Map.of("success", true, "message", "Invitation rejected"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to reject invitation"));
         }
     }
 }

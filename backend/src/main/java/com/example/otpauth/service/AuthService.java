@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -267,18 +268,44 @@ public class AuthService {
 
         Long activeProjectId = user.getActiveProjectId();
         String permissions = null;
+        String roleTitle = "Owner";
+        java.time.LocalDateTime subEndDate = user.getSubscriptionEndDate();
+        String businessType = user.getBusinessType();
+
         if (activeProjectId != null && !activeProjectId.equals(user.getId())) {
-            permissions = memberRepository.findByProjectIdAndMemberUserId(activeProjectId, user.getId())
-                    .map(com.example.otpauth.model.ProjectMember::getPermissions)
-                    .orElse(null);
+            Optional<com.example.otpauth.model.ProjectMember> memberOpt = memberRepository.findByProjectIdAndMemberUserId(activeProjectId, user.getId());
+            if (memberOpt.isPresent()) {
+                com.example.otpauth.model.ProjectMember member = memberOpt.get();
+                if ("INACTIVE".equalsIgnoreCase(member.getStatus())) {
+                    throw new RuntimeException("Your staff account has been deactivated by the workspace owner.");
+                }
+                permissions = member.getPermissions();
+                roleTitle = member.getRoleTitle() != null ? member.getRoleTitle() : "Staff";
+
+                // Inherit owner's plan and business type
+                User owner = userRepository.findById(activeProjectId).orElse(null);
+                if (owner != null) {
+                    if (owner.getPlan() != null && owner.getPlan() != com.example.otpauth.model.SubscriptionPlan.NONE) {
+                        planStr = owner.getPlan().name();
+                        subEndDate = owner.getSubscriptionEndDate();
+                    }
+                    if (owner.getBusinessType() != null && !owner.getBusinessType().isBlank()) {
+                        businessType = owner.getBusinessType();
+                    }
+                }
+            } else {
+                user.setActiveProjectId(null);
+                userRepository.save(user);
+                activeProjectId = null;
+            }
         }
 
         String nextPlanStr = user.getNextPlan() != null ? user.getNextPlan().name() : null;
         Integer nextDays = user.getNextSubscriptionDays(); // derived from nextSubscriptionEndDate
 
         return new AuthResponse(user.getId(), token, user.getEmail(), user.getFullName(), user.getFirstName(),
-                user.getLastName(), user.getUsername(), user.getBusinessType(), roles, planStr, user.isEmailVerified(),
-                user.isPhoneVerified(), activeProjectId, permissions, user.getSubscriptionEndDate(), nextPlanStr, nextDays);
+                user.getLastName(), user.getUsername(), businessType, roles, planStr, user.isEmailVerified(),
+                user.isPhoneVerified(), activeProjectId, permissions, subEndDate, nextPlanStr, nextDays, roleTitle);
     }
 
     public AuthResponse getCurrentUser(String email) {

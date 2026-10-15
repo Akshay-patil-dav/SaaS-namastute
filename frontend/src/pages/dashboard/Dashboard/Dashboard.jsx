@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import apiClient, { API } from '../../../api/config';
+import { usePermissions } from '../../../hooks/usePermissions';
 import { 
     Wallet, ShoppingCart, ShoppingBag, ArrowUpRight, ArrowDownRight, 
     MoreVertical, Info, Package, Users, Activity,
     Calendar, TrendingUp, RefreshCcw, DollarSign, Box, ShieldCheck,
-    Cpu, AlertTriangle, Truck, CheckCircle2, Clock
+    Cpu, AlertTriangle, Truck, CheckCircle2, Clock, Plus, ArrowRight
 } from 'lucide-react';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -49,9 +50,12 @@ const _categoryStatisticsData = [
 
 export default function Dashboard() {
     const { currencySymbol } = useCurrency();
-
     const { user } = useAuth();
-    const name = user?.firstName || (user?.name && !user.name.includes('@') ? user.name : user?.email?.split('@')[0]) || 'Admin';
+    const { canView, hasFullAccess } = usePermissions();
+
+    const name = user?.firstName || (user?.fullName && !user.fullName.includes('@') ? user.fullName : (user?.name && !user.name.includes('@') ? user.name : user?.email?.split('@')[0])) || 'Admin';
+    const roleTitle = user?.roleTitle || (user?.activeProjectId && user?.activeProjectId !== user?.id ? 'Staff' : 'Workspace Owner');
+    const bizType = user?.businessType || 'Retail Store';
 
     // { onlineCount, posCount, total } — fetched from /api/sales/today/summary
     const [todaySummary, setTodaySummary] = useState(null);
@@ -244,7 +248,26 @@ export default function Dashboard() {
             {/* Header Area */}
             <div className="d-flex justify-content-between align-items-center mb-3 mb-sm-4 flex-wrap gap-2">
                 <div>
-                    <h2 className="fw-bold mb-1 dash-header-title" style={{color: '#1e293b'}}>Welcome, {name}</h2>
+                    <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <h2 className="fw-bold mb-0 dash-header-title" style={{color: '#1e293b'}}>Welcome back, {name}</h2>
+                        <span className="badge rounded-pill px-2.5 py-1" style={{
+                            backgroundColor: hasFullAccess ? '#fff7ed' : '#f0fdf4',
+                            color: hasFullAccess ? '#c2410c' : '#15803d',
+                            border: `1px solid ${hasFullAccess ? '#fed7aa' : '#bbf7d0'}`,
+                            fontSize: '11px',
+                            fontWeight: 600
+                        }}>
+                            {roleTitle}
+                        </span>
+                        <span className="badge rounded-pill px-2.5 py-1 bg-white text-secondary border" style={{ fontSize: '11px', fontWeight: 500 }}>
+                            🏢 {bizType}
+                        </span>
+                        {!hasFullAccess && (
+                            <span className="badge rounded-pill px-2.5 py-1 bg-light text-primary border" style={{ fontSize: '11px', fontWeight: 500 }}>
+                                🔗 Assigned Member
+                            </span>
+                        )}
+                    </div>
                     <p className="text-muted small mb-0 dash-header-subtitle">
                         You have{' '}
                         <span className="text-warning fw-bold">
@@ -270,220 +293,291 @@ export default function Dashboard() {
                 </div>
             </div>
 
+            {/* Quick Action Navigation Toolbar */}
+            <div className="d-flex align-items-center gap-2 mb-3 mb-sm-4 overflow-auto pb-1 flex-nowrap flex-sm-wrap">
+                {(hasFullAccess || canView('pos') || canView('sales')) && (
+                    <Link 
+                        to="/pos" 
+                        className="btn btn-sm text-white fw-bold d-flex align-items-center gap-1.5 shadow-sm flex-shrink-0 px-3 py-2 rounded-3 text-decoration-none"
+                        style={{ backgroundColor: '#ea580c', borderColor: '#ea580c', fontSize: '12.5px' }}
+                    >
+                        <ShoppingCart size={15} /> Open POS Terminal
+                    </Link>
+                )}
+
+                {(hasFullAccess || canView('products')) && (
+                    <Link 
+                        to="/create-product" 
+                        className="btn btn-sm btn-white border bg-white text-dark fw-semibold d-flex align-items-center gap-1.5 shadow-sm flex-shrink-0 px-3 py-2 rounded-3 text-decoration-none"
+                        style={{ fontSize: '12.5px' }}
+                    >
+                        <Package size={15} className="text-primary" /> + Add Product
+                    </Link>
+                )}
+
+                {(hasFullAccess || canView('purchases')) && (
+                    <Link 
+                        to="/add-purchase" 
+                        className="btn btn-sm btn-white border bg-white text-dark fw-semibold d-flex align-items-center gap-1.5 shadow-sm flex-shrink-0 px-3 py-2 rounded-3 text-decoration-none"
+                        style={{ fontSize: '12.5px' }}
+                    >
+                        <ShoppingBag size={15} className="text-success" /> + New Purchase
+                    </Link>
+                )}
+
+                {(hasFullAccess || canView('users')) && (
+                    <Link 
+                        to="/users" 
+                        className="btn btn-sm btn-white border bg-white text-dark fw-semibold d-flex align-items-center gap-1.5 shadow-sm flex-shrink-0 px-3 py-2 rounded-3 text-decoration-none"
+                        style={{ fontSize: '12.5px' }}
+                    >
+                        <Users size={15} className="text-info" /> Users &amp; Staff
+                    </Link>
+                )}
+
+                {(hasFullAccess || canView('manufacturing')) && bizType === 'Manufacturing' && (
+                    <Link 
+                        to="/manufacturing/work-orders" 
+                        className="btn btn-sm btn-white border bg-white text-dark fw-semibold d-flex align-items-center gap-1.5 shadow-sm flex-shrink-0 px-3 py-2 rounded-3 text-decoration-none"
+                        style={{ fontSize: '12.5px' }}
+                    >
+                        <Cpu size={15} className="text-primary" /> Work Orders
+                    </Link>
+                )}
+
+                {(hasFullAccess || canView('reports')) && (
+                    <Link 
+                        to="/dashboard/financial-report" 
+                        className="btn btn-sm btn-white border bg-white text-dark fw-semibold d-flex align-items-center gap-1.5 shadow-sm flex-shrink-0 px-3 py-2 rounded-3 text-decoration-none"
+                        style={{ fontSize: '12.5px' }}
+                    >
+                        <TrendingUp size={15} className="text-warning" /> Reports &amp; Analytics
+                    </Link>
+                )}
+            </div>
+
             {/* Top Cards Row 1 */}
             <div className="row g-2 g-sm-3 mb-3">
                 <div className="col-12 col-sm-6 col-xl-3">
-                    <div className="dash-card top-card-orange">
-                        <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
-                            <div>
-                                <p className="mb-1 fw-medium text-white-50 small top-kpi-label">Today's Total Sales</p>
-                                <h3 className="mb-0 fw-bold top-kpi-amount">
-                                    {fmt(totalAmount)}
-                                </h3>
-                                <h6 className="text-white-50 top-kpi-sub mt-1"><b>Total Sales: </b>{totalCount}</h6>
+                    <Link to="/pos" className="text-decoration-none d-block h-100">
+                        <div className="dash-card top-card-orange">
+                            <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
+                                <div>
+                                    <p className="mb-1 fw-medium text-white-50 small top-kpi-label">Today's Total Sales</p>
+                                    <h3 className="mb-0 fw-bold top-kpi-amount">
+                                        {fmt(totalAmount)}
+                                    </h3>
+                                    <h6 className="text-white-50 top-kpi-sub mt-1"><b>Total Sales: </b>{totalCount}</h6>
+                                </div>
+                                <div className="top-kpi-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.2" d="M3 7C3 5.34315 4.34315 4 6 4H18C19.6569 4 21 5.34315 21 7V17C21 18.6569 19.6569 20 18 20H6C4.34315 20 3 18.6569 3 17V7Z" fill="#ea580c"/>
+                                        <path d="M15 12C15 13.1046 14.1046 14 13 14C11.8954 14 11 13.1046 11 12C11 10.8954 11.8954 10 13 10C14.1046 10 15 10.8954 15 12Z" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M3 9H21" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M3 7C3 5.34315 4.34315 4 6 4H18C19.6569 4 21 5.34315 21 7V17C21 18.6569 19.6569 20 18 20H6C4.34315 20 3 18.6569 3 17V7Z" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
                             </div>
-                            <div className="top-kpi-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.2" d="M3 7C3 5.34315 4.34315 4 6 4H18C19.6569 4 21 5.34315 21 7V17C21 18.6569 19.6569 20 18 20H6C4.34315 20 3 18.6569 3 17V7Z" fill="#ea580c"/>
-                                    <path d="M15 12C15 13.1046 14.1046 14 13 14C11.8954 14 11 13.1046 11 12C11 10.8954 11.8954 10 13 10C14.1046 10 15 10.8954 15 12Z" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M3 9H21" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M3 7C3 5.34315 4.34315 4 6 4H18C19.6569 4 21 5.34315 21 7V17C21 18.6569 19.6569 20 18 20H6C4.34315 20 3 18.6569 3 17V7Z" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                            {/* Mini breakdown inside the card */}
+                            <div className="d-flex gap-2 gap-sm-3 mb-1" style={{fontSize:'12px'}}>
+                                <div className="d-flex align-items-center gap-1 text-white-50">
+                                    <span style={{width:7,height:7,borderRadius:'50%',background:'rgba(255,255,255,0.9)',display:'inline-block'}}></span>
+                                    Online: <span className="text-white fw-bold ms-1">{loadingCount ? '…' : onlineCount}</span>
+                                </div>
+                                <div className="d-flex align-items-center gap-1 text-white-50">
+                                    <span style={{width:7,height:7,borderRadius:'50%',background:'rgba(255,255,255,0.5)',display:'inline-block'}}></span>
+                                    POS: <span className="text-white fw-bold ms-1">{loadingCount ? '…' : posCount}</span>
+                                </div>
                             </div>
                         </div>
-                        {/* Mini breakdown inside the card */}
-                        <div className="d-flex gap-2 gap-sm-3 mb-1" style={{fontSize:'12px'}}>
-                            <div className="d-flex align-items-center gap-1 text-white-50">
-                                <span style={{width:7,height:7,borderRadius:'50%',background:'rgba(255,255,255,0.9)',display:'inline-block'}}></span>
-                                Online: <span className="text-white fw-bold ms-1">{loadingCount ? '…' : onlineCount}</span>
+                    </Link>
+                </div>
+                <div className="col-12 col-sm-6 col-xl-3">
+                    <Link to="/dashboard/sales-return" className="text-decoration-none d-block h-100">
+                        <div className="dash-card top-card-navy">
+                            <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
+                                <div>
+                                    <p className="mb-1 fw-medium text-white-50 small top-kpi-label">Total Sales Return</p>
+                                    <h3 className="mb-0 fw-bold top-kpi-amount">
+                                        {loadingReturn
+                                            ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
+                                            : fmt(returnSummary?.totalAmount ?? 0)}
+                                    </h3>
+                                    <h6 className="text-white-50 top-kpi-sub mt-1"><b>Total Returns: </b>{loadingReturn ? '…' : (returnSummary?.totalCount ?? 0)}</h6>
+                                </div>
+                                <div className="top-kpi-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.2" d="M20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" fill="#0f172a"/>
+                                        <path d="M8 12L12 8M8 12L12 16M8 12H16" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <circle cx="12" cy="12" r="10" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
                             </div>
-                            <div className="d-flex align-items-center gap-1 text-white-50">
-                                <span style={{width:7,height:7,borderRadius:'50%',background:'rgba(255,255,255,0.5)',display:'inline-block'}}></span>
-                                POS: <span className="text-white fw-bold ms-1">{loadingCount ? '…' : posCount}</span>
+                            {/* Mini breakdown: Paid vs Due */}
+                            <div className="d-flex gap-2 gap-sm-3 mb-1" style={{fontSize:'12px'}}>
+                                <div className="d-flex align-items-center gap-1 text-white-50">
+                                    <span style={{width:7,height:7,borderRadius:'50%',background:'#4ade80',display:'inline-block'}}></span>
+                                    Paid: <span className="text-white fw-bold ms-1">{loadingReturn ? '…' : fmt(returnSummary?.totalPaid ?? 0)}</span>
+                                </div>
+                                <div className="d-flex align-items-center gap-1 text-white-50">
+                                    <span style={{width:7,height:7,borderRadius:'50%',background:'#f87171',display:'inline-block'}}></span>
+                                    Due: <span className="text-white fw-bold ms-1">{loadingReturn ? '…' : fmt(returnSummary?.totalDue ?? 0)}</span>
+                                </div>
                             </div>
+                        </div>
+                    </Link>
+                </div>
+                <div className="col-12 col-sm-6 col-xl-3">
+                    <Link to="/purchases" className="text-decoration-none d-block h-100">
+                        <div className="dash-card top-card-teal">
+                            <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
+                                <div>
+                                    <p className="mb-1 fw-medium text-white-50 small top-kpi-label">Total Purchase (Net)</p>
+                                    <h3 className="mb-0 fw-bold top-kpi-amount">
+                                        {loadingPurchase || loadingPurchaseReturn
+                                            ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
+                                            : fmt(Math.max(0, (purchaseSummary?.totalAmount ?? 0) - (purchaseReturnSummary?.totalAmount ?? 0)))}
+                                    </h3>
+                                    <h6 className="text-white-50 top-kpi-sub mt-1">
+                                        <b>Purchases: </b>{loadingPurchase ? '…' : (purchaseSummary?.totalCount ?? 0)}
+                                        <span className="ms-1" style={{opacity: 0.8}}>({loadingPurchase ? '…' : fmt(purchaseSummary?.totalAmount ?? 0)})</span>
+                                    </h6>
+                                </div>
+                                <div className="top-kpi-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.2" d="M5 8L6.5 19C6.63807 19.5523 7.12781 20 7.69736 20H16.3026C16.8722 20 17.3619 19.5523 17.5 19L19 8H5Z" fill="#0d9488"/>
+                                        <path d="M9 11V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V11" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M5 8H19L17.5 19C17.3619 19.5523 16.8722 20 16.3026 20H7.69736C7.12781 20 6.63807 19.5523 6.5 19L5 8Z" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+                <div className="col-12 col-sm-6 col-xl-3">
+                    <Link to="/purchase-return" className="text-decoration-none d-block h-100">
+                        <div className="dash-card top-card-blue">
+                            <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
+                                <div>
+                                    <p className="mb-1 fw-medium text-white-50 small top-kpi-label">Total Purchase Return</p>
+                                    <h3 className="mb-0 fw-bold top-kpi-amount">
+                                        {loadingPurchaseReturn
+                                            ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
+                                            : fmt(purchaseReturnSummary?.totalAmount ?? 0)}
+                                    </h3>
+                                    <h6 className="text-white-50 top-kpi-sub mt-1">
+                                        <b>Total Returns: </b>{loadingPurchaseReturn ? '…' : (purchaseReturnSummary?.totalCount ?? 0)}
+                                    </h6>
+                                </div>
+                                <div className="top-kpi-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.2" d="M12 3L4 7V17L12 21L20 17V7L12 3Z" fill="#2563eb"/>
+                                        <path d="M12 3L4 7V17L12 21L20 17V7L12 3Z" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M4 7L12 11M20 7L12 11M12 11V21" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M15 4.5L9 8" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Top Cards Row 2 (White Cards) */}
+            <div className="row g-2 g-sm-3 mb-3 mb-sm-4">
+                <div className="col-6 col-md-6 col-xl-3">
+                    <div className="dash-card">
+                        <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
+                            <div style={{minWidth: 0}}>
+                                <h4 className="fw-bold fs-5 mb-0 text-dark top-kpi-amount text-truncate">
+                                    {loadingAnalytics ? (
+                                        <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:16,height:16}} />
+                                    ) : (
+                                        fmt(dashboardAnalytics?.totalStockProfit ?? 0)
+                                    )}
+                                </h4>
+                                <p className="text-secondary small mb-0 top-kpi-label text-truncate">Today's Profit</p>
+                            </div>
+                            <div className="icon-rounded-white bg-light-blue flex-shrink-0 ms-1" style={{width:36, height:36}}>
+                                <DollarSign size={18} />
+                            </div>
+                        </div>
+                        <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                            <small className="text-success fw-semibold" style={{fontSize:'11px'}}>Analytics</small>
+                            <Link to="/dashboard/financial-report" className="small fw-semibold text-primary text-decoration-none" style={{fontSize:'11px'}}>View &gt;</Link>
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-sm-6 col-xl-3">
-                    <div className="dash-card top-card-navy">
+                <div className="col-6 col-md-6 col-xl-3">
+                    <div className="dash-card">
                         <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
-                            <div>
-                                <p className="mb-1 fw-medium text-white-50 small top-kpi-label">Total Sales Return</p>
-                                <h3 className="mb-0 fw-bold top-kpi-amount">
-                                    {loadingReturn
-                                        ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
-                                        : fmt(returnSummary?.totalAmount ?? 0)}
-                                </h3>
-                                <h6 className="text-white-50 top-kpi-sub mt-1"><b>Total Returns: </b>{loadingReturn ? '…' : (returnSummary?.totalCount ?? 0)}</h6>
+                            <div style={{minWidth: 0}}>
+                                <h4 className="fw-bold fs-5 mb-0 text-dark top-kpi-amount text-truncate">
+                                    {loadingAnalytics ? (
+                                        <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:16,height:16}} />
+                                    ) : (
+                                        fmt(dashboardAnalytics?.totalSellingStockValue ?? 0)
+                                    )}
+                                </h4>
+                                <p className="text-secondary small mb-0 top-kpi-label text-truncate">Stock Valuation</p>
                             </div>
-                            <div className="top-kpi-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.2" d="M20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" fill="#0f172a"/>
-                                    <path d="M8 12L12 8M8 12L12 16M8 12H16" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <circle cx="12" cy="12" r="10" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                            <div className="icon-rounded-white bg-light-teal flex-shrink-0 ms-1" style={{width:36, height:36}}>
+                                <TrendingUp size={18} />
                             </div>
                         </div>
-                        {/* Mini breakdown: Paid vs Due */}
-                        <div className="d-flex gap-2 gap-sm-3 mb-1" style={{fontSize:'12px'}}>
-                            <div className="d-flex align-items-center gap-1 text-white-50">
-                                <span style={{width:7,height:7,borderRadius:'50%',background:'#4ade80',display:'inline-block'}}></span>
-                                Paid: <span className="text-white fw-bold ms-1">{loadingReturn ? '…' : fmt(returnSummary?.totalPaid ?? 0)}</span>
-                            </div>
-                            <div className="d-flex align-items-center gap-1 text-white-50">
-                                <span style={{width:7,height:7,borderRadius:'50%',background:'#f87171',display:'inline-block'}}></span>
-                                Due: <span className="text-white fw-bold ms-1">{loadingReturn ? '…' : fmt(returnSummary?.totalDue ?? 0)}</span>
-                            </div>
+                        <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                            <small className="text-success fw-semibold" style={{fontSize:'11px'}}>Inventory</small>
+                            <Link to="/products" className="small fw-semibold text-primary text-decoration-none" style={{fontSize:'11px'}}>View &gt;</Link>
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-sm-6 col-xl-3">
-                    <div className="dash-card top-card-teal">
+                <div className="col-6 col-md-6 col-xl-3">
+                    <div className="dash-card">
                         <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
-                            <div>
-                                <p className="mb-1 fw-medium text-white-50 small top-kpi-label">Total Purchase (Net)</p>
-                                <h3 className="mb-0 fw-bold top-kpi-amount">
-                                    {loadingPurchase || loadingPurchaseReturn
-                                        ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
-                                        : fmt(Math.max(0, (purchaseSummary?.totalAmount ?? 0) - (purchaseReturnSummary?.totalAmount ?? 0)))}
-                                </h3>
-                                <h6 className="text-white-50 top-kpi-sub mt-1">
-                                    <b>Purchases: </b>{loadingPurchase ? '…' : (purchaseSummary?.totalCount ?? 0)}
-                                    <span className="ms-1" style={{opacity: 0.8}}>({loadingPurchase ? '…' : fmt(purchaseSummary?.totalAmount ?? 0)})</span>
-                                </h6>
+                            <div style={{minWidth: 0}}>
+                                <h4 className="fw-bold fs-5 mb-0 text-dark top-kpi-amount text-truncate">
+                                    {loadingAnalytics ? (
+                                        <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:16,height:16}} />
+                                    ) : (
+                                        fmt(dashboardAnalytics?.totalPurchaseStockValue ?? 0)
+                                    )}
+                                </h4>
+                                <p className="text-secondary small mb-0 top-kpi-label text-truncate">Purchase Cost</p>
                             </div>
-                            <div className="top-kpi-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.2" d="M5 8L6.5 19C6.63807 19.5523 7.12781 20 7.69736 20H16.3026C16.8722 20 17.3619 19.5523 17.5 19L19 8H5Z" fill="#0d9488"/>
-                                    <path d="M9 11V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V11" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M5 8H19L17.5 19C17.3619 19.5523 16.8722 20 16.3026 20H7.69736C7.12781 20 6.63807 19.5523 6.5 19L5 8Z" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                            <div className="icon-rounded-white bg-light-orange flex-shrink-0 ms-1" style={{width:36, height:36}}>
+                                <Activity size={18} />
                             </div>
+                        </div>
+                        <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                            <small className="text-success fw-semibold" style={{fontSize:'11px'}}>Supply</small>
+                            <Link to="/purchases" className="small fw-semibold text-primary text-decoration-none" style={{fontSize:'11px'}}>View &gt;</Link>
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-sm-6 col-xl-3">
-                    <div className="dash-card top-card-blue">
+                <div className="col-6 col-md-6 col-xl-3">
+                    <div className="dash-card">
                         <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
-                            <div>
-                                <p className="mb-1 fw-medium text-white-50 small top-kpi-label">Total Purchase Return</p>
-                                <h3 className="mb-0 fw-bold top-kpi-amount">
-                                    {loadingPurchaseReturn
-                                        ? <span className="spinner-border spinner-border-sm text-light" role="status" style={{width:18,height:18}} />
-                                        : fmt(purchaseReturnSummary?.totalAmount ?? 0)}
-                                </h3>
-                                <h6 className="text-white-50 top-kpi-sub mt-1">
-                                    <b>Total Returns: </b>{loadingPurchaseReturn ? '…' : (purchaseReturnSummary?.totalCount ?? 0)}
-                                </h6>
+                            <div style={{minWidth: 0}}>
+                                <h4 className="fw-bold fs-5 mb-0 text-dark top-kpi-amount text-truncate">
+                                    {loadingReturn || loadingPurchaseReturn ? (
+                                        <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:16,height:16}} />
+                                    ) : (
+                                        fmt(overallReturns)
+                                    )}
+                                </h4>
+                                <p className="text-secondary small mb-0 top-kpi-label text-truncate">Payment Returns</p>
                             </div>
-                            <div className="top-kpi-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.2" d="M12 3L4 7V17L12 21L20 17V7L12 3Z" fill="#2563eb"/>
-                                    <path d="M12 3L4 7V17L12 21L20 17V7L12 3Z" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M4 7L12 11M20 7L12 11M12 11V21" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M15 4.5L9 8" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                            <div className="icon-rounded-white bg-light-purple flex-shrink-0 ms-1" style={{width:36, height:36}}>
+                                <RefreshCcw size={18} />
                             </div>
+                        </div>
+                        <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                            <small className="text-danger fw-semibold" style={{fontSize:'11px'}}>Returns</small>
+                            <Link to="/dashboard/sales-return" className="small fw-semibold text-primary text-decoration-none" style={{fontSize:'11px'}}>View &gt;</Link>
                         </div>
                     </div>
                 </div>
             </div>
-
-                    {/* Top Cards Row 2 (White Cards) */}
-                    <div className="row g-2 g-sm-3 mb-3 mb-sm-4">
-                        <div className="col-6 col-md-6 col-xl-3">
-                            <div className="dash-card">
-                                <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
-                                    <div style={{minWidth: 0}}>
-                                        <h4 className="fw-bold fs-5 mb-0 text-dark top-kpi-amount text-truncate">
-                                            {loadingAnalytics ? (
-                                                <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:16,height:16}} />
-                                            ) : (
-                                                fmt(dashboardAnalytics?.totalStockProfit ?? 0)
-                                            )}
-                                        </h4>
-                                        <p className="text-secondary small mb-0 top-kpi-label text-truncate">Today's Profit</p>
-                                    </div>
-                                    <div className="icon-rounded-white bg-light-blue flex-shrink-0 ms-1" style={{width:36, height:36}}>
-                                        <DollarSign size={18} />
-                                    </div>
-                                </div>
-                                <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                                    <small className="text-success fw-semibold" style={{fontSize:'11px'}}>+22% <span className="d-none d-sm-inline">vs Last Mo.</span></small>
-                                    <a href="#" className="small fw-semibold text-primary text-decoration-none" style={{fontSize:'11px'}}>View</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-6 col-md-6 col-xl-3">
-                            <div className="dash-card">
-                                <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
-                                    <div style={{minWidth: 0}}>
-                                        <h4 className="fw-bold fs-5 mb-0 text-dark top-kpi-amount text-truncate">
-                                            {loadingAnalytics ? (
-                                                <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:16,height:16}} />
-                                            ) : (
-                                                fmt(dashboardAnalytics?.totalSellingStockValue ?? 0)
-                                            )}
-                                        </h4>
-                                        <p className="text-secondary small mb-0 top-kpi-label text-truncate">Today's Revenue</p>
-                                    </div>
-                                    <div className="icon-rounded-white bg-light-teal flex-shrink-0 ms-1" style={{width:36, height:36}}>
-                                        <TrendingUp size={18} />
-                                    </div>
-                                </div>
-                                <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                                    <small className="text-success fw-semibold" style={{fontSize:'11px'}}>+15% <span className="d-none d-sm-inline">vs Last Mo.</span></small>
-                                    <a href="#" className="small fw-semibold text-primary text-decoration-none" style={{fontSize:'11px'}}>View</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-6 col-md-6 col-xl-3">
-                            <div className="dash-card">
-                                <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
-                                    <div style={{minWidth: 0}}>
-                                        <h4 className="fw-bold fs-5 mb-0 text-dark top-kpi-amount text-truncate">
-                                            {loadingAnalytics ? (
-                                                <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:16,height:16}} />
-                                            ) : (
-                                                fmt(dashboardAnalytics?.totalPurchaseStockValue ?? 0)
-                                            )}
-                                        </h4>
-                                        <p className="text-secondary small mb-0 top-kpi-label text-truncate">Purchase Cost</p>
-                                    </div>
-                                    <div className="icon-rounded-white bg-light-orange flex-shrink-0 ms-1" style={{width:36, height:36}}>
-                                        <Activity size={18} />
-                                    </div>
-                                </div>
-                                <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                                    <small className="text-success fw-semibold" style={{fontSize:'11px'}}>+42% <span className="d-none d-sm-inline">vs Last Mo.</span></small>
-                                    <a href="#" className="small fw-semibold text-primary text-decoration-none" style={{fontSize:'11px'}}>View</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-6 col-md-6 col-xl-3">
-                            <div className="dash-card">
-                                <div className="d-flex justify-content-between align-items-start mb-2 mb-sm-3">
-                                    <div style={{minWidth: 0}}>
-                                        <h4 className="fw-bold fs-5 mb-0 text-dark top-kpi-amount text-truncate">
-                                            {loadingReturn || loadingPurchaseReturn ? (
-                                                <span className="spinner-border spinner-border-sm text-secondary" role="status" style={{width:16,height:16}} />
-                                            ) : (
-                                                fmt(overallReturns)
-                                            )}
-                                        </h4>
-                                        <p className="text-secondary small mb-0 top-kpi-label text-truncate">Payment Returns</p>
-                                    </div>
-                                    <div className="icon-rounded-white bg-light-purple flex-shrink-0 ms-1" style={{width:36, height:36}}>
-                                        <RefreshCcw size={18} />
-                                    </div>
-                                </div>
-                                <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                                    <small className="text-danger fw-semibold" style={{fontSize:'11px'}}>-20% <span className="d-none d-sm-inline">vs Last Mo.</span></small>
-                                    <a href="#" className="small fw-semibold text-primary text-decoration-none" style={{fontSize:'11px'}}>View</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     {/* Today's Sales Breakdown */}
                     <div className="row g-3 mb-3 mb-sm-4">
@@ -741,7 +835,7 @@ export default function Dashboard() {
                             <div className="dash-card">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <h5 className="dash-title mb-0"><TrendingUp size={20} className="text-pink-500" color="#ec4899"/> Top Selling</h5>
-                                    <button className="dash-select text-primary bg-light border-0 fw-semibold">View All &gt;</button>
+                                    <Link to="/products" className="dash-select text-primary bg-light border-0 fw-semibold text-decoration-none">View All &gt;</Link>
                                 </div>
                                 {loadingAnalytics ? (
                                     <div className="text-center py-4">
@@ -768,7 +862,7 @@ export default function Dashboard() {
                             <div className="dash-card">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <h5 className="dash-title mb-0"><Activity size={20} className="text-danger" color="#ef4444"/> Low Stock</h5>
-                                    <button className="dash-select text-primary bg-light border-0 fw-semibold">View All &gt;</button>
+                                    <Link to="/low-stocks" className="dash-select text-primary bg-light border-0 fw-semibold text-decoration-none">View All &gt;</Link>
                                 </div>
                                 {loadingAnalytics ? (
                                     <div className="text-center py-4">

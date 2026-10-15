@@ -6,7 +6,9 @@ export function usePermissions() {
     let permissions = {};
     if (user?.projectPermissions) {
         try {
-            permissions = JSON.parse(user.projectPermissions);
+            permissions = typeof user.projectPermissions === 'string'
+                ? JSON.parse(user.projectPermissions)
+                : user.projectPermissions;
             if (typeof permissions !== 'object' || permissions === null) {
                 permissions = {};
             }
@@ -15,16 +17,24 @@ export function usePermissions() {
         }
     }
 
-    const hasFullAccess = !user?.activeProjectId || user?.activeProjectId === user?.id;
+    const hasFullAccess = user?.role === 'SUPER_ADMIN' || !user?.activeProjectId || user?.activeProjectId === user?.id;
 
     const canView = (module) => {
         if (hasFullAccess) return true;
+        if (!module) return true;
+        if (Array.isArray(module)) {
+            return module.some(m => canView(m));
+        }
         if (!permissions[module]) return false;
         return permissions[module].includes('VIEW') || permissions[module].includes('MANAGE');
     };
 
     const canManage = (module) => {
         if (hasFullAccess) return true;
+        if (!module) return true;
+        if (Array.isArray(module)) {
+            return module.some(m => canManage(m));
+        }
         if (!permissions[module]) return false;
         return permissions[module].includes('MANAGE') || 
                permissions[module].includes('CREATE') || 
@@ -32,5 +42,5 @@ export function usePermissions() {
                permissions[module].includes('DELETE');
     };
 
-    return { canView, canManage, hasFullAccess };
+    return { canView, canManage, hasFullAccess, permissions };
 }

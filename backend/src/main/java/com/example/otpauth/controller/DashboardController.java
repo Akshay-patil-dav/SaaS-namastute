@@ -28,17 +28,22 @@ public class DashboardController {
     }
 
     @GetMapping("/sales")
-    public ResponseEntity<?> getSalesDashboardAnalytics(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getSalesDashboardAnalytics(@RequestHeader(value = "Authorization", required = false) String token) {
         try {
-            String jwt = token.substring(7);
-            String email = jwtUtil.extractUsername(jwt);
-            Optional<User> userOptional = userRepository.findByEmail(email);
-            
-            if (userOptional.isEmpty()) {
-                return ResponseEntity.badRequest().body("User not found");
+            Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+            if (userId == null && token != null && token.startsWith("Bearer ")) {
+                String jwt = token.substring(7);
+                String email = jwtUtil.extractUsername(jwt);
+                Optional<User> userOptional = userRepository.findByEmail(email);
+                if (userOptional.isPresent()) {
+                    User u = userOptional.get();
+                    userId = u.getActiveProjectId() != null ? u.getActiveProjectId() : u.getId();
+                }
+            }
+            if (userId == null) {
+                return ResponseEntity.badRequest().body("User not authenticated");
             }
             
-            Long userId = userOptional.get().getId();
             DashboardDTO dashboard = dashboardService.getDashboardAnalytics(userId);
             return ResponseEntity.ok(dashboard);
         } catch (Exception e) {
@@ -48,18 +53,23 @@ public class DashboardController {
 
     @GetMapping("/chart")
     public ResponseEntity<?> getSalesPurchaseChartData(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "Authorization", required = false) String token,
             @org.springframework.web.bind.annotation.RequestParam(defaultValue = "1W", required = false) String period) {
         try {
-            String jwt = token.substring(7);
-            String email = jwtUtil.extractUsername(jwt);
-            Optional<User> userOptional = userRepository.findByEmail(email);
-
-            if (userOptional.isEmpty()) {
-                return ResponseEntity.badRequest().body("User not found");
+            Long userId = com.example.otpauth.util.SecurityUtils.getCurrentUserId();
+            if (userId == null && token != null && token.startsWith("Bearer ")) {
+                String jwt = token.substring(7);
+                String email = jwtUtil.extractUsername(jwt);
+                Optional<User> userOptional = userRepository.findByEmail(email);
+                if (userOptional.isPresent()) {
+                    User u = userOptional.get();
+                    userId = u.getActiveProjectId() != null ? u.getActiveProjectId() : u.getId();
+                }
+            }
+            if (userId == null) {
+                return ResponseEntity.badRequest().body("User not authenticated");
             }
 
-            Long userId = userOptional.get().getId();
             java.util.List<com.example.otpauth.dto.SalesPurchaseChartDTO> chartData = dashboardService.getSalesPurchaseChartData(userId, period);
             return ResponseEntity.ok(chartData);
         } catch (Exception e) {

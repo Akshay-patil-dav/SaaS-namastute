@@ -20,8 +20,13 @@ public class AuthResponse {
     private java.time.LocalDateTime subscriptionEndDate;
     private String nextPlan;
     private Integer nextSubscriptionDays;
+    private String roleTitle;
 
     public AuthResponse(Long id, String token, String email, String fullName, String firstName, String lastName, String username, String businessType, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified, Long activeProjectId, String projectPermissions, java.time.LocalDateTime subscriptionEndDate, String nextPlan, Integer nextSubscriptionDays) {
+        this(id, token, email, fullName, firstName, lastName, username, businessType, roles, plan, emailVerified, phoneVerified, activeProjectId, projectPermissions, subscriptionEndDate, nextPlan, nextSubscriptionDays, null);
+    }
+
+    public AuthResponse(Long id, String token, String email, String fullName, String firstName, String lastName, String username, String businessType, List<String> roles, String plan, boolean emailVerified, boolean phoneVerified, Long activeProjectId, String projectPermissions, java.time.LocalDateTime subscriptionEndDate, String nextPlan, Integer nextSubscriptionDays, String roleTitle) {
         this.id = id;
         this.token = token;
         this.email = email;
@@ -39,6 +44,7 @@ public class AuthResponse {
         this.subscriptionEndDate = subscriptionEndDate;
         this.nextPlan = nextPlan;
         this.nextSubscriptionDays = nextSubscriptionDays;
+        this.roleTitle = roleTitle;
     }
 
     public Long getId() { return id; }
@@ -91,4 +97,10 @@ public class AuthResponse {
 
     public Integer getNextSubscriptionDays() { return nextSubscriptionDays; }
     public void setNextSubscriptionDays(Integer nextSubscriptionDays) { this.nextSubscriptionDays = nextSubscriptionDays; }
+
+    public String getRoleTitle() { return roleTitle; }
+    public void setRoleTitle(String roleTitle) { this.roleTitle = roleTitle; }
+
+    public String getPermissions() { return projectPermissions; }
+    public void setPermissions(String permissions) { this.projectPermissions = permissions; }
 }

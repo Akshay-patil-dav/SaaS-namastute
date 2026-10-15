@@ -57,7 +57,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/verification/**", "/oauth2/**", "/login/**",
                                 "/api/upload/**", "/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands",
-                                "/api/units", "/api/warranties")
+                                "/api/units", "/api/warranties", "/error")
                         .permitAll()
                         // Allow public e-commerce storefront access
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**")

@@ -55,7 +55,7 @@ import {
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
     const { user } = useAuth();
-    const { usage, openUpgradeModal } = useDataUsage();
+    const { usage, openUpgradeModal, isStaffOrMember } = useDataUsage();
     const isSuperAdmin = user?.role === 'SUPER_ADMIN';
     const isClientOrAdmin = user?.role === 'ADMIN' || user?.role === 'CLIENT';
 
@@ -109,7 +109,9 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     let permissions = {};
     if (user?.projectPermissions) {
         try {
-            permissions = JSON.parse(user.projectPermissions);
+            permissions = typeof user.projectPermissions === 'string'
+                ? JSON.parse(user.projectPermissions)
+                : user.projectPermissions;
             if (typeof permissions !== 'object' || permissions === null) {
                 permissions = {};
             }
@@ -546,24 +548,60 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 )}
 
                                 {/* ── Finance & Khata — all types */}
-                                <div className="pos-menu-divider"></div>
-                                <div className="pos-menu-section">Finance &amp; Khata</div>
-                                <ul className="pos-menu-list pb-2">
-                                    <li className="pos-menu-item">
-                                        <a className={`pos-menu-link ${isKhataActive ? 'active' : ''} ${openMenus.khata ? 'open' : ''}`} onClick={() => toggleMenu('khata')}>
-                                            <div className="pos-menu-link-content"><BookOpen className="pos-menu-icon" strokeWidth={1.5} /><span>Khata Book</span></div>
-                                            <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
-                                        </a>
-                                        <ul className={`pos-submenu ${openMenus.khata ? 'show' : ''}`}>
-                                            <li><NavLink to="/khata-book" end className={() => `pos-submenu-link ${location.pathname === '/khata-book' && (!location.search || location.search.includes('customers')) ? 'active' : ''}`}>Customers Khata</NavLink></li>
-                                            <li><NavLink to="/khata-book?tab=suppliers" className={() => `pos-submenu-link ${location.pathname === '/khata-book' && location.search.includes('suppliers') ? 'active' : ''}`}>Suppliers Khata</NavLink></li>
-                                            <li><NavLink to="/khata-book?tab=daybook" className={() => `pos-submenu-link ${location.pathname === '/khata-book' && location.search.includes('daybook') ? 'active' : ''}`}>Day Book (Daily Ledger)</NavLink></li>
+                                {canView('khata') && (
+                                    <>
+                                        <div className="pos-menu-divider"></div>
+                                        <div className="pos-menu-section">Finance &amp; Khata</div>
+                                        <ul className="pos-menu-list pb-2">
+                                            <li className="pos-menu-item">
+                                                <a className={`pos-menu-link ${isKhataActive ? 'active' : ''} ${openMenus.khata ? 'open' : ''}`} onClick={() => toggleMenu('khata')}>
+                                                    <div className="pos-menu-link-content"><BookOpen className="pos-menu-icon" strokeWidth={1.5} /><span>Khata Book</span></div>
+                                                    <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                                </a>
+                                                <ul className={`pos-submenu ${openMenus.khata ? 'show' : ''}`}>
+                                                    <li><NavLink to="/khata-book" end className={() => `pos-submenu-link ${location.pathname === '/khata-book' && (!location.search || location.search.includes('customers')) ? 'active' : ''}`}>Customers Khata</NavLink></li>
+                                                    <li><NavLink to="/khata-book?tab=suppliers" className={() => `pos-submenu-link ${location.pathname === '/khata-book' && location.search.includes('suppliers') ? 'active' : ''}`}>Suppliers Khata</NavLink></li>
+                                                    <li><NavLink to="/khata-book?tab=daybook" className={() => `pos-submenu-link ${location.pathname === '/khata-book' && location.search.includes('daybook') ? 'active' : ''}`}>Day Book (Daily Ledger)</NavLink></li>
+                                                </ul>
+                                            </li>
                                         </ul>
-                                    </li>
-                                </ul>
+                                    </>
+                                )}
+
+                                {/* ── Team & Staff — for Owner or permitted user ── */}
+                                {(hasFullAccess || canView('users')) && (
+                                    <>
+                                        <div className="pos-menu-divider"></div>
+                                        <div className="pos-menu-section">Team &amp; Staff</div>
+                                        <ul className="pos-menu-list pb-2">
+                                            <li className="pos-menu-item">
+                                                <NavLink 
+                                                    to="/users" 
+                                                    className={() => `pos-menu-link ${location.pathname.startsWith('/users') || location.pathname.startsWith('/staff') || location.pathname.startsWith('/team') ? 'active' : ''}`}
+                                                >
+                                                    <div className="pos-menu-link-content">
+                                                        <Users className="pos-menu-icon" strokeWidth={1.5} />
+                                                        <span>Users &amp; Staff</span>
+                                                    </div>
+                                                    <span style={{ 
+                                                        background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)', 
+                                                        color: '#fff', 
+                                                        fontSize: '10px', 
+                                                        fontWeight: '700', 
+                                                        padding: '2px 7px', 
+                                                        borderRadius: '10px', 
+                                                        letterSpacing: '0.04em' 
+                                                    }}>
+                                                        STAFF
+                                                    </span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
+                                    </>
+                                )}
 
                                 {/* ── Reports */}
-                                {!isBilling && canView('sales') && (
+                                {!isBilling && (canView('sales') || canView('reports')) && (
                                     <>
                                         <div className="pos-menu-divider"></div>
                                         <div className="pos-menu-section">Reports</div>
@@ -578,38 +616,45 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 )}
 
                                 {/* ── Settings & Integrations — all types */}
-                                <div className="pos-menu-divider"></div>
-                                <div className="pos-menu-section">{isSubscriber && !isBilling ? 'Settings & Integrations' : 'System Settings'}</div>
-                                <ul className="pos-menu-list pb-4">
-                                    {isSubscriber && !isBilling && (
-                                        <li className="pos-menu-item">
-                                            <NavLink to="/settings/connected_apps" className={() => `pos-menu-link ${isConnectedAppsActive ? 'active' : ''}`}>
-                                                <div className="pos-menu-link-content"><Puzzle className="pos-menu-icon" strokeWidth={1.5} /><span>Connected Apps</span></div>
-                                                <span style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', color: '#fff', fontSize: '10px', fontWeight: '700', padding: '2px 7px', borderRadius: '10px', letterSpacing: '0.04em' }}>APPS</span>
-                                            </NavLink>
-                                        </li>
-                                    )}
-                                    <li className="pos-menu-item">
-                                        <a className={`pos-menu-link ${isSystemSettingsActive ? 'active' : ''} ${openMenus.settings ? 'open' : ''}`} onClick={() => toggleMenu('settings')}>
-                                            <div className="pos-menu-link-content"><Settings className="pos-menu-icon" strokeWidth={1.5} /><span>System Settings</span></div>
-                                            <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
-                                        </a>
-                                        <ul className={`pos-submenu ${openMenus.settings ? 'show' : ''}`}>
-                                            <li><NavLink to="/settings/profile" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Profile Settings</NavLink></li>
-                                            <li><NavLink to="/settings/company_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Company Settings</NavLink></li>
-                                            <li><NavLink to="/settings/bank_accounts" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Bank Accounts</NavLink></li>
-                                            {!isBilling && (
-                                                <>
-                                                    <li><NavLink to="/settings/payment_gateway" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Payment Gateway</NavLink></li>
-                                                    <li><NavLink to="/settings/tax_rates" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Tax Rates</NavLink></li>
-                                                    <li><NavLink to="/settings/currencies" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Currencies</NavLink></li>
-                                                    <li><NavLink to="/settings/pos_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>POS Settings</NavLink></li>
-                                                    <li><NavLink to="/settings/ai_helper" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>AI Helper</NavLink></li>
-                                                </>
+                                {canView('settings') && (
+                                    <>
+                                        <div className="pos-menu-divider"></div>
+                                        <div className="pos-menu-section">{isSubscriber && !isBilling ? 'Settings & Integrations' : 'System Settings'}</div>
+                                        <ul className="pos-menu-list pb-4">
+                                            {isSubscriber && !isBilling && (
+                                                <li className="pos-menu-item">
+                                                    <NavLink to="/settings/connected_apps" className={() => `pos-menu-link ${isConnectedAppsActive ? 'active' : ''}`}>
+                                                        <div className="pos-menu-link-content"><Puzzle className="pos-menu-icon" strokeWidth={1.5} /><span>Connected Apps</span></div>
+                                                        <span style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', color: '#fff', fontSize: '10px', fontWeight: '700', padding: '2px 7px', borderRadius: '10px', letterSpacing: '0.04em' }}>APPS</span>
+                                                    </NavLink>
+                                                </li>
                                             )}
+                                            <li className="pos-menu-item">
+                                                <a className={`pos-menu-link ${isSystemSettingsActive ? 'active' : ''} ${openMenus.settings ? 'open' : ''}`} onClick={() => toggleMenu('settings')}>
+                                                    <div className="pos-menu-link-content"><Settings className="pos-menu-icon" strokeWidth={1.5} /><span>System Settings</span></div>
+                                                    <ChevronRight className="pos-menu-chevron" strokeWidth={1.5} />
+                                                </a>
+                                                <ul className={`pos-submenu ${openMenus.settings ? 'show' : ''}`}>
+                                                    <li><NavLink to="/settings/profile" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Profile Settings</NavLink></li>
+                                                    <li><NavLink to="/settings/company_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Company Settings</NavLink></li>
+                                                    <li><NavLink to="/settings/bank_accounts" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Bank Accounts</NavLink></li>
+                                                    {(hasFullAccess || canView('users')) && (
+                                                        <li><NavLink to="/settings/team_management" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Team &amp; Staff</NavLink></li>
+                                                    )}
+                                                    {!isBilling && (
+                                                        <>
+                                                            <li><NavLink to="/settings/payment_gateway" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Payment Gateway</NavLink></li>
+                                                            <li><NavLink to="/settings/tax_rates" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Tax Rates</NavLink></li>
+                                                            <li><NavLink to="/settings/currencies" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Currencies</NavLink></li>
+                                                            <li><NavLink to="/settings/pos_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>POS Settings</NavLink></li>
+                                                            <li><NavLink to="/settings/ai_helper" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>AI Helper</NavLink></li>
+                                                        </>
+                                                    )}
+                                                </ul>
+                                            </li>
                                         </ul>
-                                    </li>
-                                </ul>
+                                    </>
+                                )}
                             </>
                         );
                     })()}
@@ -702,10 +747,10 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                 type="button"
                                                 onClick={() => openUpgradeModal('50 Records Max Completed')}
                                                 className={`pos-mini-pro-btn ${isLimitReached ? 'pos-mini-pro-btn--alert' : ''}`}
-                                                title={`Upgrade Plan (${freeUsed}/${freeLimit} used)`}
+                                                title={isStaffOrMember ? `Workspace Quota (${freeUsed}/${freeLimit} used)` : `Upgrade Plan (${freeUsed}/${freeLimit} used)`}
                                             >
                                                 <Sparkles size={11} />
-                                                <span>{isLimitReached ? 'UPG' : 'PRO'}</span>
+                                                <span>{isStaffOrMember ? (isLimitReached ? 'FULL' : 'QTA') : (isLimitReached ? 'UPG' : 'PRO')}</span>
                                             </button>
 
                                             {/* Hover Flyout Card */}
@@ -751,7 +796,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                     className={`pos-flyout-upgrade-btn ${isLimitReached ? 'pos-flyout-upgrade-btn--alert' : ''}`}
                                                 >
                                                     <Sparkles size={13} />
-                                                    <span>{isLimitReached ? 'Upgrade Plan Now' : 'Upgrade to Pro'}</span>
+                                                    <span>{isStaffOrMember ? (isLimitReached ? 'Workspace Limit Info' : 'Workspace Quota') : (isLimitReached ? 'Upgrade Plan Now' : 'Upgrade to Pro')}</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -820,7 +865,7 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                     className={`pos-sub-upgrade-btn ${isLimitReached ? 'pos-sub-upgrade-btn--alert' : ''}`}
                                                 >
                                                     <Sparkles size={13} />
-                                                    <span>{isLimitReached ? 'Upgrade Plan Now' : 'Upgrade to Pro'}</span>
+                                                    <span>{isStaffOrMember ? (isLimitReached ? 'Workspace Quota Full' : 'Workspace Quota') : (isLimitReached ? 'Upgrade Plan Now' : 'Upgrade to Pro')}</span>
                                                 </button>
                                             </div>
                                         </div>

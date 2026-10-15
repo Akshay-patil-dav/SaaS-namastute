@@ -74,8 +74,15 @@ export function UsageProvider({ children }) {
         return () => window.removeEventListener('open-upgrade-plan-modal', handleOpenModal);
     }, [openUpgradeModal]);
 
-    // Auto-open modal on first detection of 50 records max limit completion
+    const isStaffOrMember = Boolean(
+        (user?.activeProjectId && user.activeProjectId !== user.id) ||
+        (user?.roleTitle && user.roleTitle !== 'Owner' && user?.roleTitle !== 'Super Admin')
+    );
+
+    // Auto-open modal on first detection of 50 records max limit completion (Owner / Admins only)
     useEffect(() => {
+        if (isStaffOrMember) return;
+
         const isFree = !user?.plan || user?.plan === 'NONE';
         const limit = usage?.limit && usage.limit > 0 ? usage.limit : 50;
         const isLimitReached = isFree && usage?.totalUsed >= limit;
@@ -87,12 +94,13 @@ export function UsageProvider({ children }) {
                 openUpgradeModal(`You have completed the ${limit} Records Max free plan limit. Upgrade your plan to continue adding records.`);
             }
         }
-    }, [usage?.totalUsed, usage?.limit, user?.plan, openUpgradeModal]);
+    }, [usage?.totalUsed, usage?.limit, user?.plan, isStaffOrMember, openUpgradeModal]);
 
     return (
         <UsageContext.Provider value={{
             usage,
             loading,
+            isStaffOrMember,
             refreshUsage: fetchUsage,
             isUpgradeModalOpen,
             openUpgradeModal,

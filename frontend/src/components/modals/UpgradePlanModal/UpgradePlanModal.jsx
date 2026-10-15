@@ -86,8 +86,72 @@ export default function UpgradePlanModal() {
 
     if (!isUpgradeModalOpen) return null;
 
+    const isStaffOrMember = Boolean(
+        (user?.activeProjectId && user.activeProjectId !== user.id) ||
+        (user?.roleTitle && user.roleTitle !== 'Owner' && user?.roleTitle !== 'Super Admin')
+    );
+
     const freeLimit = usage?.limit && usage.limit > 0 ? usage.limit : 50;
     const freeUsed = usage?.totalUsed ?? 0;
+
+    if (isStaffOrMember) {
+        return (
+            <div className="upm-backdrop" onClick={closeUpgradeModal}>
+                <div className="upm-container" style={{ maxWidth: '480px', padding: '36px 28px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                    <button
+                        type="button"
+                        className="upm-close-btn"
+                        onClick={closeUpgradeModal}
+                        title="Close"
+                    >
+                        <X size={20} />
+                    </button>
+
+                    <div style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: '50%',
+                        background: '#fff7ed',
+                        color: '#ea580c',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 18px'
+                    }}>
+                        <Shield size={30} />
+                    </div>
+
+                    <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>
+                        Workspace Plan Limit
+                    </h3>
+                    <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, marginBottom: '20px' }}>
+                        This workspace has reached its <strong>{freeLimit} Records</strong> quota. You are assigned as a <strong>{user?.roleTitle || 'Staff Member'}</strong>.
+                    </p>
+                    <div style={{
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        padding: '14px 16px',
+                        fontSize: '12.5px',
+                        color: '#475569',
+                        textAlign: 'left',
+                        marginBottom: '24px'
+                    }}>
+                        💡 <strong>Note for Team Members:</strong> Subscription billing and plan upgrades are managed exclusively by the workspace owner. Please notify your workspace administrator to upgrade the plan.
+                    </div>
+
+                    <button
+                        type="button"
+                        className="btn btn-warning text-white fw-bold w-100 py-2.5 rounded-3 border-0"
+                        style={{ backgroundColor: '#ea580c' }}
+                        onClick={closeUpgradeModal}
+                    >
+                        Understood
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     const getPlanPrice = (plan) => plan.monthlyPrice;
     const getChargeAmount = (plan) => plan.monthlyPrice;

@@ -23,6 +23,7 @@ import {
     Bot
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { usePermissions } from '../../../hooks/usePermissions';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './settings.css';
 import { ProfileSettings, SecuritySettings, Notifications, ConnectedApps } from '../../../components/settings/GeneralSettings/GeneralSettings';
@@ -47,10 +48,12 @@ const sectionMapping = {
 
 export default function Settings() {
     const { user } = useAuth();
+    const { canView } = usePermissions();
     const navigate = useNavigate();
     const location = useLocation();
     
     const isMainUser = !user?.activeProjectId || user?.activeProjectId === user?.id || user?.role === 'SUPER_ADMIN';
+    const canManageTeam = isMainUser || canView('users');
     const isBilling = user?.businessType === 'Billing Invoice';
     
     const isSubscriber = Boolean(
@@ -75,8 +78,8 @@ export default function Settings() {
         const path = getPathSegment();
         if (!isSubscriber || isBilling) {
             const allowed = isBilling 
-                ? ['profile', 'company_settings', 'bank_accounts', 'billing'] 
-                : ['profile', 'company_settings', 'payment_gateway', 'bank_accounts', 'tax_rates', 'currencies', 'pos_settings', 'ai_helper', 'billing'];
+                ? ['profile', 'company_settings', 'bank_accounts', 'billing', 'team_management'] 
+                : ['profile', 'company_settings', 'payment_gateway', 'bank_accounts', 'tax_rates', 'currencies', 'pos_settings', 'ai_helper', 'billing', 'team_management'];
             if (!allowed.includes(path)) {
                 navigate('/settings/profile', { replace: true });
             }
@@ -145,6 +148,11 @@ export default function Settings() {
                                             </li>
                                         </>
                                     )}
+                                    {canManageTeam && (
+                                        <li className={`settings-sidebar-item ${isActive('team_management') ? 'active' : ''}`} onClick={() => navigate('/settings/team_management')}>
+                                            Team &amp; Staff
+                                        </li>
+                                    )}
                                 </ul>
                             )}
                         </div>
@@ -195,7 +203,9 @@ export default function Settings() {
                                     <li className={`settings-sidebar-item ${isActive('security') ? 'active' : ''}`} onClick={() => navigate('/settings/security')}>Security</li>
                                     <li className={`settings-sidebar-item ${isActive('notifications') ? 'active' : ''}`} onClick={() => navigate('/settings/notifications')}>Notifications</li>
                                     <li className={`settings-sidebar-item ${isActive('connected_apps') ? 'active' : ''}`} onClick={() => navigate('/settings/connected_apps')}>Connected Apps</li>
-                                    <li className={`settings-sidebar-item ${isActive('team_management') ? 'active' : ''}`} onClick={() => navigate('/settings/team_management')}>Team Management</li>
+                                    {canManageTeam && (
+                                        <li className={`settings-sidebar-item ${isActive('team_management') ? 'active' : ''}`} onClick={() => navigate('/settings/team_management')}>Team Management</li>
+                                    )}
                                     <li className={`settings-sidebar-item ${isActive('billing') ? 'active' : ''}`} onClick={() => navigate('/settings/billing')}>Billing & Plans</li>
                                 </ul>
                             )}
@@ -353,6 +363,7 @@ export default function Settings() {
                             {!isBilling && <Route path="currencies" element={<Currencies />} />}
                             {!isBilling && <Route path="pos_settings" element={<PosSettings />} />}
                             {!isBilling && <Route path="ai_helper" element={<AiHelperSettings />} />}
+                            <Route path="team_management" element={canManageTeam ? <TeamManagement /> : <Navigate to="/settings/profile" replace state={{ permissionDenied: true, message: "Access Restricted: You don't have permission to manage team members." }} />} />
                             <Route path="billing" element={<Billing />} />
                             <Route path="*" element={<Navigate to="profile" replace />} />
                         </Routes>
@@ -364,7 +375,7 @@ export default function Settings() {
                             <Route path="security" element={<SecuritySettings />} />
                             <Route path="notifications" element={<Notifications />} />
                             <Route path="connected_apps" element={<ConnectedApps />} />
-                            <Route path="team_management" element={<TeamManagement />} />
+                            <Route path="team_management" element={canManageTeam ? <TeamManagement /> : <Navigate to="/settings/profile" replace state={{ permissionDenied: true, message: "Access Restricted: You don't have permission to manage team members." }} />} />
                             <Route path="billing" element={<Billing />} />
                             
                             <Route path="system_settings" element={<SystemSettings />} />

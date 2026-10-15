@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CompanyProvider } from './context/CompanyContext';
 import ProtectedRoute from './components/auth/ProtectedRoute/ProtectedRoute';
+import ModuleGuard from './components/auth/ModuleGuard/ModuleGuard';
 import GuestRoute from './components/auth/GuestRoute/GuestRoute';
 import { ConfirmProvider } from './context/ConfirmContext';
 import { SettingsProvider } from './context/SettingsContext';
@@ -15,6 +16,7 @@ const Register = lazy(() => import('./pages/auth/Register/Register.jsx'));
 
 const Onboarding = lazy(() => import('./pages/auth/Onboarding/Onboarding.jsx'));
 const Unauthorized = lazy(() => import('./pages/auth/Unauthorized/Unauthorized.jsx'));
+const AcceptInvite = lazy(() => import('./pages/auth/AcceptInvite/AcceptInvite.jsx'));
 const Dashboard = lazy(() => import('./pages/dashboard/Dashboard/Dashboard.jsx'));
 const Dashboard2 = lazy(() => import('./pages/dashboard/Dashboard2/Dashboard2.jsx'));
 const ManageStock = lazy(() => import('./pages/inventory/ManageStock/ManageStock.jsx'));
@@ -52,6 +54,7 @@ const WorkCenters = lazy(() => import('./pages/manufacturing/WorkCenters/WorkCen
 const Invoices = lazy(() => import('./pages/sales/Invoices/Invoices.jsx'));
 const FinancialReport = lazy(() => import('./pages/reports/FinancialReport/FinancialReport.jsx'));
 const KhataBook = lazy(() => import('./pages/finance/KhataBook/KhataBook.jsx'));
+const TeamManagementPage = lazy(() => import('./pages/settings/TeamManagementPage.jsx'));
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
@@ -88,9 +91,11 @@ function PageLoader() {
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-const PosPage = ({ roles, children }) => (
+const PosPage = ({ roles, module, requireManage = false, children }) => (
     <ProtectedRoute allowedRoles={roles}>
-        <PosLayout>{children}</PosLayout>
+        <ModuleGuard module={module} requireManage={requireManage}>
+            <PosLayout>{children}</PosLayout>
+        </ModuleGuard>
     </ProtectedRoute>
 );
 
@@ -110,6 +115,7 @@ function AppRoutes() {
                 <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
 
                 <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="/invite/accept/:token" element={<AcceptInvite />} />
 
                 {/* ── ONBOARDING ───────────────────────── */}
                 <Route
@@ -131,140 +137,140 @@ function AppRoutes() {
                 />
                 <Route
                     path="/dashboard/manage-stock"
-                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><ManageStock /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES} module="inventory"><ManageStock /></PosPage>}
                 />
                 <Route
                     path="/dashboard/stock-adjustment"
-                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><StockAdjustment /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES} module="inventory" requireManage={true}><StockAdjustment /></PosPage>}
                 />
                 <Route
                     path="/dashboard/stock-transfer"
-                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><StockTransfer /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES} module="inventory" requireManage={true}><StockTransfer /></PosPage>}
                 />
                 <Route
                     path="/dashboard/sales-online"
-                    element={<PosPage roles={ADMIN_ROLES}><OnlineOrders /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="sales"><OnlineOrders /></PosPage>}
                 />
                 <Route
                     path="/dashboard/sales-pos"
-                    element={<PosPage roles={ADMIN_ROLES}><PosTerminal /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['pos', 'sales']}><PosTerminal /></PosPage>}
                 />
                 <Route
                     path="/pos"
-                    element={<PosPage roles={ADMIN_ROLES}><PosTerminal /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['pos', 'sales']}><PosTerminal /></PosPage>}
                 />
 
                 <Route
                     path="/dashboard/sales-return"
-                    element={<PosPage roles={ADMIN_ROLES}><SalesReturn /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="sales"><SalesReturn /></PosPage>}
                 />
                 <Route
                     path="/dashboard/invoices"
-                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><Invoices /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES} module="sales"><Invoices /></PosPage>}
                 />
 
                 {/* Products */}
                 <Route
                     path="/products"
-                    element={<PosPage roles={ADMIN_ROLES}><Products /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><Products /></PosPage>}
                 />
                 <Route
                     path="/create-product"
-                    element={<PosPage roles={ADMIN_ROLES}><CreateProduct /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']} requireManage={true}><CreateProduct /></PosPage>}
                 />
                 <Route
                     path="/edit-product/:id"
-                    element={<PosPage roles={ADMIN_ROLES}><EditProduct /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']} requireManage={true}><EditProduct /></PosPage>}
                 />
                 <Route
                     path="/expired-products"
-                    element={<PosPage roles={ADMIN_ROLES}><ExpiredProducts /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><ExpiredProducts /></PosPage>}
                 />
                 <Route
                     path="/low-stocks"
-                    element={<PosPage roles={ADMIN_ROLES}><LowStocks /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><LowStocks /></PosPage>}
                 />
                 <Route
                     path="/category"
-                    element={<PosPage roles={ADMIN_ROLES}><Category /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><Category /></PosPage>}
                 />
                 <Route
                     path="/sub-category"
-                    element={<PosPage roles={ADMIN_ROLES}><SubCategory /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><SubCategory /></PosPage>}
                 />
                 <Route
                     path="/brands"
-                    element={<PosPage roles={ADMIN_ROLES}><Brands /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><Brands /></PosPage>}
                 />
                 <Route
                     path="/units"
-                    element={<PosPage roles={ADMIN_ROLES}><Units /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><Units /></PosPage>}
                 />
                 <Route
                     path="/warranties"
-                    element={<PosPage roles={ADMIN_ROLES}><Warranties /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><Warranties /></PosPage>}
                 />
                 <Route
                     path="/stores"
-                    element={<PosPage roles={ADMIN_ROLES}><Store /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory', 'settings']}><Store /></PosPage>}
                 />
                 <Route
                     path="/warehouses"
-                    element={<PosPage roles={ADMIN_ROLES}><Warehouse /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module={['products', 'inventory', 'settings']}><Warehouse /></PosPage>}
                 />
                 <Route
                     path="/print-barcode"
-                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><PrintBarcode /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><PrintBarcode /></PosPage>}
                 />
                 <Route
                     path="/print-qrcode"
-                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><PrintQRCode /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES} module={['products', 'inventory']}><PrintQRCode /></PosPage>}
                 />
 
                 {/* Purchases */}
                 <Route
                     path="/purchases"
-                    element={<PosPage roles={ADMIN_ROLES}><Purchases /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="purchases"><Purchases /></PosPage>}
                 />
                 <Route
                     path="/add-purchase"
-                    element={<PosPage roles={ADMIN_ROLES}><AddPurchase /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="purchases" requireManage={true}><AddPurchase /></PosPage>}
                 />
                 <Route
                     path="/edit-purchase/:id"
-                    element={<PosPage roles={ADMIN_ROLES}><EditPurchase /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="purchases" requireManage={true}><EditPurchase /></PosPage>}
                 />
                 <Route
                     path="/purchase-return"
-                    element={<PosPage roles={ADMIN_ROLES}><PurchaseReturn /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="purchases"><PurchaseReturn /></PosPage>}
                 />
                 <Route
                     path="/add-purchase-return"
-                    element={<PosPage roles={ADMIN_ROLES}><AddPurchaseReturn /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="purchases" requireManage={true}><AddPurchaseReturn /></PosPage>}
                 />
                 <Route
                     path="/edit-purchase-return/:id"
-                    element={<PosPage roles={ADMIN_ROLES}><EditPurchaseReturn /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="purchases" requireManage={true}><EditPurchaseReturn /></PosPage>}
                 />
 
                 {/* Manufacturing */}
                 <Route
                     path="/manufacturing/bom"
-                    element={<PosPage roles={ADMIN_ROLES}><BillOfMaterials /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="manufacturing"><BillOfMaterials /></PosPage>}
                 />
                 <Route
                     path="/manufacturing/work-orders"
-                    element={<PosPage roles={ADMIN_ROLES}><WorkOrders /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="manufacturing"><WorkOrders /></PosPage>}
                 />
                 <Route
                     path="/manufacturing/work-centers"
-                    element={<PosPage roles={ADMIN_ROLES}><WorkCenters /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="manufacturing"><WorkCenters /></PosPage>}
                 />
 
                 {/* Settings & Connected Apps Direct Aliases */}
                 <Route
                     path="/settings/*"
-                    element={<PosPage roles={ADMIN_ROLES}><Settings /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="settings"><Settings /></PosPage>}
                 />
                 <Route
                     path="/connected-apps"
@@ -282,13 +288,27 @@ function AppRoutes() {
                 {/* Reports */}
                 <Route
                     path="/dashboard/financial-report"
-                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES}><FinancialReport /></PosPage>}
+                    element={isBillingInvoice ? <Navigate to="/dashboard" replace /> : <PosPage roles={ADMIN_ROLES} module={['reports', 'sales']}><FinancialReport /></PosPage>}
                 />
 
                 {/* Finance & Khata Book */}
                 <Route
                     path="/khata-book"
-                    element={<PosPage roles={ADMIN_ROLES}><KhataBook /></PosPage>}
+                    element={<PosPage roles={ADMIN_ROLES} module="khata"><KhataBook /></PosPage>}
+                />
+
+                {/* Users & Staff Management */}
+                <Route
+                    path="/users"
+                    element={<PosPage roles={ADMIN_ROLES} module="users"><TeamManagementPage /></PosPage>}
+                />
+                <Route
+                    path="/staff"
+                    element={<Navigate to="/users" replace />}
+                />
+                <Route
+                    path="/team"
+                    element={<Navigate to="/users" replace />}
                 />
 
 

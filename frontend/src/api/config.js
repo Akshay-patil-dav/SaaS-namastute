@@ -250,6 +250,18 @@ apiClient.interceptors.response.use(
             detail: data
           }));
         }
+      } else {
+        if (typeof window !== 'undefined') {
+          const msg = data?.message || data?.error || (typeof data === 'string' ? data : null) || 'Access Denied: You do not have permission for this action.';
+          window.dispatchEvent(new CustomEvent('permission-denied', {
+            detail: {
+              message: msg,
+              status: 403,
+              url: originalRequest?.url,
+              method: originalRequest?.method
+            }
+          }));
+        }
       }
     }
     return Promise.reject(error);

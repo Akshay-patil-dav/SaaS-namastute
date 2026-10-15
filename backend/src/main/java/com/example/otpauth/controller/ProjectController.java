@@ -50,6 +50,33 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getProjectMembers());
     }
 
+    @PostMapping("/staff")
+    public ResponseEntity<?> createStaff(@RequestBody com.example.otpauth.dto.StaffRequest request) {
+        try {
+            return ResponseEntity.ok(projectService.createStaffMember(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/members/{id}")
+    public ResponseEntity<?> updateMember(@PathVariable Long id, @RequestBody com.example.otpauth.dto.StaffRequest request) {
+        try {
+            return ResponseEntity.ok(projectService.updateStaffMember(id, request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/members/{id}/status")
+    public ResponseEntity<?> toggleMemberStatus(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(projectService.toggleMemberStatus(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PutMapping("/members/{id}/permissions")
     public ResponseEntity<?> updatePermissions(@PathVariable Long id, @RequestBody Map<String, String> request) {
         try {
@@ -68,5 +95,45 @@ public class ProjectController {
     public ResponseEntity<?> removeMember(@PathVariable Long id) {
         projectService.removeMember(id);
         return ResponseEntity.ok(Map.of("message", "Member removed"));
+    }
+
+    @GetMapping("/invitations/me")
+    public ResponseEntity<List<ProjectInvitation>> getMyInvitations() {
+        return ResponseEntity.ok(projectService.getMyInvitations());
+    }
+
+    @PostMapping("/invite/accept/{token}")
+    public ResponseEntity<?> acceptInvitation(@PathVariable String token) {
+        boolean ok = projectService.acceptInvitation(token);
+        if (ok) {
+            return ResponseEntity.ok(Map.of("message", "Invitation accepted successfully", "success", true));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid, expired, or unauthorized invitation link"));
+        }
+    }
+
+    @PostMapping("/invite/reject/{token}")
+    public ResponseEntity<?> rejectInvitation(@PathVariable String token) {
+        boolean ok = projectService.rejectInvitation(token);
+        if (ok) {
+            return ResponseEntity.ok(Map.of("message", "Invitation rejected", "success", true));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to reject invitation"));
+        }
+    }
+
+    @GetMapping("/my-workspaces")
+    public ResponseEntity<?> getMyWorkspaces() {
+        return ResponseEntity.ok(projectService.getAcceptedProjects());
+    }
+
+    @PostMapping("/switch/{projectId}")
+    public ResponseEntity<?> switchActiveWorkspace(@PathVariable Long projectId) {
+        try {
+            projectService.switchActiveProject(projectId);
+            return ResponseEntity.ok(Map.of("message", "Switched active workspace successfully", "activeProjectId", projectId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

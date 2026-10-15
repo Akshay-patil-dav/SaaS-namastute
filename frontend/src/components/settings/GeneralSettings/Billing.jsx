@@ -90,7 +90,7 @@ const PLANS = [
 
 export default function Billing() {
     const { user, fetchSession } = useAuth();
-    const { usage, refreshUsage } = useDataUsage();
+    const { usage, refreshUsage, isStaffOrMember } = useDataUsage();
     const { currencySymbol } = useCurrency();
     const billing = 'monthly';
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -137,6 +137,10 @@ export default function Billing() {
     const getChargeAmount = (plan) => plan.monthlyPrice;
 
     const handlePay = async (plan) => {
+        if (isStaffOrMember) {
+            setError('Workspace subscription and billing upgrades can only be made by the workspace owner.');
+            return;
+        }
         const end = user?.subscriptionEndDate ? new Date(user.subscriptionEndDate) : null;
         const isCurrentActive = currentPlan === plan.id && end && end.getTime() > Date.now();
         if (isCurrentActive) return;
@@ -277,6 +281,25 @@ export default function Billing() {
 
             return (
                 <div className="bp-status-container">
+                    {isStaffOrMember && (
+                        <div style={{
+                            background: '#eff6ff',
+                            border: '1px solid #bfdbfe',
+                            borderRadius: '12px',
+                            padding: '14px 18px',
+                            color: '#1e40af',
+                            fontSize: '13px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            marginBottom: '16px'
+                        }}>
+                            <Shield size={20} style={{ flexShrink: 0 }} />
+                            <div>
+                                <strong>Workspace Member Account:</strong> You are working as <strong>{user?.roleTitle || 'Staff'}</strong>. Subscription billing and payment upgrades are handled by your workspace administrator.
+                            </div>
+                        </div>
+                    )}
                     {isLimitReached && (
                         <div className="bp-status-limit-banner">
                             <div className="bp-status-limit-banner-left">
@@ -284,20 +307,26 @@ export default function Billing() {
                                 <div>
                                     <div className="bp-status-limit-title">50 Records Max Completed!</div>
                                     <div className="bp-status-limit-sub">
-                                        You have stored {used} of {limit} free records. Please choose an upgrade plan below to unlock unlimited records.
+                                        {isStaffOrMember ? (
+                                            <>This workspace has stored {used} of {limit} free records. Please inform the workspace owner to upgrade.</>
+                                        ) : (
+                                            <>You have stored {used} of {limit} free records. Please choose an upgrade plan below to unlock unlimited records.</>
+                                        )}
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                className="bp-limit-upgrade-quick-btn"
-                                onClick={() => {
-                                    const growth = PLANS.find(p => p.id === 'GROWTH') || PLANS[0];
-                                    handlePay(growth);
-                                }}
-                            >
-                                <Sparkles size={14} />
-                                Upgrade Now
-                            </button>
+                            {!isStaffOrMember && (
+                                <button
+                                    className="bp-limit-upgrade-quick-btn"
+                                    onClick={() => {
+                                        const growth = PLANS.find(p => p.id === 'GROWTH') || PLANS[0];
+                                        handlePay(growth);
+                                    }}
+                                >
+                                    <Sparkles size={14} />
+                                    Upgrade Now
+                                </button>
+                            )}
                         </div>
                     )}
                     <div className={`bp-status bp-status--free ${isLimitReached ? 'bp-status--limit' : ''}`}>
