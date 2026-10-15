@@ -1,0 +1,199 @@
+/* ── Mobile Bottom App Navigation Bar ───────────────────────────────── */
+.pos-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .pos-bottom-nav {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06), 0 -1px 3px rgba(15, 23, 42, 0.03);
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pos-bottom-nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 60px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 8px;
+    position: relative;
+  }
+
+  /* Individual Tab Item */
+  .pos-bottom-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    padding: 6px 4px 4px;
+    color: #64748b;
+    cursor: pointer;
+    text-decoration: none;
+    outline: none;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pos-bottom-tab:active {
+    transform: scale(0.92);
+  }
+
+  .pos-bottom-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 26px;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .pos-bottom-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    color: #64748b;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+  }
+
+  /* Active Tab State */
+  .pos-bottom-tab.active {
+    color: #ea580c;
+  }
+
+  .pos-bottom-tab.active .pos-bottom-icon-wrap {
+    color: #ea580c;
+    background: rgba(234, 88, 12, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .pos-bottom-tab.active .pos-bottom-label {
+    color: #ea580c;
+    font-weight: 700;
+  }
+
+  .pos-bottom-active-indicator {
+    position: absolute;
+    bottom: 2px;
+    width: 14px;
+    height: 3px;
+    border-radius: 3px;
+    background: #ea580c;
+    box-shadow: 0 1px 4px rgba(234, 88, 12, 0.4);
+    animation: indicatorPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes indicatorPop {
+    from {
+      transform: scaleX(0);
+      opacity: 0;
+    }
+    to {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+  }
+
+  .pos-bottom-menu-open-icon {
+    color: #ea580c;
+    animation: rotateClose 0.2s ease-out;
+  }
+
+  @keyframes rotateClose {
+    from { transform: rotate(-90deg); }
+    to { transform: rotate(0); }
+  }
+
+  /* ── Center Elevated Floating Action Button (FAB) ───────────────────── */
+  .pos-bottom-center-fab-slot {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 100%;
+  }
+
+  .pos-bottom-fab-btn {
+    position: absolute;
+    bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .pos-bottom-fab-btn:active {
+    transform: scale(0.9);
+  }
+
+  .pos-bottom-fab-icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.42), 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 3.5px solid #ffffff;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .pos-bottom-fab-btn.active .pos-bottom-fab-icon-box {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+    box-shadow: 0 6px 18px rgba(234, 88, 12, 0.55), 0 0 0 3px rgba(234, 88, 12, 0.2);
+    transform: scale(1.06);
+  }
+
+  .pos-bottom-fab-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #ea580c;
+    letter-spacing: 0.02em;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+
+  .pos-bottom-fab-btn:hover .pos-bottom-fab-icon-box {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 18px rgba(234, 88, 12, 0.48);
+  }
+}
+
+@media print {
+  .pos-bottom-nav {
+    display: none !important;
+  }
+}

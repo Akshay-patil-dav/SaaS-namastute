@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PosSidebar from '../PosSidebar/PosSidebar';
 import PosHeader from '../PosHeader/PosHeader';
+import PosBottomNav from '../PosBottomNav/PosBottomNav';
 import './pos-layout.css';
 import AIHelper from '../../ai/AIHelper/AIHelper';
 import GlobalPrintHeader from '../GlobalPrintHeader/GlobalPrintHeader';
@@ -126,6 +127,9 @@ export default function PosLayout({ children }) {
                 <main className="pos-content-area">
                     {children}
                 </main>
+                
+                {/* Mobile Bottom App Navigation Bar */}
+                <PosBottomNav sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
             </div>
             {/* AI Helper — floats on all authenticated pages, per-user isolated */}
             {!isBillingInvoice && <AIHelper />}

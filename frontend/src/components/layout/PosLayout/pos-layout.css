@@ -1150,7 +1150,7 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Overlay for Mobile Sidebar */
+/* ── Mobile Overlay for Sidebar Drawer ────────────────────────── */
 .pos-sidebar-overlay {
   display: none;
   position: fixed;
@@ -1158,37 +1158,256 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(2px);
-  z-index: 1035;
-  transition: opacity 0.3s ease;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1040;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Responsive constraints */
+/* ── Mobile & Tablet Layout Constraints (<= 991px) ───────────── */
 @media (max-width: 991px) {
+  :root {
+    --pos-mobile-sidebar-width: min(340px, 86vw);
+  }
+
+  .pos-layout-wrapper {
+    position: relative;
+    overflow-x: hidden;
+  }
+
   .pos-layout-wrapper .pos-sidebar {
     position: fixed;
-    left: calc(var(--pos-sidebar-width) * -1);
-    height: 100vh;
-    margin-left: 0; 
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
-  }
-  .pos-layout-wrapper.sidebar-open .pos-sidebar {
+    top: 0;
+    bottom: 0;
     left: 0;
+    width: var(--pos-mobile-sidebar-width);
+    min-width: var(--pos-mobile-sidebar-width);
+    max-width: 90vw;
+    height: 100vh;
+    height: 100dvh;
+    margin-left: 0;
+    border-radius: 0 24px 24px 0;
+    box-shadow: 12px 0 36px rgba(15, 23, 42, 0.22);
+    z-index: 1050;
+    transform: translateX(-105%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #ffffff;
+    border-right: 1px solid rgba(226, 232, 240, 0.8);
   }
-  .pos-sidebar-overlay.mobile-open {
+
+  .pos-layout-wrapper.sidebar-open .pos-sidebar,
+  .pos-sidebar.pos-sidebar-open {
+    transform: translateX(0) !important;
+  }
+
+  .pos-sidebar-overlay {
     display: block;
+  }
+
+  .pos-sidebar-overlay.mobile-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Safe content area with padding for bottom nav */
+  .pos-content-area {
+    padding: 12px 10px;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pos-main-content {
+    height: 100vh;
+    height: 100dvh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Mobile Top App Bar */
+  .pos-header {
+    height: 60px;
+    padding: 0 14px;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+  }
+
+  .pos-toggle-btn {
+    display: none !important;
+  }
+
+  .pos-header-actions {
+    gap: 8px;
+  }
+
+  /* ── Mobile Sidebar Drawer Profile Card ── */
+  .pos-sidebar-mobile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 8px 12px 6px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f8fafc 0%, #fff7ed 100%);
+    border: 1px solid #fed7aa;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.06);
+  }
+
+  .pos-sidebar-mobile-user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pos-sidebar-mobile-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .pos-sidebar-mobile-user-info {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .pos-sidebar-mobile-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pos-sidebar-mobile-email {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pos-sidebar-mobile-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .pos-sidebar-mobile-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2.5px 7px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    text-transform: capitalize;
+  }
+
+  .pos-sidebar-badge-role {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+  }
+
+  .pos-sidebar-badge-plan {
+    background: #fefce8;
+    color: #ca8a04;
+    border: 1px solid #fef08a;
+  }
+
+  .pos-sidebar-badge-mode {
+    background: #fff7ed;
+    color: #ea580c;
+    border: 1px solid #fed7aa;
+  }
+
+  /* ── Mobile Drawer Bottom Actions ── */
+  .pos-sidebar-mobile-bottom-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #f1f5f9;
+    background: #ffffff;
+    margin-top: auto;
+  }
+
+  .pos-sidebar-mobile-action-link {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .pos-sidebar-mobile-action-link:hover,
+  .pos-sidebar-mobile-action-link:active {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+  }
+
+  .pos-sidebar-mobile-logout {
+    color: #dc2626;
+    border-color: #fecaca;
+    background: #fef2f2;
+  }
+
+  .pos-sidebar-mobile-logout:hover,
+  .pos-sidebar-mobile-logout:active {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+  }
+}
+
+/* Hide mobile-specific cards on desktop */
+@media (min-width: 992px) {
+  .pos-sidebar-mobile-card,
+  .pos-sidebar-mobile-bottom-actions {
+    display: none !important;
   }
 }
 
 @media (max-width: 768px) {
-  .pos-header {
-    height: 60px;
-    padding: 0 12px;
-  }
-  .pos-content-area {
-    padding: 10px 8px;
-  }
   .pos-search-bar {
     display: none;
   }
@@ -1198,9 +1417,6 @@ body {
   .pos-btn-orange span, .pos-btn-dark span {
     display: none;
   }
-  .pos-header-actions {
-    gap: 8px;
-  }
   .hide-on-mobile {
     display: none !important;
   }
@@ -1208,7 +1424,8 @@ body {
 
 @media (max-width: 480px) {
   .pos-content-area {
-    padding: 8px 6px;
+    padding: 10px 6px;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
   }
 }
 

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
 import { useDataUsage } from '../../../context/UsageContext';
+import { useSettings } from '../../../hooks/useSettings';
+import { ENV } from '@/api/config';
 
 import {
     LayoutDashboard,
@@ -49,12 +51,15 @@ import {
     X,
     Database,
     Crown,
-    AlertTriangle
+    AlertTriangle,
+    LogOut
 } from 'lucide-react';
 
 export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
-    const { user } = useAuth();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const { settings } = useSettings();
     const { usage, openUpgradeModal, isStaffOrMember } = useDataUsage();
     const isSuperAdmin = user?.role === 'SUPER_ADMIN';
     const isClientOrAdmin = user?.role === 'ADMIN' || user?.role === 'CLIENT';
@@ -66,6 +71,45 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
     const hasAdvancedPlan = isSubscriber && user?.plan !== 'STARTER';
 
     const { companyInfo } = useCompany();
+
+    // User details for mobile drawer card
+    const userName = settings?.profileFirstName
+        ? `${settings.profileFirstName} ${settings.profileLastName || ''}`.trim()
+        : (user?.name || user?.fullName || user?.identifier?.split('@')[0] || 'User');
+    const initials = userName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const roleColor = user?.role === 'SUPER_ADMIN' ? '#f59e0b'
+        : user?.role === 'ADMIN' ? '#ea580c'
+        : '#10b981';
+
+    // Lock body scroll on mobile when drawer is open
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        if (sidebarOpen && window.innerWidth <= 991) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [sidebarOpen]);
+
+    // Close on Escape key
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && sidebarOpen) {
+                setSidebarOpen(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [sidebarOpen, setSidebarOpen]);
+
+    const handleLogout = () => {
+        setSidebarOpen(false);
+        logout();
+        navigate('/login');
+    };
 
     const handleSidebarNavClick = (e) => {
         if (typeof window !== 'undefined' && window.innerWidth <= 991) {
@@ -238,6 +282,45 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                     >
                         <X size={18} />
                     </button>
+                </div>
+
+                {/* ── Mobile App Drawer Profile & Workspace Card ── */}
+                <div className="pos-sidebar-mobile-card">
+                    <div className="pos-sidebar-mobile-user-row">
+                        <div 
+                            className="pos-sidebar-mobile-avatar" 
+                            style={{ 
+                                background: settings?.profileImage ? 'transparent' : roleColor,
+                                border: `2px solid ${roleColor}44`
+                            }}
+                        >
+                            {settings?.profileImage ? (
+                                <img
+                                    src={settings.profileImage.startsWith('http') ? settings.profileImage : `${ENV.BACKEND_BASE_URL}${settings.profileImage}`}
+                                    alt="User"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                            ) : initials}
+                        </div>
+                        <div className="pos-sidebar-mobile-user-info">
+                            <div className="pos-sidebar-mobile-name">{userName}</div>
+                            <div className="pos-sidebar-mobile-email">{user?.email || user?.identifier}</div>
+                        </div>
+                    </div>
+
+                    {/* Badges Row */}
+                    <div className="pos-sidebar-mobile-badges">
+                        <span className="pos-sidebar-mobile-badge pos-sidebar-badge-role">
+                            {isSuperAdmin ? 'Super Admin' : (user?.role === 'ADMIN' ? 'Admin' : 'Staff')}
+                        </span>
+                        <span className="pos-sidebar-mobile-badge pos-sidebar-badge-plan">
+                            <Crown size={11} />
+                            <span>{(user?.plan || 'Starter').toLowerCase()} plan</span>
+                        </span>
+                        <span className="pos-sidebar-mobile-badge pos-sidebar-badge-mode">
+                            {user?.businessType || 'Retail Store'}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="pos-sidebar-content" onClick={handleSidebarNavClick}>
@@ -970,6 +1053,26 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                         )}
                     </div>
                 )}
+
+                {/* ── Mobile Drawer Bottom Actions ── */}
+                <div className="pos-sidebar-mobile-bottom-actions">
+                    <Link
+                        to="/settings"
+                        className="pos-sidebar-mobile-action-link"
+                        onClick={() => setSidebarOpen(false)}
+                    >
+                        <Settings size={16} />
+                        <span>Settings</span>
+                    </Link>
+                    <button
+                        type="button"
+                        className="pos-sidebar-mobile-action-link pos-sidebar-mobile-logout"
+                        onClick={handleLogout}
+                    >
+                        <LogOut size={16} />
+                        <span>Log Out</span>
+                    </button>
+                </div>
             </aside>
         </>
     );

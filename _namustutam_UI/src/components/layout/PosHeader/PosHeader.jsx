@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useCompany } from '../../../context/CompanyContext';
@@ -26,8 +26,66 @@ import {
     Check,
     X,
     ShoppingCart,
-    RotateCcw
+    RotateCcw,
+    LayoutDashboard,
+    FileText,
+    CalendarX,
+    TrendingDown,
+    Folder,
+    List,
+    Tag,
+    Scale,
+    ShieldCheck,
+    Barcode,
+    Box,
+    SlidersHorizontal,
+    ArrowRightLeft,
+    ShoppingBag,
+    FileUp,
+    BookOpen,
+    Users,
+    Briefcase,
+    BarChart2,
+    UserCog,
+    Puzzle
 } from 'lucide-react';
+
+const searchablePages = [
+    { title: 'Dashboard', path: '/dashboard', category: 'Dashboard', icon: <LayoutDashboard size={15} /> },
+    { title: 'Sales Dashboard', path: '/dashboard/sales', category: 'Dashboard', icon: <BarChart2 size={15} /> },
+    { title: 'POS Terminal (Sell)', path: '/dashboard/sales-pos', category: 'Sales', badge: 'Live POS', icon: <MonitorDot size={15} /> },
+    { title: 'Generate Invoice', path: '/dashboard/invoices', category: 'Sales', icon: <FileText size={15} /> },
+    { title: 'Online Orders', path: '/dashboard/sales-online', category: 'Sales', icon: <ShoppingCart size={15} /> },
+    { title: 'POS Orders List', path: '/dashboard/sales-pos', category: 'Sales', icon: <MonitorDot size={15} /> },
+    { title: 'Sales Return', path: '/dashboard/sales-return', category: 'Sales', icon: <RotateCcw size={15} /> },
+    { title: 'Orders History', path: '/dashboard/orders', category: 'Sales', icon: <ShoppingCart size={15} /> },
+    { title: 'Products Inventory', path: '/products', category: 'Inventory', icon: <Package size={15} /> },
+    { title: 'Create Product', path: '/create-product', category: 'Inventory', icon: <PlusCircle size={15} /> },
+    { title: 'Expired Products', path: '/expired-products', category: 'Inventory', icon: <CalendarX size={15} /> },
+    { title: 'Low Stock Alerts', path: '/low-stocks', category: 'Inventory', icon: <TrendingDown size={15} /> },
+    { title: 'Categories', path: '/category', category: 'Inventory', icon: <Folder size={15} /> },
+    { title: 'Sub Categories', path: '/sub-category', category: 'Inventory', icon: <List size={15} /> },
+    { title: 'Brands', path: '/brands', category: 'Inventory', icon: <Tag size={15} /> },
+    { title: 'Units of Measure', path: '/units', category: 'Inventory', icon: <Scale size={15} /> },
+    { title: 'Manage Stock', path: '/dashboard/manage-stock', category: 'Stock', icon: <Box size={15} /> },
+    { title: 'Stock Adjustment', path: '/dashboard/stock-adjustment', category: 'Stock', icon: <SlidersHorizontal size={15} /> },
+    { title: 'Stock Transfer', path: '/dashboard/stock-transfer', category: 'Stock', icon: <ArrowRightLeft size={15} /> },
+    { title: 'Purchase Orders', path: '/purchases', category: 'Stock', icon: <ShoppingBag size={15} /> },
+    { title: 'Purchase Return', path: '/purchase-return', category: 'Stock', icon: <FileUp size={15} /> },
+    { title: 'Khata Book Overview', path: '/khata-book', category: 'Khata', icon: <BookOpen size={15} /> },
+    { title: 'Khata Customers', path: '/khata-book?tab=customers', category: 'Khata', icon: <Users size={15} /> },
+    { title: 'Khata Suppliers', path: '/khata-book?tab=suppliers', category: 'Khata', icon: <Briefcase size={15} /> },
+    { title: 'Khata Day Book', path: '/khata-book?tab=daybook', category: 'Khata', icon: <BookOpen size={15} /> },
+    { title: 'Company Settings', path: '/settings/company_settings', category: 'Settings', icon: <Building size={15} /> },
+    { title: 'Profile Settings', path: '/settings/profile', category: 'Settings', icon: <User size={15} /> },
+    { title: 'Billing & Subscriptions', path: '/settings/billing', category: 'Settings', icon: <DollarSign size={15} /> },
+    { title: 'Connected Apps', path: '/settings/connected_apps', category: 'Settings', icon: <Puzzle size={15} /> },
+    { title: 'Print Barcode', path: '/print-barcode', category: 'Tools', icon: <Barcode size={15} /> },
+    { title: 'Warranties', path: '/warranties', category: 'Tools', icon: <ShieldCheck size={15} /> },
+    { title: 'Super Admin Dashboard', path: '/dashboard/super-dashboard', category: 'Settings', icon: <UserCog size={15} /> },
+    { title: 'Super Admin Companies', path: '/dashboard/super-companies', category: 'Settings', icon: <Building size={15} /> },
+    { title: 'Super Admin Subscriptions', path: '/dashboard/super-subscriptions', category: 'Settings', icon: <DollarSign size={15} /> }
+];
 
 const initialNotifications = [
     { id: 'NT-1', title: 'Low Stock Alert', message: 'Item "PVC Resin Molding Compound" has dropped below safe stock levels (Currently: 14 kg, Safe: 50 kg). Immediate replenishment ordered.', type: 'Stock', date: '2026-05-25', unread: true },
@@ -93,9 +151,27 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
     // Sales Dropdown State
     const [salesOpen, setSalesOpen] = useState(false);
-    const salesRef = React.useRef(null);
+    const salesRef = useRef(null);
 
-    React.useEffect(() => {
+    // macOS Spotlight Search State
+    const [spotlightOpen, setSpotlightOpen] = useState(false);
+    const [spotlightQuery, setSpotlightQuery] = useState('');
+    const [activeCategory, setActiveCategory] = useState('All');
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const spotlightInputRef = useRef(null);
+    const resultsListRef = useRef(null);
+
+    const filteredPages = searchablePages.filter(page => {
+        const matchesCategory = activeCategory === 'All' || page.category === activeCategory;
+        const q = spotlightQuery.trim().toLowerCase();
+        const matchesQuery = !q ||
+            page.title.toLowerCase().includes(q) ||
+            page.category.toLowerCase().includes(q) ||
+            page.path.toLowerCase().includes(q);
+        return matchesCategory && matchesQuery;
+    });
+
+    useEffect(() => {
         const handleClickOutside = (event) => {
             if (salesRef.current && !salesRef.current.contains(event.target)) {
                 setSalesOpen(false);
@@ -105,6 +181,61 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                setSpotlightOpen(prev => !prev);
+            }
+            if (e.key === 'Escape' && spotlightOpen) {
+                setSpotlightOpen(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [spotlightOpen]);
+
+    useEffect(() => {
+        if (spotlightOpen) {
+            setSelectedIndex(0);
+            setTimeout(() => {
+                spotlightInputRef.current?.focus();
+            }, 60);
+        } else {
+            setSpotlightQuery('');
+            setActiveCategory('All');
+        }
+    }, [spotlightOpen]);
+
+    useEffect(() => {
+        if (resultsListRef.current) {
+            const selectedEl = resultsListRef.current.querySelector('.pos-mac-result-item.selected');
+            if (selectedEl) {
+                selectedEl.scrollIntoView({ block: 'nearest' });
+            }
+        }
+    }, [selectedIndex]);
+
+    const handleSpotlightKeyDown = (e) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedIndex(prev => (filteredPages.length > 0 ? (prev + 1) % filteredPages.length : 0));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedIndex(prev => (filteredPages.length > 0 ? (prev - 1 + filteredPages.length) % filteredPages.length : 0));
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (filteredPages[selectedIndex]) {
+                handleSelectPage(filteredPages[selectedIndex].path);
+            }
+        }
+    };
+
+    const handleSelectPage = (path) => {
+        setSpotlightOpen(false);
+        navigate(path);
+    };
+
     return (
         <header className="pos-header">
             {/* Left side */}
@@ -113,9 +244,19 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     <ChevronsLeft size={20} style={{ transform: sidebarOpen ? 'none' : 'rotate(180deg)', transition: 'transform 0.3s' }} />
                 </button>
 
-                <div className="pos-search-bar hide-on-mobile">
-                    <Search size={16} color="#888" className="me-2" />
-                    <input type="text" placeholder="Search" />
+                <div 
+                    className="pos-search-bar hide-on-mobile" 
+                    onClick={() => setSpotlightOpen(true)}
+                    style={{ cursor: 'pointer', position: 'relative' }}
+                    title="Press ⌘K or Ctrl+K to open Spotlight Search"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') setSpotlightOpen(true); }}
+                >
+                    <Search size={15} color="#888" className="me-2" />
+                    <span style={{ fontSize: '13px', color: '#94a3b8', userSelect: 'none' }}>
+                        Search pages, actions...
+                    </span>
                     <div className="pos-search-shortcut">
                         <MonitorDot size={12} /> K
                     </div>
@@ -209,6 +350,17 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
 
             {/* Right side */}
             <div className="pos-header-actions">
+                {/* Mobile Quick Search Button */}
+                <button 
+                    type="button"
+                    className="pos-icon-btn pos-mobile-search-btn" 
+                    onClick={() => setSpotlightOpen(true)}
+                    title="Search Pages and Menus (macOS Spotlight)"
+                    aria-label="Search"
+                >
+                    <Search size={18} />
+                </button>
+
                 <div className="pos-store-selector hide-on-mobile">
                     <Store className="pos-store-icon" size={16} />
                     <span>{companyInfo.name || 'My Store'}</span>
@@ -352,12 +504,12 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     )}
                 </div>
 
-                <button className="pos-icon-btn hide-on-mobile" onClick={() => navigate('/settings')}>
+                <button className="pos-icon-btn pos-header-settings-btn hide-on-mobile" onClick={() => navigate('/settings')}>
                     <Settings size={18} />
                 </button>
 
                 {/* User Profile Dropdown */}
-                <div style={{ position: 'relative' }}>
+                <div className="pos-header-profile-section hide-on-mobile" style={{ position: 'relative' }}>
                     {/* Avatar — shows initials */}
                     <div
                         className="pos-user-avatar ms-1"
@@ -680,6 +832,145 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     );
                                 })()}
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
+            {/* ── macOS Spotlight Command Palette Modal ── */}
+            {spotlightOpen && createPortal(
+                <div 
+                    className="pos-mac-spotlight-backdrop" 
+                    onClick={() => setSpotlightOpen(false)}
+                >
+                    <div 
+                        className="pos-mac-spotlight-window" 
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        {/* macOS Window Titlebar with Traffic Lights */}
+                        <div className="pos-mac-spotlight-titlebar">
+                            <div className="pos-mac-traffic-lights">
+                                <button 
+                                    type="button" 
+                                    className="pos-mac-dot pos-mac-dot-close" 
+                                    onClick={() => setSpotlightOpen(false)} 
+                                    title="Close (Esc)" 
+                                />
+                                <span className="pos-mac-dot pos-mac-dot-min" />
+                                <span className="pos-mac-dot pos-mac-dot-max" />
+                            </div>
+                            <div className="pos-mac-titlebar-title">
+                                <span>Spotlight Search</span>
+                            </div>
+                            <div className="pos-mac-shortcut-hint">
+                                <span className="pos-mac-kbd">esc</span>
+                            </div>
+                        </div>
+
+                        {/* macOS Search Input Bar */}
+                        <div className="pos-mac-input-row">
+                            <div className="pos-mac-search-icon-wrap">
+                                <Search size={20} className="pos-mac-search-icon" />
+                            </div>
+                            <input
+                                ref={spotlightInputRef}
+                                type="text"
+                                className="pos-mac-search-input"
+                                placeholder="Search apps, menus, POS, products..."
+                                value={spotlightQuery}
+                                onChange={(e) => {
+                                    setSpotlightQuery(e.target.value);
+                                    setSelectedIndex(0);
+                                }}
+                                onKeyDown={handleSpotlightKeyDown}
+                            />
+                            {spotlightQuery && (
+                                <button 
+                                    type="button" 
+                                    className="pos-mac-clear-btn" 
+                                    onClick={() => {
+                                        setSpotlightQuery('');
+                                        spotlightInputRef.current?.focus();
+                                    }}
+                                    title="Clear search"
+                                >
+                                    <X size={14} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* macOS Filter Chips */}
+                        <div className="pos-mac-chips-bar">
+                            {['All', 'Sales', 'Inventory', 'Stock', 'Khata', 'Settings'].map(cat => (
+                                <button
+                                    key={cat}
+                                    type="button"
+                                    className={`pos-mac-chip ${activeCategory === cat ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setActiveCategory(cat);
+                                        setSelectedIndex(0);
+                                    }}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Results List */}
+                        <div className="pos-mac-results-list" ref={resultsListRef}>
+                            {filteredPages.length > 0 ? (
+                                filteredPages.map((page, idx) => {
+                                    const isSelected = idx === selectedIndex;
+                                    return (
+                                        <div
+                                            key={page.path + idx}
+                                            className={`pos-mac-result-item ${isSelected ? 'selected' : ''}`}
+                                            onMouseEnter={() => setSelectedIndex(idx)}
+                                            onClick={() => handleSelectPage(page.path)}
+                                        >
+                                            <div className="pos-mac-item-icon-box">
+                                                {page.icon}
+                                            </div>
+                                            <div className="pos-mac-item-info">
+                                                <div className="pos-mac-item-title-row">
+                                                    <span className="pos-mac-item-title">{page.title}</span>
+                                                    {page.badge && (
+                                                        <span className="pos-mac-item-badge">{page.badge}</span>
+                                                    )}
+                                                </div>
+                                                <span className="pos-mac-item-path">{page.path}</span>
+                                            </div>
+                                            <div className="pos-mac-item-action-tag">
+                                                <span className="pos-mac-category-tag">{page.category}</span>
+                                                {isSelected && <span className="pos-mac-return-key">Open ↵</span>}
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="pos-mac-empty-state">
+                                    <div className="pos-mac-empty-icon">
+                                        <Search size={28} />
+                                    </div>
+                                    <div className="pos-mac-empty-title">No matching results found</div>
+                                    <div className="pos-mac-empty-sub">Try searching for POS, Invoices, Products, or Settings.</div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* macOS Spotlight Footer */}
+                        <div className="pos-mac-footer">
+                            <div className="pos-mac-footer-tips">
+                                <span className="pos-mac-tip"><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+                                <span className="pos-mac-tip"><kbd>↵</kbd> Select</span>
+                                <span className="pos-mac-tip"><kbd>esc</kbd> Close</span>
+                            </div>
+                            <div className="pos-mac-footer-count">
+                                {filteredPages.length} {filteredPages.length === 1 ? 'result' : 'results'}
                             </div>
                         </div>
                     </div>

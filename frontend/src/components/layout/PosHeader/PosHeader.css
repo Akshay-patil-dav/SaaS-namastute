@@ -18,71 +18,15 @@
     to { opacity: 1; transform: scale(1); }
 }
 
-/* ── Mobile and Tablet Sales Quick-Access Navbar Dropdown (<= 1024px) ── */
-.pos-mobile-sales-container {
-    display: none;
-}
-
-@media (max-width: 1024px) {
-    .pos-mobile-sales-container {
-        display: flex !important;
+/* ── Mobile View Overrides (< 1025px) ── */
+@media (min-width: 1025px) {
+    .pos-mobile-toggle-icon {
+        display: none !important;
+    }
+    .pos-desktop-toggle-icon {
+        display: inline-flex !important;
         align-items: center;
-        position: relative;
-        margin-left: 2px;
-    }
-
-    .pos-mobile-sales-trigger {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 12px;
-        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-        border: 1px solid #fed7aa;
-        border-radius: 20px;
-        color: #ea580c;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 3px rgba(234, 88, 12, 0.12);
-        white-space: nowrap;
-        outline: none;
-    }
-
-    .pos-mobile-sales-trigger:hover,
-    .pos-mobile-sales-trigger:active,
-    .pos-mobile-sales-trigger.active {
-        background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
-        border-color: #fdba74;
-        box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
-        color: #c2410c;
-    }
-
-    .pos-sales-icon {
-        color: #ea580c;
-        flex-shrink: 0;
-    }
-
-    .pos-sales-chevron {
-        transition: transform 0.2s ease;
-        flex-shrink: 0;
-    }
-
-    .pos-sales-chevron.open {
-        transform: rotate(180deg);
-    }
-
-    .pos-mobile-sales-dropdown {
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 0;
-        width: 260px;
-        z-index: 1060;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
-        background: #ffffff;
-        animation: fadeIn 0.15s ease-out;
+        justify-content: center;
     }
 }
 
@@ -117,42 +61,12 @@
     }
 
     .pos-mobile-toggle-icon {
-        display: inline-flex !important;
-        align-items: center;
-        justify-content: center;
+        display: none !important;
     }
 
-    /* Modern, Touch-Friendly Mobile & Tablet Toggle Button */
+    /* Completely hide hamburger toggle button on mobile & tablet */
     .pos-toggle-btn {
-        width: 38px !important;
-        height: 38px !important;
-        border-radius: 10px !important;
-        background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%) !important;
-        border: 1.5px solid #fed7aa !important;
-        color: #ea580c !important;
-        box-shadow: 0 2px 6px rgba(255, 155, 41, 0.16), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        cursor: pointer !important;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        outline: none !important;
-        flex-shrink: 0 !important;
-    }
-
-    .pos-toggle-btn:hover,
-    .pos-toggle-btn:active {
-        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%) !important;
-        border-color: #fdba74 !important;
-        box-shadow: 0 3px 8px rgba(255, 155, 41, 0.25) !important;
-        transform: scale(0.96) !important;
-    }
-
-    .pos-toggle-btn.sidebar-is-open {
-        background: linear-gradient(135deg, var(--primary-color, #ff9b29) 0%, #ea580c 100%) !important;
-        color: #ffffff !important;
-        border-color: #ea580c !important;
-        box-shadow: 0 3px 10px rgba(234, 88, 12, 0.35) !important;
+        display: none !important;
     }
 
     /* Hide Quick POS Page Action Button on Mobile & Tablet (<= 1024px) */
@@ -177,6 +91,720 @@
     .pos-header-globe-btn,
     .pos-header-fullscreen-btn {
         display: flex !important;
+    }
+}
+
+/* ── Mobile Brand Identity (Header) ─────────────────────────────── */
+.pos-mobile-brand-wrap {
+    display: none;
+}
+
+.pos-mobile-search-btn {
+    display: none !important;
+}
+
+@media (max-width: 991px) {
+    /* Hide desktop toggle button on mobile & tablet since bottom nav has Menu */
+    .pos-toggle-btn {
+        display: none !important;
+    }
+
+    /* Native App Top Header Bar */
+    .pos-header {
+        height: 60px !important;
+        padding: 0 14px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.85) !important;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1020 !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+    }
+
+    .pos-header-left {
+        display: flex !important;
+        align-items: center !important;
+        min-width: 0 !important;
+        flex: 1 !important;
+        margin-right: 12px !important;
+        overflow: hidden !important;
+    }
+
+    .pos-mobile-brand-wrap {
+        display: flex !important;
+        align-items: center !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        flex: 1 !important;
+        margin-left: 0 !important;
+    }
+
+    .pos-mobile-brand-link {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        text-decoration: none !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        outline: none !important;
+    }
+
+    .pos-mobile-brand-logo {
+        width: 38px !important;
+        height: 38px !important;
+        object-fit: contain !important;
+        border-radius: 11px !important;
+        flex-shrink: 0 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .pos-mobile-brand-badge {
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 11px !important;
+        background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%) !important;
+        color: #ffffff !important;
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.5px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        box-shadow: 0 3px 10px rgba(234, 88, 12, 0.28) !important;
+    }
+
+    .pos-mobile-brand-text {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .pos-mobile-brand-name {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        line-height: 1.25 !important;
+        letter-spacing: -0.015em !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 180px !important;
+    }
+
+    .pos-mobile-brand-sub {
+        font-size: 10.5px !important;
+        font-weight: 600 !important;
+        color: #059669 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 4.5px !important;
+        line-height: 1 !important;
+        margin-top: 2.5px !important;
+    }
+
+    .pos-mobile-live-dot {
+        width: 6.5px !important;
+        height: 6.5px !important;
+        border-radius: 50% !important;
+        background-color: #10b981 !important;
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.9) !important;
+        animation: livePulse 2s infinite ease-in-out !important;
+    }
+
+    @keyframes livePulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.35; transform: scale(0.85); }
+    }
+
+    .pos-header-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        flex-shrink: 0 !important;
+        margin-left: auto !important;
+    }
+
+    .pos-mobile-search-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 50% !important;
+        border: 1.5px solid #e2e8f0 !important;
+        background: #ffffff !important;
+        color: #475569 !important;
+        padding: 0 !important;
+        cursor: pointer !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+        transition: all 0.15s ease !important;
+    }
+
+    .pos-mobile-search-btn:active {
+        background: #f1f5f9 !important;
+        transform: scale(0.93) !important;
+    }
+
+    /* Hide Settings and User Profile Avatar from top navbar on mobile */
+    .pos-header-settings-btn,
+    .pos-header-profile-section,
+    .hide-on-mobile {
+        display: none !important;
+    }
+
+    .pos-header-actions .pos-icon-btn:not(.hide-on-mobile) {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 50% !important;
+        border: 1.5px solid #e2e8f0 !important;
+        background: #ffffff !important;
+        color: #475569 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+        position: relative !important;
+        transition: all 0.15s ease !important;
+    }
+
+    .pos-header-actions .pos-icon-btn:not(.hide-on-mobile):active {
+        background: #f1f5f9 !important;
+        transform: scale(0.93) !important;
+    }
+
+    .pos-header-actions .pos-badge {
+        position: absolute !important;
+        top: -3px !important;
+        right: -3px !important;
+        min-width: 17px !important;
+        height: 17px !important;
+        padding: 0 3px !important;
+        border-radius: 9px !important;
+        background: #ef4444 !important;
+        color: #ffffff !important;
+        font-size: 9.5px !important;
+        font-weight: 700 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 2px solid #ffffff !important;
+        box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4) !important;
+        line-height: 1 !important;
+    }
+}
+
+/* Extra small devices (<= 380px) like iPhone SE / Fold */
+@media (max-width: 380px) {
+    .pos-header {
+        padding: 0 10px !important;
+    }
+
+    .pos-header-left {
+        margin-right: 8px !important;
+    }
+
+    .pos-mobile-brand-name {
+        max-width: 130px !important;
+        font-size: 14px !important;
+    }
+
+    .pos-mobile-brand-logo,
+    .pos-mobile-brand-badge {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 12.5px !important;
+        border-radius: 9px !important;
+    }
+
+    .pos-header-actions {
+        gap: 6px !important;
+    }
+
+    .pos-mobile-search-btn,
+    .pos-header-actions .pos-icon-btn:not(.hide-on-mobile) {
+        width: 34px !important;
+        height: 34px !important;
+    }
+}
+
+/* ── macOS Spotlight Search Palette (macOS UI & Animations) ─────────── */
+.pos-mac-spotlight-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 14vh;
+    animation: macBackdropFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes macBackdropFade {
+    0% {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+    }
+    100% {
+        opacity: 1;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+}
+
+.pos-mac-spotlight-window {
+    width: 680px;
+    max-width: calc(100vw - 32px);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(32px) saturate(190%);
+    -webkit-backdrop-filter: blur(32px) saturate(190%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 
+        0 25px 70px -12px rgba(15, 23, 42, 0.38),
+        0 0 0 1px rgba(0, 0, 0, 0.08),
+        0 12px 28px -6px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    max-height: 76vh;
+    overflow: hidden;
+    animation: macSpotlightEnter 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-origin: center top;
+}
+
+@keyframes macSpotlightEnter {
+    0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(-22px);
+    }
+    65% {
+        opacity: 1;
+        transform: scale(1.008) translateY(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* macOS Titlebar / Traffic Lights */
+.pos-mac-spotlight-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.65);
+    background: rgba(248, 250, 252, 0.65);
+    user-select: none;
+}
+
+.pos-mac-traffic-lights {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.pos-mac-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    padding: 0;
+    border: none;
+    cursor: default;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.pos-mac-dot-close {
+    background: #ff5f56;
+    border: 1px solid #e0443e;
+    cursor: pointer;
+}
+.pos-mac-dot-close:hover {
+    filter: brightness(0.9);
+    transform: scale(1.1);
+}
+
+.pos-mac-dot-min {
+    background: #ffbd2e;
+    border: 1px solid #dea123;
+}
+
+.pos-mac-dot-max {
+    background: #27c93f;
+    border: 1px solid #1aab29;
+}
+
+.pos-mac-titlebar-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pos-mac-shortcut-hint {
+    display: flex;
+    align-items: center;
+}
+
+.pos-mac-kbd {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #64748b;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 1.5px 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-family: inherit;
+    text-transform: uppercase;
+}
+
+/* macOS Search Input Row */
+.pos-mac-input-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    gap: 12px;
+    background: transparent;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+}
+
+.pos-mac-search-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ea580c;
+    flex-shrink: 0;
+}
+
+.pos-mac-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16.5px;
+    font-weight: 500;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.pos-mac-search-input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.pos-mac-clear-btn {
+    border: none;
+    background: rgba(148, 163, 184, 0.16);
+    color: #64748b;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.pos-mac-clear-btn:hover {
+    background: rgba(148, 163, 184, 0.28);
+    color: #0f172a;
+}
+
+/* macOS Category Filter Chips */
+.pos-mac-chips-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(248, 250, 252, 0.5);
+    border-bottom: 1px solid rgba(241, 245, 249, 0.9);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pos-mac-chips-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.pos-mac-chip {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.pos-mac-chip:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.pos-mac-chip.active {
+    background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+    border-color: #ea580c;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.32);
+}
+
+/* Results List */
+.pos-mac-results-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    overscroll-behavior: contain;
+}
+
+.pos-mac-results-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pos-mac-results-list::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 4px;
+}
+
+.pos-mac-result-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.14s ease;
+    border: 1px solid transparent;
+}
+
+.pos-mac-result-item:hover,
+.pos-mac-result-item.selected {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border-color: rgba(254, 215, 170, 0.85);
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.08);
+}
+
+.pos-mac-item-icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #f1f5f9;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.pos-mac-result-item.selected .pos-mac-item-icon-box {
+    background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(234, 88, 12, 0.3);
+}
+
+.pos-mac-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.pos-mac-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pos-mac-item-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pos-mac-result-item.selected .pos-mac-item-title {
+    color: #c2410c;
+}
+
+.pos-mac-item-badge {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 1.5px 6px;
+    border-radius: 6px;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.pos-mac-item-path {
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pos-mac-result-item.selected .pos-mac-item-path {
+    color: #ea580c;
+    opacity: 0.85;
+}
+
+.pos-mac-item-action-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.pos-mac-category-tag {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+
+.pos-mac-return-key {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #ffffff;
+    background: #ea580c;
+    padding: 2px 8px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(234, 88, 12, 0.35);
+    animation: fadeIn 0.15s ease-out;
+}
+
+/* Empty State */
+.pos-mac-empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pos-mac-empty-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.pos-mac-empty-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 4px;
+}
+
+.pos-mac-empty-sub {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* macOS Footer */
+.pos-mac-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: rgba(248, 250, 252, 0.85);
+    border-top: 1px solid rgba(226, 232, 240, 0.7);
+    font-size: 11.5px;
+    color: #64748b;
+    user-select: none;
+}
+
+.pos-mac-footer-tips {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pos-mac-tip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pos-mac-tip kbd {
+    font-size: 10px;
+    font-weight: 700;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: #475569;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.pos-mac-footer-count {
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+/* Responsive for Mobile Devices */
+@media (max-width: 768px) {
+    .pos-mac-spotlight-backdrop {
+        padding-top: calc(14px + env(safe-area-inset-top, 0px));
+        align-items: flex-start;
+    }
+
+    .pos-mac-spotlight-window {
+        width: calc(100vw - 20px);
+        max-height: 82vh;
+        border-radius: 18px;
+    }
+
+    .pos-mac-input-row {
+        padding: 10px 14px;
+    }
+
+    .pos-mac-search-input {
+        font-size: 15px;
+    }
+
+    .pos-mac-footer-tips {
+        display: none;
     }
 }
 

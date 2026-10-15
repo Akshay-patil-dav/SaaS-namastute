@@ -500,6 +500,37 @@ body {
   }
 }
 
+.pos-mobile-search-btn {
+    display: none !important;
+}
+
+@media (max-width: 991px) {
+  .pos-mobile-search-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    color: #475569 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    transition: all 0.15s ease !important;
+  }
+  .pos-mobile-search-btn:active {
+    background: #f1f5f9 !important;
+    transform: scale(0.93) !important;
+  }
+  .pos-header-settings-btn,
+  .pos-header-profile-section,
+  .hide-on-mobile {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .pos-search-bar {
     display: none;
@@ -516,4 +547,474 @@ body {
   .hide-on-mobile {
     display: none !important;
   }
+}
+
+/* ── macOS Spotlight Search Palette (macOS UI & Animations) ─────────── */
+.pos-mac-spotlight-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 14vh;
+    animation: macBackdropFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes macBackdropFade {
+    0% {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+    }
+    100% {
+        opacity: 1;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+}
+
+.pos-mac-spotlight-window {
+    width: 680px;
+    max-width: calc(100vw - 32px);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(32px) saturate(190%);
+    -webkit-backdrop-filter: blur(32px) saturate(190%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 
+        0 25px 70px -12px rgba(15, 23, 42, 0.38),
+        0 0 0 1px rgba(0, 0, 0, 0.08),
+        0 12px 28px -6px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    max-height: 76vh;
+    overflow: hidden;
+    animation: macSpotlightEnter 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-origin: center top;
+}
+
+@keyframes macSpotlightEnter {
+    0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(-22px);
+    }
+    65% {
+        opacity: 1;
+        transform: scale(1.008) translateY(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* macOS Titlebar / Traffic Lights */
+.pos-mac-spotlight-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.65);
+    background: rgba(248, 250, 252, 0.65);
+    user-select: none;
+}
+
+.pos-mac-traffic-lights {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.pos-mac-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    padding: 0;
+    border: none;
+    cursor: default;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.pos-mac-dot-close {
+    background: #ff5f56;
+    border: 1px solid #e0443e;
+    cursor: pointer;
+}
+.pos-mac-dot-close:hover {
+    filter: brightness(0.9);
+    transform: scale(1.1);
+}
+
+.pos-mac-dot-min {
+    background: #ffbd2e;
+    border: 1px solid #dea123;
+}
+
+.pos-mac-dot-max {
+    background: #27c93f;
+    border: 1px solid #1aab29;
+}
+
+.pos-mac-titlebar-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pos-mac-shortcut-hint {
+    display: flex;
+    align-items: center;
+}
+
+.pos-mac-kbd {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #64748b;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 1.5px 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-family: inherit;
+    text-transform: uppercase;
+}
+
+/* macOS Search Input Row */
+.pos-mac-input-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    gap: 12px;
+    background: transparent;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+}
+
+.pos-mac-search-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ea580c;
+    flex-shrink: 0;
+}
+
+.pos-mac-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16.5px;
+    font-weight: 500;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.pos-mac-search-input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.pos-mac-clear-btn {
+    border: none;
+    background: rgba(148, 163, 184, 0.16);
+    color: #64748b;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.pos-mac-clear-btn:hover {
+    background: rgba(148, 163, 184, 0.28);
+    color: #0f172a;
+}
+
+/* macOS Category Filter Chips */
+.pos-mac-chips-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(248, 250, 252, 0.5);
+    border-bottom: 1px solid rgba(241, 245, 249, 0.9);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pos-mac-chips-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.pos-mac-chip {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.pos-mac-chip:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.pos-mac-chip.active {
+    background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+    border-color: #ea580c;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.32);
+}
+
+/* Results List */
+.pos-mac-results-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    overscroll-behavior: contain;
+}
+
+.pos-mac-results-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pos-mac-results-list::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 4px;
+}
+
+.pos-mac-result-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.14s ease;
+    border: 1px solid transparent;
+}
+
+.pos-mac-result-item:hover,
+.pos-mac-result-item.selected {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border-color: rgba(254, 215, 170, 0.85);
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.08);
+}
+
+.pos-mac-item-icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #f1f5f9;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.pos-mac-result-item.selected .pos-mac-item-icon-box {
+    background: linear-gradient(135deg, #ff822d 0%, #ea580c 100%);
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(234, 88, 12, 0.3);
+}
+
+.pos-mac-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.pos-mac-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pos-mac-item-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pos-mac-result-item.selected .pos-mac-item-title {
+    color: #c2410c;
+}
+
+.pos-mac-item-badge {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 1.5px 6px;
+    border-radius: 6px;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.pos-mac-item-path {
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pos-mac-result-item.selected .pos-mac-item-path {
+    color: #ea580c;
+    opacity: 0.85;
+}
+
+.pos-mac-item-action-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.pos-mac-category-tag {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+
+.pos-mac-return-key {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #ffffff;
+    background: #ea580c;
+    padding: 2px 8px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(234, 88, 12, 0.35);
+    animation: fadeIn 0.15s ease-out;
+}
+
+/* Empty State */
+.pos-mac-empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pos-mac-empty-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.pos-mac-empty-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 4px;
+}
+
+.pos-mac-empty-sub {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* macOS Footer */
+.pos-mac-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: rgba(248, 250, 252, 0.85);
+    border-top: 1px solid rgba(226, 232, 240, 0.7);
+    font-size: 11.5px;
+    color: #64748b;
+    user-select: none;
+}
+
+.pos-mac-footer-tips {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pos-mac-tip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pos-mac-tip kbd {
+    font-size: 10px;
+    font-weight: 700;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: #475569;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.pos-mac-footer-count {
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+/* Responsive for Mobile Devices */
+@media (max-width: 768px) {
+    .pos-mac-spotlight-backdrop {
+        padding-top: calc(14px + env(safe-area-inset-top, 0px));
+        align-items: flex-start;
+    }
+
+    .pos-mac-spotlight-window {
+        width: calc(100vw - 20px);
+        max-height: 82vh;
+        border-radius: 18px;
+    }
+
+    .pos-mac-input-row {
+        padding: 10px 14px;
+    }
+
+    .pos-mac-search-input {
+        font-size: 15px;
+    }
+
+    .pos-mac-footer-tips {
+        display: none;
+    }
 }

@@ -65,37 +65,40 @@ const initialNotifications = [
 ];
 
 const searchablePages = [
-    { title: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={14} /> },
-    { title: 'Sales Dashboard', path: '/dashboard/sales', icon: <BarChart2 size={14} /> },
-    { title: 'Super Admin Dashboard', path: '/dashboard/super-dashboard', icon: <UserCog size={14} /> },
-    { title: 'Super Admin Companies', path: '/dashboard/super-companies', icon: <Building size={14} /> },
-    { title: 'Super Admin Subscriptions', path: '/dashboard/super-subscriptions', icon: <DollarSign size={14} /> },
-    { title: 'Super Admin Packages', path: '/dashboard/super-packages', icon: <Package size={14} /> },
-    { title: 'Products', path: '/products', icon: <Package size={14} /> },
-    { title: 'Expired Products', path: '/expired-products', icon: <CalendarX size={14} /> },
-    { title: 'Low Stocks', path: '/low-stocks', icon: <TrendingDown size={14} /> },
-    { title: 'Category', path: '/category', icon: <Folder size={14} /> },
-    { title: 'Sub Category', path: '/sub-category', icon: <List size={14} /> },
-    { title: 'Brands', path: '/brands', icon: <Tag size={14} /> },
-    { title: 'Units', path: '/units', icon: <Scale size={14} /> },
-    { title: 'Warranties', path: '/warranties', icon: <ShieldCheck size={14} /> },
-    { title: 'Print Barcode', path: '/print-barcode', icon: <Barcode size={14} /> },
-    { title: 'Manage Stock', path: '/dashboard/manage-stock', icon: <Box size={14} /> },
-    { title: 'Stock Adjustment', path: '/dashboard/stock-adjustment', icon: <SlidersHorizontal size={14} /> },
-    { title: 'Stock Transfer', path: '/dashboard/stock-transfer', icon: <ArrowRightLeft size={14} /> },
-    { title: 'Online Orders', path: '/dashboard/sales-online', icon: <ShoppingCart size={14} /> },
-    { title: 'POS Orders', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
-    { title: 'POS Page', path: '/dashboard/sales-pos', icon: <MonitorDot size={14} /> },
-    { title: 'Sales Return', path: '/dashboard/sales-return', icon: <RotateCcw size={14} /> },
-    { title: 'Orders', path: '/dashboard/orders', icon: <ShoppingCart size={14} /> },
-    { title: 'Purchase', path: '/purchases', icon: <ShoppingBag size={14} /> },
-    { title: 'Purchase Return', path: '/purchase-return', icon: <FileUp size={14} /> },
-    { title: 'Khata Book', path: '/khata-book', icon: <BookOpen size={14} /> },
-    { title: 'Khata Customers', path: '/khata-book?tab=customers', icon: <BookOpen size={14} /> },
-    { title: 'Khata Suppliers', path: '/khata-book?tab=suppliers', icon: <BookOpen size={14} /> },
-    { title: 'Khata Day Book', path: '/khata-book?tab=daybook', icon: <BookOpen size={14} /> },
-    { title: 'Web App Menus', path: '/dashboard/menus', icon: <List size={14} /> },
-    { title: 'Blog Posts', path: '/dashboard/blog-posts', icon: <FileText size={14} /> }
+    { title: 'Dashboard', path: '/dashboard', category: 'Dashboard', icon: <LayoutDashboard size={15} /> },
+    { title: 'Sales Dashboard', path: '/dashboard/sales', category: 'Dashboard', icon: <BarChart2 size={15} /> },
+    { title: 'POS Terminal (Sell)', path: '/dashboard/sales-pos', category: 'Sales', badge: 'Live POS', icon: <MonitorDot size={15} /> },
+    { title: 'Generate Invoice', path: '/dashboard/invoices', category: 'Sales', icon: <FileText size={15} /> },
+    { title: 'Online Orders', path: '/dashboard/sales-online', category: 'Sales', icon: <ShoppingCart size={15} /> },
+    { title: 'POS Orders List', path: '/dashboard/sales-pos', category: 'Sales', icon: <MonitorDot size={15} /> },
+    { title: 'Sales Return', path: '/dashboard/sales-return', category: 'Sales', icon: <RotateCcw size={15} /> },
+    { title: 'Orders History', path: '/dashboard/orders', category: 'Sales', icon: <ShoppingCart size={15} /> },
+    { title: 'Products Inventory', path: '/products', category: 'Inventory', icon: <Package size={15} /> },
+    { title: 'Create Product', path: '/create-product', category: 'Inventory', icon: <PlusCircle size={15} /> },
+    { title: 'Expired Products', path: '/expired-products', category: 'Inventory', icon: <CalendarX size={15} /> },
+    { title: 'Low Stock Alerts', path: '/low-stocks', category: 'Inventory', icon: <TrendingDown size={15} /> },
+    { title: 'Categories', path: '/category', category: 'Inventory', icon: <Folder size={15} /> },
+    { title: 'Sub Categories', path: '/sub-category', category: 'Inventory', icon: <List size={15} /> },
+    { title: 'Brands', path: '/brands', category: 'Inventory', icon: <Tag size={15} /> },
+    { title: 'Units of Measure', path: '/units', category: 'Inventory', icon: <Scale size={15} /> },
+    { title: 'Manage Stock', path: '/dashboard/manage-stock', category: 'Stock', icon: <Box size={15} /> },
+    { title: 'Stock Adjustment', path: '/dashboard/stock-adjustment', category: 'Stock', icon: <SlidersHorizontal size={15} /> },
+    { title: 'Stock Transfer', path: '/dashboard/stock-transfer', category: 'Stock', icon: <ArrowRightLeft size={15} /> },
+    { title: 'Purchase Orders', path: '/purchases', category: 'Stock', icon: <ShoppingBag size={15} /> },
+    { title: 'Purchase Return', path: '/purchase-return', category: 'Stock', icon: <FileUp size={15} /> },
+    { title: 'Khata Book Overview', path: '/khata-book', category: 'Khata', icon: <BookOpen size={15} /> },
+    { title: 'Khata Customers', path: '/khata-book?tab=customers', category: 'Khata', icon: <Users size={15} /> },
+    { title: 'Khata Suppliers', path: '/khata-book?tab=suppliers', category: 'Khata', icon: <Briefcase size={15} /> },
+    { title: 'Khata Day Book', path: '/khata-book?tab=daybook', category: 'Khata', icon: <BookOpen size={15} /> },
+    { title: 'Company Settings', path: '/settings/company_settings', category: 'Settings', icon: <Building size={15} /> },
+    { title: 'Profile Settings', path: '/settings/profile', category: 'Settings', icon: <User size={15} /> },
+    { title: 'Billing & Subscriptions', path: '/settings/billing', category: 'Settings', icon: <DollarSign size={15} /> },
+    { title: 'Connected Apps', path: '/settings/connected_apps', category: 'Settings', icon: <Puzzle size={15} /> },
+    { title: 'Print Barcode', path: '/print-barcode', category: 'Tools', icon: <Barcode size={15} /> },
+    { title: 'Warranties', path: '/warranties', category: 'Tools', icon: <ShieldCheck size={15} /> },
+    { title: 'Super Admin Dashboard', path: '/dashboard/super-dashboard', category: 'Settings', icon: <UserCog size={15} /> },
+    { title: 'Super Admin Companies', path: '/dashboard/super-companies', category: 'Settings', icon: <Building size={15} /> },
+    { title: 'Super Admin Subscriptions', path: '/dashboard/super-subscriptions', category: 'Settings', icon: <DollarSign size={15} /> }
 ];
 
 import ProjectSwitcher from './ProjectSwitcher';
@@ -116,32 +119,32 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const [allNotiMaximized, setAllNotiMaximized] = useState(false);
     const [maximizedActiveId, setMaximizedActiveId] = useState(initialNotifications[0]?.id || null);
 
-    // Search States
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchOpen, setSearchOpen] = useState(false);
-    const searchRef = useRef(null);
-    const searchInputRef = useRef(null);
+    // macOS Spotlight Search State
+    const [spotlightOpen, setSpotlightOpen] = useState(false);
+    const [spotlightQuery, setSpotlightQuery] = useState('');
+    const [activeCategory, setActiveCategory] = useState('All');
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const spotlightInputRef = useRef(null);
+    const resultsListRef = useRef(null);
 
     // Sales Dropdown State
     const [salesOpen, setSalesOpen] = useState(false);
     const salesRef = useRef(null);
-    const [mobileSalesOpen, setMobileSalesOpen] = useState(false);
-    const mobileSalesRef = useRef(null);
 
-    const filteredPages = searchablePages.filter(page =>
-        page.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredPages = searchablePages.filter(page => {
+        const matchesCategory = activeCategory === 'All' || page.category === activeCategory;
+        const q = spotlightQuery.trim().toLowerCase();
+        const matchesQuery = !q ||
+            page.title.toLowerCase().includes(q) ||
+            page.category.toLowerCase().includes(q) ||
+            page.path.toLowerCase().includes(q);
+        return matchesCategory && matchesQuery;
+    });
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setSearchOpen(false);
-            }
             if (salesRef.current && !salesRef.current.contains(event.target)) {
                 setSalesOpen(false);
-            }
-            if (mobileSalesRef.current && !mobileSalesRef.current.contains(event.target)) {
-                setMobileSalesOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -152,13 +155,56 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
         const handleKeyDown = (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
-                searchInputRef.current?.focus();
-                setSearchOpen(true);
+                setSpotlightOpen(prev => !prev);
+            }
+            if (e.key === 'Escape' && spotlightOpen) {
+                setSpotlightOpen(false);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    }, [spotlightOpen]);
+
+    useEffect(() => {
+        if (spotlightOpen) {
+            setSelectedIndex(0);
+            setTimeout(() => {
+                spotlightInputRef.current?.focus();
+            }, 60);
+        } else {
+            setSpotlightQuery('');
+            setActiveCategory('All');
+        }
+    }, [spotlightOpen]);
+
+    useEffect(() => {
+        if (resultsListRef.current) {
+            const selectedEl = resultsListRef.current.querySelector('.pos-mac-result-item.selected');
+            if (selectedEl) {
+                selectedEl.scrollIntoView({ block: 'nearest' });
+            }
+        }
+    }, [selectedIndex]);
+
+    const handleSpotlightKeyDown = (e) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedIndex(prev => (filteredPages.length > 0 ? (prev + 1) % filteredPages.length : 0));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedIndex(prev => (filteredPages.length > 0 ? (prev - 1 + filteredPages.length) % filteredPages.length : 0));
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (filteredPages[selectedIndex]) {
+                handleSelectPage(filteredPages[selectedIndex].path);
+            }
+        }
+    };
+
+    const handleSelectPage = (path) => {
+        setSpotlightOpen(false);
+        navigate(path);
+    };
 
     const fetchMyInvitations = async () => {
         try {
@@ -253,7 +299,7 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     return (
         <header className="pos-header">
             {/* Left side */}
-            <div className="d-flex align-items-center gap-2 gap-sm-3">
+            <div className="pos-header-left d-flex align-items-center gap-2 gap-sm-3">
                 <button 
                     className={`pos-toggle-btn ${sidebarOpen ? 'sidebar-is-open' : 'sidebar-is-closed'}`} 
                     onClick={() => setSidebarOpen(prev => !prev)}
@@ -270,71 +316,50 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     </span>
                 </button>
 
-                <div className="pos-search-bar hide-on-mobile" ref={searchRef} style={{ position: 'relative' }}>
-                    <Search size={16} color="#888" className="me-2" />
-                    <input
-                        type="text"
-                        placeholder="Search"
-                        ref={searchInputRef}
-                        value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            setSearchOpen(true);
-                        }}
-                        onFocus={() => setSearchOpen(true)}
-                    />
+                {/* Mobile Brand Identity */}
+                <div className="pos-mobile-brand-wrap">
+                    <Link to="/dashboard" className="pos-mobile-brand-link">
+                        {companyInfo?.logo ? (
+                            <img src={companyInfo.logo} alt="Logo" className="pos-mobile-brand-logo" />
+                        ) : (
+                            <div className="pos-mobile-brand-badge">
+                                {(() => {
+                                    const cName = companyInfo?.name || 'Samrajya Software';
+                                    const words = cName.trim().split(/\s+/);
+                                    if (words.length > 1 && words[0] && words[1]) {
+                                        return (words[0][0] + words[1][0]).toUpperCase();
+                                    }
+                                    return (cName.slice(0, 2) || 'SS').toUpperCase();
+                                })()}
+                            </div>
+                        )}
+                        <div className="pos-mobile-brand-text">
+                            <span className="pos-mobile-brand-name">
+                                {companyInfo?.name || 'Namastute'}
+                            </span>
+                            <span className="pos-mobile-brand-sub">
+                                <span className="pos-mobile-live-dot" /> Live
+                            </span>
+                        </div>
+                    </Link>
+                </div>
+
+                <div 
+                    className="pos-search-bar hide-on-mobile" 
+                    onClick={() => setSpotlightOpen(true)}
+                    style={{ cursor: 'pointer', position: 'relative' }}
+                    title="Press ⌘K or Ctrl+K to open Spotlight Search"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') setSpotlightOpen(true); }}
+                >
+                    <Search size={15} color="#888" className="me-2" />
+                    <span style={{ fontSize: '13px', color: '#94a3b8', userSelect: 'none' }}>
+                        Search pages, actions...
+                    </span>
                     <div className="pos-search-shortcut">
                         <MonitorDot size={12} /> K
                     </div>
-
-                    {/* Search Suggestions Dropdown */}
-                    {searchOpen && (
-                        <div
-                            className="shadow-lg border rounded-3 bg-white"
-                            style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                marginTop: '10px',
-                                width: '300px',
-                                zIndex: 1050,
-                                maxHeight: '300px',
-                                overflowY: 'auto',
-                                animation: 'fadeIn 0.15s ease-out'
-                            }}
-                        >
-                            <div className="p-2 border-bottom text-muted small fw-bold" style={{ fontSize: '11px' }}>
-                                QUICK LINKS
-                            </div>
-                            <div className="d-flex flex-column">
-                                {filteredPages.length > 0 ? (
-                                    filteredPages.map((page, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="d-flex align-items-center gap-3 p-2 border-bottom cursor-pointer text-decoration-none text-dark notification-feed-item"
-                                            style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
-                                            onClick={() => {
-                                                setSearchOpen(false);
-                                                setSearchQuery('');
-                                                navigate(page.path);
-                                            }}
-                                        >
-                                            <div className="p-1 rounded bg-light text-secondary">
-                                                {page.icon}
-                                            </div>
-                                            <span style={{ fontSize: '13px', fontWeight: '500' }}>
-                                                {page.title}
-                                            </span>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="p-3 text-center text-muted small">
-                                        No matching pages found.
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <ProjectSwitcher />
@@ -438,100 +463,21 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                         </div>
                     )}
                 </div>
-
-                {/* Mobile & Tablet Sales Quick-Access Dropdown (Visible ONLY on Mobile & Tablet <= 1024px) */}
-                <div className="pos-mobile-sales-container" ref={mobileSalesRef}>
-                    <button
-                        type="button"
-                        onClick={() => setMobileSalesOpen(!mobileSalesOpen)}
-                        className={`pos-mobile-sales-trigger ${mobileSalesOpen ? 'active' : ''}`}
-                        aria-label="Sales and POS Menu"
-                    >
-                        <ShoppingCart size={15} className="pos-sales-icon" />
-                        <span>Sales</span>
-                        <ChevronDown size={13} className={`pos-sales-chevron ${mobileSalesOpen ? 'open' : ''}`} />
-                    </button>
-
-                    {mobileSalesOpen && (
-                        <div className="pos-mobile-sales-dropdown shadow-lg border rounded-3 bg-white py-2">
-                            <div className="px-3 py-1.5 text-muted small fw-bold border-bottom d-flex align-items-center justify-content-between" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>
-                                <span>SALES &amp; BILLING</span>
-                                <span className="badge bg-warning-subtle text-warning px-1.5 py-0.5" style={{ fontSize: '10px' }}>Quick Access</span>
-                            </div>
-
-                            {/* POS (Sell) */}
-                            <Link
-                                to="/dashboard/sales-pos"
-                                className="d-flex align-items-center gap-2.5 px-3 py-2.5 text-decoration-none text-dark notification-feed-item"
-                                onClick={() => setMobileSalesOpen(false)}
-                            >
-                                <div className="p-2 rounded-2 flex-shrink-0" style={{ background: 'rgba(255, 155, 41, 0.15)', color: 'var(--primary-color, #ff9b29)' }}>
-                                    <MonitorDot size={18} />
-                                </div>
-                                <div className="flex-grow-1 min-w-0">
-                                    <div className="d-flex align-items-center justify-content-between">
-                                        <div className="fw-bold" style={{ fontSize: '13px', color: '#1f2937' }}>POS (Sell)</div>
-                                        <span className="badge text-bg-warning text-white" style={{ fontSize: '9.5px', fontWeight: 600 }}>Live POS</span>
-                                    </div>
-                                    <div className="text-muted" style={{ fontSize: '11px' }}>Direct Billing Terminal &amp; Orders</div>
-                                </div>
-                            </Link>
-
-                            {/* Generate Invoice */}
-                            <Link
-                                to="/dashboard/invoices"
-                                className="d-flex align-items-center gap-2.5 px-3 py-2.5 text-decoration-none text-dark notification-feed-item"
-                                onClick={() => setMobileSalesOpen(false)}
-                            >
-                                <div className="p-2 rounded-2 flex-shrink-0" style={{ background: 'rgba(14, 165, 233, 0.12)', color: '#0ea5e9' }}>
-                                    <FileText size={18} />
-                                </div>
-                                <div className="flex-grow-1 min-w-0">
-                                    <div className="d-flex align-items-center justify-content-between">
-                                        <div className="fw-bold" style={{ fontSize: '13px', color: '#1f2937' }}>Invoice Generate</div>
-                                        <span className="badge text-bg-info text-white" style={{ fontSize: '9.5px', fontWeight: 600 }}>Invoices</span>
-                                    </div>
-                                    <div className="text-muted" style={{ fontSize: '11px' }}>Generate, print &amp; manage bills</div>
-                                </div>
-                            </Link>
-
-                            {/* Online Orders */}
-                            <Link
-                                to="/dashboard/sales-online"
-                                className="d-flex align-items-center gap-2.5 px-3 py-2.5 text-decoration-none text-dark notification-feed-item"
-                                onClick={() => setMobileSalesOpen(false)}
-                            >
-                                <div className="p-2 rounded-2 flex-shrink-0" style={{ background: 'rgba(99, 102, 241, 0.12)', color: '#6366f1' }}>
-                                    <ShoppingCart size={18} />
-                                </div>
-                                <div className="flex-grow-1 min-w-0">
-                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>Online Orders</div>
-                                    <div className="text-muted" style={{ fontSize: '11px' }}>Web store &amp; e-commerce sales</div>
-                                </div>
-                            </Link>
-
-                            {/* Sales Return */}
-                            <Link
-                                to="/dashboard/sales-return"
-                                className="d-flex align-items-center gap-2.5 px-3 py-2.5 text-decoration-none text-dark notification-feed-item"
-                                onClick={() => setMobileSalesOpen(false)}
-                            >
-                                <div className="p-2 rounded-2 flex-shrink-0" style={{ background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444' }}>
-                                    <RotateCcw size={18} />
-                                </div>
-                                <div className="flex-grow-1 min-w-0">
-                                    <div className="fw-semibold" style={{ fontSize: '13px', color: '#1f2937' }}>Sales Return</div>
-                                    <div className="text-muted" style={{ fontSize: '11px' }}>Returns &amp; refunds management</div>
-                                </div>
-                            </Link>
-                        </div>
-                    )}
-                </div>
             </div>
 
             {/* Right side */}
             <div className="pos-header-actions">
 
+                {/* Mobile Quick Search Button */}
+                <button 
+                    type="button"
+                    className="pos-icon-btn pos-mobile-search-btn" 
+                    onClick={() => setSpotlightOpen(true)}
+                    title="Search Pages and Menus (macOS Spotlight)"
+                    aria-label="Search"
+                >
+                    <Search size={18} />
+                </button>
 
                 {/* Quick POS Page Action Button (Desktop Only) */}
                 <Link
@@ -573,17 +519,18 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 onClick={() => setNotiOpen(false)}
                             />
                             {/* Notification Panel Card */}
-                            <div className="shadow-lg border rounded-3 p-3 bg-white" style={{
+                            <div className="shadow-lg border p-3 bg-white pos-notification-panel" style={{
                                 position: 'absolute',
                                 top: '100%',
-                                right: '-8px',
+                                right: 0,
                                 marginTop: '10px',
                                 width: 'min(330px, calc(100vw - 20px))',
                                 maxWidth: 'calc(100vw - 20px)',
                                 zIndex: 1050,
                                 maxHeight: '420px',
                                 overflowY: 'auto',
-                                animation: 'fadeIn 0.15s ease-out'
+                                animation: 'fadeIn 0.15s ease-out',
+                                borderRadius: '16px'
                             }}>
                                 <div className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                     <span className="fw-bold text-dark d-flex align-items-center gap-1.5" style={{ fontSize: '13.5px' }}>
@@ -678,20 +625,17 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                     )}
                 </div>
 
-                <button className="pos-icon-btn hide-on-mobile" onClick={() => navigate('/settings')}>
+                <button className="pos-icon-btn hide-on-mobile pos-header-settings-btn" onClick={() => navigate('/settings')} title="Settings">
                     <Settings size={18} />
                 </button>
 
-                {/* User Profile Dropdown */}
-                <div style={{ position: 'relative' }}>
+                {/* User Profile Dropdown - Hidden on mobile top navbar */}
+                <div className="pos-header-profile-section hide-on-mobile" style={{ position: 'relative' }}>
                     {/* Avatar — shows initials */}
                     <div
-                        className="pos-user-avatar ms-1"
+                        className="pos-user-avatar ms-0 ms-md-1"
                         onClick={() => setProfileOpen(!profileOpen)}
                         style={{
-                            width: '34px',
-                            height: '34px',
-                            borderRadius: '50%',
                             background: settings?.profileImage ? 'transparent' : roleColor,
                             display: 'flex',
                             alignItems: 'center',
@@ -724,16 +668,17 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                 onClick={() => setProfileOpen(false)}
                             />
                             {/* Dropdown */}
-                            <div style={{
+                            <div className="pos-profile-dropdown" style={{
                                 position: 'absolute',
                                 top: '100%',
                                 right: 0,
                                 marginTop: '10px',
                                 background: 'white',
                                 border: '1px solid #eaedf0',
-                                borderRadius: '10px',
-                                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                                minWidth: '200px',
+                                borderRadius: '16px',
+                                boxShadow: '0 12px 32px rgba(0,0,0,0.15)',
+                                minWidth: '220px',
+                                maxWidth: 'calc(100vw - 20px)',
                                 zIndex: 1050,
                                 overflow: 'hidden',
                             }}>
@@ -1027,6 +972,145 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     );
                                 })()}
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
+            {/* ── macOS Spotlight Command Palette Modal ── */}
+            {spotlightOpen && createPortal(
+                <div 
+                    className="pos-mac-spotlight-backdrop" 
+                    onClick={() => setSpotlightOpen(false)}
+                >
+                    <div 
+                        className="pos-mac-spotlight-window" 
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        {/* macOS Window Titlebar with Traffic Lights */}
+                        {/* <div className="pos-mac-spotlight-titlebar">
+                            <div className="pos-mac-traffic-lights">
+                                <button 
+                                    type="button" 
+                                    className="pos-mac-dot pos-mac-dot-close" 
+                                    onClick={() => setSpotlightOpen(false)} 
+                                    title="Close (Esc)" 
+                                />
+                                <span className="pos-mac-dot pos-mac-dot-min" />
+                                <span className="pos-mac-dot pos-mac-dot-max" />
+                            </div>
+                            <div className="pos-mac-titlebar-title">
+                                <span>Spotlight Search</span>
+                            </div>
+                            <div className="pos-mac-shortcut-hint">
+                                <span className="pos-mac-kbd">esc</span>
+                            </div>
+                        </div> */}
+
+                        {/* macOS Search Input Bar */}
+                        <div className="pos-mac-input-row">
+                            <div className="pos-mac-search-icon-wrap">
+                                <Search size={20} className="pos-mac-search-icon" />
+                            </div>
+                            <input
+                                ref={spotlightInputRef}
+                                type="text"
+                                className="pos-mac-search-input"
+                                placeholder="Search apps, menus, POS, products..."
+                                value={spotlightQuery}
+                                onChange={(e) => {
+                                    setSpotlightQuery(e.target.value);
+                                    setSelectedIndex(0);
+                                }}
+                                onKeyDown={handleSpotlightKeyDown}
+                            />
+                            {spotlightQuery && (
+                                <button 
+                                    type="button" 
+                                    className="pos-mac-clear-btn" 
+                                    onClick={() => {
+                                        setSpotlightQuery('');
+                                        spotlightInputRef.current?.focus();
+                                    }}
+                                    title="Clear search"
+                                >
+                                    <X size={14} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* macOS Filter Chips */}
+                        <div className="pos-mac-chips-bar">
+                            {['All', 'Sales', 'Inventory', 'Stock', 'Khata', 'Settings'].map(cat => (
+                                <button
+                                    key={cat}
+                                    type="button"
+                                    className={`pos-mac-chip ${activeCategory === cat ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setActiveCategory(cat);
+                                        setSelectedIndex(0);
+                                    }}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Results List */}
+                        <div className="pos-mac-results-list" ref={resultsListRef}>
+                            {filteredPages.length > 0 ? (
+                                filteredPages.map((page, idx) => {
+                                    const isSelected = idx === selectedIndex;
+                                    return (
+                                        <div
+                                            key={page.path + idx}
+                                            className={`pos-mac-result-item ${isSelected ? 'selected' : ''}`}
+                                            onMouseEnter={() => setSelectedIndex(idx)}
+                                            onClick={() => handleSelectPage(page.path)}
+                                        >
+                                            <div className="pos-mac-item-icon-box">
+                                                {page.icon}
+                                            </div>
+                                            <div className="pos-mac-item-info">
+                                                <div className="pos-mac-item-title-row">
+                                                    <span className="pos-mac-item-title">{page.title}</span>
+                                                    {page.badge && (
+                                                        <span className="pos-mac-item-badge">{page.badge}</span>
+                                                    )}
+                                                </div>
+                                                <span className="pos-mac-item-path">{page.path}</span>
+                                            </div>
+                                            <div className="pos-mac-item-action-tag">
+                                                <span className="pos-mac-category-tag">{page.category}</span>
+                                                {isSelected && <span className="pos-mac-return-key">Open ↵</span>}
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="pos-mac-empty-state">
+                                    <div className="pos-mac-empty-icon">
+                                        <Search size={28} />
+                                    </div>
+                                    <div className="pos-mac-empty-title">No matching results found</div>
+                                    <div className="pos-mac-empty-sub">Try searching for POS, Invoices, Products, or Settings.</div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* macOS Spotlight Footer */}
+                        <div className="pos-mac-footer">
+                            <div className="pos-mac-footer-tips">
+                                <span className="pos-mac-tip"><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+                                <span className="pos-mac-tip"><kbd>↵</kbd> Select</span>
+                                <span className="pos-mac-tip"><kbd>esc</kbd> Close</span>
+                            </div>
+                            <div className="pos-mac-footer-count">
+                                {filteredPages.length} {filteredPages.length === 1 ? 'result' : 'results'}
                             </div>
                         </div>
                     </div>

@@ -116,17 +116,18 @@
   height: 700px;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 991px) {
   .ai-panel {
     width: calc(100vw - 20px);
     right: 10px;
-    bottom: 78px;
+    bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
     height: 72vh;
-    border-radius: 14px;
+    max-height: calc(100vh - 160px);
+    border-radius: 16px;
   }
   .ai-fab {
-    bottom: 16px;
-    right: 16px;
+    bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+    right: 14px !important;
   }
 }
 
