@@ -28,7 +28,7 @@ const WebsiteFooter = () => {
                             <div className="company-info-box">
                                 <div className="company-info-header">
                                     <strong>Namustutam</strong>
-                                    {/* <span className="verified-badge">Verified IT Agency</span> */}
+                                    {/* <span className="verified-badge">Verified Freelancer</span> */}
                                 </div>
                                 <div className="company-info-item">
                                     <FaMapMarkerAlt className="info-icon" />
@@ -46,7 +46,7 @@ const WebsiteFooter = () => {
                         </div>
 
                         <div className="premium-footer-col">
-                            <h4>Company</h4>
+                            <h4>Quick Links</h4>
                             <ul>
                                 <li><Link to="/">About Us</Link></li>
                                 <li><Link to="#services">Our Services</Link></li>
@@ -87,7 +87,7 @@ const WebsiteFooter = () => {
                     {/* <div className="footer-badges">
                         <div className="badge-item"><FaLock className="badge-icon green"/> SSL 256-Bit Encryption</div>
                         <div className="badge-item"><FaShieldAlt className="badge-icon blue"/> Quality Assured Delivery</div>
-                        <div className="badge-item"><FaTrophy className="badge-icon" style={{color: '#eab308'}}/> Top Rated Agency</div>
+                        <div className="badge-item"><FaTrophy className="badge-icon" style={{color: '#eab308'}}/> Top Rated Freelancer</div>
                         <div className="badge-item"><FaHandshake className="badge-icon purple"/> Secure & Transparent Process</div>
                     </div> */}
 

@@ -4,7 +4,7 @@ import { SiMongodb, SiTypescript, SiExpress, SiPostgresql } from 'react-icons/si
 export const projectsData = [
     {
         title: 'Krón',
-        author: 'Pranasari',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'Business Page',
         price: '$59 USD',
@@ -15,7 +15,7 @@ export const projectsData = [
     },
     {
         title: 'Frentavo',
-        author: 'Flow Design Agency',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'Business Page',
         price: '$129 USD',
@@ -26,7 +26,7 @@ export const projectsData = [
     },
     {
         title: 'Safeers',
-        author: 'Weabers',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'SaaS Project',
         price: '$99 USD',
@@ -36,8 +36,8 @@ export const projectsData = [
         liveLink: '#', githubLink: '#'
     },
     {
-        title: 'Fullstack Studio',
-        author: 'Div Supply',
+        title: 'Fullstack Web App',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$99 USD',
@@ -48,7 +48,7 @@ export const projectsData = [
     },
     {
         title: 'ORIGIN®',
-        author: 'Creative UI',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'Business Page',
         price: '$49 USD',
@@ -59,7 +59,7 @@ export const projectsData = [
     },
     {
         title: 'ORVO',
-        author: 'Design Flow',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'SaaS Project',
         price: '$89 USD',
@@ -70,7 +70,7 @@ export const projectsData = [
     },
     {
         title: 'Buy. Sell. Rent',
-        author: 'RealEstate Co',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$149 USD',
@@ -81,7 +81,7 @@ export const projectsData = [
     },
     {
         title: 'AXURE',
-        author: 'UX Studio',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'Business Page',
         price: '$79 USD',

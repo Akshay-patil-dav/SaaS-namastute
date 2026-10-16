@@ -114,7 +114,7 @@ const AkshayPatil = () => {
                                 <h3>Frontend Developer</h3>
                                 <span className="date">2020 - 2022</span>
                             </div>
-                            <h4>Creative Agency</h4>
+                            <h4>Freelance Developer</h4>
                             <p>
                                 Built interactive user interfaces for client projects. Ensured cross-browser compatibility 
                                 and mobile responsiveness. Reduced load times by 30% through code optimization.

@@ -254,7 +254,7 @@ export default function WebDevelopment() {
                         <div className="wd-why-left">
                             <div className="wd-section-tag">Why Namustutam</div>
                             <h2>Built for <span className="wd-gradient-text">Startups & Growing Businesses</span></h2>
-                            <p>We're not just a dev agency — we're a product-first startup that understands the pressure of building something that must work, scale, and impress from day one.</p>
+                            <p>I'm not just writing code — as a dedicated freelance developer, I understand the pressure of building something that must work, scale, and impress from day one.</p>
                             <button className="wd-btn-primary" style={{ marginTop: '32px' }} onClick={() => navigate('/contact')}>
                                 Let's Talk <ArrowRight size={18} />
                             </button>

@@ -11,7 +11,7 @@ import p7 from "../assets/project/p7.png"
 export const projectsData = [
     {
         title: 'Clothing E-commerce Design| Shopify ',
-        author: 'Pranasari',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'Business Page',
         price: '$59 USD',
@@ -22,7 +22,7 @@ export const projectsData = [
     },
     {
         title: 'Shopify Web Design',
-        author: 'Flow Design Agency',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'Business Page',
         price: '$129 USD',
@@ -33,7 +33,7 @@ export const projectsData = [
     },
     {
         title: 'Clothing E-commerce Templates | Shopify Web Design',
-        author: 'Akshay Patil',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$99 USD',
@@ -43,8 +43,8 @@ export const projectsData = [
         liveLink: '#', githubLink: '#'
     },
     {
-        title: 'MyITRDesk.com | Fullstack Studio',
-        author: 'Div Supply',
+        title: 'MyITRDesk.com | Fullstack Web App',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$99 USD',
@@ -55,7 +55,7 @@ export const projectsData = [
     },
     {
         title: 'POS Software | SaaS',
-        author: 'Akshay Patil',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'SaaS Project',
         price: '$49 USD',
@@ -66,7 +66,7 @@ export const projectsData = [
     },
     {
         title: 'NatureLink India .com | Shopify',
-        author: 'Design Flow',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$89 USD',
@@ -77,7 +77,7 @@ export const projectsData = [
     },
     {
         title: 'Buy. Sell. Rent',
-        author: 'RealEstate Co',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$149 USD',
@@ -88,7 +88,7 @@ export const projectsData = [
     },
     {
         title: 'AXURE',
-        author: 'UX Studio',
+        author: 'Freelancer',
         category: 'NEW',
         filter: 'Business Page',
         price: '$79 USD',
