@@ -14,7 +14,7 @@ import BlogPreviewSection from '../../../components/common/BlogPreviewSection/Bl
 
 export default function ITPortfolio() {
     const navigate = useNavigate();
-    
+
     // Rotating Text State
     const [wordIndex, setWordIndex] = useState(0);
     const rotatingWords = ['Excellence', 'Innovation', 'Experiences', 'Solutions'];
@@ -28,7 +28,7 @@ export default function ITPortfolio() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        document.title = "Namustutam | IT Services & Solutions";
+        document.title = "Namustutam |Software Dev & Freelancer  ";
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -88,15 +88,15 @@ export default function ITPortfolio() {
                 <div className="hero-floating-background">
                     {/* Floating Project Images */}
                     {floatingImages.map((imgUrl, index) => (
-                        <div 
-                            key={`img-${index}`} 
+                        <div
+                            key={`img-${index}`}
                             className={`floating-project-card floating-card-${index + 1}`}
                             style={{ backgroundImage: `url(${imgUrl})` }}
                         ></div>
                     ))}
                     {floatingImages.map((imgUrl, index) => (
-                        <div 
-                            key={`dup-${index}`} 
+                        <div
+                            key={`dup-${index}`}
                             className={`floating-project-card floating-card-dup-${index + 1}`}
                             style={{ backgroundImage: `url(${imgUrl})` }}
                         ></div>
@@ -122,14 +122,14 @@ export default function ITPortfolio() {
                         Freelance Software Developer • IT Solutions
                     </div>
                     <h1 className="portfolio-hero-title">
-                        Building Digital 
+                        Building Digital
                         <div className="rotating-text-wrapper">
                             {rotatingWords.map((word, index) => {
                                 const isActive = index === wordIndex;
                                 const isPrevious = index === (wordIndex - 1 + rotatingWords.length) % rotatingWords.length;
-                                
+
                                 return (
-                                    <span 
+                                    <span
                                         key={index}
                                         className={`portfolio-gradient-text rotating-text-item ${isActive ? 'active' : ''} ${isPrevious && !isActive ? 'previous' : ''}`}
                                     >
@@ -143,7 +143,7 @@ export default function ITPortfolio() {
                     </h1>
                     <p className="portfolio-hero-subtitle">
                         {/* We transform ideas into high-performance web applications, scalable e-commerce platforms, and beautiful corporate websites. Your technology partner from concept to launch. */}
-                  I build custom software, POS solutions, business websites, and web applications tailored to your business needs — from idea to deployment
+                        I build custom software, POS solutions, business websites, and web applications tailored to your business needs — from idea to deployment
                     </p>
                     <div className="portfolio-hero-actions">
                         <button className="portfolio-btn-primary" onClick={() => scrollTo('portfolio')}>
@@ -154,7 +154,7 @@ export default function ITPortfolio() {
                         </button>
                     </div>
                 </div>
-                
+
                 {/* Gradient transition to next section */}
                 <div className="hero-bottom-transition"></div>
             </section>
@@ -176,9 +176,9 @@ export default function ITPortfolio() {
 
                 <div className="portfolio-bento-grid">
                     {projects.map((p, i) => (
-                        <div 
-                            key={`project-${i}`} 
-                            className={`portfolio-bento-card bento-card-${i} reveal-up`} 
+                        <div
+                            key={`project-${i}`}
+                            className={`portfolio-bento-card bento-card-${i} reveal-up`}
                             style={{ transitionDelay: `${i * 100}ms` }}
                             onClick={() => navigate('/project-info/' + p.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''))}
                         >
@@ -210,8 +210,8 @@ export default function ITPortfolio() {
 
             {/* ── Progressive Growth Section ──────────────────────── */}
             <section className="portfolio-progressive-section" id="progressive-growth">
-                
-                
+
+
                 {/* Bottom Marquee */}
                 <div className="progressive-marquee-container">
                     <div className="progressive-marquee">
