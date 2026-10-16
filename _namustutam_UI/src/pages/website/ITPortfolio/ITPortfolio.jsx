@@ -28,7 +28,7 @@ export default function ITPortfolio() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        document.title = "Namustutam |Software Dev & Freelancer  ";
+        document.title = "Namustutam | Software Dev & Freelancer  ";
 
         const observer = new IntersectionObserver(
             (entries) => {
