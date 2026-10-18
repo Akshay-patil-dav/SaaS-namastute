@@ -34,7 +34,9 @@ import {
     MessageSquare,
     ExternalLink,
     RefreshCw,
-    Zap
+    Zap,
+    ArrowLeft,
+    ChevronRight
 } from 'lucide-react';
 import { sendWhatsAppMessage, formatWhatsAppPhone, isWhatsAppBackgroundReady } from '../../../services/whatsappService';
 import './KhataBook.css';
@@ -211,7 +213,21 @@ export default function KhataBook() {
     const handleTabChange = (tabKey) => {
         setActiveTab(tabKey);
         setSearchParams({ tab: tabKey });
+        setMobileTab('list');
     };
+
+    // Responsive Mobile View Detection (<= 991px)
+    const [isMobileView, setIsMobileView] = useState(() =>
+        typeof window !== 'undefined' ? window.innerWidth <= 991 : false
+    );
+    useEffect(() => {
+        const handleResize = () => setIsMobileView(window.innerWidth <= 991);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Mobile Navigation Mode: 'list' (parties directory) or 'ledger' (active party passbook)
+    const [mobileTab, setMobileTab] = useState('list');
 
     // State
     const [parties, setParties] = useState([]);
@@ -1035,9 +1051,37 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                 </button>
             </div>
 
+            {/* ── Mobile View Toggle: Parties List vs Active Ledger ── */}
+            {isMobileView && activeTab !== 'daybook' && (
+                <div className="khata-mobile-view-toggle">
+                    <button
+                        type="button"
+                        className={`khata-mobile-toggle-btn ${mobileTab === 'list' ? 'active' : ''}`}
+                        onClick={() => setMobileTab('list')}
+                    >
+                        <Users size={14} />
+                        <span>{activeTab === 'suppliers' ? 'Suppliers' : 'Customers'} ({filteredParties.length})</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`khata-mobile-toggle-btn ${mobileTab === 'ledger' ? 'active' : ''}`}
+                        onClick={() => {
+                            if (selectedParty) {
+                                setMobileTab('ledger');
+                            } else {
+                                alert('Please select a party from the list first.');
+                            }
+                        }}
+                    >
+                        <BookOpen size={14} />
+                        <span>{selectedParty ? `${(selectedParty.name || '').split(' ')[0]}'s Ledger` : 'Passbook Ledger'}</span>
+                    </button>
+                </div>
+            )}
+
             {/* ── VIEW 1: CUSTOMERS / SUPPLIERS SPLIT VIEW ─────────────── */}
             {activeTab !== 'daybook' && (
-                <div className="khata-split-layout no-print">
+                <div className={`khata-split-layout no-print ${isMobileView ? `mobile-view-${mobileTab}` : ''}`}>
                     {/* LEFT PANE: Parties List */}
                     <div className="khata-parties-pane">
                         <div className="khata-parties-header">
@@ -1085,7 +1129,13 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                                         <div
                                             key={party.id}
                                             className={`khata-party-row ${isSelected ? 'selected' : ''}`}
-                                            onClick={() => setSelectedParty(party)}
+                                            onClick={() => {
+                                                setSelectedParty(party);
+                                                if (isMobileView) {
+                                                    setMobileTab('ledger');
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }
+                                            }}
                                         >
                                             <div className="khata-party-row-left">
                                                 <div className={`party-avatar ${party.partyType === 'SUPPLIER' ? 'avatar-supplier' : 'avatar-customer'}`}>
@@ -1141,6 +1191,19 @@ ${txForm.referenceNumber ? `🔢 *Reference #:* ${txForm.referenceNumber}\n` : '
                             <>
                                 {/* Ledger Header */}
                                 <div className="ledger-header">
+                                    {isMobileView && (
+                                        <button
+                                            type="button"
+                                            className="khata-mobile-back-btn"
+                                            onClick={() => {
+                                                setMobileTab('list');
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
+                                        >
+                                            <ArrowLeft size={16} />
+                                            <span>Back to {activeTab === 'suppliers' ? 'Suppliers' : 'Customers'} List</span>
+                                        </button>
+                                    )}
                                     <div className="ledger-party-profile">
                                         <div className={`ledger-avatar-big ${selectedParty.partyType === 'SUPPLIER' ? 'avatar-supplier' : 'avatar-customer'}`}>
                                             {(selectedParty.name || 'U').slice(0, 2)}

@@ -24,7 +24,9 @@ import {
     UploadCloud,
     Layers,
     Factory,
-    PlayCircle
+    PlayCircle,
+    LayoutGrid,
+    List
 } from 'lucide-react';
 import { useConfirm } from '../../../context/ConfirmContext';
 import { useCurrency } from '../../../hooks/useCurrency';
@@ -67,6 +69,17 @@ const Products = () => {
     const [importing, setImporting]             = useState(false);
     const [dragActive, setDragActive]           = useState(false);
     const [importError, setImportError]         = useState('');
+
+    const [isMobile, setIsMobile]               = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768);
+    const [mobileViewMode, setMobileViewMode]   = useState('cards'); // 'cards' | 'table'
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     
     const { confirm } = useConfirm();
 
@@ -297,33 +310,35 @@ const Products = () => {
                     </p>
                 </div>
                 <div className="ss-header-actions">
-                    {canManage('products') && (
-                        <>
-                            <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF"><FileText size={16} /></button>
-                            <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel"><FileSpreadsheet size={16} /></button>
-                        </>
-                    )}
-                    <button className="ss-btn-icon-square" title="Refresh" onClick={fetchProducts}>
-                        <RefreshCw size={16} className={loading ? 'spin' : ''} />
-                    </button>
-                    {canManage('products') && selectedIds.length > 0 && (
+                    <div className="ss-header-tools">
+                        {canManage('products') && (
+                            <>
+                                <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF"><FileText size={16} /></button>
+                                <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel"><FileSpreadsheet size={16} /></button>
+                            </>
+                        )}
+                        <button className="ss-btn-icon-square" title="Refresh" onClick={fetchProducts}>
+                            <RefreshCw size={16} className={loading ? 'spin' : ''} />
+                        </button>
+                    </div>
+                    {canManage('products') && selectedIds.length > 0 && !isMobile && (
                         <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
                     {canManage('products') && (
-                        <>
-                            <Link to="/create-product" className="ss-btn-orange" style={{ textDecoration: 'none' }}>
+                        <div className="ss-header-primary-btns">
+                            <Link to="/create-product" className="ss-btn-orange ss-btn-add-product" style={{ textDecoration: 'none' }}>
                                 <PlusCircle size={18} /> Add Product
                             </Link>
                             <button 
-                                className="ss-btn-orange" 
+                                className="ss-btn-orange ss-btn-import-product" 
                                 style={{ background: '#5b6670', borderColor: '#5b6670' }}
                                 onClick={() => setShowImportModal(true)}
                             >
                                 <Download size={18} /> Import Product
                             </button>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>
@@ -340,7 +355,7 @@ const Products = () => {
             <div className="ss-main-panel">
 
                 {/* Item Type Filter Tabs */}
-                <div className="d-flex gap-2 p-3 border-bottom bg-light">
+                <div className="ss-filter-tabs-scroll d-flex gap-2 p-3 border-bottom bg-light">
                     {[
                         { id: 'ALL', label: 'All Products', icon: Package },
                         { id: 'STANDARD_ITEM', label: 'Standard Products', icon: Package },
@@ -381,11 +396,199 @@ const Products = () => {
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                         />
+                        {searchTerm && (
+                            <button 
+                                type="button" 
+                                className="ss-search-clear-btn" 
+                                onClick={() => { setSearchTerm(''); setCurrentPage(1); }}
+                                title="Clear search"
+                            >
+                                <X size={15} />
+                            </button>
+                        )}
                     </div>
+
+                    {/* Mobile View Toggle */}
+                    {isMobile && (
+                        <div className="products-mobile-view-toggle">
+                            <div className="pm-view-btn-group">
+                                <button 
+                                    type="button" 
+                                    className={`pm-view-btn ${mobileViewMode === 'cards' ? 'active' : ''}`}
+                                    onClick={() => setMobileViewMode('cards')}
+                                >
+                                    <LayoutGrid size={15} /> Cards
+                                </button>
+                                <button 
+                                    type="button" 
+                                    className={`pm-view-btn ${mobileViewMode === 'table' ? 'active' : ''}`}
+                                    onClick={() => setMobileViewMode('table')}
+                                >
+                                    <List size={15} /> Table
+                                </button>
+                            </div>
+                            <span className="pm-filter-count">{filtered.length} found</span>
+                        </div>
+                    )}
                 </div>
 
+                {/* Mobile Cards View */}
+                {isMobile && mobileViewMode === 'cards' && (
+                    <div className="products-mobile-card-list">
+                        {/* Loading skeletons for mobile */}
+                        {loading && Array.from({ length: 4 }).map((_, i) => (
+                            <div key={`m-skel-${i}`} className="product-mobile-card skeleton">
+                                <div className="pmc-top">
+                                    <div className="skel skel-circle" style={{ width: 44, height: 44, borderRadius: 8 }} />
+                                    <div style={{ flex: 1 }}>
+                                        <div className="skel skel-md" style={{ marginBottom: 6 }} />
+                                        <div className="skel skel-sm" />
+                                    </div>
+                                </div>
+                                <div className="pmc-details-grid">
+                                    <div className="skel skel-sm" />
+                                    <div className="skel skel-sm" />
+                                    <div className="skel skel-sm" />
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* Empty state for mobile */}
+                        {!loading && paginated.length === 0 && (
+                            <div className="empty-state p-4 text-center">
+                                <Package size={44} strokeWidth={1} />
+                                <p className="mt-2 mb-3">{searchTerm ? 'No products match your search.' : 'No products available.'}</p>
+                                {!searchTerm && canManage('products') && (
+                                    <Link to="/create-product" className="btn-orange text-decoration-none">
+                                        <PlusCircle size={16} /> Add Product
+                                    </Link>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Actual Mobile Cards */}
+                        {!loading && paginated.length > 0 && paginated.map((item) => (
+                            <div key={`m-${item.id}`} className={`product-mobile-card ${selectedIds.includes(item.id) ? 'selected' : ''}`}>
+                                <div className="pmc-top">
+                                    <label className="pmc-checkbox-wrap" onClick={(e) => e.stopPropagation()}>
+                                        <input 
+                                            type="checkbox" 
+                                            className="ss-checkbox" 
+                                            checked={selectedIds.includes(item.id)}
+                                            onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                                        />
+                                    </label>
+                                    <div className="pmc-thumb" onClick={() => { setViewProduct(item); setActiveImgIndex(0); }}>
+                                        {item.images && item.images.split(',')[0]?.trim() ? (
+                                            <img
+                                                src={resolveImageUrl(item.images.split(',')[0])}
+                                                alt={item.name}
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                                }}
+                                            />
+                                        ) : null}
+                                        <div
+                                            className="pmc-avatar-fallback"
+                                            style={{
+                                                background: getAvatarColor(item.name),
+                                                display: (item.images && item.images.split(',')[0]?.trim()) ? 'none' : 'flex'
+                                            }}
+                                        >
+                                            {getInitials(item.name)}
+                                        </div>
+                                    </div>
+                                    <div className="pmc-info" onClick={() => { setViewProduct(item); setActiveImgIndex(0); }}>
+                                        <div className="pmc-name-row">
+                                            <span className="pmc-name">{item.name}</span>
+                                            {item._isMock && <span className="pmc-demo-badge">demo</span>}
+                                        </div>
+                                        <div className="pmc-meta-row">
+                                            <span className="pmc-sku-badge">{item.sku || 'No SKU'}</span>
+                                            {item.category && (
+                                                <span 
+                                                    className="pmc-cat-badge"
+                                                    style={{
+                                                        background: `${getCategoryColor(item.category)}18`,
+                                                        color: getCategoryColor(item.category)
+                                                    }}
+                                                >
+                                                    {item.category}
+                                                </span>
+                                            )}
+                                            {item.itemType === 'FINISHED_GOOD' && (
+                                                <span className="badge bg-warning bg-opacity-25 text-dark border border-warning" style={{ fontSize: '10px' }}>
+                                                    Manufactured
+                                                </span>
+                                            )}
+                                            {item.itemType === 'RAW_MATERIAL' && (
+                                                <span className="badge bg-info bg-opacity-25 text-info border border-info" style={{ fontSize: '10px' }}>
+                                                    Raw Mat.
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pmc-details-grid">
+                                    <div className="pmc-grid-cell">
+                                        <span className="pmc-cell-label">Purchase</span>
+                                        <span className="pmc-cell-value price">{formatPrice(item.purchasePrice)}</span>
+                                    </div>
+                                    <div className="pmc-grid-cell">
+                                        <span className="pmc-cell-label">Selling</span>
+                                        <span className="pmc-cell-value">{formatPrice(item.price)}</span>
+                                    </div>
+                                    <div className="pmc-grid-cell">
+                                        <span className="pmc-cell-label">Stock</span>
+                                        <span className={`pmc-stock-pill ${item.quantity <= 0 ? 'out' : item.quantity < 50 ? 'low' : 'good'}`}>
+                                            {item.quantity ?? 0} {item.unit || 'Pc'}
+                                        </span>
+                                    </div>
+                                    {item.brand && (
+                                        <div className="pmc-grid-cell">
+                                            <span className="pmc-cell-label">Brand</span>
+                                            <span className="pmc-cell-value text-truncate">{item.brand}</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="pmc-actions-row">
+                                    {item.itemType === 'FINISHED_GOOD' && (
+                                        <Link
+                                            to="/manufacturing/work-orders"
+                                            className="pmc-action-btn produce"
+                                            title="Start Batch Work Order"
+                                        >
+                                            <PlayCircle size={14} /> Produce
+                                        </Link>
+                                    )}
+                                    <button 
+                                        type="button"
+                                        className="pmc-action-btn view" 
+                                        onClick={() => { setViewProduct(item); setActiveImgIndex(0); }}
+                                    >
+                                        <Eye size={14} /> View
+                                    </button>
+                                    <Link to={`/edit-product/${item.id}`} className="pmc-action-btn edit">
+                                        <Pencil size={14} /> Edit
+                                    </Link>
+                                    <button 
+                                        type="button"
+                                        className="pmc-action-btn delete" 
+                                        onClick={() => handleDelete(item.id)}
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 {/* Table */}
-                <div className="ss-table-wrapper">
+                <div className={`ss-table-wrapper ${isMobile && mobileViewMode === 'cards' ? 'd-none' : ''}`}>
                     <table className="ss-table">
                         <thead>
                             <tr>
@@ -589,6 +792,24 @@ const Products = () => {
                     </div>
                 )}
             </div>
+
+            {/* Mobile Sticky Bulk Actions Bar */}
+            {canManage('products') && selectedIds.length > 0 && isMobile && (
+                <div className="products-mobile-bulk-bar">
+                    <div className="pm-bulk-info">
+                        <span className="pm-bulk-count">{selectedIds.length}</span>
+                        <span>selected</span>
+                    </div>
+                    <div className="pm-bulk-actions">
+                        <button type="button" className="pm-bulk-btn-clear" onClick={() => setSelectedIds([])}>
+                            Deselect All
+                        </button>
+                        <button type="button" className="pm-bulk-btn-delete" onClick={handleBulkDelete}>
+                            <Trash2 size={15} /> Delete Selected
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Enhanced Product View Modal */}
             {viewProduct && (

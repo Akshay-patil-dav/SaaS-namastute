@@ -520,44 +520,48 @@ export default function PosTerminal() {
         <div className="pos-terminal-container">
             {/* Top Bar Switcher */}
             <div className="pos-terminal-topbar">
-                <div className="d-flex align-items-center gap-3">
+                <div className="pos-topbar-tabs">
                     <button 
                         className={`pos-tab-btn ${activeTab === 'terminal' ? 'active' : ''}`}
                         onClick={() => setActiveTab('terminal')}
                     >
                         <ShoppingCart size={16} />
-                        <span>POS Billing Terminal</span>
+                        <span className="d-none d-sm-inline">POS Billing Terminal</span>
+                        <span className="d-sm-none">Terminal</span>
                     </button>
                     <button 
                         className={`pos-tab-btn ${activeTab === 'history' ? 'active' : ''}`}
                         onClick={() => setActiveTab('history')}
                     >
                         <FileText size={16} />
-                        <span>Sales History & Orders</span>
+                        <span className="d-none d-sm-inline">Sales History & Orders</span>
+                        <span className="d-sm-none">Orders</span>
                     </button>
                 </div>
 
-                <div className="d-none d-md-flex align-items-center gap-3 text-muted small">
-                    <span className="d-flex align-items-center gap-1">
-                        <MonitorDot size={14} color="var(--primary-color)" /> Terminal Active
-                    </span>
-                    <span className="border-end pe-3">
-                        Cashier: <strong className="text-dark">{user?.name || user?.identifier?.split('@')[0] || 'Admin'}</strong>
-                    </span>
+                <div className="d-flex align-items-center gap-2">
+                    <div className="d-none d-md-flex align-items-center gap-3 text-muted small">
+                        <span className="d-flex align-items-center gap-1">
+                            <MonitorDot size={14} color="var(--primary-color)" /> Terminal Active
+                        </span>
+                        <span className="border-end pe-3">
+                            Cashier: <strong className="text-dark">{user?.name || user?.identifier?.split('@')[0] || 'Admin'}</strong>
+                        </span>
+                    </div>
                     <button 
-                        className="btn btn-sm btn-light border d-flex align-items-center gap-1" 
+                        className="btn btn-sm btn-light border d-flex align-items-center gap-1 pos-topbar-sync-btn" 
                         onClick={() => fetchCatalog(true)}
                         disabled={isRefreshing}
                         title="Sync latest inventory and catalog"
                     >
                         <RefreshCw size={13} className={isRefreshing ? 'pos-spin-icon text-warning' : ''} />
-                        <span>{isRefreshing ? 'Syncing...' : 'Refresh'}</span>
+                        <span className="d-none d-sm-inline">{isRefreshing ? 'Syncing...' : 'Refresh'}</span>
                     </button>
                 </div>
             </div>
 
             {activeTab === 'history' ? (
-                <div className="p-3" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+                <div className="p-3 pos-history-tab-pane">
                     <PosOrders />
                 </div>
             ) : (
@@ -588,17 +592,27 @@ export default function PosTerminal() {
                         {/* Search & Barcode Bar */}
                         <div className="pos-filter-bar">
                             <div className="pos-search-input-wrap">
-                                <Search size={16} className="position-absolute start-0 top-50 translate-middle-y ms-3 text-muted" />
+                                <Search size={16} className="pos-input-left-icon text-muted" />
                                 <input 
                                     type="text"
                                     placeholder="Search products by Name or SKU..."
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
                                 />
+                                {searchQuery && (
+                                    <button 
+                                        type="button" 
+                                        className="pos-input-clear-btn" 
+                                        onClick={() => setSearchQuery('')}
+                                        title="Clear search"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                )}
                             </div>
 
                             <div className="pos-barcode-wrap">
-                                <Barcode size={16} className="position-absolute start-0 top-50 translate-middle-y ms-3 text-muted" />
+                                <Barcode size={16} className="pos-input-left-icon text-muted" />
                                 <input 
                                     ref={barcodeRef}
                                     type="text"
@@ -607,6 +621,16 @@ export default function PosTerminal() {
                                     onChange={e => setBarcodeQuery(e.target.value)}
                                     onKeyDown={handleBarcodeKeyDown}
                                 />
+                                {barcodeQuery && (
+                                    <button 
+                                        type="button" 
+                                        className="pos-input-clear-btn" 
+                                        onClick={() => setBarcodeQuery('')}
+                                        title="Clear barcode"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -745,13 +769,13 @@ export default function PosTerminal() {
                         {/* Cart Header */}
                         <div className="pos-cart-header">
                             <div className="pos-cust-select">
-                                <User size={14} className="text-muted" />
-                                <span>
+                                <User size={14} className="text-muted flex-shrink-0" />
+                                <span className="pos-cust-name-text text-truncate">
                                     {customerBusinessName ? `${customerBusinessName} (${customerName})` : customerName}
                                     {customerPhone ? ` - ${customerPhone}` : ''}
                                 </span>
                                 <button 
-                                    className="btn btn-sm btn-link p-0 text-warning text-decoration-none fw-bold ms-1"
+                                    className="btn btn-sm btn-link p-0 text-warning text-decoration-none fw-bold ms-1 flex-shrink-0"
                                     onClick={() => { 
                                         setTempCustName(customerName); 
                                         setTempCustPhone(customerPhone); 
@@ -765,18 +789,27 @@ export default function PosTerminal() {
                                     Edit
                                 </button>
                             </div>
-                            <button className="btn btn-sm text-danger text-decoration-none p-0 fw-semibold" onClick={clearCart}>
-                                Clear Cart
-                            </button>
+                            <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-warning d-md-none pos-cart-header-add-btn"
+                                    onClick={() => setMobileView('catalog')}
+                                >
+                                    <Plus size={13} className="me-1" /> Add
+                                </button>
+                                <button className="btn btn-sm text-danger text-decoration-none p-0 fw-semibold" onClick={clearCart}>
+                                    Clear
+                                </button>
+                            </div>
                         </div>
 
                         {/* Cart Body Items */}
                         <div className="pos-cart-body">
                             {cart.length === 0 ? (
-                                <div className="text-center py-5 text-muted">
+                                <div className="text-center py-5 text-muted pos-empty-cart-state">
                                     <ShoppingCart size={40} className="opacity-30 mb-2 text-warning" />
                                     <h6>Cart is Empty</h6>
-                                    <p className="small mb-0">Click products or scan barcode to add items to bill.</p>
+                                    <p className="small mb-0">Select products or scan barcode to add items to bill.</p>
                                     <button
                                         type="button"
                                         className="btn btn-sm btn-outline-warning mt-3 pos-mobile-add-btn"
@@ -788,21 +821,28 @@ export default function PosTerminal() {
                             ) : (
                                 cart.map(item => (
                                     <div className="pos-cart-item" key={item.productId}>
-                                        <div className="pos-cart-item-img d-flex align-items-center justify-content-center bg-light text-secondary">
-                                            <ImageOff size={16} className="opacity-50" />
-                                        </div>
                                         <div className="pos-cart-item-info">
-                                            <div className="pos-cart-item-name">{item.name}</div>
+                                            <div className="pos-cart-item-name" title={item.name}>{item.name}</div>
                                             <div className="pos-cart-item-price">{currencySymbol}{item.unitPrice.toFixed(2)}</div>
                                         </div>
 
                                         <div className="pos-qty-controls">
-                                            <button className="pos-qty-btn" onClick={() => updateQty(item.productId, -1)}>
-                                                <Minus size={12} />
+                                            <button 
+                                                type="button"
+                                                className="pos-qty-btn" 
+                                                onClick={() => updateQty(item.productId, -1)}
+                                                aria-label="Decrease quantity"
+                                            >
+                                                <Minus size={13} />
                                             </button>
                                             <span className="pos-qty-val">{item.quantity}</span>
-                                            <button className="pos-qty-btn" onClick={() => updateQty(item.productId, 1)}>
-                                                <Plus size={12} />
+                                            <button 
+                                                type="button"
+                                                className="pos-qty-btn" 
+                                                onClick={() => updateQty(item.productId, 1)}
+                                                aria-label="Increase quantity"
+                                            >
+                                                <Plus size={13} />
                                             </button>
                                         </div>
 
@@ -810,8 +850,13 @@ export default function PosTerminal() {
                                             {currencySymbol}{(item.unitPrice * item.quantity).toFixed(2)}
                                         </div>
 
-                                        <button className="pos-cart-del-btn" onClick={() => removeItem(item.productId)}>
-                                            <Trash2 size={14} />
+                                        <button 
+                                            type="button"
+                                            className="pos-cart-del-btn" 
+                                            onClick={() => removeItem(item.productId)}
+                                            aria-label="Remove item"
+                                        >
+                                            <Trash2 size={15} />
                                         </button>
                                     </div>
                                 ))

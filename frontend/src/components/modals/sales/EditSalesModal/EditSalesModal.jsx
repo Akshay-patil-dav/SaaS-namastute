@@ -155,12 +155,27 @@ const EditSalesModal = ({ isOpen, order, onClose, onSuccess }) => {
                                             {p.img ? <img src={p.img} alt="" className="sm-prod-img"/> : <div className="sm-prod-placeholder">{(p.name||'?').charAt(0)}</div>}
                                             <div><div className="sm-prod-name-text">{p.name}</div><div className="sm-prod-sku">SKU: {p.sku}</div></div>
                                         </div>
-                                        <input className="sm-prod-input" type="number" min="1" value={p.quantity} onChange={e=>updateField(idx,'quantity',e.target.value)}/>
-                                        <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.unitPrice} onChange={e=>updateField(idx,'unitPrice',e.target.value)}/>
-                                        <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.discount} onChange={e=>updateField(idx,'discount',e.target.value)}/>
-                                        <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.taxPercent} onChange={e=>updateField(idx,'taxPercent',e.target.value)}/>
-                                        <div className="sm-prod-total">{currencySymbol}{lineTotal(p).toFixed(2)}</div>
-                                        <button className="sm-prod-remove" onClick={()=>setProducts(prev=>prev.filter((_,i)=>i!==idx))}><Trash2 size={13}/></button>
+                                        <div className="sm-prod-cell">
+                                            <span className="sm-prod-cell-label">Qty</span>
+                                            <input className="sm-prod-input" type="number" min="1" value={p.quantity} onChange={e=>updateField(idx,'quantity',e.target.value)}/>
+                                        </div>
+                                        <div className="sm-prod-cell">
+                                            <span className="sm-prod-cell-label">Unit Price</span>
+                                            <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.unitPrice} onChange={e=>updateField(idx,'unitPrice',e.target.value)}/>
+                                        </div>
+                                        <div className="sm-prod-cell">
+                                            <span className="sm-prod-cell-label">Discount</span>
+                                            <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.discount} onChange={e=>updateField(idx,'discount',e.target.value)}/>
+                                        </div>
+                                        <div className="sm-prod-cell">
+                                            <span className="sm-prod-cell-label">Tax %</span>
+                                            <input className="sm-prod-input" type="number" min="0" step="0.01" value={p.taxPercent} onChange={e=>updateField(idx,'taxPercent',e.target.value)}/>
+                                        </div>
+                                        <div className="sm-prod-total">
+                                            <span className="sm-prod-total-label">Total: </span>
+                                            <span className="sm-prod-total-val">{currencySymbol}{lineTotal(p).toFixed(2)}</span>
+                                        </div>
+                                        <button className="sm-prod-remove" onClick={()=>setProducts(prev=>prev.filter((_,i)=>i!==idx))} title="Remove product"><Trash2 size={14}/></button>
                                     </div>
                                 ))}
                             </div>

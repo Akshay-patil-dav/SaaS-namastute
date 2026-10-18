@@ -99,3 +99,52 @@
 .btn-confirm-global:hover {
     background: #ea580c;
 }
+
+@media (max-width: 576px) {
+    .global-delete-modal {
+        width: 92% !important;
+        max-width: 360px !important;
+        padding: 24px 18px !important;
+        border-radius: 16px !important;
+    }
+
+    .global-delete-icon-wrapper {
+        width: 52px !important;
+        height: 52px !important;
+        margin-bottom: 14px !important;
+    }
+
+    .global-delete-icon-wrapper svg {
+        width: 26px !important;
+        height: 26px !important;
+    }
+
+    .global-delete-modal h4 {
+        font-size: 1.15rem !important;
+        margin-bottom: 8px !important;
+    }
+
+    .global-delete-modal p {
+        font-size: 0.88rem !important;
+        margin-bottom: 20px !important;
+    }
+
+    .global-delete-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .btn-cancel-global,
+    .btn-confirm-global {
+        height: 44px !important;
+        width: 100% !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 0.9rem !important;
+        border-radius: 8px !important;
+    }
+}

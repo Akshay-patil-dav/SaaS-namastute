@@ -1246,3 +1246,402 @@
     color: #ffffff;
 }
 
+/* ==========================================================================
+   Mobile-First Responsiveness for KhataBook (<= 991px, <= 768px, <= 480px)
+   ========================================================================== */
+
+/* Hidden on desktop by default */
+.khata-mobile-view-toggle,
+.khata-mobile-back-btn {
+    display: none;
+}
+
+@media (max-width: 991px) {
+    .khata-container {
+        padding: 12px 12px 28px 12px;
+    }
+
+    .khata-header {
+        margin-bottom: 14px;
+        gap: 12px;
+    }
+
+    .khata-title-area h1 {
+        font-size: 20px;
+    }
+
+    .khata-title-area h1 .khata-icon-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+    }
+
+    .khata-title-area p {
+        font-size: 12px;
+    }
+
+    .khata-header-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+    }
+
+    .khata-header-actions .khata-btn {
+        flex: 1;
+        justify-content: center;
+        min-height: 42px;
+        font-size: 13px;
+    }
+
+    /* KPI Summary Cards: 2x2 Grid on Mobile */
+    .khata-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .khata-kpi-card {
+        padding: 12px 14px;
+        border-radius: 12px;
+    }
+
+    .kpi-info-label {
+        font-size: 10.5px;
+        margin-bottom: 2px;
+    }
+
+    .kpi-value {
+        font-size: 18px;
+    }
+
+    .kpi-subtext {
+        font-size: 10px;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .kpi-icon-wrap {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+    }
+
+    .kpi-icon-wrap svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Tabs Bar horizontally scrollable on mobile */
+    .khata-tabs-bar {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .khata-tabs-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .khata-tab-btn {
+        padding: 8px 14px;
+        font-size: 12.5px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* Mobile Segmented View Switcher: List vs Ledger */
+    .khata-mobile-view-toggle {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    .khata-mobile-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 9px 12px;
+        border-radius: 9px;
+        border: none;
+        background: transparent;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+
+    .khata-mobile-toggle-btn.active {
+        background: #ffffff;
+        color: #ea580c;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Back Button on Mobile Ledger Header */
+    .khata-mobile-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        color: #ea580c;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-bottom: 10px;
+        align-self: flex-start;
+        transition: all 0.15s ease;
+    }
+
+    .khata-mobile-back-btn:hover {
+        background: #fff7ed;
+        border-color: #fed7aa;
+    }
+
+    /* Split Layout mobile toggling */
+    .khata-split-layout {
+        display: block;
+        min-height: auto;
+    }
+
+    .khata-split-layout.mobile-view-list .khata-ledger-pane {
+        display: none !important;
+    }
+
+    .khata-split-layout.mobile-view-list .khata-parties-pane {
+        display: flex !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: calc(100vh - 220px) !important;
+        border-radius: 14px;
+    }
+
+    .khata-split-layout.mobile-view-ledger .khata-parties-pane {
+        display: none !important;
+    }
+
+    .khata-split-layout.mobile-view-ledger .khata-ledger-pane {
+        display: flex !important;
+        width: 100% !important;
+        height: auto !important;
+        border-radius: 14px;
+    }
+
+    /* Parties Pane on Mobile */
+    .khata-parties-pane {
+        height: auto;
+        max-height: 70vh;
+    }
+
+    .khata-parties-header {
+        padding: 12px 14px;
+    }
+
+    .khata-search-input {
+        font-size: 16px !important; /* iOS zoom prevention */
+        min-height: 42px;
+    }
+
+    /* Ledger Pane on Mobile */
+    .khata-ledger-pane {
+        height: auto;
+    }
+
+    .ledger-header {
+        padding: 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .ledger-avatar-big {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+
+    .ledger-title-text h3 {
+        font-size: 16px;
+    }
+
+    .ledger-party-contacts {
+        gap: 8px;
+        font-size: 11.5px;
+        flex-wrap: wrap;
+    }
+
+    .ledger-balance-box {
+        text-align: left;
+        background: #f8fafc;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .balance-val {
+        font-size: 20px;
+    }
+
+    /* Action Bar */
+    .ledger-action-bar {
+        padding: 10px 12px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .ledger-action-buttons {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+    }
+
+    .ledger-action-buttons button {
+        flex: 1;
+        justify-content: center;
+        min-height: 40px;
+        font-size: 12px;
+    }
+
+    /* Ledger Table */
+    .ledger-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 80px; /* space for sticky footer */
+    }
+
+    .ledger-table {
+        min-width: 520px;
+    }
+
+    /* Sticky Mobile Bottom Give / Got Buttons */
+    .ledger-entry-footer {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: #ffffff;
+        padding: 10px 14px;
+        box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.1);
+        border-top: 1.5px solid #e2e8f0;
+        gap: 10px;
+    }
+
+    .btn-gave,
+    .btn-got {
+        padding: 12px;
+        font-size: 13px;
+        min-height: 46px;
+        border-radius: 10px;
+    }
+
+    /* Daybook on Mobile */
+    .daybook-panel {
+        border-radius: 14px;
+    }
+
+    .daybook-header {
+        padding: 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .daybook-header > div:last-child {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .daybook-header input[type="date"] {
+        width: 100% !important;
+        min-height: 42px;
+        font-size: 16px !important;
+    }
+
+    .daybook-header .khata-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 42px;
+    }
+
+    .daybook-panel .ledger-table {
+        min-width: 600px;
+    }
+
+    /* Modals on Mobile */
+    .khata-modal-card {
+        width: 100% !important;
+        max-width: calc(100vw - 20px) !important;
+        margin: 10px auto;
+        max-height: 92vh;
+        border-radius: 16px;
+    }
+
+    .khata-form-input,
+    .khata-form-select,
+    .khata-form-textarea {
+        font-size: 16px !important; /* iOS zoom fix */
+        min-height: 44px;
+    }
+
+    .khata-modal-footer {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 16px;
+    }
+
+    .khata-modal-footer button {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .khata-modal-body div[style*="gridTemplateColumns"],
+    .khata-modal-body div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .khata-kpi-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .khata-kpi-card {
+        padding: 10px 12px;
+    }
+
+    .kpi-value {
+        font-size: 16px;
+    }
+
+    .kpi-subtext {
+        display: none;
+    }
+
+    .btn-gave span,
+    .btn-got span {
+        font-size: 12px;
+    }
+}
+
