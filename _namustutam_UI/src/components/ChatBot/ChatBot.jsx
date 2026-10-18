@@ -186,10 +186,10 @@ const ChatBot = () => {
     };
 
     return (
-        <div className="chatbot-wrapper">
+        <div className="chatbot-wrapper hide-on-mobile">
             {/* Chatbot Toggle Button */}
             <button
-                className={`chatbot-toggle ${isOpen ? 'active' : ''}`}
+                className={`chatbot-toggle ${isOpen ? 'active' : ''} hide-on-mobile`}
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Toggle Chatbot"
             >
@@ -197,7 +197,7 @@ const ChatBot = () => {
             </button>
 
             {/* Chatbot Window */}
-            <div className={`chatbot-window ${isOpen ? 'open' : ''}`}>
+            <div className={`chatbot-window ${isOpen ? 'open' : ''} hide-on-mobile`}>
                 <div className="chatbot-header">
                     <div className="chatbot-header-info">
                         <div className="chatbot-avatar">

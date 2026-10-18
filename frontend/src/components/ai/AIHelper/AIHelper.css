@@ -116,18 +116,15 @@
   height: 700px;
 }
 
+/* ── Mobile: Hide AI Chat Section Completely on Mobile Screens ── */
 @media (max-width: 991px) {
-  .ai-panel {
-    width: calc(100vw - 20px);
-    right: 10px;
-    bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
-    height: 72vh;
-    max-height: calc(100vh - 160px);
-    border-radius: 16px;
-  }
-  .ai-fab {
-    bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
-    right: 14px !important;
+  .ai-fab,
+  .ai-panel,
+  .ai-panel--max,
+  .ai-helper-root {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
 }
 

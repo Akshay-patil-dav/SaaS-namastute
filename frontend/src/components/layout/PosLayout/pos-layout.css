@@ -762,6 +762,13 @@ body {
   .pos-sub-widget-expanded {
     display: flex !important;
   }
+  .hide-on-mobile,
+  .ai-fab,
+  .ai-panel,
+  .ai-panel--max,
+  .settings-ai-section {
+    display: none !important;
+  }
 }
 
 .pos-sidebar-logo {

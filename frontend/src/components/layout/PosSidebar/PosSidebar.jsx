@@ -702,16 +702,14 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                 {canView('settings') && (
                                     <>
                                         <div className="pos-menu-divider"></div>
-                                        <div className="pos-menu-section">{isSubscriber && !isBilling ? 'Settings & Integrations' : 'System Settings'}</div>
+                                        <div className="pos-menu-section">Settings &amp; Integrations</div>
                                         <ul className="pos-menu-list pb-4">
-                                            {isSubscriber && !isBilling && (
-                                                <li className="pos-menu-item">
-                                                    <NavLink to="/settings/connected_apps" className={() => `pos-menu-link ${isConnectedAppsActive ? 'active' : ''}`}>
-                                                        <div className="pos-menu-link-content"><Puzzle className="pos-menu-icon" strokeWidth={1.5} /><span>Connected Apps</span></div>
-                                                        <span style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', color: '#fff', fontSize: '10px', fontWeight: '700', padding: '2px 7px', borderRadius: '10px', letterSpacing: '0.04em' }}>APPS</span>
-                                                    </NavLink>
-                                                </li>
-                                            )}
+                                            <li className="pos-menu-item">
+                                                <NavLink to="/settings/connected_apps" className={() => `pos-menu-link ${isConnectedAppsActive ? 'active' : ''}`}>
+                                                    <div className="pos-menu-link-content"><Puzzle className="pos-menu-icon" strokeWidth={1.5} /><span>Connected Apps</span></div>
+                                                    <span style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', color: '#fff', fontSize: '10px', fontWeight: '700', padding: '2px 7px', borderRadius: '10px', letterSpacing: '0.04em' }}>APPS</span>
+                                                </NavLink>
+                                            </li>
                                             <li className="pos-menu-item">
                                                 <a className={`pos-menu-link ${isSystemSettingsActive ? 'active' : ''} ${openMenus.settings ? 'open' : ''}`} onClick={() => toggleMenu('settings')}>
                                                     <div className="pos-menu-link-content"><Settings className="pos-menu-icon" strokeWidth={1.5} /><span>System Settings</span></div>
@@ -720,19 +718,25 @@ export default function PosSidebar({ sidebarOpen, setSidebarOpen }) {
                                                 <ul className={`pos-submenu ${openMenus.settings ? 'show' : ''}`}>
                                                     <li><NavLink to="/settings/profile" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Profile Settings</NavLink></li>
                                                     <li><NavLink to="/settings/company_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Company Settings</NavLink></li>
+                                                    <li><NavLink to="/settings/team_management" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Team &amp; Staff</NavLink></li>
+                                                    <li><NavLink to="/settings/billing" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Billing &amp; Plans</NavLink></li>
+                                                    <li><NavLink to="/settings/system_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Website &amp; Branding</NavLink></li>
+                                                    <li><NavLink to="/settings/invoice_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Invoice &amp; Printer</NavLink></li>
+                                                    <li><NavLink to="/settings/pos_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>POS Settings</NavLink></li>
+                                                    <li><NavLink to="/settings/payment_gateway" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Payment Gateway</NavLink></li>
                                                     <li><NavLink to="/settings/bank_accounts" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Bank Accounts</NavLink></li>
-                                                    {(hasFullAccess || canView('users')) && (
-                                                        <li><NavLink to="/settings/team_management" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Team &amp; Staff</NavLink></li>
-                                                    )}
-                                                    {!isBilling && (
-                                                        <>
-                                                            <li><NavLink to="/settings/payment_gateway" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Payment Gateway</NavLink></li>
-                                                            <li><NavLink to="/settings/tax_rates" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Tax Rates</NavLink></li>
-                                                            <li><NavLink to="/settings/currencies" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Currencies</NavLink></li>
-                                                            <li><NavLink to="/settings/pos_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>POS Settings</NavLink></li>
-                                                            <li><NavLink to="/settings/ai_helper" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>AI Helper</NavLink></li>
-                                                        </>
-                                                    )}
+                                                    <li><NavLink to="/settings/tax_rates" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Tax Rates &amp; Currencies</NavLink></li>
+                                                    <li><NavLink to="/settings/email_settings" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>Email &amp; SMS Gateway</NavLink></li>
+                                                    <li className="hide-on-mobile"><NavLink to="/settings/ai_helper" className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}>AI Helper Assistant</NavLink></li>
+                                                    <li>
+                                                        <NavLink 
+                                                            to="/settings/profile" 
+                                                            className={({ isActive }) => `pos-submenu-link ${isActive ? 'active' : ''}`}
+                                                            style={{ fontWeight: '700', color: 'var(--primary-color, #ea580c)' }}
+                                                        >
+                                                            All Settings →
+                                                        </NavLink>
+                                                    </li>
                                                 </ul>
                                             </li>
                                         </ul>

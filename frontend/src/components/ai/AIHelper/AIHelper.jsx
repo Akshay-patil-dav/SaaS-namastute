@@ -267,7 +267,7 @@ export default function AIHelper() {
           Floating Action Button
       ────────────────────────────────────────────────────────────────── */}
       <button
-        className={`ai-fab ${isOpen ? 'ai-fab--open' : ''}`}
+        className={`ai-fab ${isOpen ? 'ai-fab--open' : ''} hide-on-mobile`}
         onClick={() => setIsOpen(v => !v)}
         title={isOpen ? 'Close AI Helper' : 'Open AI Helper'}
         aria-label={isOpen ? 'Close AI Helper' : 'Open AI Helper'}
@@ -283,7 +283,7 @@ export default function AIHelper() {
           Chat Panel
       ────────────────────────────────────────────────────────────────── */}
       {isOpen && (
-        <div className={`ai-panel ${isMaximized ? 'ai-panel--max' : ''}`}>
+        <div className={`ai-panel ${isMaximized ? 'ai-panel--max' : ''} hide-on-mobile`}>
 
           {/* Header */}
           <div className="ai-panel__header">

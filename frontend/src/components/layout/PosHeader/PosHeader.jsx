@@ -54,7 +54,12 @@ import {
     ArrowRightLeft,
     ShoppingBag,
     FileUp,
-    BookOpen
+    BookOpen,
+    Lock,
+    Printer,
+    Smartphone,
+    Mail,
+    Bot
 } from 'lucide-react';
 
 const initialNotifications = [
@@ -90,10 +95,40 @@ const searchablePages = [
     { title: 'Khata Customers', path: '/khata-book?tab=customers', category: 'Khata', icon: <Users size={15} /> },
     { title: 'Khata Suppliers', path: '/khata-book?tab=suppliers', category: 'Khata', icon: <Briefcase size={15} /> },
     { title: 'Khata Day Book', path: '/khata-book?tab=daybook', category: 'Khata', icon: <BookOpen size={15} /> },
-    { title: 'Company Settings', path: '/settings/company_settings', category: 'Settings', icon: <Building size={15} /> },
+    // ── Settings (All 31 settings pages) ──
+    { title: 'All Settings Overview', path: '/settings/profile', category: 'Settings', icon: <Settings size={15} /> },
     { title: 'Profile Settings', path: '/settings/profile', category: 'Settings', icon: <User size={15} /> },
-    { title: 'Billing & Subscriptions', path: '/settings/billing', category: 'Settings', icon: <DollarSign size={15} /> },
-    { title: 'Connected Apps', path: '/settings/connected_apps', category: 'Settings', icon: <Puzzle size={15} /> },
+    { title: 'Security & Password', path: '/settings/security', category: 'Settings', icon: <Lock size={15} /> },
+    { title: 'Notification Preferences', path: '/settings/notifications', category: 'Settings', icon: <Bell size={15} /> },
+    { title: 'Connected Apps & Integrations', path: '/settings/connected_apps', category: 'Settings', icon: <Puzzle size={15} /> },
+    { title: 'Team & Staff Management', path: '/settings/team_management', category: 'Settings', icon: <Users size={15} /> },
+    { title: 'Billing & Plans', path: '/settings/billing', category: 'Settings', icon: <DollarSign size={15} /> },
+    { title: 'System & Branding Appearance', path: '/settings/system_settings', category: 'Settings', icon: <Globe size={15} /> },
+    { title: 'Company Settings', path: '/settings/company_settings', category: 'Settings', icon: <Building size={15} /> },
+    { title: 'Localization & Timezone', path: '/settings/localization', category: 'Settings', icon: <Globe size={15} /> },
+    { title: 'Document Prefixes', path: '/settings/prefixes', category: 'Settings', icon: <FileText size={15} /> },
+    { title: 'Store Preferences', path: '/settings/preference', category: 'Settings', icon: <SlidersHorizontal size={15} /> },
+    { title: 'Social Authentication Logins', path: '/settings/social_authentication', category: 'Settings', icon: <Globe size={15} /> },
+    { title: 'Language & Locale Settings', path: '/settings/language', category: 'Settings', icon: <Globe size={15} /> },
+    { title: 'Invoice Settings', path: '/settings/invoice_settings', category: 'Settings', icon: <FileText size={15} /> },
+    { title: 'Invoice Template Designer', path: '/settings/invoice_template', category: 'Settings', icon: <FileText size={15} /> },
+    { title: 'Printer & Thermal Hardware', path: '/settings/printer', category: 'Settings', icon: <Printer size={15} /> },
+    { title: 'POS Terminal Settings', path: '/settings/pos_settings', category: 'Settings', icon: <Smartphone size={15} /> },
+    { title: 'Custom Fields', path: '/settings/custom_fields', category: 'Settings', icon: <List size={15} /> },
+    { title: 'Email (SMTP) Settings', path: '/settings/email_settings', category: 'Settings', icon: <Mail size={15} /> },
+    { title: 'Email Templates', path: '/settings/email_template', category: 'Settings', icon: <Mail size={15} /> },
+    { title: 'SMS Gateway Settings', path: '/settings/sms_settings', category: 'Settings', icon: <Smartphone size={15} /> },
+    { title: 'SMS Notification Templates', path: '/settings/sms_template', category: 'Settings', icon: <Smartphone size={15} /> },
+    { title: 'OTP Verification Settings', path: '/settings/otp', category: 'Settings', icon: <Lock size={15} /> },
+    { title: 'GDPR & Cookie Policy', path: '/settings/gdpr_cookies', category: 'Settings', icon: <ShieldCheck size={15} /> },
+    { title: 'Payment Gateways (Stripe/PayPal)', path: '/settings/payment_gateway', category: 'Settings', icon: <DollarSign size={15} /> },
+    { title: 'Bank Accounts & UPI', path: '/settings/bank_accounts', category: 'Settings', icon: <Building size={15} /> },
+    { title: 'Tax Rates (GST/VAT)', path: '/settings/tax_rates', category: 'Settings', icon: <Scale size={15} /> },
+    { title: 'Currencies & Rates', path: '/settings/currencies', category: 'Settings', icon: <DollarSign size={15} /> },
+    { title: 'Cloud Storage & AWS S3', path: '/settings/storage', category: 'Settings', icon: <Box size={15} /> },
+    { title: 'Ban IP Address Management', path: '/settings/ban_ip', category: 'Settings', icon: <AlertTriangle size={15} /> },
+    { title: 'AI Helper Assistant Settings', path: '/settings/ai_helper', category: 'Settings', icon: <Bot size={15} /> },
+    // ── Tools & Admin ──
     { title: 'Print Barcode', path: '/print-barcode', category: 'Tools', icon: <Barcode size={15} /> },
     { title: 'Warranties', path: '/warranties', category: 'Tools', icon: <ShieldCheck size={15} /> },
     { title: 'Super Admin Dashboard', path: '/dashboard/super-dashboard', category: 'Settings', icon: <UserCog size={15} /> },
@@ -131,7 +166,20 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
     const [salesOpen, setSalesOpen] = useState(false);
     const salesRef = useRef(null);
 
+    // Responsive Mobile View Detection (<= 991px)
+    const [isMobile, setIsMobile] = useState(() => 
+        typeof window !== 'undefined' ? window.innerWidth <= 991 : false
+    );
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 991);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const filteredPages = searchablePages.filter(page => {
+        if (isMobile && (page.path === '/settings/ai_helper' || page.title.includes('AI Helper'))) {
+            return false;
+        }
         const matchesCategory = activeCategory === 'All' || page.category === activeCategory;
         const q = spotlightQuery.trim().toLowerCase();
         const matchesQuery = !q ||
@@ -726,19 +774,29 @@ export default function PosHeader({ sidebarOpen, setSidebarOpen }) {
                                     <Building size={15} color="#888" /> Company Settings
                                 </button>
 
-                                {!isBilling && (
-                                    <button
-                                        style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#374151', textAlign: 'left', transition: 'background 0.15s' }}
-                                        onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
-                                        onMouseOut={(e) => e.currentTarget.style.background = 'white'}
-                                        onClick={() => {
-                                            setProfileOpen(false);
-                                            navigate('/settings/connected_apps');
-                                        }}
-                                    >
-                                        <Puzzle size={15} color="#888" /> Connected Apps
-                                    </button>
-                                )}
+                                <button
+                                    style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#374151', textAlign: 'left', transition: 'background 0.15s' }}
+                                    onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
+                                    onMouseOut={(e) => e.currentTarget.style.background = 'white'}
+                                    onClick={() => {
+                                        setProfileOpen(false);
+                                        navigate('/settings/connected_apps');
+                                    }}
+                                >
+                                    <Puzzle size={15} color="#888" /> Connected Apps
+                                </button>
+
+                                <button
+                                    style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', background: 'white', cursor: 'pointer', fontSize: '13px', color: 'var(--primary-color, #ea580c)', fontWeight: '600', textAlign: 'left', transition: 'background 0.15s' }}
+                                    onMouseOver={(e) => e.currentTarget.style.background = '#fff7ed'}
+                                    onMouseOut={(e) => e.currentTarget.style.background = 'white'}
+                                    onClick={() => {
+                                        setProfileOpen(false);
+                                        navigate('/settings/profile');
+                                    }}
+                                >
+                                    <Settings size={15} /> All 31 Settings
+                                </button>
 
                                 <button
                                     style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px 16px', border: 'none', borderTop: '1px solid #eaedf0', background: 'white', cursor: 'pointer', fontSize: '13px', color: '#ef4444', textAlign: 'left', transition: 'background 0.15s' }}

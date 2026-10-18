@@ -146,12 +146,6 @@ export const AiHelperSettings = () => {
 
     const isMainUser = !user?.activeProjectId || user?.activeProjectId === user?.id || user?.role === 'SUPER_ADMIN';
 
-    useEffect(() => {
-        if (!isMainUser) {
-            navigate('/dashboard', { replace: true });
-        }
-    }, [isMainUser, navigate]);
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
