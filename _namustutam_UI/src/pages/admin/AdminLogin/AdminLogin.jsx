@@ -88,7 +88,7 @@ export default function AdminLogin() {
                             <input
                                 type="email"
                                 className="admin-input"
-                                placeholder="admin@namustutam.com"
+                                placeholder="admin@gmail.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 autoFocus
@@ -142,19 +142,19 @@ export default function AdminLogin() {
                 </form>
 
                 <div className="admin-demo-box">
-                    <button
+                    {/* <button
                         type="button"
                         className="admin-demo-btn"
                         onClick={handleQuickAdmin}
                     >
                         <Sparkles size={16} />
                         <span>One-Click Quick Admin Access (Demo)</span>
-                    </button>
+                    </button> */}
 
-                    <Link to="/" className="admin-back-link">
+                    {/* <Link to="/" className="admin-back-link">
                         <ArrowLeft size={14} />
                         <span>Back to Public Website</span>
-                    </Link>
+                    </Link> */}
                 </div>
             </div>
         </div>

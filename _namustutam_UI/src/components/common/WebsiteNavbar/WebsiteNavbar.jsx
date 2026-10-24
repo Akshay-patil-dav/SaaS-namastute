@@ -140,12 +140,12 @@ const WebsiteNavbar = () => {
 
                 <ul className="lp-nav-links">
                     <li>
-                        <Link 
-                            to="/project-works" 
-                            style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: '6px', 
+                        <Link
+                            to="/project-works"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
                                 textDecoration: 'none',
                                 color: location.pathname.startsWith('/project-works') ? 'var(--primary, #ff5b00)' : 'inherit',
                                 fontWeight: location.pathname.startsWith('/project-works') ? 700 : 500
@@ -175,12 +175,12 @@ const WebsiteNavbar = () => {
                         </>
                     )}
                     <li>
-                        <Link 
-                            to="/blog" 
-                            style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: '6px', 
+                        <Link
+                            to="/blog"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
                                 textDecoration: 'none',
                                 color: location.pathname.startsWith('/blog') ? 'var(--primary, #ff5b00)' : 'inherit',
                                 fontWeight: location.pathname.startsWith('/blog') ? 700 : 500
@@ -190,12 +190,12 @@ const WebsiteNavbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/contact" 
-                            style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: '6px', 
+                        <Link
+                            to="/contact"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
                                 textDecoration: 'none',
                                 color: location.pathname === '/contact' ? 'var(--primary, #ff5b00)' : 'inherit',
                                 fontWeight: location.pathname === '/contact' ? 700 : 500
@@ -212,9 +212,7 @@ const WebsiteNavbar = () => {
                     <a href="https://github.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Github size={20} /></a>
                     <a href="https://instagram.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Instagram size={20} /></a>
                     <a href="https://x.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Twitter size={20} /></a>
-                    <Link to="/admin" className="lp-social-icon" title="Admin CMS Portal" style={{ color: '#ff620b', background: 'rgba(255, 98, 11, 0.1)', borderRadius: '8px', padding: '5px' }}>
-                        <Shield size={18} />
-                    </Link>
+
                 </div>
 
                 {showCTA && (
@@ -293,7 +291,7 @@ const WebsiteNavbar = () => {
                         <a href="#" className="lp-btn-primary" onClick={() => { setMenuOpen(false); navigate('/register'); }}>Get Started Free</a>
                     </div>
                 )}
-                
+
                 {/* Mobile Social Icons */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '24px 0 10px' }}>
                     <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Linkedin size={22} /></a>

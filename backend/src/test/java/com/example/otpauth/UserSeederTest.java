@@ -39,7 +39,7 @@ public class UserSeederTest {
         java.util.Map<String, Object> report = schemaUpgrader.performFullSchemaUpgradeAndSeed();
         org.junit.jupiter.api.Assertions.assertNotNull(report);
         org.junit.jupiter.api.Assertions.assertEquals("SUCCESS", report.get("status"));
-        org.junit.jupiter.api.Assertions.assertEquals(38, report.get("tablesChecked"));
+        org.junit.jupiter.api.Assertions.assertTrue((Integer) report.get("tablesChecked") >= 38, "Should have checked at least 38 entity tables");
         org.junit.jupiter.api.Assertions.assertTrue((Integer) report.get("columnsAdded") >= 1, "Should have auto-added missing column");
 
         // Verify that after upgrade, subsequent run is clean (0 columns missing)

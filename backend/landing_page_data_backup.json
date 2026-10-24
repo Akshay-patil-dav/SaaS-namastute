@@ -60,18 +60,6 @@
     "subtitle" : "Explore some of our recent flagship projects and enterprise solutions."
   },
   "projects" : [ {
-    "id" : "proj-2",
-    "title" : "Shopify Web Design & Consulting",
-    "category" : "Consulting",
-    "filter" : "Business Page",
-    "price" : "$129 USD",
-    "img" : "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
-    "techStack" : [ "React", "Next.js", "Node.js" ],
-    "description" : "Growth consulting solutions designed to drive scalable commercial results.",
-    "liveLink" : "http://localhost:4000",
-    "githubLink" : "#",
-    "featured" : true
-  }, {
     "id" : "proj-3",
     "title" : "Clothing E-commerce Templates",
     "category" : "Templates",
