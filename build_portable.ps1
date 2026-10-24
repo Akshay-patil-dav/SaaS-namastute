@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$ProjectRoot = "c:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute"
+$ProjectRoot = $PSScriptRoot
 $DesktopEnv = Join-Path $ProjectRoot "Desktop-env"
 $FrontendDir = Join-Path $ProjectRoot "_namustutam_UI"
 $BackendDir = Join-Path $ProjectRoot "backend"

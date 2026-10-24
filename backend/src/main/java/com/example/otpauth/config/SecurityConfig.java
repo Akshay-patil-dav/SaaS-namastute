@@ -55,6 +55,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // Allow static assets and frontend Single Page Application (SPA) routes
+                        .requestMatchers(
+                                "/", "/index.html", "/assets/**", "/favicon.ico",
+                                "/*.png", "/*.jpg", "/*.jpeg", "/*.svg", "/*.ico", "/*.webp", "/*.json", "/*.txt", "/*.html",
+                                "/admin/**", "/blog/**", "/contact/**", "/project-works/**", "/login/**", "/register/**",
+                                "/it-portfolio/**", "/web-development/**", "/ai-automation/**", "/ecommerce/**",
+                                "/privacy-policy/**", "/terms/**")
+                        .permitAll()
                         .requestMatchers("/api/auth/**", "/api/verification/**", "/oauth2/**", "/login/**",
                                 "/api/upload/**", "/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands",
                                 "/api/units", "/api/warranties", "/api/landing-page/**", "/api/blog-posts", "/api/blog-posts/**",
