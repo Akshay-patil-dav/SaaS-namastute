@@ -9,8 +9,8 @@ export default function AdminLogin() {
     const location = useLocation();
     const { login, demoAdminLogin, isAuthenticated } = useAuth();
 
-    const [email, setEmail] = useState('admin@namustutam.com');
-    const [password, setPassword] = useState('admin123');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -88,7 +88,6 @@ export default function AdminLogin() {
                             <input
                                 type="email"
                                 className="admin-input"
-                                placeholder="admin@gmail.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 autoFocus
@@ -106,7 +105,6 @@ export default function AdminLogin() {
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 className="admin-input"
-                                placeholder="••••••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
