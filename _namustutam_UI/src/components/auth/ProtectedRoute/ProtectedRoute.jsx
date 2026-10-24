@@ -42,12 +42,19 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
 
     // Not logged in → go to login
     if (!isAuthenticated()) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        return <Navigate to="/admin/login" state={{ from: location }} replace />;
     }
 
-    // Logged in but wrong role → go to unauthorized
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-        return <Navigate to="/unauthorized" replace />;
+    // Role check with normalization
+    if (allowedRoles.length > 0) {
+        const userRole = (user?.role || '').toUpperCase().replace(/^ROLE_/, '');
+        const cleanAllowed = allowedRoles.map(r => r.toUpperCase().replace(/^ROLE_/, ''));
+        const isSuper = userRole === 'SUPER_ADMIN';
+        const hasAccess = isSuper || cleanAllowed.includes(userRole);
+
+        if (!hasAccess) {
+            return <Navigate to="/admin/login" replace />;
+        }
     }
 
     return children;

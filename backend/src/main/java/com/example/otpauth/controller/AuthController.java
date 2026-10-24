@@ -16,9 +16,38 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final com.example.otpauth.config.DatabaseSchemaAutoUpgrader schemaUpgrader;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, com.example.otpauth.config.DatabaseSchemaAutoUpgrader schemaUpgrader) {
         this.authService = authService;
+        this.schemaUpgrader = schemaUpgrader;
+    }
+
+    @GetMapping("/database-status")
+    public ResponseEntity<?> getDatabaseStatus() {
+        try {
+            return ResponseEntity.ok(schemaUpgrader.performFullSchemaUpgradeAndSeed());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/database-upgrade")
+    public ResponseEntity<?> upgradeDatabase() {
+        try {
+            return ResponseEntity.ok(schemaUpgrader.performFullSchemaUpgradeAndSeed());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/database-cleanup")
+    public ResponseEntity<?> cleanupDatabase() {
+        try {
+            return ResponseEntity.ok(schemaUpgrader.performFullCleanup());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/register")

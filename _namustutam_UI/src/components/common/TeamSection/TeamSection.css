@@ -1,8 +1,9 @@
 .team-section {
     padding: 100px 20px;
-    background: linear-gradient(135deg, #fce9e9 0%, #f3e8ff 50%, #e0f2fe 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #fffaf5 50%, #f8fafc 100%);
     position: relative;
     overflow: hidden;
+    border-top: 1px solid #f1f5f9;
 }
 
 .team-container {

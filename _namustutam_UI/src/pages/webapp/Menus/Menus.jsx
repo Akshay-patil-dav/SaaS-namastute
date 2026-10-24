@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { PlusCircle, Edit, Trash2, Search, Settings } from 'lucide-react';
 import apiClient, { ENV } from '@/api/config';
 import { useConfirm } from '../../../context/ConfirmContext';
+import AdminPagination from '@/pages/admin/AdminPanel/components/AdminPagination';
 import '../../inventory/Brands/Products.css';
 import '../../inventory/Brands/inventory-pages-custom.css';
 
 const API_BASE = `${ENV.API_BASE_URL}/menus`;
-const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
+const ROWS_PER_PAGE_OPTIONS = [5, 10, 25, 50];
 
 export default function Menus() {
     const navigate = useNavigate();
@@ -230,27 +231,19 @@ export default function Menus() {
 
                 {/* Pagination */}
                 {filtered.length > 0 && (
-                    <div className="ss-pagination-row">
-                        <div className="ss-page-size">
-                            Row Per Page&nbsp;
-                            <select
-                                value={rowsPerPage}
-                                onChange={(e) => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                            >
-                                {ROWS_PER_PAGE_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
-                            </select>
-                            &nbsp;| Showing {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, filtered.length)} of {filtered.length}
-                        </div>
-                        <div className="ss-page-controls">
-                            <button className="ss-page-btn" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
-                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                .map((p) =>
-                                    <button key={p} className={`ss-page-btn ${p === currentPage ? 'active' : ''}`} onClick={() => goToPage(p)}>{p}</button>
-                                )
-                            }
-                            <button className="ss-page-btn" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>&gt;</button>
-                        </div>
-                    </div>
+                    <AdminPagination
+                        currentPage={currentPage}
+                        totalItems={filtered.length}
+                        pageSize={rowsPerPage}
+                        onPageChange={(page) => setCurrentPage(page)}
+                        onPageSizeChange={(newSize) => {
+                            setRowsPerPage(newSize);
+                            setCurrentPage(1);
+                        }}
+                        pageSizeOptions={ROWS_PER_PAGE_OPTIONS}
+                        itemLabel="menus"
+                        theme="light"
+                    />
                 )}
             </div>
         </div>

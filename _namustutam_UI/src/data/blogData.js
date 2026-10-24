@@ -55,7 +55,7 @@ export const DEFAULT_BLOGS = [
         authorRole: 'Founder & CTO',
         date: '2026-04-14',
         readTime: '4 min',
-        coverColor: 'linear-gradient(135deg, #ffb38a 0%, #ff9666 100%)',
+        coverColor: 'linear-gradient(135deg, #ff620b 0%, #c2410c 100%)',
         coverEmoji: '🚀',
         tags: ['release', 'features', 'update'],
     },

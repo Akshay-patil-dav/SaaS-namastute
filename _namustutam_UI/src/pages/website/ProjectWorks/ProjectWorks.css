@@ -139,9 +139,24 @@
 
 /* Projects Grid */
 .pw-projects-grid {
-    columns: 350px;
-    column-gap: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
     margin-bottom: 80px;
+}
+
+@media (max-width: 1024px) {
+    .pw-projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+}
+
+@media (max-width: 640px) {
+    .pw-projects-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
 }
 
 .pw-project-card {

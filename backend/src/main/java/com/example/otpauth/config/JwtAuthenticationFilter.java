@@ -39,12 +39,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Also support ?token=<jwt> query param for SSE connections (EventSource cannot set headers)
         String tokenFromHeader = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            tokenFromHeader = authHeader.substring(7);
+            tokenFromHeader = authHeader.substring(7).trim();
         } else if (request.getParameter("token") != null) {
-            tokenFromHeader = request.getParameter("token");
+            tokenFromHeader = request.getParameter("token").trim();
         }
 
-        if (tokenFromHeader == null) {
+        if (tokenFromHeader == null || tokenFromHeader.isEmpty() 
+                || "null".equalsIgnoreCase(tokenFromHeader) 
+                || "undefined".equalsIgnoreCase(tokenFromHeader)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -65,8 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // Token is invalid/expired, let filter chain handle it which will result in 401/403
-            logger.error("Authentication error: " + e.getMessage());
+            // Token is invalid/expired, log at debug level and let filter chain handle authorization
+            logger.debug("Authentication error: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);

@@ -5,15 +5,28 @@ import {
     FaMapMarkerAlt, FaEnvelope, FaRegClock, FaLock, FaShieldAlt,
     FaRegCreditCard, FaCode, FaTrophy, FaHandshake
 } from 'react-icons/fa';
+import { Shield } from 'lucide-react';
+import { useLandingPage } from '../../../context/LandingPageContext';
 import './WebsiteFooter.css';
 
 const WebsiteFooter = () => {
+    const { landingData } = useLandingPage();
+    const contact = landingData?.contact || {};
+    const socials = contact.socials || {};
+
+    const rawEmail = (contact.email ?? '').trim();
+    const rawPhone = (contact.phone ?? '').trim();
+    const rawWhatsapp = (contact.whatsapp ?? '').trim();
+    const rawLocation = (contact.location ?? '').trim();
+    const rawHours = (contact.supportHours ?? '').trim();
+    const phoneDisplay = rawPhone || rawWhatsapp;
+
     return (
         <div className="premium-footer-wrapper">
             <footer className="premium-footer">
                 <div className="premium-footer-inner">
                     {/* Watermark */}
-                    <div className="footer-watermark">namustutam</div>
+                    <div className="footer-watermark">{contact.brandName || 'namustutam'}</div>
 
                     <div className="premium-footer-grid">
 
@@ -22,26 +35,37 @@ const WebsiteFooter = () => {
                                 <NavLogo />
                             </div>
                             <p className="brand-description">
-                                Namustutam empowers businesses to scale and innovate with premium Web Development, SaaS Applications, AI Automation, and cutting-edge UI/UX Design tailored to your specific needs.
+                                {contact.brandDescription || 'Namustutam empowers businesses to scale and innovate with premium Web Development, SaaS Applications, AI Automation, and cutting-edge UI/UX Design tailored to your specific needs.'}
                             </p>
 
                             <div className="company-info-box">
                                 <div className="company-info-header">
-                                    <strong>Namustutam</strong>
-                                    {/* <span className="verified-badge">Verified Freelancer</span> */}
+                                    <strong>{contact.brandName || 'Namustutam'}</strong>
                                 </div>
-                                <div className="company-info-item">
-                                    <FaMapMarkerAlt className="info-icon" />
-                                    <span>Remote / Global Freelancer</span>
-                                </div>
-                                <div className="company-info-item">
-                                    <FaEnvelope className="info-icon" />
-                                    <span>namustutam@gmail.com</span>
-                                </div>
-                                <div className="company-info-item">
-                                    <FaRegClock className="info-icon" />
-                                    <span>Available 24/7 for Support</span>
-                                </div>
+                                {rawLocation && (
+                                    <div className="company-info-item">
+                                        <FaMapMarkerAlt className="info-icon" />
+                                        <span>{rawLocation}</span>
+                                    </div>
+                                )}
+                                {rawEmail && (
+                                    <div className="company-info-item">
+                                        <FaEnvelope className="info-icon" />
+                                        <span>{rawEmail}</span>
+                                    </div>
+                                )}
+                                {phoneDisplay && (
+                                    <div className="company-info-item">
+                                        <span className="info-icon" style={{ display: 'inline-flex', alignItems: 'center' }}>📞</span>
+                                        <span>{phoneDisplay}</span>
+                                    </div>
+                                )}
+                                {rawHours && (
+                                    <div className="company-info-item">
+                                        <FaRegClock className="info-icon" />
+                                        <span>{rawHours}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -49,8 +73,8 @@ const WebsiteFooter = () => {
                             <h4>Quick Links</h4>
                             <ul>
                                 <li><Link to="/">About Us</Link></li>
-                                <li><Link to="#services">Our Services</Link></li>
-                                <li><Link to="#projects">Portfolio</Link></li>
+                                <li><a href="/#services">Our Services</a></li>
+                                <li><a href="/#portfolio">Portfolio</a></li>
                                 <li><Link to="/contact">Contact Us</Link></li>
                             </ul>
                         </div>
@@ -76,23 +100,55 @@ const WebsiteFooter = () => {
                         </div>
 
                         <div className="premium-footer-socials">
-                            <a href="#" className="social-icon" aria-label="Twitter"><FaTwitter /></a>
-                            {/* <a href="#" className="social-icon" aria-label="GitHub"><FaGithub /></a> */}
-                            <a href="#" className="social-icon" aria-label="Discord"><FaDiscord /></a>
-                            <a href="https://www.instagram.com/namustute/" target="_blank" rel="noreferrer" className="social-icon" aria-label="Instagram"><FaInstagram /></a>
-                            <a href="https://www.linkedin.com/company/namustute/" target="_blank" rel="noreferrer" className="social-icon" aria-label="LinkedIn"><FaLinkedinIn /></a>
+                            {socials.twitter && (
+                                <a href={socials.twitter} target="_blank" rel="noreferrer" className="social-icon" aria-label="Twitter">
+                                    <FaTwitter />
+                                </a>
+                            )}
+                            {socials.github && (
+                                <a href={socials.github} target="_blank" rel="noreferrer" className="social-icon" aria-label="GitHub">
+                                    <FaGithub />
+                                </a>
+                            )}
+                            {socials.discord && (
+                                <a href={socials.discord} target="_blank" rel="noreferrer" className="social-icon" aria-label="Discord">
+                                    <FaDiscord />
+                                </a>
+                            )}
+                            {socials.instagram && (
+                                <a href={socials.instagram} target="_blank" rel="noreferrer" className="social-icon" aria-label="Instagram">
+                                    <FaInstagram />
+                                </a>
+                            )}
+                            {socials.linkedin && (
+                                <a href={socials.linkedin} target="_blank" rel="noreferrer" className="social-icon" aria-label="LinkedIn">
+                                    <FaLinkedinIn />
+                                </a>
+                            )}
                         </div>
                     </div>
 
-                    {/* <div className="footer-badges">
-                        <div className="badge-item"><FaLock className="badge-icon green"/> SSL 256-Bit Encryption</div>
-                        <div className="badge-item"><FaShieldAlt className="badge-icon blue"/> Quality Assured Delivery</div>
-                        <div className="badge-item"><FaTrophy className="badge-icon" style={{color: '#eab308'}}/> Top Rated Freelancer</div>
-                        <div className="badge-item"><FaHandshake className="badge-icon purple"/> Secure & Transparent Process</div>
-                    </div> */}
-
-                    <div className="premium-footer-bottom">
-                        <p>© {new Date().getFullYear()} Namustutam. All rights reserved.</p>
+                    <div className="premium-footer-bottom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                        <p>{contact.copyright || `© ${new Date().getFullYear()} Namustutam. All rights reserved.`}</p>
+                        
+                        <Link 
+                            to="/admin" 
+                            style={{ 
+                                display: 'inline-flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                color: '#94a3b8', 
+                                fontSize: '12px', 
+                                textDecoration: 'none',
+                                transition: 'color 0.2s',
+                                fontWeight: 500
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#ff5b00'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+                        >
+                            <Shield size={12} />
+                            <span>Admin Portal</span>
+                        </Link>
                     </div>
                 </div>
             </footer>

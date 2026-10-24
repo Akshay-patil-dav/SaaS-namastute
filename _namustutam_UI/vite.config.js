@@ -21,6 +21,8 @@ export default defineConfig({
   },
 
   server: {
+    port: 4000,
+    strictPort: true,
     allowedHosts: true,
     proxy: {
       '/api/groq': {
@@ -36,7 +38,28 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        },
+        configure: (proxy) => {
+          proxy.on('error', (err, req, res) => {
+            console.warn('[Vite Proxy] Localhost 3000 offline. Auto-fallback to ngrok active via client config.');
+          });
+        }
+      },
+      '/uploads': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        },
+        configure: (proxy) => {
+          proxy.on('error', (err, req, res) => {
+            console.warn('[Vite Proxy] Localhost 3000 offline for uploads.');
+          });
+        }
       }
     }
   },

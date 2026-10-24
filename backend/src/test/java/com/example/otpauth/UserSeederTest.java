@@ -25,6 +25,74 @@ public class UserSeederTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private com.example.otpauth.config.DatabaseSchemaAutoUpgrader schemaUpgrader;
+
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
+    @Test
+    public void testDatabaseSchemaAutoUpgrade() {
+        // Deliberately drop a column to verify auto-repair detection
+        jdbcTemplate.execute("ALTER TABLE warranties DROP COLUMN IF EXISTS duration");
+
+        java.util.Map<String, Object> report = schemaUpgrader.performFullSchemaUpgradeAndSeed();
+        org.junit.jupiter.api.Assertions.assertNotNull(report);
+        org.junit.jupiter.api.Assertions.assertEquals("SUCCESS", report.get("status"));
+        org.junit.jupiter.api.Assertions.assertEquals(38, report.get("tablesChecked"));
+        org.junit.jupiter.api.Assertions.assertTrue((Integer) report.get("columnsAdded") >= 1, "Should have auto-added missing column");
+
+        // Verify that after upgrade, subsequent run is clean (0 columns missing)
+        java.util.Map<String, Object> report2 = schemaUpgrader.performFullSchemaUpgradeAndSeed();
+        org.junit.jupiter.api.Assertions.assertEquals(0, report2.get("columnsAdded"));
+        System.out.println("Auto-Upgrade Report: " + report);
+    }
+
+    @Test
+    public void testDatabaseCleanupOfUnneededTablesAndColumnsAndRows() {
+        // 1. Create a dummy unneeded table
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS dummy_unneeded_test_table (id BIGSERIAL PRIMARY KEY, test_val VARCHAR(100))");
+
+        // 2. Add an unneeded column to an existing table
+        try {
+            jdbcTemplate.execute("ALTER TABLE warranties ADD COLUMN IF NOT EXISTS unneeded_test_column VARCHAR(100)");
+        } catch (Exception ignored) {
+        }
+
+        // 3. Insert an invalid orphaned/dummy row
+        try {
+            jdbcTemplate.execute("INSERT INTO roles (name) VALUES ('')");
+        } catch (Exception ignored) {
+        }
+
+        // Run full cleanup
+        java.util.Map<String, Object> cleanupReport = schemaUpgrader.performFullCleanup();
+        org.junit.jupiter.api.Assertions.assertNotNull(cleanupReport);
+        org.junit.jupiter.api.Assertions.assertEquals("SUCCESS", cleanupReport.get("status"));
+        org.junit.jupiter.api.Assertions.assertTrue((Integer) cleanupReport.get("tablesDropped") >= 1, "Should have dropped dummy_unneeded_test_table");
+        org.junit.jupiter.api.Assertions.assertTrue((Integer) cleanupReport.get("columnsDropped") >= 1, "Should have dropped unneeded_test_column");
+
+        // Verify table no longer exists
+        Integer tableCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE LOWER(table_name) = 'dummy_unneeded_test_table'",
+                Integer.class
+        );
+        org.junit.jupiter.api.Assertions.assertEquals(0, tableCount != null ? tableCount : 0);
+
+        // Verify column no longer exists
+        Integer colCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.columns WHERE LOWER(table_name) = 'warranties' AND LOWER(column_name) = 'unneeded_test_column'",
+                Integer.class
+        );
+        org.junit.jupiter.api.Assertions.assertEquals(0, colCount != null ? colCount : 0);
+
+        // Subsequent cleanup run should be clean (0 drops)
+        java.util.Map<String, Object> secondCleanup = schemaUpgrader.performFullCleanup();
+        org.junit.jupiter.api.Assertions.assertEquals(0, secondCleanup.get("tablesDropped"));
+        org.junit.jupiter.api.Assertions.assertEquals(0, secondCleanup.get("columnsDropped"));
+        System.out.println("Database Cleanup Report: " + cleanupReport);
+    }
+
     @Test
     public void seedUsers() {
         Role clientRole = roleRepository.findByName(RoleName.CLIENT).orElseGet(() -> {

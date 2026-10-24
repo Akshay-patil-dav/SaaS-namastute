@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Filter, Plus, FileEdit, MessageSquare, Settings, ArrowUpDown, Trash2, Loader, Eye, EyeOff } from 'lucide-react';
 import apiClient, { ENV } from '@/api/config';
-import '../../inventory/Brands/Products.css';
-import '../../inventory/Brands/inventory-pages-custom.css';
+import AdminPagination from '@/pages/admin/AdminPanel/components/AdminPagination';
 
 export default function BlogPosts() {
     const navigate = useNavigate();
@@ -11,6 +10,8 @@ export default function BlogPosts() {
     const [selectedIds, setSelectedIds] = useState([]);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
     const fetchPosts = async () => {
         setLoading(true);
@@ -68,11 +69,31 @@ export default function BlogPosts() {
         }
     };
 
+    const filteredPosts = useMemo(() => {
+        if (!searchTerm.trim()) return posts;
+        const q = searchTerm.toLowerCase();
+        return posts.filter(p =>
+            p.title?.toLowerCase().includes(q) ||
+            p.author?.toLowerCase().includes(q) ||
+            p.category?.toLowerCase().includes(q) ||
+            p.blogCategory?.toLowerCase().includes(q)
+        );
+    }, [posts, searchTerm]);
+
+    const totalPages = Math.max(1, Math.ceil(filteredPosts.length / pageSize));
+    const safeCurrentPage = Math.min(currentPage, totalPages);
+    const paginatedPosts = useMemo(() => {
+        const start = (safeCurrentPage - 1) * pageSize;
+        return filteredPosts.slice(start, start + pageSize);
+    }, [filteredPosts, safeCurrentPage, pageSize]);
+
     const handleSelectAll = (isChecked) => {
         if (isChecked) {
-            setSelectedIds(posts.map(item => item.id));
+            const pageIds = paginatedPosts.map(item => item.id);
+            setSelectedIds(prev => Array.from(new Set([...prev, ...pageIds])));
         } else {
-            setSelectedIds([]);
+            const pageIds = new Set(paginatedPosts.map(item => item.id));
+            setSelectedIds(prev => prev.filter(id => !pageIds.has(id)));
         }
     };
 
@@ -147,7 +168,10 @@ export default function BlogPosts() {
                                 type="text" 
                                 placeholder="Search..." 
                                 value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
+                                onChange={e => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 style={{ border: 'none', padding: '6px 10px', fontSize: '14px', outline: 'none' }}
                             />
                         </div>
@@ -166,7 +190,7 @@ export default function BlogPosts() {
                                         type="checkbox" 
                                         className="ss-checkbox" 
                                         style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                                        checked={posts.length > 0 && selectedIds.length === posts.length}
+                                        checked={paginatedPosts.length > 0 && paginatedPosts.every(item => selectedIds.includes(item.id))}
                                         onChange={(e) => handleSelectAll(e.target.checked)}
                                     />
                                 </th>
@@ -196,8 +220,14 @@ export default function BlogPosts() {
                                         No blog posts found. Click "Add blog post" to create one.
                                     </td>
                                 </tr>
+                            ) : filteredPosts.length === 0 ? (
+                                <tr>
+                                    <td colSpan="8" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
+                                        No blog posts match "{searchTerm}".
+                                    </td>
+                                </tr>
                             ) : (
-                                posts.filter(p => p.title?.toLowerCase().includes(searchTerm.toLowerCase())).map((post) => (
+                                paginatedPosts.map((post) => (
                                     <tr key={post.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                                         <td style={{ padding: '14px 16px' }}>
                                             <input 
@@ -209,11 +239,15 @@ export default function BlogPosts() {
                                             />
                                         </td>
                                         <td style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                            <div style={{ width: '48px', height: '32px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
+                                            <div style={{ width: '48px', height: '32px', background: post.coverColor || '#e2e8f0', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                 {post.imageUrl ? (
-                                                    <img src={`${ENV.API_BASE_URL.replace('/api', '')}${post.imageUrl}`} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <img 
+                                                        src={post.imageUrl.startsWith('http') ? post.imageUrl : `${(ENV.BACKEND_BASE_URL || '').replace(/\/$/, '')}${post.imageUrl.startsWith('/') ? '' : '/'}${post.imageUrl}`} 
+                                                        alt="thumbnail" 
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                                    />
                                                 ) : (
-                                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#e2e8f0', color: '#94a3b8', fontSize: '10px' }}>No Img</div>
+                                                    <span style={{ fontSize: '14px' }}>{post.coverEmoji || '📖'}</span>
                                                 )}
                                             </div>
                                             <span style={{ fontWeight: '600', color: '#1e293b' }}>{post.title}</span>
@@ -223,12 +257,17 @@ export default function BlogPosts() {
                                                 {post.visibility || 'Hidden'}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '14px 16px', color: '#475569' }}>{post.author}</td>
-                                        <td style={{ padding: '14px 16px', color: '#475569' }}>{post.blogCategory}</td>
-                                        <td style={{ padding: '14px 16px', color: '#475569' }}>{formatDate(post.updatedAt)}</td>
+                                        <td style={{ padding: '14px 16px', color: '#475569' }}>{post.author || 'Akshay Patil'}</td>
+                                        <td style={{ padding: '14px 16px', color: '#475569' }}>{post.category || post.blogCategory || 'Software'}</td>
+                                        <td style={{ padding: '14px 16px', color: '#475569' }}>{formatDate(post.updatedAt || post.createdAt)}</td>
                                         <td style={{ padding: '14px 16px', color: '#475569', textAlign: 'right' }}>{formatPublishDate(post.createdAt)}</td>
                                         <td style={{ padding: '14px 16px', textAlign: 'right' }}>
                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                                {post.slug && (
+                                                    <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#64748b', cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} title="View on website">
+                                                        <Eye size={16} />
+                                                    </a>
+                                                )}
                                                 <button onClick={() => navigate(`/dashboard/edit-blog-post/${post.id}`)} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#64748b', cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} title="Edit">
                                                     <FileEdit size={16} />
                                                 </button>
@@ -247,6 +286,22 @@ export default function BlogPosts() {
                     </table>
                     <style>{`@keyframes spin { 100% { transform: rotate(360deg); } } .spin { animation: spin 1s linear infinite; }`}</style>
                 </div>
+
+                {filteredPosts.length > 0 && (
+                    <AdminPagination
+                        currentPage={safeCurrentPage}
+                        totalItems={filteredPosts.length}
+                        pageSize={pageSize}
+                        onPageChange={(page) => setCurrentPage(page)}
+                        onPageSizeChange={(newSize) => {
+                            setPageSize(newSize);
+                            setCurrentPage(1);
+                        }}
+                        pageSizeOptions={[5, 10, 20, 50]}
+                        itemLabel="blog posts"
+                        theme="light"
+                    />
+                )}
             </div>
 
             <div style={{ textAlign: 'center', marginTop: '24px' }}>

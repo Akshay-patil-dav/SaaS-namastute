@@ -25,14 +25,14 @@
 .contact-badge {
     display: inline-block;
     padding: 6px 16px;
-    background: var(--primary-pale);
-    color: var(--primary-d);
+    background: var(--primary-pale, rgba(234, 88, 12, 0.1));
+    color: var(--primary, #ea580c);
     border-radius: 50px;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 1px;
     margin-bottom: 24px;
-    border: 1px solid rgba(255, 179, 138,0.3);
+    border: 1px solid rgba(234, 88, 12, 0.35);
 }
 .contact-title {
     font-size: 56px;
@@ -184,6 +184,7 @@
     margin-bottom: 8px;
 }
 .contact-form-group input,
+.contact-form-group select,
 .contact-form-group textarea {
     width: 100%;
     padding: 16px;
@@ -195,7 +196,17 @@
     font-family: inherit;
     transition: 0.3s;
 }
+.contact-form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ea580c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
 .contact-form-group input:focus,
+.contact-form-group select:focus,
 .contact-form-group textarea:focus {
     outline: none;
     border-color: var(--primary);
@@ -206,7 +217,7 @@
 .contact-submit-btn {
     width: 100%;
     padding: 18px;
-    background: var(--primary);
+    background: var(--gradient, linear-gradient(135deg, #ff620b 0%, #c2410c 100%));
     color: #ffffff;
     border: none;
     border-radius: 12px;
@@ -214,11 +225,15 @@
     font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
-    box-shadow: 0 10px 20px rgba(255, 179, 138,0.2);
+    box-shadow: 0 10px 20px rgba(234, 88, 12, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 .contact-submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 25px rgba(255, 179, 138,0.3);
+    box-shadow: 0 15px 25px rgba(234, 88, 12, 0.35);
 }
 .contact-submit-btn:disabled {
     opacity: 0.7;
@@ -228,13 +243,39 @@
 
 .contact-success-msg {
     margin-top: 20px;
-    padding: 16px;
+    padding: 16px 20px;
     background: #ecfdf5;
     border: 1px solid #10b981;
     color: #065f46;
     border-radius: 12px;
     font-weight: 600;
-    text-align: center;
+    line-height: 1.5;
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: fadeIn 0.4s ease;
+}
+
+.contact-error-msg {
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: #fef2f2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
+    border-radius: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Responsive ── */

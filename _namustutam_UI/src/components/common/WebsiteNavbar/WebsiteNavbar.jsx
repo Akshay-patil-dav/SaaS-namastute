@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette, Linkedin, Github, Instagram, Twitter } from 'lucide-react';
+import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette, Linkedin, Github, Instagram, Twitter, Shield } from 'lucide-react';
 import logo from '../../../assets/logo.svg';
 import '../../../pages/website/BlogDetail/LandingPage.css';
 
@@ -139,7 +139,21 @@ const WebsiteNavbar = () => {
                 <NavLogo />
 
                 <ul className="lp-nav-links">
-                    <li><Link to="/project-works" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'inherit', textDecoration: 'none' }}><Briefcase size={16} /> Project Works</Link></li>
+                    <li>
+                        <Link 
+                            to="/project-works" 
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                textDecoration: 'none',
+                                color: location.pathname.startsWith('/project-works') ? 'var(--primary, #ff5b00)' : 'inherit',
+                                fontWeight: location.pathname.startsWith('/project-works') ? 700 : 500
+                            }}
+                        >
+                            <Briefcase size={16} /> Project Works
+                        </Link>
+                    </li>
                     <li
                         className="lp-nav-dropdown-trigger"
                         onMouseEnter={() => handleMouseEnter('services')}
@@ -150,7 +164,7 @@ const WebsiteNavbar = () => {
                             className={`lp-nav-btn ${activeDropdown === 'services' ? 'active' : ''}`}
                             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
                         >
-                            <Layers size={16} /> Skill
+                            <Layers size={16} /> Services
                             <svg className={`lp-nav-chevron ${activeDropdown === 'services' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
                         </button>
                     </li>
@@ -160,16 +174,47 @@ const WebsiteNavbar = () => {
                             <li><a href="#pricing" onClick={() => scrollTo('pricing')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Tag size={16} /> Pricing</a></li>
                         </>
                     )}
-                    <li><Link to="/blog" style={{ color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}><BookOpen size={16} /> Blog</Link></li>
-                    <li><Link to="/contact" style={{ color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}><Phone size={16} /> Contact</Link></li>
+                    <li>
+                        <Link 
+                            to="/blog" 
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                textDecoration: 'none',
+                                color: location.pathname.startsWith('/blog') ? 'var(--primary, #ff5b00)' : 'inherit',
+                                fontWeight: location.pathname.startsWith('/blog') ? 700 : 500
+                            }}
+                        >
+                            <BookOpen size={16} /> Blog
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/contact" 
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                textDecoration: 'none',
+                                color: location.pathname === '/contact' ? 'var(--primary, #ff5b00)' : 'inherit',
+                                fontWeight: location.pathname === '/contact' ? 700 : 500
+                            }}
+                        >
+                            <Phone size={16} /> Contact
+                        </Link>
+                    </li>
                 </ul>
 
-                {/* Social Icons */}
+                {/* Social Icons & Admin link */}
                 <div className="lp-nav-socials">
                     <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Linkedin size={20} /></a>
                     <a href="https://github.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Github size={20} /></a>
                     <a href="https://instagram.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Instagram size={20} /></a>
                     <a href="https://x.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Twitter size={20} /></a>
+                    <Link to="/admin" className="lp-social-icon" title="Admin CMS Portal" style={{ color: '#ff620b', background: 'rgba(255, 98, 11, 0.1)', borderRadius: '8px', padding: '5px' }}>
+                        <Shield size={18} />
+                    </Link>
                 </div>
 
                 {showCTA && (
@@ -240,6 +285,7 @@ const WebsiteNavbar = () => {
                     )}
                     <Link to="/blog" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><BookOpen size={16} /> Blog</Link>
                     <Link to="/contact" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><Phone size={16} /> Contact Us</Link>
+                    <Link to="/admin" onClick={() => setMenuOpen(false)} style={{ color: '#ff620b', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><Shield size={16} /> Admin CMS Studio</Link>
                 </div>
                 {showCTA && (
                     <div className="lp-mobile-menu-cta">

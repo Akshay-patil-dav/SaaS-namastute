@@ -1,100 +1,157 @@
-import { FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs } from 'react-icons/fa';
-import { SiMongodb, SiTypescript, SiExpress, SiPostgresql } from 'react-icons/si';
+import { FaReact, FaNodeJs, FaShopify, FaWordpress, FaPhp } from 'react-icons/fa';
+import { SiPostgresql, SiSpringboot, SiMongodb, SiTypescript, SiTailwindcss, SiNextdotjs, SiRedux, SiStripe } from 'react-icons/si';
 import p1 from "../assets/project/p1.png";
 import p2 from "../assets/project/p2.jpg";
 import p3 from "../assets/project/p3.jpg";
 import p4 from "../assets/project/p6.png";
 import p5 from "../assets/project/p5.png";
-import p7 from "../assets/project/p7.png"
-// import p4 from from "./"
+import p7 from "../assets/project/p7.png";
 
 export const projectsData = [
     {
-        title: 'Clothing E-commerce Design| Shopify ',
-        author: 'Freelancer',
+        title: 'Clothing E-commerce Design | Shopify',
+        author: 'Namustutam',
         category: 'NEW',
-        filter: 'Business Page',
+        filter: 'E-Commerce',
         price: '$59 USD',
-        img: p1, 
-        techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
-        description: 'Design beyond limits. A sharp visual execution for eye-popping brands.',
-        liveLink: '#', githubLink: '#'
+        img: p1,
+        techStack: [
+            { name: 'Shopify', icon: <FaShopify />, color: '#96bf48' },
+            { name: 'Liquid', icon: null, color: '#cc8d34' },
+            { name: 'JavaScript', icon: null, color: '#f7df1e' },
+            { name: 'CSS3', icon: null, color: '#264de4' },
+        ],
+        description: 'A high-converting Shopify clothing store with eye-popping visual design, product variant selectors, collection pages, and a streamlined checkout optimized for mobile and desktop.',
+        liveLink: '#',
+        githubLink: '#',
+        featured: true,
     },
     {
         title: 'Shopify Web Design',
-        author: 'Freelancer',
+        author: 'Namustutam',
         category: 'NEW',
         filter: 'Business Page',
         price: '$129 USD',
         img: p2,
-        techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
-        description: 'Growth consulting solutions designed to drive results.',
-        liveLink: '#', githubLink: '#'
+        techStack: [
+            { name: 'Shopify', icon: <FaShopify />, color: '#96bf48' },
+            { name: 'Liquid', icon: null, color: '#cc8d34' },
+            { name: 'React', icon: <FaReact />, color: '#61dafb' },
+            { name: 'TailwindCSS', icon: null, color: '#38bdf8' },
+        ],
+        description: 'A sophisticated Shopify website redesign focused on brand identity, conversion rate optimization, and storytelling layouts. Built with pixel-perfect attention to detail.',
+        liveLink: '#',
+        githubLink: '#',
+        featured: false,
     },
     {
         title: 'Clothing E-commerce Templates | Shopify Web Design',
-        author: 'Freelancer',
+        author: 'Namustutam',
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$99 USD',
         img: p3,
-         techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
-        description: 'Explore the best natural places with travelers sharing lovely moments.',
-        liveLink: '#', githubLink: '#'
+        techStack: [
+            { name: 'Shopify', icon: <FaShopify />, color: '#96bf48' },
+            { name: 'Liquid', icon: null, color: '#cc8d34' },
+            { name: 'CSS3', icon: null, color: '#264de4' },
+            { name: 'JavaScript', icon: null, color: '#f7df1e' },
+        ],
+        description: 'A premium, ready-to-deploy Shopify clothing template featuring mega menus, lookbook galleries, size guides, and a blazing-fast checkout experience.',
+        liveLink: '#',
+        githubLink: '#',
+        featured: false,
     },
     {
         title: 'MyITRDesk.com | Fullstack Web App',
-        author: 'Freelancer',
+        author: 'Namustutam',
         category: 'NEW',
-        filter: 'E-Commerce',
-        price: '$99 USD',
-        img: p4 ,
-          techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
-        description: 'We blend creativity and visuals that are functional.',
-        liveLink: '#', githubLink: '#'
+        filter: 'Web Application',
+        price: '$299 USD',
+        img: p4,
+        techStack: [
+            { name: 'React', icon: <FaReact />, color: '#61dafb' },
+            { name: 'Spring Boot', icon: <SiSpringboot />, color: '#6db33f' },
+            { name: 'PostgreSQL', icon: <SiPostgresql />, color: '#4169e1' },
+            { name: 'TypeScript', icon: <SiTypescript />, color: '#3178c6' },
+            { name: 'Stripe', icon: <SiStripe />, color: '#635bff' },
+        ],
+        description: 'A full-stack ITR filing and tax management web application with multi-user authentication, form generation, document uploads, and secure payment processing.',
+        liveLink: '#',
+        githubLink: '#',
+        featured: true,
     },
     {
         title: 'POS Software | SaaS',
-        author: 'Freelancer',
+        author: 'Namustutam',
         category: 'NEW',
         filter: 'SaaS Project',
-        price: '$49 USD',
+        price: '$499 USD',
         img: p5,
-          techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
-        description: 'A modern origin template for futuristic brands.',
-        liveLink: '#', githubLink: '#'
+        techStack: [
+            { name: 'React', icon: <FaReact />, color: '#61dafb' },
+            { name: 'Spring Boot', icon: <SiSpringboot />, color: '#6db33f' },
+            { name: 'PostgreSQL', icon: <SiPostgresql />, color: '#4169e1' },
+            { name: 'Redux', icon: <SiRedux />, color: '#764abc' },
+            { name: 'JWT Auth', icon: null, color: '#ff620b' },
+        ],
+        description: 'A robust multi-tenant Point-of-Sale SaaS platform with inventory management, sales analytics, invoicing, customer ledger (Khata), and real-time dashboard reporting.',
+        liveLink: '#',
+        githubLink: '#',
+        featured: true,
     },
     {
         title: 'NatureLink India .com | Shopify',
-        author: 'Freelancer',
+        author: 'Namustutam',
         category: 'NEW',
         filter: 'E-Commerce',
         price: '$89 USD',
         img: p7,
-        techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
-        description: 'Building ideas, shaping identities, and creating meaningful experiences.',
-        liveLink: '#', githubLink: '#'
+        techStack: [
+            { name: 'Shopify', icon: <FaShopify />, color: '#96bf48' },
+            { name: 'Liquid', icon: null, color: '#cc8d34' },
+            { name: 'JavaScript', icon: null, color: '#f7df1e' },
+            { name: 'CSS3', icon: null, color: '#264de4' },
+        ],
+        description: 'An eco-conscious Shopify store for natural products featuring rich product imagery, certifications showcase, sustainability storytelling, and optimized mobile UX.',
+        liveLink: '#',
+        githubLink: '#',
+        featured: false,
     },
     {
-        title: 'Buy. Sell. Rent',
-        author: 'Freelancer',
+        title: 'Buy Sell Rent | Real Estate Platform',
+        author: 'Namustutam',
         category: 'NEW',
-        filter: 'E-Commerce',
+        filter: 'Web Application',
         price: '$149 USD',
         img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800',
-        techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
-        description: 'Curated properties for refined living.',
-        liveLink: '#', githubLink: '#'
+        techStack: [
+            { name: 'Next.js', icon: <SiNextdotjs />, color: '#ffffff' },
+            { name: 'React', icon: <FaReact />, color: '#61dafb' },
+            { name: 'MongoDB', icon: <SiMongodb />, color: '#47a248' },
+            { name: 'Node.js', icon: <FaNodeJs />, color: '#339933' },
+        ],
+        description: 'A full-featured real estate marketplace for property listing, searching, filtering, and inquiry management — built for both buyers and sellers with an intuitive agent dashboard.',
+        liveLink: '#',
+        githubLink: '#',
+        featured: false,
     },
     {
-        title: 'AXURE',
-        author: 'Freelancer',
+        title: 'AXURE | Digital Agency',
+        author: 'Namustutam',
         category: 'NEW',
         filter: 'Business Page',
         price: '$79 USD',
         img: 'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=800',
-        techStack: [{ name: 'React', icon: <FaReact />, color: '#8b5cf6' }],
-        description: 'Focused, intentional, human-centered design for brands that want to stand out.',
-        liveLink: '#', githubLink: '#'
+        techStack: [
+            { name: 'React', icon: <FaReact />, color: '#61dafb' },
+            { name: 'TailwindCSS', icon: <SiTailwindcss />, color: '#38bdf8' },
+            { name: 'TypeScript', icon: <SiTypescript />, color: '#3178c6' },
+            { name: 'GSAP', icon: null, color: '#88ce02' },
+        ],
+        description: 'A premium digital agency landing page with scroll-driven animations, immersive case study sections, team showcase, service pricing tables, and a high-converting contact flow.',
+        liveLink: '#',
+        githubLink: '#',
+        featured: false,
     }
 ];

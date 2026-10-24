@@ -57,7 +57,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/verification/**", "/oauth2/**", "/login/**",
                                 "/api/upload/**", "/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands",
-                                "/api/units", "/api/warranties", "/error")
+                                "/api/units", "/api/warranties", "/api/landing-page/**", "/api/blog-posts", "/api/blog-posts/**",
+                                "/api/contact-submissions", "/api/contact-submissions/**", "/api/contacts", "/api/contacts/**", "/error")
                         .permitAll()
                         // Allow public e-commerce storefront access
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**")
@@ -117,7 +118,13 @@ public class SecurityConfig {
         // both resolve to the same origin, preventing subtle CORS mismatches.
         String primary = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
         origins.add(primary);
-        origins.add("http://localhost:5174"); // Explicitly add ecomm storefront
+        origins.add("https://namustutam.vercel.app");
+        origins.add("http://localhost:4000");
+        origins.add("http://localhost:5173");
+        origins.add("http://localhost:5174");
+        origins.add("http://127.0.0.1:4000");
+        origins.add("http://127.0.0.1:5173");
+        origins.add("http://127.0.0.1:5174");
 
         if (corsExtraOrigins != null && !corsExtraOrigins.isBlank()) {
             for (String o : corsExtraOrigins.split(",")) {

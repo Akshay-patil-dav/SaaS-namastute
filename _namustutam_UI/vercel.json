@@ -8,6 +8,10 @@
       "source": "/api/gemini/:path*",
       "destination": "https://generativelanguage.googleapis.com/:path*"
     },
+    {
+      "source": "/api/:path*",
+      "destination": "https://awhile-venus-unlearned.ngrok-free.dev/api/:path*"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

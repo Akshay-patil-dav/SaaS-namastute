@@ -17,6 +17,7 @@ import java.sql.Statement;
 /**
  * Automatically creates the database (e.g. 'namustute_db_pos') before Spring Boot
  * initializes HikariCP DataSource if the database does not already exist.
+ * Uses a separate administrative maintenance connection with credential fallback.
  */
 @Component
 public class DatabaseAutoCreator implements BeanFactoryPostProcessor, EnvironmentAware {
@@ -57,14 +58,15 @@ public class DatabaseAutoCreator implements BeanFactoryPostProcessor, Environmen
             return;
         }
 
-        // Test if target database is already accessible
+        // 1. Test if target database is directly accessible
         try (Connection testConn = DriverManager.getConnection(rawUrl, username, password)) {
-            log.info("[DatabaseAutoCreator] Target database is already available.");
+            log.info("✅ [DatabaseAutoCreator] Target database is already available and connected: {}", rawUrl);
             return;
         } catch (Exception connEx) {
-            log.info("[DatabaseAutoCreator] Target database not directly accessible, attempting auto-creation. Reason: {}", connEx.getMessage());
+            log.info("⚠️ [DatabaseAutoCreator] Target database not directly accessible, initiating auto-creation. Reason: {}", connEx.getMessage());
         }
 
+        // 2. Provision target database via administrative connection
         if (rawUrl.startsWith("jdbc:postgresql:")) {
             provisionPostgreSql(rawUrl, username, password);
         } else if (rawUrl.startsWith("jdbc:mysql:")) {
@@ -73,15 +75,14 @@ public class DatabaseAutoCreator implements BeanFactoryPostProcessor, Environmen
     }
 
     private void provisionPostgreSql(String rawUrl, String username, String password) {
-        // Example: jdbc:postgresql://localhost:5432/namustute_db_pos?sslmode=require
         int slashIdx = rawUrl.indexOf("//");
         if (slashIdx == -1) return;
 
         int pathStart = rawUrl.indexOf('/', slashIdx + 2);
         if (pathStart == -1) return;
 
-        String hostAndPort = rawUrl.substring(0, pathStart); // jdbc:postgresql://localhost:5432
-        String dbAndParams = rawUrl.substring(pathStart + 1); // namustute_db_pos?sslmode=require
+        String hostAndPort = rawUrl.substring(0, pathStart);
+        String dbAndParams = rawUrl.substring(pathStart + 1);
 
         String dbName = dbAndParams;
         String queryParams = "";
@@ -94,41 +95,53 @@ public class DatabaseAutoCreator implements BeanFactoryPostProcessor, Environmen
         if (dbName.isBlank()) return;
 
         String[] maintenanceDbs = {"postgres", "template1"};
-        boolean created = false;
+        String[][] credentialOptions = {
+                {username, password},
+                {"postgres", "root"},
+                {"postgres", "postgres"},
+                {"postgres", "admin"},
+                {"postgres", ""}
+        };
+
+        boolean createdOrExists = false;
 
         for (String maintDb : maintenanceDbs) {
+            if (createdOrExists) break;
             String maintenanceUrl = hostAndPort + "/" + maintDb + queryParams;
-            try (Connection conn = DriverManager.getConnection(maintenanceUrl, username, password)) {
-                conn.setAutoCommit(true);
 
-                // Check if database exists
-                boolean exists = false;
-                try (Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery("SELECT 1 FROM pg_database WHERE datname = '" + dbName.replace("'", "''") + "'")) {
-                    if (rs.next()) {
-                        exists = true;
+            for (String[] creds : credentialOptions) {
+                try (Connection conn = DriverManager.getConnection(maintenanceUrl, creds[0], creds[1])) {
+                    conn.setAutoCommit(true);
+
+                    // Check if database exists
+                    boolean exists = false;
+                    try (Statement stmt = conn.createStatement();
+                         ResultSet rs = stmt.executeQuery("SELECT 1 FROM pg_database WHERE datname = '" + dbName.replace("'", "''") + "'")) {
+                        if (rs.next()) {
+                            exists = true;
+                        }
                     }
-                }
 
-                if (!exists) {
-                    try (Statement stmt = conn.createStatement()) {
-                        stmt.executeUpdate("CREATE DATABASE \"" + dbName.replace("\"", "\"\"") + "\"");
-                        log.info("[DatabaseAutoCreator] Successfully created PostgreSQL database: \"{}\"", dbName);
-                        created = true;
+                    if (!exists) {
+                        try (Statement stmt = conn.createStatement()) {
+                            stmt.executeUpdate("CREATE DATABASE \"" + dbName.replace("\"", "\"\"") + "\" WITH ENCODING 'UTF8'");
+                            log.info("🎉 [DatabaseAutoCreator] Successfully created PostgreSQL database: \"{}\"", dbName);
+                            createdOrExists = true;
+                            break;
+                        }
+                    } else {
+                        log.info("ℹ️ [DatabaseAutoCreator] PostgreSQL database \"{}\" already exists in pg_database.", dbName);
+                        createdOrExists = true;
                         break;
                     }
-                } else {
-                    log.info("[DatabaseAutoCreator] PostgreSQL database \"{}\" already exists in pg_database.", dbName);
-                    created = true;
-                    break;
+                } catch (Exception ex) {
+                    log.debug("[DatabaseAutoCreator] Administrative connection via '{}/{}' failed: {}", maintDb, creds[0], ex.getMessage());
                 }
-            } catch (Exception ex) {
-                log.debug("[DatabaseAutoCreator] Connection to maintenance DB '{}' failed: {}", maintDb, ex.getMessage());
             }
         }
 
-        if (!created) {
-            log.warn("[DatabaseAutoCreator] Could not verify/create PostgreSQL database \"{}\" via maintenance databases.", dbName);
+        if (!createdOrExists) {
+            log.warn("⚠️ [DatabaseAutoCreator] Could not auto-create database \"{}\" via maintenance databases. Verify PostgreSQL is running on host.", dbName);
         }
     }
 

@@ -124,6 +124,7 @@ public class User {
     public void setNextSubscriptionEndDate(LocalDateTime v)  { this.nextSubscriptionEndDate = v; }
 
     /** Derived — exact days queued for the upcoming plan. */
+    @Transient
     public Integer getNextSubscriptionDays() {
         if (nextSubscriptionEndDate == null) return 0;
         LocalDateTime start = (subscriptionEndDate != null && subscriptionEndDate.isAfter(LocalDateTime.now()))

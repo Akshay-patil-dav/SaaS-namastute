@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
 import BlogPreviewSection from '../../../components/common/BlogPreviewSection/BlogPreviewSection';
+import { useLandingPage } from '../../../context/LandingPageContext';
 import {
     Code, ShoppingCart, Layout, Smartphone, Search, HeadphonesIcon,
     ArrowRight, ExternalLink, ChevronLeft, ChevronRight, Check,
@@ -113,10 +114,21 @@ export default function WebDevelopment() {
         }
     };
 
-    let showcaseProjects = projectsData.filter(p =>
-        p.category.includes('Web') || p.category.includes('E-Commerce') || p.category.includes('SaaS')
+    const { landingData } = useLandingPage();
+    const allProjects = useMemo(() => {
+        const adminProjs = (landingData?.projects || []).map(p => ({
+            ...p,
+            author: p.author || 'Namustutam'
+        }));
+        const seen = new Set(adminProjs.map(p => (p.title || '').toLowerCase().trim()));
+        const staticFiltered = projectsData.filter(p => !seen.has((p.title || '').toLowerCase().trim()));
+        return [...adminProjs, ...staticFiltered];
+    }, [landingData?.projects]);
+
+    let showcaseProjects = allProjects.filter(p =>
+        (p.category || '').includes('Web') || (p.category || '').includes('E-Commerce') || (p.category || '').includes('SaaS')
     ).slice(0, 8);
-    if (showcaseProjects.length < 4) showcaseProjects = projectsData.slice(0, 8);
+    if (showcaseProjects.length < 4) showcaseProjects = allProjects.slice(0, 8);
 
     return (
         <div className="wd-page">

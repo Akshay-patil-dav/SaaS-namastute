@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './TeamSection.css';
+import { Facebook, Twitter, Linkedin, Instagram, Github, MoveLeft, MoveRight } from 'lucide-react';
+import { useLandingPage } from '../../../context/LandingPageContext';
 
-const teamMembers = [
-    { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: '/team/Akshay.png' },
-    // { name: 'Santosh Patil', role: 'Business Developer', image: '/team/sp.png' },
-    // { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' },
-    // { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' },
-    // { name: 'Amol Wagh', role: 'Developer', image: '/team/wagh.png' }
+const DEFAULT_MEMBERS = [
+    { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: '/team/Akshay.png', badge: 'Freelancer', bio: 'Passionate professional dedicated to delivering excellence and driving innovation.' }
 ];
-
-import { Facebook, Twitter, Linkedin, Instagram, MoveLeft, MoveRight } from 'lucide-react';
 
 const TeamCard = ({ member }) => (
     <div className="team-card">
@@ -17,12 +13,17 @@ const TeamCard = ({ member }) => (
             <div className="team-card-front">
                 <div className="card-decoration"></div>
                 <div className="team-image-container">
-                    <img src={member.image} alt={member.name} className="team-image" />
+                    <img 
+                        src={member.image || '/team/Akshay.png'} 
+                        alt={member.name} 
+                        className="team-image"
+                        onError={(e) => { e.target.src = '/team/Akshay.png'; }}
+                    />
                 </div>
                 <div className="team-info-label">
                     <h3 className="member-name">{member.name}</h3>
                     <div className="member-role">{member.role}</div>
-                     <div className="member-role-back">Freelancer</div>
+                    <div className="member-role-back">{member.badge || 'Freelancer'}</div>
                 </div>
             </div>
             <div className="team-card-back">
@@ -30,13 +31,31 @@ const TeamCard = ({ member }) => (
                 <div className="team-info-back">
                     <h3 className="member-name-back">{member.name}</h3>
                     <div className="member-role-back">{member.role}</div>
-                    <div className="member-role-back">Freelancer</div>
-                    <p className="member-bio">Passionate professional dedicated to delivering excellence and driving innovation.</p>
+                    <div className="member-role-back">{member.badge || 'Freelancer'}</div>
+                    <p className="member-bio">
+                        {member.bio || 'Passionate professional dedicated to delivering excellence and driving innovation.'}
+                    </p>
                     <div className="social-links">
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon"><Facebook size={18} /></a>
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon"><Twitter size={18} /></a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-icon"><Linkedin size={18} /></a>
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon"><Instagram size={18} /></a>
+                        {member.socials?.linkedin && (
+                            <a href={member.socials.linkedin} target="_blank" rel="noopener noreferrer" className="social-icon">
+                                <Linkedin size={18} />
+                            </a>
+                        )}
+                        {member.socials?.github && (
+                            <a href={member.socials.github} target="_blank" rel="noopener noreferrer" className="social-icon">
+                                <Github size={18} />
+                            </a>
+                        )}
+                        {member.socials?.twitter && (
+                            <a href={member.socials.twitter} target="_blank" rel="noopener noreferrer" className="social-icon">
+                                <Twitter size={18} />
+                            </a>
+                        )}
+                        {member.socials?.instagram && (
+                            <a href={member.socials.instagram} target="_blank" rel="noopener noreferrer" className="social-icon">
+                                <Instagram size={18} />
+                            </a>
+                        )}
                     </div>
                 </div>
             </div>
@@ -45,6 +64,11 @@ const TeamCard = ({ member }) => (
 );
 
 const TeamSection = () => {
+    const { landingData } = useLandingPage();
+    const teamMembers = (landingData?.team && landingData.team.length > 0)
+        ? landingData.team
+        : DEFAULT_MEMBERS;
+
     const [isAutoSlide, setIsAutoSlide] = useState(teamMembers.length > 4);
 
     useEffect(() => {
@@ -56,7 +80,7 @@ const TeamSection = () => {
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    }, [teamMembers]);
 
     return (
         <section className="team-section" id="team">
@@ -75,14 +99,14 @@ const TeamSection = () => {
                         <div className="team-slider-marquee">
                             <div className="team-track">
                                 {teamMembers.map((member, index) => (
-                                    <div key={`first-${index}`} className="team-flip-wrapper">
+                                    <div key={`first-${member.id || index}`} className="team-flip-wrapper">
                                         <TeamCard member={member} />
                                     </div>
                                 ))}
                             </div>
                             <div className="team-track" aria-hidden="true">
                                 {teamMembers.map((member, index) => (
-                                    <div key={`second-${index}`} className="team-flip-wrapper">
+                                    <div key={`second-${member.id || index}`} className="team-flip-wrapper">
                                         <TeamCard member={member} />
                                     </div>
                                 ))}
@@ -91,7 +115,7 @@ const TeamSection = () => {
                     ) : (
                         <div className="team-static-grid">
                             {teamMembers.map((member, index) => (
-                                <div key={`static-${index}`} className="team-flip-wrapper">
+                                <div key={`static-${member.id || index}`} className="team-flip-wrapper">
                                     <TeamCard member={member} />
                                 </div>
                             ))}

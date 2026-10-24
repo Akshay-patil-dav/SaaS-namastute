@@ -1,14 +1,17 @@
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\CategoryController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\PlanController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\PosOrderController.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\LandingPageConfig.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\ProductRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\UserRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\SalesReturnController.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\LandingPageConfigRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\PurchaseReturnController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\NoteDto.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\Stock.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\KhataParty.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\PlanRequest.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\LandingPageController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\PosOrderRequest.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\SmsService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\SaleOrderRepository.java
@@ -38,10 +41,12 @@ C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\KhataService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\DashboardDTO.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\BankAccount.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\BlogPost.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\config\CustomOAuth2UserService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\PageFolder.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\BuilderService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\UnitController.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\config\DatabaseSchemaAutoUpgrader.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\WarehouseService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\ProjectMember.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\UserController.java
@@ -71,6 +76,7 @@ C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\StockController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\StockBatchRequest.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\config\UserDetailsImpl.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\ContactSubmission.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\BillOfMaterialRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\PurchaseReturnRequest.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\NoteController.java
@@ -85,7 +91,9 @@ C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\SaleOrderService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\WarrantyRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\AiController.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\BlogPostRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\ProjectInvitationRepository.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\BlogPostController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\SaleOrderRequest.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\Purchase.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\BomItemRepository.java
@@ -138,6 +146,7 @@ C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\AuthService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\PaymentOrderRequest.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\InvitationController.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\DatabaseConnectionService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\config\JwtAuthenticationFilter.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\SalesReturnService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\FileUploadController.java
@@ -149,6 +158,7 @@ C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\ProductController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\WarehouseRequest.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\WorkOrderRepository.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\AiChatService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\PosOrderService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\PageBlock.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\Setting.java
@@ -190,10 +200,12 @@ C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\PurchaseReturn.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\dto\StockUpdateRequest.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\SubCategoryService.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\repository\ContactSubmissionRepository.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\BillOfMaterial.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\WorkCenterController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\service\NotificationEmitterService.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\ProjectInvitation.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\model\WorkOrder.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\AuthController.java
+C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\ContactSubmissionController.java
 C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\backend\src\main\java\com\example\otpauth\controller\WorkOrderController.java

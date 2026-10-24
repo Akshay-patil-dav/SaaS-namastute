@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit2, FileEdit, Sparkles, Image as ImageIcon, Link as LinkIcon, Bold, Italic, Underline, List, Type, Video, LayoutList, ChevronDown, Eye, Calendar, Loader } from 'lucide-react';
 import apiClient, { ENV } from '@/api/config';
-import '../../inventory/Brands/Products.css';
-import '../../inventory/Brands/inventory-pages-custom.css';
 
 export default function AddBlogPost() {
     const navigate = useNavigate();

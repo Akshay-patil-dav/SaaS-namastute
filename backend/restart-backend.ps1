@@ -3,7 +3,7 @@
 # Usage: Right-click -> "Run with PowerShell"  OR  run from terminal: .\restart-backend.ps1
 
 $PORT = 3000
-$BACKEND = "C:\Users\aksha\OneDrive\Desktop\Namustutam\SaaS-namastute\backend"
+$BACKEND = $PSScriptRoot
 
 Write-Host ""
 Write-Host "===============================================" -ForegroundColor Cyan

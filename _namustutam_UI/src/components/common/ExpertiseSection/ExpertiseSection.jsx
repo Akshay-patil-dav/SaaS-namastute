@@ -3,53 +3,37 @@ import {
     Search, PenTool, Code2, ShieldCheck,
     Rocket, Users, Settings, Activity
 } from 'lucide-react';
+import { useLandingPage } from '../../../context/LandingPageContext';
 import './ExpertiseSection.css';
 
-/* ── All 8 steps in strict ascending order ── */
-const STEPS = [
-    {
-        num: 1, Icon: Search,
-        title: 'Discovery',
-        desc: 'Requirements gathering, stakeholder interviews, and project scoping to forge a crystal-clear roadmap.'
-    },
-    {
-        num: 2, Icon: PenTool,
-        title: 'Design',
-        desc: 'UX research, wireframes, and high-fidelity prototypes before a single line of code is written.'
-    },
-    {
-        num: 3, Icon: Code2,
-        title: 'Development',
-        desc: 'Agile sprints with daily standups, CI/CD pipelines, and rigorous peer code-reviews at every step.'
-    },
-    {
-        num: 4, Icon: ShieldCheck,
-        title: 'Testing',
-        desc: 'Automated QA, security audits, load testing, and cross-device validation before go-live.'
-    },
-    {
-        num: 5, Icon: Rocket,
-        title: 'Launch',
-        desc: 'Zero-downtime deployment with staged rollouts, rollback strategy, and dedicated go-live support.'
-    },
-    {
-        num: 6, Icon: Users,
-        title: 'Onboard',
-        desc: 'Team training, documentation hand-off, and a smooth transition so your staff fully own the product.'
-    },
-    {
-        num: 7, Icon: Settings,
-        title: 'Operate',
-        desc: 'Ongoing maintenance, performance monitoring, feature iterations, and round-the-clock support.'
-    },
-    {
-        num: 8, Icon: Activity,
-        title: 'Scale',
-        desc: 'Architectural optimisations, auto-scaling infrastructure, and strategic capacity planning for growth.'
-    },
+const ICON_MAP = {
+    Search, PenTool, Code2, ShieldCheck,
+    Rocket, Users, Settings, Activity
+};
+
+/* ── Default 8 steps ── */
+const DEFAULT_STEPS = [
+    { num: 1, Icon: Search, title: 'Discovery', desc: 'Requirements gathering, stakeholder interviews, and project scoping to forge a crystal-clear roadmap.' },
+    { num: 2, Icon: PenTool, title: 'Design', desc: 'UX research, wireframes, and high-fidelity prototypes before a single line of code is written.' },
+    { num: 3, Icon: Code2, title: 'Development', desc: 'Agile sprints with daily standups, CI/CD pipelines, and rigorous peer code-reviews at every step.' },
+    { num: 4, Icon: ShieldCheck, title: 'Testing', desc: 'Automated QA, security audits, load testing, and cross-device validation before go-live.' },
+    { num: 5, Icon: Rocket, title: 'Launch', desc: 'Zero-downtime deployment with staged rollouts, rollback strategy, and dedicated go-live support.' },
+    { num: 6, Icon: Users, title: 'Onboard', desc: 'Team training, documentation hand-off, and a smooth transition so your staff fully own the product.' },
+    { num: 7, Icon: Settings, title: 'Operate', desc: 'Ongoing maintenance, performance monitoring, feature iterations, and round-the-clock support.' },
+    { num: 8, Icon: Activity, title: 'Scale', desc: 'Architectural optimisations, auto-scaling infrastructure, and strategic capacity planning for growth.' },
 ];
 
 export default function ExpertiseSection() {
+    const { landingData } = useLandingPage();
+    const rawSteps = landingData?.sdlcSteps || [];
+
+    const STEPS = rawSteps.length === 8 ? rawSteps.map(s => ({
+        num: s.num,
+        Icon: ICON_MAP[s.icon] || Code2,
+        title: s.title,
+        desc: s.desc
+    })) : DEFAULT_STEPS;
+
     const gridRef = useRef(null);
     const connRef = useRef(null);
 
