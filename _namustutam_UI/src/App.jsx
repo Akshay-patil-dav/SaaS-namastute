@@ -7,6 +7,7 @@ import { ConfirmProvider } from './context/ConfirmContext';
 import ProtectedRoute from './components/auth/ProtectedRoute/ProtectedRoute';
 import GuestRoute from './components/auth/GuestRoute/GuestRoute';
 import ChatBot from './components/ChatBot/ChatBot.jsx';
+import { isAdminPanelDisabled } from './utils/domainConfig';
 
 // Public pages
 const ITPortfolio = lazy(() => import('./pages/website/ITPortfolio/ITPortfolio.jsx'));
@@ -23,6 +24,7 @@ const LivePreview = lazy(() => import('./pages/website/LivePreview/LivePreview.j
 const ProjectWorks = lazy(() => import('./pages/website/ProjectWorks/ProjectWorks.jsx'));
 const ProjectInfo = lazy(() => import('./pages/website/ProjectInfo/ProjectInfo.jsx'));
 const PrivacyPolicy = lazy(() => import('./pages/website/PrivacyPolicy/PrivacyPolicy.jsx'));
+const NotFound = lazy(() => import('./pages/website/NotFound/NotFound.jsx'));
 
 // Admin pages
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin/AdminLogin.jsx'));
@@ -63,6 +65,8 @@ function PageLoader() {
 
 // ── Routes ──────────────────────────────────────────────────────────────────
 function AppRoutes() {
+    const adminDisabled = isAdminPanelDisabled();
+
     return (
         <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -70,54 +74,69 @@ function AppRoutes() {
                 <Route path="/" element={<ITPortfolio />} />
                 <Route path="/Akshay-Patil" element={<AkshayPatil />} />
 
-                {/* Admin Routes */}
-                <Route
-                    path="/admin/login"
-                    element={
-                        <GuestRoute>
-                            <AdminLogin />
-                        </GuestRoute>
-                    }
-                />
-                <Route
-                    path="/login"
-                    element={
-                        <GuestRoute>
-                            <AdminLogin />
-                        </GuestRoute>
-                    }
-                />
-                <Route
-                    path="/admin"
-                    element={
-                        <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
-                            <AdminPanel />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/:section"
-                    element={
-                        <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
-                            <AdminPanel />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/*"
-                    element={
-                        <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
-                            <AdminPanel />
-                        </ProtectedRoute>
-                    }
-                />
+                {/* Admin Routes — Disabled when running on https://namustutam.vercel.app/ */}
+                {adminDisabled ? (
+                    <>
+                        <Route path="/admin" element={<NotFound />} />
+                        <Route path="/admin/:section" element={<NotFound />} />
+                        <Route path="/admin/*" element={<NotFound />} />
+                        <Route path="/admin/login" element={<NotFound />} />
+                        <Route path="/login" element={<NotFound />} />
+                        <Route path="/dashboard/*" element={<NotFound />} />
+                    </>
+                ) : (
+                    <>
+                        <Route
+                            path="/admin/login"
+                            element={
+                                <GuestRoute>
+                                    <AdminLogin />
+                                </GuestRoute>
+                            }
+                        />
+                        <Route
+                            path="/login"
+                            element={
+                                <GuestRoute>
+                                    <AdminLogin />
+                                </GuestRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin"
+                            element={
+                                <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
+                                    <AdminPanel />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/:section"
+                            element={
+                                <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
+                                    <AdminPanel />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/*"
+                            element={
+                                <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
+                                    <AdminPanel />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        {/* Dashboard Blog Management */}
+                        <Route path="/dashboard/blog-posts" element={<BlogPosts />} />
+                        <Route path="/dashboard/add-blog-post" element={<AddBlogPost />} />
+                        <Route path="/dashboard/edit-blog-post/:id" element={<EditBlogPost />} />
+                    </>
+                )}
 
                 {/* Blog & Public Content */}
                 <Route path="/blog" element={<BlogPage />} />
                 <Route path="/blog/:slug" element={<BlogDetail />} />
-                <Route path="/dashboard/blog-posts" element={<BlogPosts />} />
-                <Route path="/dashboard/add-blog-post" element={<AddBlogPost />} />
-                <Route path="/dashboard/edit-blog-post/:id" element={<EditBlogPost />} />
                 <Route path="/project-works" element={<ProjectWorks />} />
                 <Route path="/project-info/:slug" element={<ProjectInfo />} />
                 <Route path="/contact" element={<ContactUs />} />
@@ -129,8 +148,8 @@ function AppRoutes() {
                 <Route path="/live-preview" element={<LivePreview />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
-                {/* Fallback */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* 404 Fallback for any unknown route */}
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </Suspense>
     );

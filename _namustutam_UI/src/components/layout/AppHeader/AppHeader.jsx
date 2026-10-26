@@ -3,6 +3,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User, ChevronDown, LayoutDashboard, Shield } from 'lucide-react';
 import { useCompany } from '../../../context/CompanyContext';
+import { isAdminPanelDisabled } from '@/utils/domainConfig';
 
 export default function AppHeader() {
     const { user, logout, isAdmin } = useAuth();
@@ -86,7 +87,7 @@ export default function AppHeader() {
                             <span className="font-medium">Profile</span>
                         </button>
 
-                        {isAdmin() && (
+                        {isAdmin() && !isAdminPanelDisabled() && (
                             <>
                                 <button
                                     onClick={() => { setProfileOpen(false); navigate('/admin'); }}

@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette, Linkedin, Github, Instagram, Twitter, Shield } from 'lucide-react';
 import logo from '../../../assets/logo.svg';
 import '../../../pages/website/BlogDetail/LandingPage.css';
+import { isAdminPanelDisabled } from '@/utils/domainConfig';
 
 
 const servicesDropdown = {
@@ -283,7 +284,9 @@ const WebsiteNavbar = () => {
                     )}
                     <Link to="/blog" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><BookOpen size={16} /> Blog</Link>
                     <Link to="/contact" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><Phone size={16} /> Contact Us</Link>
-                    <Link to="/admin" onClick={() => setMenuOpen(false)} style={{ color: '#ff620b', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><Shield size={16} /> Admin CMS Studio</Link>
+                    {!isAdminPanelDisabled() && (
+                        <Link to="/admin" onClick={() => setMenuOpen(false)} style={{ color: '#ff620b', fontWeight: 700, textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: 15 }}><Shield size={16} /> Admin CMS Studio</Link>
+                    )}
                 </div>
                 {showCTA && (
                     <div className="lp-mobile-menu-cta">

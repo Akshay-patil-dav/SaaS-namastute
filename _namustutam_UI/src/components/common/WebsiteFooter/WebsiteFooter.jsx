@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fa';
 import { Shield } from 'lucide-react';
 import { useLandingPage } from '../../../context/LandingPageContext';
+import { isAdminPanelDisabled } from '@/utils/domainConfig';
 import './WebsiteFooter.css';
 
 const WebsiteFooter = () => {
@@ -131,24 +132,26 @@ const WebsiteFooter = () => {
                     <div className="premium-footer-bottom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                         <p>{contact.copyright || `© ${new Date().getFullYear()} Namustutam. All rights reserved.`}</p>
                         
-                        <Link 
-                            to="/admin" 
-                            style={{ 
-                                display: 'inline-flex', 
-                                alignItems: 'center', 
-                                gap: '6px', 
-                                color: '#94a3b8', 
-                                fontSize: '12px', 
-                                textDecoration: 'none',
-                                transition: 'color 0.2s',
-                                fontWeight: 500
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#ff5b00'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
-                        >
-                            <Shield size={12} />
-                            <span>Admin Portal</span>
-                        </Link>
+                        {!isAdminPanelDisabled() && (
+                            <Link 
+                                to="/admin" 
+                                style={{ 
+                                    display: 'inline-flex', 
+                                    alignItems: 'center', 
+                                    gap: '6px', 
+                                    color: '#94a3b8', 
+                                    fontSize: '12px', 
+                                    textDecoration: 'none',
+                                    transition: 'color 0.2s',
+                                    fontWeight: 500
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.color = '#ff5b00'}
+                                onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+                            >
+                                <Shield size={12} />
+                                <span>Admin Portal</span>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </footer>
