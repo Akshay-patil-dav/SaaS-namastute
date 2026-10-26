@@ -12,30 +12,24 @@ export default function NotFound() {
         const prevTitle = document.title;
         document.title = '404 - Page Not Found | Namustutam';
         window.scrollTo(0, 0);
-
-        return () => {
-            document.title = prevTitle;
-        };
+        return () => { document.title = prevTitle; };
     }, []);
 
     return (
         <div className="notfound-wrapper">
-            {/* Ambient Background Glows */}
-            <div className="notfound-glow-top" />
-            <div className="notfound-glow-bottom" />
+            <div className="notfound-glow-top" aria-hidden="true" />
+            <div className="notfound-glow-bottom" aria-hidden="true" />
 
-            {/* Global Website Navbar */}
             <WebsiteNavbar />
 
-            {/* Main 404 Hero Area */}
             <main className="notfound-main">
                 <div className="notfound-card">
                     <div className="notfound-badge">
                         <span className="notfound-pulse-dot" />
-                        <span>404 Error • Page Not Found</span>
+                        <span>404 • Page Not Found</span>
                     </div>
 
-                    <div className="notfound-code" aria-label="Error 404">
+                    <div className="notfound-code" aria-label="404">
                         404
                     </div>
 
@@ -44,24 +38,20 @@ export default function NotFound() {
                     </h1>
 
                     <p className="notfound-description">
-                        The requested page could not be found or is not accessible on this domain.
-                        Please check the web address or return to the homepage.
+                        The requested page could not be found or is not available on this domain.
                     </p>
 
-                    <div className="notfound-actions">
-                        <button
-                            type="button"
-                            className="notfound-btn-primary"
-                            onClick={() => navigate('/')}
-                        >
-                            <Home size={18} />
-                            <span>Back to Homepage</span>
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        className="notfound-btn-primary"
+                        onClick={() => navigate('/')}
+                    >
+                        <Home size={18} />
+                        <span>Back to Homepage</span>
+                    </button>
                 </div>
             </main>
 
-            {/* Global Website Footer */}
             <WebsiteFooter />
         </div>
     );

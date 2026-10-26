@@ -1,4 +1,4 @@
-/* ── 404 Not Found Page — Clean Light Theme ──────────────────────────────── */
+/* ── 404 Not Found Page — Clean & Fully Responsive ────────────────────────── */
 .notfound-wrapper {
     min-height: 100vh;
     display: flex;
@@ -8,74 +8,65 @@
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
     position: relative;
     overflow-x: hidden;
+    width: 100%;
 }
 
-/* Ambient Subtle Background Glows */
+/* Subtle Ambient Glows */
 .notfound-glow-top {
     position: absolute;
-    top: -120px;
+    top: -100px;
     left: 50%;
     transform: translateX(-50%);
-    width: 650px;
-    height: 420px;
-    background: radial-gradient(circle, rgba(255, 91, 0, 0.12) 0%, rgba(255, 120, 45, 0.04) 55%, transparent 75%);
-    filter: blur(70px);
+    width: min(600px, 90vw);
+    height: 380px;
+    background: radial-gradient(circle, rgba(255, 91, 0, 0.12) 0%, rgba(255, 120, 45, 0.03) 60%, transparent 80%);
+    filter: blur(60px);
     pointer-events: none;
     z-index: 0;
 }
 
 .notfound-glow-bottom {
     position: absolute;
-    bottom: -80px;
-    right: 12%;
-    width: 500px;
-    height: 350px;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
-    filter: blur(80px);
+    bottom: -60px;
+    right: 10%;
+    width: min(450px, 80vw);
+    height: 300px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.07) 0%, transparent 70%);
+    filter: blur(70px);
     pointer-events: none;
     z-index: 0;
 }
 
-/* Main Hero Area */
+/* Centered Main Layout */
 .notfound-main {
     flex: 1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 130px 24px 80px;
+    padding: clamp(90px, 14vh, 140px) 16px clamp(40px, 8vh, 80px);
     position: relative;
     z-index: 1;
-    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Clean White Frosted Glass Card */
+/* Responsive Glass Card */
 .notfound-card {
-    max-width: 580px;
     width: 100%;
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    max-width: 520px;
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(226, 232, 240, 0.9);
-    border-radius: 28px;
-    padding: 48px 36px;
-    box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.08), 0 10px 20px -5px rgba(255, 91, 0, 0.04);
+    border-radius: clamp(18px, 4vw, 24px);
+    padding: clamp(32px, 6vw, 48px) clamp(20px, 5vw, 36px);
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.07), 0 8px 16px -4px rgba(255, 91, 0, 0.04);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
-    animation: notfoundFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes notfoundFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+    text-align: center;
+    gap: clamp(14px, 2.5vw, 18px);
+    box-sizing: border-box;
 }
 
 /* Badge */
@@ -83,23 +74,25 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 16px;
+    padding: 5px 14px;
     background: rgba(255, 91, 0, 0.08);
     border: 1px solid rgba(255, 91, 0, 0.22);
     border-radius: 9999px;
     color: #ea580c;
-    font-size: 13px;
+    font-size: clamp(11px, 2.6vw, 12px);
     font-weight: 700;
     letter-spacing: 0.4px;
     text-transform: uppercase;
+    max-width: 100%;
 }
 
 .notfound-pulse-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
     background: #ff5b00;
     border-radius: 50%;
-    box-shadow: 0 0 8px rgba(255, 91, 0, 0.7);
+    box-shadow: 0 0 6px rgba(255, 91, 0, 0.8);
     animation: notfoundPulse 2s infinite ease-in-out;
 }
 
@@ -110,77 +103,71 @@
 
 /* 404 Large Number */
 .notfound-code {
-    font-size: clamp(5.2rem, 13vw, 8rem);
+    font-size: clamp(4.5rem, 16vw, 7.5rem);
     font-weight: 900;
     line-height: 0.95;
     letter-spacing: -2px;
-    background: linear-gradient(135deg, #ff5b00 0%, #ff782d 50%, #f43f5e 100%);
+    background: linear-gradient(135deg, #ff5b00 0%, #ff782d 55%, #f43f5e 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin: 4px 0 0;
-    filter: drop-shadow(0 8px 24px rgba(255, 91, 0, 0.2));
+    margin: 2px 0 0;
+    filter: drop-shadow(0 6px 18px rgba(255, 91, 0, 0.18));
     user-select: none;
 }
 
 /* Title & Description */
 .notfound-title {
-    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    font-size: clamp(1.4rem, 4.5vw, 1.85rem);
     font-weight: 800;
     color: #0f172a;
     margin: 0;
     letter-spacing: -0.4px;
+    line-height: 1.25;
 }
 
 .notfound-description {
-    font-size: 1rem;
+    font-size: clamp(0.92rem, 2.5vw, 1rem);
     line-height: 1.6;
     color: #64748b;
     margin: 0;
-    max-width: 440px;
+    max-width: 420px;
 }
 
-/* Action Button */
-.notfound-actions {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 10px;
-}
-
+/* Single Action Button */
 .notfound-btn-primary {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     background: linear-gradient(135deg, #ff5b00 0%, #ff782d 100%);
     color: #ffffff !important;
-    padding: 13px 32px;
+    padding: 13px 30px;
     border-radius: 12px;
-    font-size: 15px;
+    font-size: clamp(14px, 3vw, 15px);
     font-weight: 700;
     text-decoration: none;
     border: none;
     cursor: pointer;
-    box-shadow: 0 10px 24px -4px rgba(255, 91, 0, 0.35);
-    transition: all 0.25s ease;
+    box-shadow: 0 10px 22px -4px rgba(255, 91, 0, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    margin-top: 6px;
+    width: auto;
+    max-width: 100%;
 }
 
 .notfound-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 30px -4px rgba(255, 91, 0, 0.45);
+    box-shadow: 0 14px 28px -4px rgba(255, 91, 0, 0.45);
     filter: brightness(1.05);
 }
 
-@media (max-width: 640px) {
-    .notfound-main {
-        padding: 110px 16px 60px;
-    }
-    .notfound-card {
-        padding: 36px 20px;
-        border-radius: 20px;
-    }
+.notfound-btn-primary:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 480px) {
     .notfound-btn-primary {
         width: 100%;
-        justify-content: center;
     }
 }
