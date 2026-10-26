@@ -7,6 +7,23 @@ import p4 from "../assets/project/p6.png";
 import p5 from "../assets/project/p5.png";
 import p7 from "../assets/project/p7.png";
 
+export const formatLiveUrl = (url) => {
+    if (!url || typeof url !== 'string') return '';
+    let trimmed = url.trim();
+    if (!trimmed || trimmed === '#') return '';
+
+    // Strip leading ./ or / if it is followed by a domain or word (e.g. ./MyITRDesk.com -> MyITRDesk.com)
+    trimmed = trimmed.replace(/^\.?\/+/, '');
+
+    if (/^(https?:\/\/|\/\/)/i.test(trimmed)) {
+        return trimmed;
+    }
+    if (trimmed.startsWith('localhost') || trimmed.startsWith('127.0.0.1')) {
+        return `http://${trimmed}`;
+    }
+    return `https://${trimmed}`;
+};
+
 export const projectsData = [
     {
         title: 'Clothing E-commerce Design | Shopify',

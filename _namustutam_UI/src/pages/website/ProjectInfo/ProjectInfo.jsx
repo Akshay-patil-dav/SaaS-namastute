@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { projectsData } from '../../../data/projectsData';
+import { projectsData, formatLiveUrl } from '../../../data/projectsData';
 import { useLandingPage } from '../../../context/LandingPageContext';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
@@ -429,13 +429,14 @@ export default function ProjectInfo() {
                                 )}
                                 {project.liveLink && project.liveLink !== '#' && (
                                     <a
-                                        href={project.liveLink}
+                                        href={formatLiveUrl(project.liveLink)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="pi-img-live-btn"
+                                        title={`Visit live: ${project.title}`}
                                     >
                                         <span className="live-dot" />
-                                        <ExternalLink size={14} /> Open Live Site
+                                        <ExternalLink size={14} /> Live Preview
                                     </a>
                                 )}
                             </div>
@@ -728,13 +729,14 @@ export default function ProjectInfo() {
                             <div className="pi-price-actions">
                                 {project.liveLink && project.liveLink !== '#' ? (
                                     <a
-                                        href={project.liveLink}
+                                        href={formatLiveUrl(project.liveLink)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="pi-cta-primary"
+                                        title={`Visit live: ${project.title}`}
                                     >
                                         <ExternalLink size={16} />
-                                        <span>Open Live Preview</span>
+                                        <span>Live Preview</span>
                                     </a>
                                 ) : (
                                     <Link to="/contact" className="pi-cta-primary">

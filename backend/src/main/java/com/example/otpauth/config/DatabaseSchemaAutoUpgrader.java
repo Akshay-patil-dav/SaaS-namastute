@@ -349,6 +349,29 @@ public class DatabaseSchemaAutoUpgrader implements ApplicationRunner, SmartIniti
                 log.debug("[DatabaseSchemaAutoUpgrader] Single-column constraint check: {}", e.getMessage());
             }
         }
+
+        // 4. Upgrade blog_posts text/URL/metadata columns to TEXT (avoids character varying(500) overflow)
+        try {
+            Set<String> blogCols = getExistingColumns("blog_posts");
+            if (!blogCols.isEmpty()) {
+                String[] textCols = {"image_url", "author_avatar", "tags", "title", "excerpt", "seo_title", "seo_description", "cover_color"};
+                for (String col : textCols) {
+                    if (blogCols.contains(col)) {
+                        try {
+                            String alterSql = isPostgres
+                                    ? "ALTER TABLE blog_posts ALTER COLUMN " + col + " TYPE TEXT"
+                                    : "ALTER TABLE blog_posts MODIFY COLUMN " + col + " LONGTEXT";
+                            jdbcTemplate.execute(alterSql);
+                        } catch (Exception e) {
+                            log.debug("[DatabaseSchemaAutoUpgrader] Could not alter blog_posts.{} to TEXT: {}", col, e.getMessage());
+                        }
+                    }
+                }
+                actionsTaken.add("Ensured blog_posts text and URL columns are of type TEXT");
+            }
+        } catch (Exception e) {
+            log.debug("[DatabaseSchemaAutoUpgrader] Blog posts column upgrade check: {}", e.getMessage());
+        }
     }
 
     /**
@@ -1384,25 +1407,25 @@ public class DatabaseSchemaAutoUpgrader implements ApplicationRunner, SmartIniti
         // 40. blog_posts
         Map<String, String> blogPosts = new LinkedHashMap<>();
         blogPosts.put("id", idCol);
-        blogPosts.put("title", "VARCHAR(500) NOT NULL");
+        blogPosts.put("title", txt + " NOT NULL");
         blogPosts.put("slug", "VARCHAR(255) NOT NULL");
-        blogPosts.put("excerpt", "VARCHAR(2000)");
+        blogPosts.put("excerpt", txt);
         blogPosts.put("content", txt);
         blogPosts.put("category", "VARCHAR(100) DEFAULT 'Software'");
         blogPosts.put("author", "VARCHAR(150) DEFAULT 'Akshay Patil'");
         blogPosts.put("author_role", "VARCHAR(150) DEFAULT 'Founder & CTO'");
-        blogPosts.put("author_avatar", "VARCHAR(500)");
-        blogPosts.put("image_url", "VARCHAR(500)");
-        blogPosts.put("cover_color", "VARCHAR(255) DEFAULT 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'");
+        blogPosts.put("author_avatar", txt);
+        blogPosts.put("image_url", txt);
+        blogPosts.put("cover_color", txt);
         blogPosts.put("cover_emoji", "VARCHAR(50) DEFAULT '📦'");
         blogPosts.put("read_time", "VARCHAR(50) DEFAULT '5 min'");
-        blogPosts.put("tags", "VARCHAR(500)");
+        blogPosts.put("tags", txt);
         blogPosts.put("visibility", "VARCHAR(50) DEFAULT 'Visible'");
         blogPosts.put("theme_template", "VARCHAR(100)");
         blogPosts.put("views_count", "BIGINT DEFAULT 0");
         blogPosts.put("likes_count", "BIGINT DEFAULT 0");
-        blogPosts.put("seo_title", "VARCHAR(500)");
-        blogPosts.put("seo_description", "VARCHAR(1000)");
+        blogPosts.put("seo_title", txt);
+        blogPosts.put("seo_description", txt);
         blogPosts.put("user_id", "BIGINT");
         blogPosts.put("created_at", dt);
         blogPosts.put("updated_at", dt);

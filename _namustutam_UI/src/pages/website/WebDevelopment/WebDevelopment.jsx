@@ -10,7 +10,7 @@ import {
     Globe, Zap, Shield, BarChart2, Layers, GitBranch, Star,
     MessageSquare, Clock, Cpu, TrendingUp, Package, Users, Lock
 } from 'lucide-react';
-import { projectsData } from '../../../data/projectsData';
+import { projectsData, formatLiveUrl } from '../../../data/projectsData';
 import './WebDevelopment.css';
 import { useCurrency } from '../../../hooks/useCurrency';
 
@@ -409,32 +409,38 @@ export default function WebDevelopment() {
 
                     <div className="wd-slider-wrap">
                         <div className="wd-slider" ref={sliderRef}>
-                            {showcaseProjects.map((project, i) => (
-                                <div
-                                    key={i}
-                                    className="wd-project-card"
-                                    onClick={() => navigate('/project-info/' + project.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''))}
-                                >
-                                    <div className="wd-project-img-wrap">
-                                        <div className="wd-project-cat">{project.category}</div>
-                                        <img
-                                            src={project.img}
-                                            alt={project.title}
-                                            className="wd-project-img"
-                                            onError={(e) => { e.target.style.display = 'none'; }}
-                                        />
-                                        <div className="wd-project-overlay">
-                                            <button className="wd-view-btn">
-                                                View Case Study <ExternalLink size={14} />
-                                            </button>
+                            {showcaseProjects.map((project, i) => {
+                                const slug = (project.title || '').toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+                                return (
+                                    <div
+                                        key={i}
+                                        className="wd-project-card"
+                                        onClick={() => navigate('/project-info/' + slug)}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/project-info/' + slug); }}
+                                    >
+                                        <div className="wd-project-img-wrap">
+                                            <div className="wd-project-cat">{project.category}</div>
+                                            <img
+                                                src={project.img}
+                                                alt={project.title}
+                                                className="wd-project-img"
+                                                onError={(e) => { e.target.style.display = 'none'; }}
+                                            />
+                                            <div className="wd-project-overlay">
+                                                <button className="wd-view-btn">
+                                                    View Case Study <ExternalLink size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="wd-project-info">
+                                            <h3>{project.title}</h3>
+                                            <span className="wd-project-author">{project.author}</span>
                                         </div>
                                     </div>
-                                    <div className="wd-project-info">
-                                        <h3>{project.title}</h3>
-                                        <span className="wd-project-author">{project.author}</span>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 

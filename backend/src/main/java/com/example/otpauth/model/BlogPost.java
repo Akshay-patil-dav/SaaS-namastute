@@ -11,13 +11,13 @@ public class BlogPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String title;
 
     @Column(unique = true, nullable = false, length = 255)
     private String slug;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String excerpt;
 
     @Column(columnDefinition = "TEXT")
@@ -32,13 +32,13 @@ public class BlogPost {
     @Column(length = 150)
     private String authorRole = "Founder & CTO";
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String authorAvatar;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     private String coverColor = "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)";
 
     @Column(length = 50)
@@ -47,7 +47,7 @@ public class BlogPost {
     @Column(length = 50)
     private String readTime = "5 min";
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String tags;
 
     @Column(length = 50)
@@ -62,10 +62,10 @@ public class BlogPost {
     @Column(name = "likes_count")
     private Long likesCount = 0L;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String seoTitle;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String seoDescription;
 
     @Column(name = "user_id")

@@ -7,21 +7,7 @@ const LandingPageContext = createContext(null);
 
 const cleanLocalLinks = (data) => {
     if (!data) return data;
-    // Primary: https://namustutam.vercel.app/ or window.location.origin; Fallback: http://localhost:4000
-    const primaryOrigin = (typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1'))
-        ? window.location.origin
-        : (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-            ? window.location.origin
-            : 'https://namustutam.vercel.app');
-
-    if (Array.isArray(data.projects)) {
-        data.projects = data.projects.map(p => ({
-            ...p,
-            liveLink: (p.liveLink && (p.liveLink.includes('namustutam.com') || p.liveLink.includes('namustutamsaas.vercel.app')))
-                ? primaryOrigin
-                : (p.liveLink || primaryOrigin)
-        }));
-    }
+    // Preserve user-entered project liveLinks exactly as entered in Admin
     return data;
 };
 

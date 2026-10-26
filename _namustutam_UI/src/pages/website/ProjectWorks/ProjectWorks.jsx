@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { projectsData } from '../../../data/projectsData';
+import { projectsData, formatLiveUrl } from '../../../data/projectsData';
 import { useLandingPage } from '../../../context/LandingPageContext';
-import { Eye, Info, X, ChevronLeft, ChevronRight, ShoppingCart, Briefcase, Cloud, Layers, ArrowRight, Code2 } from 'lucide-react';
+import { Eye, Info, X, ChevronLeft, ChevronRight, ShoppingCart, Briefcase, Cloud, Layers, ArrowRight, Code2, ExternalLink } from 'lucide-react';
 import { FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs } from 'react-icons/fa';
 import { SiMongodb, SiTypescript, SiExpress, SiPostgresql } from 'react-icons/si';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
@@ -107,6 +107,9 @@ export default function ProjectWorks() {
                             ? project.techStack.slice(0, 3).map(t => (typeof t === 'string' ? t : t?.name)).filter(Boolean)
                             : [];
 
+                        const isLive = project.liveLink && project.liveLink !== '#';
+                        const liveUrl = isLive ? formatLiveUrl(project.liveLink) : null;
+
                         return (
                             <div
                                 key={project.id || `project-${i}`}
@@ -141,9 +144,9 @@ export default function ProjectWorks() {
                                         <span className="project-category-pill">
                                             {project.filter || project.category || 'Web App'}
                                         </span>
-                                        {project.liveLink && project.liveLink !== '#' && (
+                                        {liveUrl && (
                                             <a
-                                                href={project.liveLink}
+                                                href={liveUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="project-live-btn"

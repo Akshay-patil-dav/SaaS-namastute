@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Code2, Smartphone, Server, Database, Cloud, ShieldCheck, MonitorPlay, Component, ArrowRight, Star } from 'lucide-react';
+import { Code2, Smartphone, Server, Database, Cloud, ShieldCheck, MonitorPlay, Component, ArrowRight, Star, ExternalLink } from 'lucide-react';
 import '../BlogDetail/LandingPage.css';
 import './ITPortfolio.css';
 import '../ProjectWorks/ProjectWorks.css';
-import { projectsData } from '../../../data/projectsData';
+import { projectsData, formatLiveUrl } from '../../../data/projectsData';
 import { useLandingPage } from '../../../context/LandingPageContext';
 import WebsiteNavbar from '../../../components/common/WebsiteNavbar/WebsiteNavbar';
 import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFooter';
@@ -280,6 +280,9 @@ export default function ITPortfolio() {
                             const techList = Array.isArray(p.techStack)
                                 ? p.techStack.slice(0, 3).map(t => (typeof t === 'string' ? t : t?.name)).filter(Boolean)
                                 : [];
+                            const isLive = p.liveLink && p.liveLink !== '#';
+                            const liveUrl = isLive ? formatLiveUrl(p.liveLink) : null;
+
                             return (
                                 <div
                                     key={p.id || `project-${i}`}
@@ -314,9 +317,9 @@ export default function ITPortfolio() {
                                             <span className="project-category-pill">
                                                 {p.filter || p.category || 'Web App'}
                                             </span>
-                                            {p.liveLink && p.liveLink !== '#' && (
+                                            {liveUrl && (
                                                 <a
-                                                    href={p.liveLink}
+                                                    href={liveUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="project-live-btn"
