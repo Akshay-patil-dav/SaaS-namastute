@@ -7,7 +7,7 @@
  * 3. Custom HTTP Gateway (UltraMsg, Maytapi, GreenAPI, Baileys Webhook)
  * 4. High-compatibility Direct Web / Mobile Dispatch (Popup-safe anchor click)
  */
-import { sendWhatsAppWebMessage } from './whatsappWebService';
+import { sendWhatsAppWebMessage, parseWhatsAppError } from './whatsappWebService';
 
 /**
  * Default Reference Meta Cloud API Credentials (From verified Meta Developer App)
@@ -270,7 +270,7 @@ export const sendWhatsAppMessage = async ({
             if (forceWeb || settings.whatsappFallbackToWeb === 'true') {
                 console.warn('[WhatsAppService] Falling back to WhatsApp Click-to-Chat URL...');
             } else {
-                throw new Error(webErr.response?.data?.error || webErr.message || 'WhatsApp Web message dispatch failed.');
+                throw new Error(parseWhatsAppError(webErr, 'WhatsApp Web message dispatch failed.'));
             }
         }
     }

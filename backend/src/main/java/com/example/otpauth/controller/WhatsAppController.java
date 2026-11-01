@@ -311,6 +311,9 @@ public class WhatsAppController {
             syncTenantSetting(tenantId, "whatsappLastActiveAt", LocalDateTime.now().toString());
         } else {
             errorMsg = resp.getBody();
+            if (errorMsg != null && errorMsg.length() > 900) {
+                errorMsg = errorMsg.substring(0, 900);
+            }
         }
 
         try {
@@ -349,7 +352,10 @@ public class WhatsAppController {
                     .body(resp.body());
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ResponseEntity.status(503).body("{\"error\":\"WhatsApp service unavailable: " + e.getMessage() + "\"}");
+            String cleanMsg = e.getMessage() != null ? e.getMessage().replace("\"", "'").replace("\n", " ") : "Connection refused";
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"error\":\"WhatsApp service on port 3005 is unavailable: " + cleanMsg + "\"}");
         }
     }
 
@@ -368,7 +374,10 @@ public class WhatsAppController {
                     .body(resp.body());
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ResponseEntity.status(503).body("{\"error\":\"WhatsApp service unavailable: " + e.getMessage() + "\"}");
+            String cleanMsg = e.getMessage() != null ? e.getMessage().replace("\"", "'").replace("\n", " ") : "Connection refused";
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"error\":\"WhatsApp service on port 3005 is unavailable: " + cleanMsg + "\"}");
         }
     }
 
@@ -387,7 +396,10 @@ public class WhatsAppController {
                     .body(resp.body());
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ResponseEntity.status(503).body("{\"error\":\"WhatsApp service unavailable: " + e.getMessage() + "\"}");
+            String cleanMsg = e.getMessage() != null ? e.getMessage().replace("\"", "'").replace("\n", " ") : "Connection refused";
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"error\":\"WhatsApp service on port 3005 is unavailable: " + cleanMsg + "\"}");
         }
     }
 

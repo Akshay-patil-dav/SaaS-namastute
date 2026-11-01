@@ -140,7 +140,18 @@ export function createWhatsAppRouter(waManager) {
             const result = await waManager.sendMessage(sessionId, to.trim(), message.trim());
             res.json({ success: true, ...result });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            const msg = err.message || 'Failed to send WhatsApp message.';
+            const isClientState = msg.includes('not connected') ||
+                                  msg.includes('not registered') ||
+                                  msg.includes('Invalid') ||
+                                  msg.includes('Please link') ||
+                                  msg.includes('does not exist') ||
+                                  msg.includes('initializing') ||
+                                  msg.includes('refreshing') ||
+                                  msg.includes('detached Frame');
+            const statusCode = isClientState ? 400 : 500;
+            console.error(`[WhatsApp Route] Send failed (${statusCode}):`, msg);
+            res.status(statusCode).json({ error: msg });
         }
     });
 

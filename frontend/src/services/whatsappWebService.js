@@ -161,6 +161,66 @@ export async function sendWhatsAppWebMessage({ to, message, sessionId = '', trig
     return res.data;
 }
 
+/**
+ * Unwraps and normalizes any WhatsApp-related API error into a clear, actionable human message.
+ * Shields users from raw "Internal Server Error" strings.
+ */
+export function parseWhatsAppError(err, defaultMsg = 'Failed to send WhatsApp message.') {
+    if (!err) return defaultMsg;
+
+    // Check if network / connection error
+    if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
+        return 'Network connection error: Unable to reach the backend server. Please verify your internet or local server.';
+    }
+
+    const status = err.response?.status;
+    const data = err.response?.data;
+
+    // 503 or port 3005 service down
+    if (status === 503 || (typeof data?.error === 'string' && data.error.includes('unavailable'))) {
+        return 'WhatsApp engine service on port 3005 is offline. Please start it using "npm start" in the whatsapp-service/ folder.';
+    }
+
+    let extracted = '';
+    if (typeof data === 'string') {
+        try {
+            const parsed = JSON.parse(data);
+            extracted = parsed.error || parsed.message || '';
+        } catch {
+            // HTML error page or raw text
+            if (data.includes('Internal Server Error')) {
+                extracted = '';
+            } else if (data.length < 300) {
+                extracted = data;
+            }
+        }
+    } else if (data && typeof data === 'object') {
+        if (data.error && data.error !== 'Internal Server Error') {
+            extracted = data.error;
+        } else if (data.message && data.message !== 'Internal Server Error') {
+            extracted = data.message;
+        } else if (data.error) {
+            extracted = data.error;
+        }
+    }
+
+    if (!extracted && err.message) {
+        extracted = err.message;
+    }
+
+    // Handle frame detachment / page transition gracefully
+    if (extracted.includes('detached Frame') || extracted.includes('Execution context was destroyed') || extracted.includes('Target closed')) {
+        return 'WhatsApp engine was refreshing its internal page frame. Connection has been re-synchronized. Please click "Send Live Test Message" once more.';
+    }
+
+    // Shield from generic "Internal Server Error"
+    if (!extracted || extracted === 'Internal Server Error' || extracted.includes('status code 500')) {
+        return 'WhatsApp service encountered an issue while dispatching. Please ensure your device is linked in "Device Pairing & QR" and the recipient number is registered on WhatsApp.';
+    }
+
+    return extracted;
+}
+
 export default {
     getWhatsAppServiceStatus,
     getWhatsAppSessions,
@@ -170,5 +230,6 @@ export default {
     getWhatsAppSessionStatus,
     getWhatsAppSessionQr,
     logoutWhatsAppSession,
-    sendWhatsAppWebMessage
+    sendWhatsAppWebMessage,
+    parseWhatsAppError
 };

@@ -98,7 +98,14 @@ export class WhatsAppManager extends EventEmitter {
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            '--disable-gpu'
+            '--disable-gpu',
+            '--disable-features=IsolateOrigins,site-per-process',
+            '--disable-site-isolation-trials',
+            '--disable-web-security',
+            '--disable-blink-features=AutomationControlled',
+            '--js-flags=--max-old-space-size=1024',
+            '--renderer-process-limit=2',
+            '--disable-extensions'
         ];
 
         console.log(`[WhatsApp Manager] Initializing session [${sessionId}]...`);
@@ -117,8 +124,7 @@ export class WhatsAppManager extends EventEmitter {
                 executablePath: chromeExe || undefined,
             },
             webVersionCache: {
-                type: 'remote',
-                remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.3000.1015901744-alpha/index.html',
+                type: 'none',
             },
         });
 
@@ -259,6 +265,43 @@ export class WhatsAppManager extends EventEmitter {
     }
 
     /**
+     * Execute an operation with automatic retry if Puppeteer encounters detached frames or navigation
+     */
+    async _executeWithFrameRetry(session, operationName, fn, maxRetries = 3, retryDelayMs = 2000) {
+        let lastErr = null;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                return await fn();
+            } catch (err) {
+                lastErr = err;
+                const errMsg = err?.message || String(err);
+                const isFrameDetached = errMsg.includes('detached Frame') ||
+                                        errMsg.includes('Execution context was destroyed') ||
+                                        errMsg.includes('Target closed') ||
+                                        errMsg.includes('Session closed') ||
+                                        errMsg.includes('Protocol error');
+
+                if (isFrameDetached) {
+                    console.warn(`[WhatsApp Manager] ${operationName} encountered detached frame/context (attempt ${attempt}/${maxRetries}): ${errMsg}`);
+                    if (attempt < maxRetries) {
+                        console.log(`[WhatsApp Manager] Waiting ${retryDelayMs}ms for WhatsApp Web frame to re-attach and settle...`);
+                        await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+                        // Re-inject WWebJS into new frame if page is accessible
+                        try {
+                            if (session.client?.pupPage && !session.client.pupPage.isClosed()) {
+                                await session.client.inject().catch(() => {});
+                            }
+                        } catch {}
+                        continue;
+                    }
+                }
+                throw err;
+            }
+        }
+        throw lastErr;
+    }
+
+    /**
      * Send a WhatsApp message
      * @param {string} sessionId
      * @param {string} to Phone number with country code (e.g. 919876543210)
@@ -278,9 +321,12 @@ export class WhatsAppManager extends EventEmitter {
 
         const chatId = to.includes('@') ? to : `${cleanDigits}@c.us`;
 
-        // Check WhatsApp registration
+        // Check WhatsApp registration (with frame retry wrapper)
         try {
-            const isRegistered = await session.client.isRegisteredUser(chatId);
+            const isRegistered = await this._executeWithFrameRetry(session, 'isRegisteredUser', async () => {
+                return await session.client.isRegisteredUser(chatId);
+            }, 2, 1500);
+
             if (isRegistered === false) {
                 throw new Error(`The phone number +${cleanDigits} is not registered on WhatsApp.`);
             }
@@ -292,16 +338,29 @@ export class WhatsAppManager extends EventEmitter {
             console.warn(`[WhatsApp Manager] Registration pre-check skipped: ${checkErr.message}`);
         }
 
-        const msg = await session.client.sendMessage(chatId, message);
-        const messageId = msg?.id?._serialized || msg?.id?.id || (typeof msg?.id === 'string' ? msg.id : `wamid_${Date.now()}`);
-        console.log(`[WhatsApp Manager] Message successfully sent to ${chatId}. Message ID: ${messageId}`);
+        try {
+            const msg = await this._executeWithFrameRetry(session, 'sendMessage', async () => {
+                return await session.client.sendMessage(chatId, message);
+            }, 3, 2000);
 
-        return {
-            messageId,
-            to: chatId,
-            timestamp: msg?.timestamp || Math.floor(Date.now() / 1000),
-            status: 'sent'
-        };
+            const messageId = msg?.id?._serialized || msg?.id?.id || (typeof msg?.id === 'string' ? msg.id : `wamid_${Date.now()}`);
+            console.log(`[WhatsApp Manager] Message successfully sent to ${chatId}. Message ID: ${messageId}`);
+
+            return {
+                messageId,
+                to: chatId,
+                timestamp: msg?.timestamp || Math.floor(Date.now() / 1000),
+                status: 'sent'
+            };
+        } catch (sendErr) {
+            console.error(`[WhatsApp Manager] Puppeteer sendMessage failed:`, sendErr.message);
+            if (sendErr.message.includes('detached Frame') || sendErr.message.includes('Execution context was destroyed')) {
+                console.warn(`[WhatsApp Manager] Frame detached for session [${sessionId}]. Re-synchronizing session from disk...`);
+                this.getOrCreateSession(sessionId).catch(() => {});
+                throw new Error(`WhatsApp Web session was refreshing internal page context. The connection has been auto-recovered. Please click "Send" once more.`);
+            }
+            throw new Error(`WhatsApp Web dispatch failed: ${sendErr.message}`);
+        }
     }
 
     /**

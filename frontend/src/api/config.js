@@ -203,8 +203,10 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Fallback logic: if network error or 5xx error, switch to fallbacks
-    if (error.code === 'ERR_NETWORK' || (error.response && error.response.status >= 500)) {
+    const isWhatsAppReq = originalRequest?.url?.includes('/whatsapp') || originalRequest?.baseURL?.includes('/whatsapp');
+
+    // Fallback logic: if network error or 5xx error, switch to fallbacks (never for local whatsapp requests)
+    if (!isWhatsAppReq && (error.code === 'ERR_NETWORK' || (error.response && error.response.status >= 500))) {
       originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
 
       let fallbackApiUrl = null;

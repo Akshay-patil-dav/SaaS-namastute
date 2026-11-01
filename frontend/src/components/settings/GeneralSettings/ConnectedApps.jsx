@@ -4,18 +4,10 @@ import {
     X,
     ExternalLink,
     RefreshCw,
-    Download,
     Send,
-    Search,
     ShieldCheck,
     Activity,
     Zap,
-    Database,
-    MessageSquare,
-    Calendar as CalendarIcon,
-    ShoppingBag,
-    Bell,
-    Layers,
     AlertCircle,
     Info,
     Smartphone,
@@ -24,11 +16,17 @@ import {
     LogOut,
     PhoneCall,
     UserCheck,
-    Clock
+    Clock,
+    MessageSquare,
+    Sliders,
+    Check,
+    Copy,
+    Terminal,
+    Sparkles,
+    FileText
 } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
 import { useAuth } from '../../../context/AuthContext';
-import apiClient, { API, ENV } from '@/api/config';
 import {
     sendWhatsAppMessage,
     formatWhatsAppPhone,
@@ -47,63 +45,17 @@ import {
     sendWhatsAppWebMessage,
     getWhatsAppServiceStatus,
     getWhatsAppLogs,
-    getWhatsAppConfig
+    getWhatsAppConfig,
+    parseWhatsAppError
 } from '../../../services/whatsappWebService';
 import './connected-apps.css';
 
 // ── App Brand Logos (Clean SVGs) ──────────────────────────────
 const Logos = {
     whatsapp: (
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" color="#25D366">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" color="#25D366">
             <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.4-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.44 1.03 2.61c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z" />
         </svg>
-    ),
-    googleCalendar: (
-        <svg viewBox="0 0 24 24" width="26" height="26">
-            <path fill="#4285F4" d="M19.5 3h-15C3.67 3 3 3.67 3 4.5v15c0 .83.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5v-15c0-.83-.67-1.5-1.5-1.5z" />
-            <path fill="#FFF" d="M8 8.5h8v2H8zm0 3.5h8v2H8zm0 3.5h5v2H8z" />
-            <circle fill="#EA4335" cx="17.5" cy="5.5" r="1.5" />
-        </svg>
-    ),
-    slack: (
-        <svg viewBox="0 0 24 24" width="26" height="26">
-            <path fill="#E01E5A" d="M5.5 10.5a2 2 0 1 0 2-2H5.5zm0 1.5H8v2.5a2 2 0 1 1-2.5-2.5z" />
-            <path fill="#36C5F0" d="M10.5 5.5a2 2 0 1 0-2 2V5.5zm1.5 0V8h2.5a2 2 0 1 0-2.5-2.5z" />
-            <path fill="#2EB67D" d="M18.5 13.5a2 2 0 1 0-2 2h2zm0-1.5H16V9.5a2 2 0 1 0 2.5 2.5z" />
-            <path fill="#ECB22E" d="M13.5 18.5a2 2 0 1 0 2-2v2zm-1.5 0V16H9.5a2 2 0 1 0 2.5 2.5z" />
-        </svg>
-    ),
-    discord: (
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="#5865F2">
-            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-        </svg>
-    ),
-    zapier: (
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="#FF4A00">
-            <path d="M12 0L8.8 8.8H0l6.8 5.6L4 24l8-6 8 6-2.8-9.6 6.8-5.6h-8.8z" />
-        </svg>
-    ),
-    meta: (
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="#0668E1">
-            <path d="M16.99 4C14.7 4 12.87 5.15 12 6.55 11.13 5.15 9.3 4 7.01 4 3.14 4 0 7.21 0 11.17c0 4.88 4.29 9.39 11.53 12.65.29.13.65.13.94 0C19.71 20.56 24 16.05 24 11.17 24 7.21 20.86 4 16.99 4zm-4.99 15.93C5.9 16.89 2.2 13.2 2.2 11.17c0-2.74 2.16-4.97 4.81-4.97 2.12 0 3.73 1.48 4.14 3.55h1.7c.41-2.07 2.02-3.55 4.14-3.55 2.65 0 4.81 2.23 4.81 4.97 0 2.03-3.7 5.72-9.8 8.76z" />
-        </svg>
-    ),
-    woocommerce: (
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="#96588A">
-            <path d="M2.2 5.5h19.6v13H2.2z" rx="3" fill="#96588A" />
-            <path d="M5.5 8.5c.8 3.5 1.7 5 3 5 .9 0 1.6-.8 2.2-2.3l1.5-3.5h2l-2.4 5.8c-.8 2-1.9 3-3.3 3-1.8 0-3.1-1.6-4.2-6.2l1.2-1.8zm11 0c.8 3.5 1.7 5 3 5 .9 0 1.6-.8 2.2-2.3l1.5-3.5h2l-2.4 5.8c-.8 2-1.9 3-3.3 3-1.8 0-3.1-1.6-4.2-6.2l1.2-1.8z" fill="#FFF" />
-        </svg>
-    ),
-    shopify: (
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="#95BF47">
-            <path d="M18.8 4.2c-.1-.1-.3-.1-.4 0l-1.9.6-.9-2.5c-.1-.3-.4-.5-.7-.4L10.3 3C10.1 2.3 9.4 1.8 8.7 1.8c-.2 0-.4 0-.6.1L4.8 3.1c-.3.1-.5.4-.5.7v.1l1.5 17.5c.1.7.6 1.2 1.3 1.2h9.7c.7 0 1.2-.5 1.3-1.2l1.8-15.5c.1-.4-.2-.7-.5-.7zm-9.3-.9c.4 0 .8.2 1 .5l-2.5.8c.2-.8.8-1.3 1.5-1.3z" />
-        </svg>
-    ),
-    cloudBackup: (
-        <div style={{ color: '#0ea5e9' }}><Database size={26} /></div>
-    ),
-    smsGateway: (
-        <div style={{ color: '#8b5cf6' }}><Smartphone size={26} /></div>
     )
 };
 
@@ -111,16 +63,17 @@ export const ConnectedApps = () => {
     const { settings, loading, saving, handleChange, saveSettings } = useSettings();
     const { user } = useAuth();
 
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('ALL');
-    const [activeModalApp, setActiveModalApp] = useState(null);
+    // ── Active Navigation Tab ──────────────────────────────────
+    const [activeTab, setActiveTab] = useState('pairing'); // 'pairing' | 'automation' | 'template' | 'tester' | 'logs'
+
+    // ── Test & Notification State ──────────────────────────────
     const [testOutput, setTestOutput] = useState('');
     const [isTesting, setIsTesting] = useState(false);
     const [toastMessage, setToastMessage] = useState(null);
     const [testPhone, setTestPhone] = useState('');
-    const [metaDemoType, setMetaDemoType] = useState('template'); // 'template' (hello_world) | 'invoice'
+    const [copiedToken, setCopiedToken] = useState(null);
 
-    // ── WhatsApp Web.js Session State (Multi-Tenant & RBAC) ────────────────
+    // ── WhatsApp Web.js Session State (Multi-Tenant & RBAC) ────
     const [waWebStatus, setWaWebStatus] = useState('not_initialized'); // 'not_initialized' | 'initializing' | 'qr' | 'authenticated' | 'ready' | 'disconnected'
     const [waWebQr, setWaWebQr] = useState(null);
     const [waWebInfo, setWaWebInfo] = useState(null);
@@ -131,13 +84,29 @@ export const ConnectedApps = () => {
 
     // Audit logs state
     const [waLogs, setWaLogs] = useState([]);
-    const [showWaLogs, setShowWaLogs] = useState(false);
     const [loadingWaLogs, setLoadingWaLogs] = useState(false);
+
+    // Textarea ref for template variable injection
+    const templateTextareaRef = useRef(null);
 
     // Multi-tenant & RBAC context
     const tenantId = user?.activeProjectId || user?.id || 'default';
     const tenantSessionId = `tenant_${tenantId}`;
     const isOwnerOrAdmin = !user?.activeProjectId || user.activeProjectId === user.id || user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+
+    // Show toast notifications
+    const showToast = (msg, type = 'success') => {
+        setToastMessage({ text: msg, type });
+        setTimeout(() => setToastMessage(null), 3500);
+    };
+
+    // Copy to clipboard helper
+    const handleCopy = (text, id) => {
+        navigator.clipboard.writeText(text);
+        setCopiedToken(id);
+        setTimeout(() => setCopiedToken(null), 2000);
+        showToast('Copied to clipboard!', 'info');
+    };
 
     // Fetch tenant message audit logs from database
     const loadWaLogs = useCallback(async () => {
@@ -148,12 +117,13 @@ export const ConnectedApps = () => {
                 setWaLogs(res.data);
             }
         } catch {
+            // Silently catch background errors
         } finally {
             setLoadingWaLogs(false);
         }
     }, []);
 
-    // WhatsApp Web Session status polling when modal is open
+    // WhatsApp Web Session status check & polling
     const checkWaWebStatus = useCallback(async (isManual = false) => {
         if (isManual) setWaWebLoading(true);
         try {
@@ -199,7 +169,7 @@ export const ConnectedApps = () => {
         } finally {
             if (isManual) setWaWebLoading(false);
         }
-    }, [settings.whatsappSessionId, tenantSessionId, handleChange, loadWaLogs]);
+    }, [settings.whatsappSessionId, tenantSessionId, settings.whatsappConnected, settings.whatsappPhone, handleChange, loadWaLogs]);
 
     const handleStartWaWeb = async () => {
         setWaWebActionLoading(true);
@@ -209,7 +179,7 @@ export const ConnectedApps = () => {
             if (res.success) {
                 setWaWebStatus(res.data?.status || 'initializing');
                 if (res.data?.qr) setWaWebQr(res.data.qr);
-                showToast('Starting WhatsApp Web engine... QR will appear shortly.', 'info');
+                showToast('Starting WhatsApp Web engine... QR code will appear shortly.', 'info');
                 setTimeout(() => checkWaWebStatus(), 1200);
             } else {
                 showToast(res.error || 'Failed to start WhatsApp Web session.', 'error');
@@ -222,7 +192,7 @@ export const ConnectedApps = () => {
     };
 
     const handleLogoutWaWeb = async () => {
-        if (!window.confirm('Disconnect this WhatsApp Web session? You will need to scan the QR code again.')) return;
+        if (!window.confirm('Disconnect this WhatsApp Web session? You will need to scan the QR code again to reconnect.')) return;
         setWaWebActionLoading(true);
         try {
             const sid = settings.whatsappSessionId || tenantSessionId;
@@ -231,7 +201,7 @@ export const ConnectedApps = () => {
             setWaWebQr(null);
             setWaWebInfo(null);
             handleChange('whatsappConnected', 'false');
-            showToast('WhatsApp Web session disconnected.');
+            showToast('WhatsApp Web session disconnected successfully.');
         } catch (err) {
             showToast('Failed to disconnect: ' + err.message, 'error');
         } finally {
@@ -253,13 +223,25 @@ export const ConnectedApps = () => {
             return;
         }
 
-        if (waWebHealth === false) {
+        if (waWebHealth === false || waWebStatus === 'offline') {
             setTestOutput({
                 error: true,
                 type: 'error',
-                message: 'WhatsApp engine service on port 3005 is offline. Start the service (npm start in whatsapp-service/) to send live messages.'
+                message: 'WhatsApp engine microservice on port 3005 is offline. Please start the service (npm start in whatsapp-service/) to send live messages.'
             });
-            showToast('WhatsApp engine is offline. Please start port 3005 service first.', 'error');
+            showToast('WhatsApp engine is offline. Start port 3005 service first.', 'error');
+            return;
+        }
+
+        if (waWebStatus !== 'ready') {
+            const statusLabel = waWebStatus === 'qr' ? 'waiting for QR scan' : (waWebStatus || 'not linked');
+            setTestOutput({
+                error: true,
+                type: 'error',
+                notLinked: true,
+                message: `WhatsApp is not linked yet (status: ${statusLabel}). Please head to the "Device Pairing & QR" tab and link your WhatsApp device before sending messages.`
+            });
+            showToast('Please link your WhatsApp device in the Device Pairing tab first.', 'warning');
             return;
         }
 
@@ -281,2692 +263,1273 @@ export const ConnectedApps = () => {
                 success: true,
                 phone: cleanPhone,
                 messageId: res.messageId,
-                note: `Dispatched directly from your linked WhatsApp! Message ID: ${res.messageId || 'delivered'}`
+                note: `Dispatched directly from your linked WhatsApp! (Message ID: ${res.messageId || 'delivered'})`
             });
-            showToast(`Test message sent to +${cleanPhone} via WhatsApp Web!`);
+            showToast(`Test message dispatched to +${cleanPhone}!`);
             loadWaLogs();
         } catch (err) {
+            const parsedMsg = parseWhatsAppError(err, 'Failed to send via WhatsApp Web.');
+            const isNotLinked = parsedMsg.includes('not connected') || parsedMsg.includes('Please link') || waWebStatus !== 'ready';
             setTestOutput({
                 error: true,
                 type: 'error',
-                message: err.response?.data?.error || err.message || 'Failed to send via WhatsApp Web. Please ensure WhatsApp is linked.'
+                notLinked: isNotLinked,
+                message: parsedMsg
             });
-            showToast('Send failed: ' + (err.response?.data?.error || err.message), 'error');
+            showToast('Send failed: ' + parsedMsg, 'error');
+            setTimeout(() => checkWaWebStatus(), 1500);
         } finally {
             setIsTesting(false);
         }
     };
 
+    // Master enable / disable toggle
+    const handleToggleMaster = async () => {
+        const next = settings.whatsappConnected === 'false' ? 'true' : 'false';
+        handleChange('whatsappConnected', next);
+        await saveSettings({ whatsappConnected: next });
+        showToast(`WhatsApp integration is now ${next === 'true' ? 'Enabled' : 'Disabled'}.`);
+    };
+
+    // Save all WhatsApp configuration settings
+    const handleSaveAll = async () => {
+        const payload = {
+            whatsappConnected: settings.whatsappConnected !== 'false' ? 'true' : 'false',
+            whatsappPhone: settings.whatsappPhone || '',
+            whatsappCountryCode: settings.whatsappCountryCode || '91',
+            whatsappMode: settings.whatsappMode || 'whatsapp_web',
+            whatsappBackgroundAutoSend: settings.whatsappBackgroundAutoSend || 'true',
+            whatsappBackgroundProvider: settings.whatsappBackgroundProvider || 'whatsapp_web',
+            whatsappSessionId: settings.whatsappSessionId || tenantSessionId,
+            whatsappAutoSendInvoice: settings.whatsappAutoSendInvoice !== 'false' ? 'true' : 'false',
+            whatsappTemplate: settings.whatsappTemplate !== undefined ? settings.whatsappTemplate : DEFAULT_WHATSAPP_TEMPLATE
+        };
+        const res = await saveSettings(payload);
+        if (res?.success) {
+            showToast('WhatsApp Business & Web configuration saved successfully!');
+        }
+    };
+
+    // Insert variable token into template textarea at cursor position
+    const insertToken = (tag) => {
+        const cur = settings.whatsappTemplate !== undefined
+            ? settings.whatsappTemplate
+            : DEFAULT_WHATSAPP_TEMPLATE;
+
+        const textarea = templateTextareaRef.current;
+        if (textarea) {
+            const start = textarea.selectionStart || 0;
+            const end = textarea.selectionEnd || 0;
+            const newText = cur.substring(0, start) + ' ' + tag + ' ' + cur.substring(end);
+            handleChange('whatsappTemplate', newText);
+            setTimeout(() => {
+                textarea.focus();
+                const pos = start + tag.length + 2;
+                textarea.setSelectionRange(pos, pos);
+            }, 0);
+        } else {
+            handleChange('whatsappTemplate', cur + ' ' + tag);
+        }
+    };
+
+    // Lifecycle Polling
     const checkWaWebStatusRef = useRef(checkWaWebStatus);
     checkWaWebStatusRef.current = checkWaWebStatus;
     const loadWaLogsRef = useRef(loadWaLogs);
     loadWaLogsRef.current = loadWaLogs;
 
     useEffect(() => {
-        if (activeModalApp?.id !== 'whatsapp') return;
         checkWaWebStatusRef.current();
         loadWaLogsRef.current();
 
         const interval = setInterval(() => {
             checkWaWebStatusRef.current();
-        }, 5000);
+        }, 6000);
 
         return () => clearInterval(interval);
-    }, [activeModalApp?.id]);
+    }, []);
 
-    // Automatically set test phone from dynamic settings or current user phone when available
+    // Prefill test phone
     useEffect(() => {
         if (!testPhone) {
             const dynamicPhone = settings?.whatsappPhone || user?.phone || '';
             if (dynamicPhone) setTestPhone(dynamicPhone);
         }
-    }, [settings?.whatsappPhone, user?.phone]);
+    }, [settings?.whatsappPhone, user?.phone, testPhone]);
 
-    const showToast = (msg, type = 'success') => {
-        setToastMessage({ text: msg, type });
-        setTimeout(() => setToastMessage(null), 3500);
-    };
-
-    // ── App Definitions ──────────────────────────────────────────
-    const apps = [
-        {
-            id: 'whatsapp',
-            name: 'WhatsApp Business & Web',
-            category: 'MESSAGING',
-            tag: 'Popular',
-            desc: 'Send instant invoice receipts, billing links, and automated Khata payment reminders.',
-            connectedKey: 'whatsappConnected',
-            logo: Logos.whatsapp,
-            features: ['WhatsApp Web QR (No Meta Setup)', 'POS Receipts', 'Background Auto-Send', 'Direct Click-to-Chat', 'Zero Window Opening'],
-            defaultSettings: {
-                whatsappPhone: '',
-                whatsappCountryCode: '91',
-                whatsappMode: 'whatsapp_web', // 'whatsapp_web' | 'direct'
-                whatsappBackgroundAutoSend: 'true', // 'true' | 'false' - send in background without opening
-                whatsappBackgroundProvider: 'whatsapp_web', // 'whatsapp_web' | 'cloud_api' | 'gateway'
-                whatsappSessionId: 'default',
-                whatsappToken: '',
-                whatsappPhoneId: '',
-                whatsappApiVersion: 'v22.0',
-                whatsappGatewayUrl: '',
-                whatsappGatewayToken: '',
-                whatsappAutoSendInvoice: 'true',
-                whatsappTemplate: DEFAULT_WHATSAPP_TEMPLATE
-            }
-        },
-        {
-            id: 'googleCalendar',
-            name: 'Google Calendar',
-            category: 'PRODUCTIVITY',
-            tag: 'Essential',
-            desc: 'Sync delivery dates, supplier restock schedules, and Khata debt payment due dates.',
-            connectedKey: 'googleCalendarConnected',
-            logo: Logos.googleCalendar,
-            features: ['Delivery Schedule', 'Khata Due Dates', 'Shift Reminders', '.ICS Export'],
-            defaultSettings: {
-                googleCalendarEmail: '',
-                googleCalendarSyncSales: 'true',
-                googleCalendarSyncKhata: 'true',
-                googleCalendarReminderMinutes: '60'
-            }
-        },
-        {
-            id: 'slack',
-            name: 'Slack Alerts',
-            category: 'MESSAGING',
-            tag: 'Team',
-            desc: 'Receive real-time alerts in Slack channels for new POS sales, large orders, and low stock warnings.',
-            connectedKey: 'slackConnected',
-            logo: Logos.slack,
-            features: ['New POS Sales', 'Low Stock Alert', 'Daily Closing Report'],
-            defaultSettings: {
-                slackWebhookUrl: '',
-                slackChannel: '#pos-orders',
-                slackNotifySales: 'true',
-                slackNotifyStock: 'true',
-                slackMinSaleAlert: '0'
-            }
-        },
-        {
-            id: 'discord',
-            name: 'Discord Webhook',
-            category: 'MESSAGING',
-            tag: 'Team',
-            desc: 'Post automated store sales announcements and inventory alerts to your staff Discord server.',
-            connectedKey: 'discordConnected',
-            logo: Logos.discord,
-            features: ['Sales Notifications', 'Low Stock Warnings', 'Staff Bot'],
-            defaultSettings: {
-                discordWebhookUrl: '',
-                discordBotName: 'Samrajya POS Bot',
-                discordNotifySales: 'true',
-                discordNotifyStock: 'true'
-            }
-        },
-        {
-            id: 'zapier',
-            name: 'Zapier & Webhooks',
-            category: 'AUTOMATION',
-            tag: '5000+ Apps',
-            desc: 'Stream POS transactions to Zapier, Make, Google Sheets, or custom ERP webhooks.',
-            connectedKey: 'zapierConnected',
-            logo: Logos.zapier,
-            features: ['pos.sale_completed', 'inventory.low_stock', 'khata.entry_added', 'HMAC Security'],
-            defaultSettings: {
-                zapierWebhookUrl: '',
-                zapierSecret: '',
-                zapierEvents: 'pos.sale_completed,inventory.low_stock'
-            }
-        },
-        {
-            id: 'cloudBackup',
-            name: 'Cloud Data Backup',
-            category: 'BACKUP',
-            tag: 'Security',
-            desc: 'Automated snapshots and instant full JSON/CSV export of sales, products, and Khata books.',
-            connectedKey: 'cloudBackupConnected',
-            logo: Logos.cloudBackup,
-            features: ['Full Database Export', 'Daily Snapshots', 'Zero Data Loss', 'JSON / CSV'],
-            defaultSettings: {
-                cloudBackupFrequency: 'daily',
-                cloudBackupProvider: 'archive_download',
-                cloudBackupAutoExport: 'true'
-            }
-        },
-        {
-            id: 'woocommerce',
-            name: 'WooCommerce Sync',
-            category: 'ECOMMERCE',
-            tag: 'Online Store',
-            desc: 'Synchronize POS physical stock with your online WooCommerce WordPress e-commerce shop.',
-            connectedKey: 'woocommerceConnected',
-            logo: Logos.woocommerce,
-            features: ['Two-way Stock Sync', 'Product Sync', 'Order Import'],
-            defaultSettings: {
-                woocommerceStoreUrl: '',
-                woocommerceConsumerKey: '',
-                woocommerceConsumerSecret: '',
-                woocommerceAutoSync: 'true'
-            }
-        },
-        {
-            id: 'shopify',
-            name: 'Shopify Store',
-            category: 'ECOMMERCE',
-            tag: 'Online Store',
-            desc: 'Connect your Shopify storefront to maintain synchronized inventory between store and POS.',
-            connectedKey: 'shopifyConnected',
-            logo: Logos.shopify,
-            features: ['Catalog Sync', 'Stock Deduction', 'Unified Reporting'],
-            defaultSettings: {
-                shopifyStoreDomain: '',
-                shopifyAccessToken: '',
-                shopifyAutoSync: 'true'
-            }
-        },
-        {
-            id: 'facebookAds',
-            name: 'Meta Catalog & Ads',
-            category: 'MARKETING',
-            tag: 'Sales',
-            desc: 'Publish POS inventory to Facebook & Instagram Shop Catalog and track conversion ad pixels.',
-            connectedKey: 'facebookAdsConnected',
-            logo: Logos.meta,
-            features: ['Instagram Shop', 'Facebook Catalog', 'Meta Pixel', 'Dynamic Ads'],
-            defaultSettings: {
-                metaPixelId: '',
-                metaCatalogId: '',
-                metaAccessToken: '',
-                metaAutoSyncCatalog: 'true'
-            }
-        },
-        {
-            id: 'smsGateway',
-            name: 'SMS Gateway (Twilio / MSG91)',
-            category: 'MESSAGING',
-            tag: 'Alerts',
-            desc: 'Dispatch transactional billing SMS and OTPs to customers on mobile networks.',
-            connectedKey: 'smsGatewayConnected',
-            logo: Logos.smsGateway,
-            features: ['Twilio', 'Fast2SMS', 'MSG91', 'Custom HTTP Gateway'],
-            defaultSettings: {
-                smsProvider: 'twilio',
-                smsApiKey: '',
-                smsSenderId: 'NAMUST',
-                smsTemplate: 'Dear Customer, your POS bill #{invoice_no} of {amount} is paid. Thank you!'
-            }
-        },
-        {
-            id: 'tally',
-            name: 'Tally Prime & ERP 9',
-            category: 'ACCOUNTING',
-            tag: 'Finance',
-            desc: 'Export daily POS sales vouchers, day-book ledgers, and tax summaries into Tally-compatible XML.',
-            connectedKey: 'tallyConnected',
-            logo: (
-                <div style={{ color: '#0284c7', fontWeight: '800', fontSize: '18px' }}>T</div>
-            ),
-            features: ['Tally XML Export', 'Day Book Ledgers', 'GST Vouchers', 'Auto Ledger Mapping'],
-            defaultSettings: {
-                tallyCompany: '',
-                tallyCashLedger: 'Cash-in-Hand',
-                tallySalesLedger: 'Sales Account',
-                tallyAutoSync: 'true'
-            }
-        }
-    ];
-
-    // ── Quick Toggles ───────────────────────────────────────────
-    const handleToggleApp = async (app) => {
-        const isCurrentlyConnected = settings[app.connectedKey] === 'true';
-        if (!isCurrentlyConnected) {
-            const hasConfig = Object.keys(app.defaultSettings).some(k => settings[k] && String(settings[k]).trim() !== '');
-            if (!hasConfig && app.id !== 'cloudBackup' && app.id !== 'googleCalendar' && app.id !== 'tally' && app.id !== 'whatsapp') {
-                setActiveModalApp(app);
-                showToast(`Configure ${app.name} credentials to complete setup.`, 'info');
-                return;
-            }
-        }
-        const nextState = isCurrentlyConnected ? 'false' : 'true';
-        const payload = { [app.connectedKey]: nextState };
-        if (nextState === 'true') {
-            Object.entries(app.defaultSettings).forEach(([k, v]) => {
-                if (settings[k] === undefined || settings[k] === '') {
-                    payload[k] = v;
-                }
-            });
-        }
-        await saveSettings(payload);
-        showToast(`${app.name} is now ${nextState === 'true' ? 'Connected' : 'Disconnected'}.`);
-    };
-
-    // ── Modal Actions & Real Integrations ───────────────────────
-    const handleSaveAppConfig = async (app) => {
-        const payload = { [app.connectedKey]: 'true' };
-        Object.keys(app.defaultSettings).forEach(k => {
-            payload[k] = settings[k] !== undefined && settings[k] !== '' ? settings[k] : app.defaultSettings[k];
-        });
-        const res = await saveSettings(payload);
-        if (res?.success) {
-            showToast(`${app.name} saved and connected successfully!`);
-            setActiveModalApp(null);
-        }
-    };
-
-    const handleDisconnectApp = async (app) => {
-        const res = await saveSettings({ [app.connectedKey]: 'false' });
-        if (res?.success) {
-            showToast(`${app.name} disconnected.`);
-            setActiveModalApp(null);
-        }
-    };
-
-    // ── Real Action Handlers for specific apps ───────────────────
-
-    // 1. WhatsApp Dynamic Test Message (Supports Background & Web)
-    const testWhatsApp = async (phone = '', forceWeb = false, forceDemoTemplate = null) => {
-        const defaultCode = settings.whatsappCountryCode || '91';
-        let rawPhone = phone || testPhone || settings.whatsappPhone || user?.phone || '';
-        let cleanPhone = formatWhatsAppPhone(rawPhone, defaultCode);
-
-        if (!cleanPhone) {
-            setTestOutput({
-                error: true,
-                message: 'Please enter a valid recipient mobile number with country code in the input field.'
-            });
-            showToast('Please enter a recipient phone number first.', 'error');
-            return;
-        }
-
-        const template = settings.whatsappTemplate || apps.find(a => a.id === 'whatsapp').defaultSettings.whatsappTemplate;
-        const storeName = settings.companyName || user?.companyName || 'Samrajya Store';
-        const sampleItems = '• Cotton Casual Shirt (x1) - ₹1,499.00\n• Slim Fit Trousers (x1) - ₹1,999.00';
-        const sampleDate = new Date().toLocaleDateString();
-        const sampleTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        const compiledMessage = compileWhatsAppTemplate(template, {
-            customerName: 'Aarav Sharma',
-            storeName: storeName,
-            invoiceNo: 'POS-2024-8841',
-            amount: '₹3,498.00',
-            items: sampleItems,
-            paymentStatus: 'PAID',
-            date: sampleDate,
-            time: sampleTime
-        });
-
-        // ── 0. WhatsApp Web (whatsapp-web.js) Background Dispatch ──
-        if (!forceWeb && (settings.whatsappMode === 'whatsapp_web' || !settings.whatsappMode)) {
-            setIsTesting(true);
-            setTestOutput(`Dispatching live invoice to +${cleanPhone} via WhatsApp Web...`);
-            try {
-                const sid = settings.whatsappSessionId || 'default';
-                const res = await sendWhatsAppWebMessage({
-                    to: cleanPhone,
-                    message: compiledMessage,
-                    sessionId: sid
-                });
-                setTestOutput({
-                    type: 'whatsapp_web',
-                    success: true,
-                    phone: cleanPhone,
-                    messageId: res.messageId,
-                    note: `Invoice bill dispatched directly through your linked WhatsApp phone! (Message ID: ${res.messageId || 'delivered'})`
-                });
-                showToast(`Invoice delivered to +${cleanPhone} via WhatsApp Web!`);
-            } catch (err) {
-                setTestOutput({
-                    error: true,
-                    type: 'error',
-                    message: err.response?.data?.error || err.message || 'WhatsApp Web dispatch failed. Please ensure your WhatsApp is linked via QR scan.'
-                });
-                showToast('Send failed: ' + (err.response?.data?.error || err.message), 'error');
-            } finally {
-                setIsTesting(false);
-            }
-            return;
-        }
-
-        // Determine if Meta Official Demo Template (hello_world) should be used
-        const isUsingMetaTemplate = forceDemoTemplate === true || (forceDemoTemplate === null && metaDemoType === 'template');
-        const isInvoiceMode = !isUsingMetaTemplate; // 'invoice' = Full Custom Text
-
-        // Dynamic credentials (custom settings take priority; fall back to verified demo keys if empty)
-        const dynamicPhoneId = (settings.whatsappPhoneId || DEFAULT_META_PHONE_ID || '').trim();
-        const dynamicToken = (settings.whatsappToken || DEFAULT_META_TOKEN || '').trim();
-        const dynamicApiVer = (settings.whatsappApiVersion || 'v22.0').trim();
-
-        // Check if Background Sending should be performed
-        const isBackground = !forceWeb && (
-            settings.whatsappBackgroundAutoSend === 'true' ||
-            settings.whatsappMode === 'cloud_api' ||
-            settings.whatsappMode === 'gateway' ||
-            !!dynamicPhoneId
-        );
-
-        if (isBackground) {
-            setIsTesting(true);
-            setTestOutput(
-                isUsingMetaTemplate
-                    ? `Dispatching Meta demo template (hello_world) to +${cleanPhone} in background...`
-                    : `Dispatching full POS Invoice custom text to +${cleanPhone} via Meta Cloud API in background...`
-            );
-            try {
-                const res = await sendWhatsAppMessage({
-                    phone: cleanPhone,
-                    message: compiledMessage,
-                    settings: settings,
-                    forceWeb: false,
-                    phoneId: dynamicPhoneId,
-                    token: dynamicToken,
-                    apiVersion: dynamicApiVer,
-                    templateName: isUsingMetaTemplate ? 'hello_world' : null,
-                    fallbackTemplateOn24h: true // ALWAYS fallback to hello_world if Meta restricts delivery
-                });
-
-                if (res.background) {
-                    // Determine fallback reason (sandbox restriction vs 24h window vs direct delivery)
-                    const fallbackReason = res.fallbackReason; // '24h_window' | 'sandbox_restriction' | null
-                    const wasAutoFallback = isInvoiceMode && res.isTemplate && !!fallbackReason;
-                    const isSandboxFallback = fallbackReason === 'sandbox_restriction';
-                    const is24hFallback = fallbackReason === '24h_window';
-
-                    let headerMsg, noteMsg, toastMsg;
-                    if (isUsingMetaTemplate && !wasAutoFallback) {
-                        // Pure hello_world template mode
-                        headerMsg = `Meta hello_world Template Delivered to ${'+' + res.phone}`;
-                        noteMsg = '✅ Official Meta [hello_world] template delivered via Meta WhatsApp Cloud API. ZERO windows opened!';
-                        toastMsg = `hello_world template delivered to +${res.phone} via Meta API!`;
-                    } else if (isSandboxFallback) {
-                        // Invoice mode, but sandbox restriction auto-dispatched hello_world
-                        headerMsg = `hello_world Template Auto-Sent to ${'+' + res.phone} (Sandbox Fallback)`;
-                        noteMsg = '⚠️ Recipient not in Meta sandbox allowed list — hello_world template auto-dispatched instead. Add recipient to Meta Sandbox > Allowed Numbers to send full invoice text directly.';
-                        toastMsg = `hello_world template auto-sent to +${res.phone} (sandbox fallback)!`;
-                    } else if (is24hFallback) {
-                        // Invoice mode, but 24h window closed auto-dispatched hello_world
-                        headerMsg = `hello_world Template Auto-Sent to ${'+' + res.phone} (24h Window Fallback)`;
-                        noteMsg = '⚠️ Meta 24h service window was closed — hello_world template auto-dispatched. Once recipient replies, full invoice text will deliver in next send.';
-                        toastMsg = `hello_world template auto-sent to +${res.phone} (24h fallback)!`;
-                    } else {
-                        // Invoice mode, direct text delivery succeeded!
-                        headerMsg = `POS Invoice Text Sent to ${'+' + res.phone} ✅`;
-                        noteMsg = '✅ Full custom invoice text message delivered via Meta WhatsApp Cloud API. ZERO windows opened!';
-                        toastMsg = `POS Invoice delivered to +${res.phone} via Meta API!`;
-                    }
-
-                    setTestOutput({
-                        type: 'whatsapp_background',
-                        success: true,
-                        mode: isUsingMetaTemplate ? 'template' : 'invoice',
-                        wasAutoFallback,
-                        fallbackReason,
-                        isSandboxFallback,
-                        is24hFallback,
-                        headerMsg,
-                        noteMsg,
-                        provider: res.provider === 'meta_cloud_api' ? 'Meta WhatsApp Cloud API' : 'Custom WhatsApp HTTP Gateway',
-                        phone: `+${res.phone}`,
-                        messageId: res.messageId || 'DELIVERED',
-                        isTemplate: res.isTemplate,
-                        compiledInvoice: compiledMessage, // Always carry the full invoice preview
-                        message: noteMsg
-                    });
-                    showToast(toastMsg);
-                    return;
-                }
-            } catch (err) {
-                // Only reach here on genuine errors (bad token, wrong phone ID, network failure etc)
-                // Sandbox 131030 and 24h 131047 errors are now auto-handled inside sendWhatsAppMessage
-                setTestOutput({
-                    error: true,
-                    type: 'error',
-                    mode: isInvoiceMode ? 'invoice' : 'template',
-                    compiledInvoice: compiledMessage,
-                    phone: `+${cleanPhone}`,
-                    message: `Send failed: ${err.message}\n\n💡 Check:\n1. Phone Number ID & Access Token in Settings > Connected Apps\n2. Network / firewall not blocking requests to graph.facebook.com\n3. Try 'Send Meta hello_world Demo' button instead`
-                });
-                showToast(`WhatsApp send failed: ${err.message}`, 'error');
-                return;
-            } finally {
-                setIsTesting(false);
-            }
-        }
-
-        // Web click-to-chat fallback with popup-safe dispatcher
-        const waUrl = getWhatsAppDirectUrl(cleanPhone, compiledMessage, settings.whatsappMode || 'direct');
-        const opened = dispatchWhatsAppLink(waUrl);
-
-        setTestOutput({
-            type: 'whatsapp',
-            url: waUrl,
-            phone: `+${cleanPhone}`,
-            mode: settings.whatsappMode || 'direct',
-            message: compiledMessage,
-            compiledInvoice: compiledMessage,
-            opened: opened
-        });
-        showToast(`WhatsApp invoice message opened for +${cleanPhone}!`);
-    };
-
-    // 2. Cloud Backup Real Generator & Downloader
-    const runCloudBackup = async () => {
-        setIsTesting(true);
-        setTestOutput('Initiating full cloud backup archive generation...');
-        try {
-            const [prodRes, salesRes, posRes, khataRes, settingsRes] = await Promise.all([
-                apiClient.get(API.PRODUCTS).catch(() => ({ data: [] })),
-                apiClient.get(API.SALES).catch(() => ({ data: [] })),
-                apiClient.get(API.POS_SALES).catch(() => ({ data: [] })),
-                apiClient.get(API.KHATA).catch(() => ({ data: [] })),
-                apiClient.get(API.SETTINGS).catch(() => ({ data: {} }))
-            ]);
-
-            const backupData = {
-                exportMetadata: {
-                    appName: 'Samrajya Software & SaaS ERP',
-                    version: '2.0',
-                    exportedAt: new Date().toISOString(),
-                    environment: 'Production',
-                },
-                counts: {
-                    products: prodRes.data?.length || 0,
-                    sales: salesRes.data?.length || 0,
-                    posSales: posRes.data?.length || 0,
-                    khataParties: khataRes.data?.length || 0
-                },
-                data: {
-                    products: prodRes.data,
-                    sales: salesRes.data,
-                    posSales: posRes.data,
-                    khata: khataRes.data,
-                    settings: settingsRes.data
-                }
-            };
-
-            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            const fileName = `namustutam-pos-backup-${new Date().toISOString().slice(0, 10)}.json`;
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            const timestamp = new Date().toLocaleString();
-            handleChange('cloudBackupLastRun', timestamp);
-            await saveSettings(['cloudBackupLastRun']);
-
-            setTestOutput(`Backup complete!\nDownloaded: ${fileName}\nProducts: ${backupData.counts.products} | POS Sales: ${backupData.counts.posSales} | Khata Entries: ${backupData.counts.khataParties}\nLast Run recorded: ${timestamp}`);
-            showToast('Backup archive downloaded successfully!');
-        } catch (err) {
-            setTestOutput(`Backup generation failed: ${err.message}`);
-        } finally {
-            setIsTesting(false);
-        }
-    };
-
-    // 3. Google Calendar iCal (.ics) Generator
-    const exportGoogleCalendarIcs = () => {
-        const today = new Date();
-        const formatDate = (d) => d.toISOString().replace(/-|:|\.\d+/g, '').slice(0, 15) + 'Z';
-
-        const icsData = [
-            'BEGIN:VCALENDAR',
-            'VERSION:2.0',
-            'PRODID:-//Samrajya Software//Calendar Sync//EN',
-            'CALSCALE:GREGORIAN',
-            'METHOD:PUBLISH',
-            'BEGIN:VEVENT',
-            `UID:pos-shift-${Date.now()}@samrajyasoftware.com`,
-            `DTSTAMP:${formatDate(today)}`,
-            `DTSTART:${formatDate(new Date(today.getTime() + 3600000))}`,
-            `DTEND:${formatDate(new Date(today.getTime() + 7200000))}`,
-            'SUMMARY:Samrajya Software Daily Register Close & Inventory Reconciliation',
-            'DESCRIPTION:Daily closing audit and register balance reconciliation generated by Samrajya Software.',
-            'STATUS:CONFIRMED',
-            'END:VEVENT',
-            'END:VCALENDAR'
-        ].join('\r\n');
-
-        const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `samrajya-calendar-${today.toISOString().slice(0, 10)}.ics`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        const timestamp = new Date().toLocaleString();
-        handleChange('googleCalendarLastSync', timestamp);
-        saveSettings(['googleCalendarLastSync']);
-        setTestOutput(`Google Calendar .ICS exported!\nImport into Google Calendar -> Settings -> Import & Export.\nLast Synced: ${timestamp}`);
-        showToast('Calendar .ics export generated!');
-    };
-
-    // 4. Slack Test Ping
-    const testSlackWebhook = async () => {
-        const webhookUrl = settings.slackWebhookUrl;
-        if (!webhookUrl || !webhookUrl.startsWith('http')) {
-            setTestOutput('Error: Please enter a valid Slack Incoming Webhook URL first (e.g. https://hooks.slack.com/services/...)');
-            return;
-        }
-
-        setIsTesting(true);
-        setTestOutput('Sending test notification payload to Slack...');
-
-        const payload = {
-            channel: settings.slackChannel || '#pos-orders',
-            text: `*Samrajya Software Alert* :bell:\nTest notification sent from *Connected Apps* settings at ${new Date().toLocaleTimeString()}.\nStatus: *Active & Working!*`
-        };
-
-        try {
-            await fetch(webhookUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            setTestOutput(`Success! Notification dispatched to ${settings.slackChannel || 'channel'}.\nPayload:\n${JSON.stringify(payload, null, 2)}`);
-            showToast('Slack notification dispatched!');
-        } catch (err) {
-            setTestOutput(`Dispatched with no-cors wrapper. If webhook URL is valid, the message is in Slack!\nDetails: ${err.message}`);
-        } finally {
-            setIsTesting(false);
-        }
-    };
-
-    // 5. Discord Test Ping
-    const testDiscordWebhook = async () => {
-        const webhookUrl = settings.discordWebhookUrl;
-        if (!webhookUrl || !webhookUrl.startsWith('http')) {
-            setTestOutput('Error: Please enter a valid Discord Webhook URL (e.g. https://discord.com/api/webhooks/...)');
-            return;
-        }
-
-        setIsTesting(true);
-        setTestOutput('Dispatching test payload to Discord...');
-
-        const payload = {
-            username: settings.discordBotName || 'Samrajya Software',
-            content: `**Samrajya Software Alert**\nTest message from your POS terminal! Connection verified at ${new Date().toLocaleTimeString()}.`
-        };
-
-        try {
-            await fetch(webhookUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            setTestOutput(`Discord notification dispatched successfully!\nPayload:\n${JSON.stringify(payload, null, 2)}`);
-            showToast('Discord notification dispatched!');
-        } catch (err) {
-            setTestOutput(`Dispatched webhook payload: ${err.message}`);
-        } finally {
-            setIsTesting(false);
-        }
-    };
-
-    // 6. Zapier / Custom Webhook Test
-    const testZapierWebhook = async () => {
-        const webhookUrl = settings.zapierWebhookUrl;
-        if (!webhookUrl || !webhookUrl.startsWith('http')) {
-            setTestOutput('Error: Please enter a valid Webhook endpoint URL (e.g. https://hooks.zapier.com/hooks/catch/...)');
-            return;
-        }
-
-        setIsTesting(true);
-        setTestOutput('Sending sample event payload to Zapier webhook...');
-
-        const sampleEvent = {
-            event: 'pos.sale_completed',
-            timestamp: new Date().toISOString(),
-            data: {
-                invoiceNo: 'POS-TEST-9921',
-                customerName: 'Aarav Sharma',
-                totalAmount: 2450.00,
-                paymentMethod: 'UPI',
-                itemsCount: 3,
-                store: 'Samrajya Official'
-            }
-        };
-
-        try {
-            await fetch(webhookUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Samrajya-Signature': settings.zapierSecret || 'default-secret'
-                },
-                body: JSON.stringify(sampleEvent)
-            });
-            setTestOutput(`Event [pos.sale_completed] dispatched to Zapier!\nPayload:\n${JSON.stringify(sampleEvent, null, 2)}`);
-            showToast('Zapier test ping dispatched!');
-        } catch (err) {
-            setTestOutput(`Zapier test ping triggered: ${err.message}`);
-        } finally {
-            setIsTesting(false);
-        }
-    };
-
-    // 7. Meta (Facebook & Instagram) Catalog CSV Feed Exporter
-    const exportMetaCatalogFeed = async () => {
-        setIsTesting(true);
-        setTestOutput('Compiling product catalog feed for Facebook & Instagram Shop...');
-        try {
-            const res = await apiClient.get(API.PRODUCTS).catch(() => ({ data: [] }));
-            const products = res.data || [];
-            if (products.length === 0) {
-                setTestOutput('No products found in inventory to export.');
-                return;
-            }
-
-            const headers = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand'];
-            const rows = products.map(p => [
-                `"${p.id || p.sku || 'PROD'}"`,
-                `"${(p.name || 'Product').replace(/"/g, '""')}"`,
-                `"${(p.description || p.name || 'Quality product').replace(/"/g, '""')}"`,
-                (p.quantity || 0) > 0 ? 'in stock' : 'out of stock',
-                'new',
-                `"${(p.price || p.unitPrice || 0).toFixed(2)} INR"`,
-                `"${ENV.FRONTEND_URL}/products"`,
-                `"${p.image || ''}"`,
-                `"${(p.brand?.name || p.brand || 'Samrajya').replace(/"/g, '""')}"`
-            ]);
-
-            const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement('a');
-            link.setAttribute('href', encodedUri);
-            link.setAttribute('download', `facebook_catalog_feed_${new Date().toISOString().slice(0, 10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            const timestamp = new Date().toLocaleString();
-            handleChange('metaLastSync', timestamp);
-            await saveSettings(['metaLastSync']);
-
-            setTestOutput(`Successfully exported ${products.length} products to Facebook Catalog CSV feed!\nDownloaded: facebook_catalog_feed_${new Date().toISOString().slice(0, 10)}.csv\nUpload this file to Meta Commerce Manager -> Catalog -> Data Sources.`);
-            showToast('Facebook Catalog CSV exported successfully!');
-        } catch (err) {
-            setTestOutput(`Error generating catalog feed: ${err.message}`);
-        } finally {
-            setIsTesting(false);
-        }
-    };
-
-    // 8. Tally XML Voucher Exporter
-    const exportTallyXml = async () => {
-        setIsTesting(true);
-        setTestOutput('Generating Tally XML voucher payload for POS sales...');
-        try {
-            const [posRes, salesRes] = await Promise.all([
-                apiClient.get(API.POS_SALES).catch(() => ({ data: [] })),
-                apiClient.get(API.SALES).catch(() => ({ data: [] }))
-            ]);
-
-            const allSales = [...(posRes.data || []), ...(salesRes.data || [])];
-            if (allSales.length === 0) {
-                setTestOutput('No sales transactions found to export.');
-                return;
-            }
-
-            const xmlVouchers = allSales.slice(0, 50).map(s => `
-      <TALLYMESSAGE xmlns:UDF="TallyUDF">
-        <VOUCHER VCHTYPE="Sales" ACTION="Create">
-          <DATE>${(s.date || new Date().toISOString().split('T')[0]).replace(/-/g, '')}</DATE>
-          <VOUCHERNUMBER>${s.referenceNo || s.invoiceNo || 'VCH-' + s.id}</VOUCHERNUMBER>
-          <PARTYLEDGERNAME>${s.customerName || 'Cash Sales'}</PARTYLEDGERNAME>
-          <AMOUNT>${-(parseFloat(s.grandTotal || s.totalAmount || 0))}</AMOUNT>
-          <ALLLEDGERENTRIES.LIST>
-            <LEDGERNAME>${settings.tallySalesLedger || 'Sales Account'}</LEDGERNAME>
-            <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-            <AMOUNT>${-(parseFloat(s.grandTotal || s.totalAmount || 0))}</AMOUNT>
-          </ALLLEDGERENTRIES.LIST>
-        </VOUCHER>
-      </TALLYMESSAGE>`).join('');
-
-            const fullXml = `<ENVELOPE>
-  <HEADER>
-    <TALLYREQUEST>Import Data</TALLYREQUEST>
-  </HEADER>
-  <BODY>
-    <IMPORTDATA>
-      <REQUESTDESC>
-        <REPORTNAME>Vouchers</REPORTNAME>
-        <STATICVARIABLES>
-          <SVCURRENTCOMPANY>${settings.tallyCompany || 'Samrajya Store'}</SVCURRENTCOMPANY>
-        </STATICVARIABLES>
-      </REQUESTDESC>
-      <REQUESTDATA>${xmlVouchers}
-      </REQUESTDATA>
-    </IMPORTDATA>
-  </BODY>
-</ENVELOPE>`;
-
-            const blob = new Blob([fullXml], { type: 'application/xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `tally_sales_vouchers_${new Date().toISOString().slice(0, 10)}.xml`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            setTestOutput(`Generated Tally XML with ${allSales.length} sales vouchers!\nDownloaded: tally_sales_vouchers_${new Date().toISOString().slice(0, 10)}.xml\nImport into Tally Prime: Alt+O (Import) -> Transactions.`);
-            showToast('Tally XML vouchers exported successfully!');
-        } catch (err) {
-            setTestOutput(`Error generating Tally XML: ${err.message}`);
-        } finally {
-            setIsTesting(false);
-        }
-    };
-
-    // 9. E-Commerce Store Connection Test
-    const testEcommerceSync = (platform) => {
-        setIsTesting(true);
-        setTestOutput(`Testing connection to ${platform === 'woocommerce' ? 'WooCommerce' : 'Shopify'} store...`);
-
-        setTimeout(() => {
-            const storeUrl = platform === 'woocommerce' ? settings.woocommerceStoreUrl : settings.shopifyStoreDomain;
-            if (!storeUrl) {
-                setTestOutput(`Notice: Please enter your ${platform === 'woocommerce' ? 'WordPress Store URL' : 'Shopify Store Domain'} above first.`);
-                setIsTesting(false);
-                return;
-            }
-            setTestOutput(`Connection verified successfully!
-• Target: ${storeUrl}
-• Handshake: 200 OK (Authenticated)
-• Inventory sync status: Ready
-• Two-way sync: Active`);
-            showToast(`${platform === 'woocommerce' ? 'WooCommerce' : 'Shopify'} connection verified!`);
-            setIsTesting(false);
-        }, 800);
-    };
-
-    // 10. SMS Gateway Dispatch Simulator
-    const testSmsGateway = () => {
-        const phone = testPhone || '919876543210';
-        const template = settings.smsTemplate || 'Dear Customer, your POS bill #{invoice_no} of {amount} is paid. Thank you!';
-        const formatted = template.replace('{invoice_no}', 'POS-9081').replace('{amount}', '₹2,450');
-        setTestOutput(`SMS Gateway Dispatch Simulation:
-• Provider: ${(settings.smsProvider || 'Twilio').toUpperCase()}
-• Recipient: ${phone}
-• Sender ID: ${settings.smsSenderId || 'NAMUST'}
-• Message: "${formatted}"
-• Character Count: ${formatted.length} / 160 (1 SMS Credit)
-• Status: Queued for transmission`);
-        showToast('SMS dispatch simulated!');
-    };
-
-    // ── Filtered Apps ───────────────────────────────────────────
-    const filteredApps = apps.filter(app => {
-        const matchesCategory = selectedCategory === 'ALL' || app.category === selectedCategory;
-        const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            app.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            app.features.some(f => f.toLowerCase().includes(searchQuery.toLowerCase()));
-        return matchesCategory && matchesSearch;
+    // Live compiled preview for the chat bubble
+    const activeTemplate = settings.whatsappTemplate !== undefined ? settings.whatsappTemplate : DEFAULT_WHATSAPP_TEMPLATE;
+    const storeName = settings.companyName || user?.companyName || 'Samrajya Store';
+    const previewCompiled = compileWhatsAppTemplate(activeTemplate, {
+        customerName: 'Aarav Sharma',
+        storeName: storeName,
+        invoiceNo: 'POS-2024-8841',
+        amount: '₹3,498.00',
+        items: '• Cotton Casual Shirt (x1) - ₹1,499.00\n• Slim Fit Trousers (x1) - ₹1,999.00',
+        paymentStatus: 'PAID',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        due_amount: '₹0.00',
+        payment_link: 'upi://pay?pa=store@upi&pn=' + encodeURIComponent(storeName)
     });
-
-    const connectedCount = apps.filter(a => settings[a.connectedKey] === 'true').length;
 
     if (loading) {
         return (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
-                <RefreshCw size={24} className="spin" style={{ animation: 'spin 1s linear infinite' }} />
-                <p style={{ marginTop: '12px' }}>Loading connected apps & integrations...</p>
+            <div style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
+                <RefreshCw size={28} className="spin" style={{ animation: 'spin 1s linear infinite', color: '#25D366' }} />
+                <p style={{ marginTop: '14px', fontSize: '0.95rem', fontWeight: 600 }}>Loading WhatsApp Business Integration...</p>
             </div>
         );
     }
 
     return (
-        <div className="connected-apps-container">
-            {/* ── Top Header ── */}
-            <div className="settings-content-header" style={{ marginBottom: 0 }}>
-                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div className="ca-wa-dashboard">
+            {/* ── 1. Hero Header Banner ── */}
+            <div className="ca-wa-hero-card">
+                <div className="ca-wa-hero-left">
+                    <div className="ca-wa-hero-logo">
+                        {Logos.whatsapp}
+                    </div>
                     <div>
-                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700' }}>Connected Apps & Integrations</h3>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>
-                            Connect third-party messaging, automated webhooks, calendar scheduling, and cloud backups to your POS.
+                        <div className="ca-wa-hero-title-row">
+                            <h2>WhatsApp Business & Web</h2>
+                            <span className={`ca-wa-status-pill-lg ${settings.whatsappConnected !== 'false' ? 'active' : 'inactive'}`}>
+                                <span className="pulse-dot"></span>
+                                {settings.whatsappConnected !== 'false' ? 'Integration Active' : 'Integration Disabled'}
+                            </span>
+                        </div>
+                        <p className="ca-wa-hero-sub">
+                            Deliver automated tax invoices, POS billing receipts, and Khata ledger reminders directly to your customers' WhatsApp numbers with zero popup windows.
                         </p>
                     </div>
                 </div>
+
+                <div className="ca-wa-hero-actions">
+                    <button
+                        type="button"
+                        className="ca-wa-btn-refresh-top"
+                        onClick={() => checkWaWebStatus(true)}
+                        disabled={waWebLoading}
+                        title="Check Engine Status"
+                    >
+                        <RefreshCw size={14} className={waWebLoading ? 'spin' : ''} />
+                        <span>Check Engine</span>
+                    </button>
+
+                    <div className="ca-wa-switch-box" title="Toggle WhatsApp Integration ON/OFF">
+                        <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>
+                            {settings.whatsappConnected !== 'false' ? 'Enabled' : 'Disabled'}
+                        </span>
+                        <label className="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={settings.whatsappConnected !== 'false'}
+                                onChange={handleToggleMaster}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="ca-wa-btn-save-top"
+                        onClick={handleSaveAll}
+                        disabled={saving}
+                    >
+                        {saving ? (
+                            <>
+                                <Loader2 size={15} className="spin" />
+                                <span>Saving...</span>
+                            </>
+                        ) : (
+                            <>
+                                <CheckCircle2 size={15} />
+                                <span>Save Changes</span>
+                            </>
+                        )}
+                    </button>
+                </div>
             </div>
 
-            {/* ── Metrics Banner ── */}
-            <div className="ca-metrics-grid">
-                <div className="ca-metric-card">
-                    <div className="ca-metric-icon orange">
-                        <Layers size={22} />
-                    </div>
-                    <div className="ca-metric-info">
-                        <span className="ca-metric-value">{apps.length}</span>
-                        <span className="ca-metric-label">Supported Apps</span>
-                    </div>
-                </div>
-
-                <div className="ca-metric-card">
-                    <div className="ca-metric-icon emerald">
-                        <CheckCircle2 size={22} />
-                    </div>
-                    <div className="ca-metric-info">
-                        <span className="ca-metric-value">{connectedCount}</span>
-                        <span className="ca-metric-label">Active Connections</span>
-                    </div>
-                </div>
-
-                <div className="ca-metric-card">
-                    <div className="ca-metric-icon blue">
+            {/* ── 2. Health & KPI Overview Bar ── */}
+            <div className="ca-wa-kpi-grid">
+                {/* Engine Service KPI */}
+                <div className="ca-wa-kpi-card">
+                    <div className={`ca-wa-kpi-icon ${waWebHealth === true ? 'green' : (waWebHealth === false ? 'amber' : 'blue')}`}>
                         <Activity size={22} />
                     </div>
-                    <div className="ca-metric-info">
-                        <span className="ca-metric-value">Operational</span>
-                        <span className="ca-metric-label">Webhook Engine</span>
-                    </div>
-                </div>
-
-                <div className="ca-metric-card">
-                    <div className="ca-metric-icon purple">
-                        <Database size={22} />
-                    </div>
-                    <div className="ca-metric-info">
-                        <span className="ca-metric-value" style={{ fontSize: '1.05rem' }}>
-                            {settings.cloudBackupLastRun ? settings.cloudBackupLastRun.split(',')[0] : 'Manual'}
+                    <div className="ca-wa-kpi-content">
+                        <span className="ca-wa-kpi-title">WhatsApp Engine</span>
+                        <span className="ca-wa-kpi-val" style={{ color: waWebHealth === true ? '#059669' : (waWebHealth === false ? '#dc2626' : '#2563eb') }}>
+                            {waWebHealth === true ? 'Online (Port 3005)' : (waWebHealth === false ? 'Engine Offline' : 'Checking Engine...')}
                         </span>
-                        <span className="ca-metric-label">Last Cloud Backup</span>
+                        <span className="ca-wa-kpi-sub">
+                            {waWebHealth === true ? 'Headless Puppeteer Service' : 'Run: cd whatsapp-service && npm start'}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Device Link Status KPI */}
+                <div className="ca-wa-kpi-card">
+                    <div className={`ca-wa-kpi-icon ${waWebStatus === 'ready' ? 'green' : (waWebStatus === 'qr' ? 'blue' : 'purple')}`}>
+                        <Smartphone size={22} />
+                    </div>
+                    <div className="ca-wa-kpi-content">
+                        <span className="ca-wa-kpi-title">Linked Device</span>
+                        <span className="ca-wa-kpi-val">
+                            {waWebStatus === 'ready' ? (
+                                `+${waWebInfo?.phone || settings.whatsappPhone || 'Active'}`
+                            ) : waWebStatus === 'qr' ? (
+                                'Waiting for QR Scan'
+                            ) : (
+                                'Device Not Paired'
+                            )}
+                        </span>
+                        <span className="ca-wa-kpi-sub">
+                            {waWebInfo?.pushname ? `${waWebInfo.pushname} • Linked` : `Session: ${settings.whatsappSessionId || tenantSessionId}`}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Dispatch Mode KPI */}
+                <div className="ca-wa-kpi-card">
+                    <div className="ca-wa-kpi-icon blue">
+                        <Zap size={22} />
+                    </div>
+                    <div className="ca-wa-kpi-content">
+                        <span className="ca-wa-kpi-title">Dispatch Mode</span>
+                        <span className="ca-wa-kpi-val">
+                            {settings.whatsappMode === 'direct' ? 'Direct wa.me' : 'Background Auto'}
+                        </span>
+                        <span className="ca-wa-kpi-sub">
+                            {settings.whatsappBackgroundAutoSend === 'true' ? 'Zero Browser Windows' : 'Browser Link Trigger'}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Audit Messages KPI */}
+                <div className="ca-wa-kpi-card" style={{ cursor: 'pointer' }} onClick={() => setActiveTab('logs')}>
+                    <div className="ca-wa-kpi-icon green">
+                        <FileText size={22} />
+                    </div>
+                    <div className="ca-wa-kpi-content">
+                        <span className="ca-wa-kpi-title">Dispatched Receipts</span>
+                        <span className="ca-wa-kpi-val">{waLogs.length} Messages</span>
+                        <span className="ca-wa-kpi-sub" style={{ color: '#059669', fontWeight: 600 }}>
+                            Click to View Audit Trail →
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* ── Search & Filter Controls ── */}
-            <div className="ca-controls-row">
-                <div className="ca-search-box">
-                    <Search size={16} color="#94a3b8" />
-                    <input
-                        type="text"
-                        placeholder="Search apps, webhooks, or features..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    {searchQuery && (
-                        <button
-                            style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
-                            onClick={() => setSearchQuery('')}
-                        >
-                            <X size={14} color="#94a3b8" />
-                        </button>
-                    )}
-                </div>
+            {/* ── 3. Tab Navigation Bar ── */}
+            <div className="ca-wa-tabs-bar">
+                <button
+                    type="button"
+                    className={`ca-wa-tab-button ${activeTab === 'pairing' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('pairing')}
+                >
+                    <QrCode size={16} />
+                    <span>Device Pairing & QR</span>
+                    <span className={`ca-wa-tab-badge ${waWebStatus === 'ready' ? 'green' : (waWebStatus === 'qr' ? 'blue' : 'gray')}`}>
+                        {waWebStatus === 'ready' ? 'Linked' : (waWebStatus === 'qr' ? 'Scan' : 'Unlinked')}
+                    </span>
+                </button>
 
-                <div className="ca-category-tabs">
-                    {['ALL', 'MESSAGING', 'PRODUCTIVITY', 'AUTOMATION', 'ECOMMERCE', 'ACCOUNTING', 'BACKUP'].map(cat => (
-                        <button
-                            key={cat}
-                            className={`ca-cat-btn ${selectedCategory === cat ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory(cat)}
-                        >
-                            {cat === 'ALL' ? 'All Integrations' : cat.charAt(0) + cat.slice(1).toLowerCase()}
-                        </button>
-                    ))}
-                </div>
+                <button
+                    type="button"
+                    className={`ca-wa-tab-button ${activeTab === 'automation' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('automation')}
+                >
+                    <Zap size={16} />
+                    <span>Automation & Settings</span>
+                </button>
+
+                <button
+                    type="button"
+                    className={`ca-wa-tab-button ${activeTab === 'template' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('template')}
+                >
+                    <MessageSquare size={16} />
+                    <span>Invoice Template & Preview</span>
+                </button>
+
+                <button
+                    type="button"
+                    className={`ca-wa-tab-button ${activeTab === 'tester' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('tester')}
+                >
+                    <Send size={16} />
+                    <span>Live Message Tester</span>
+                </button>
+
+                <button
+                    type="button"
+                    className={`ca-wa-tab-button ${activeTab === 'logs' ? 'active' : ''}`}
+                    onClick={() => {
+                        setActiveTab('logs');
+                        loadWaLogs();
+                    }}
+                >
+                    <Clock size={16} />
+                    <span>Message Audit Trail</span>
+                    <span className="ca-wa-tab-badge gray">{waLogs.length}</span>
+                </button>
             </div>
 
-            {/* ── Apps Cards Grid ── */}
-            <div className="ca-apps-grid">
-                {filteredApps.map(app => {
-                    const isConnected = settings[app.connectedKey] === 'true';
+            {/* ── 4. Tab 1: Device Pairing & QR ── */}
+            {activeTab === 'pairing' && (
+                <div className="ca-wa-panel-body">
+                    <div className="ca-wa-panel-title-area">
+                        <h3 className="ca-wa-panel-title">WhatsApp Business Device Connection</h3>
+                        <p className="ca-wa-panel-desc">
+                            Link your store phone via WhatsApp Web QR code to enable automated invoice receipts and payment reminders directly from your number.
+                        </p>
+                    </div>
 
-                    return (
-                        <div key={app.id} className={`ca-app-card ${isConnected ? 'is-connected' : ''}`}>
-                            <div>
-                                <div className="ca-app-card-top">
-                                    <div className="ca-app-logo-wrap">
-                                        {app.logo}
-                                    </div>
-                                    <div className="ca-badge-group">
-                                        <span className={`ca-status-pill ${isConnected ? 'connected' : 'disconnected'}`}>
-                                            <span style={{
-                                                width: '6px',
-                                                height: '6px',
-                                                borderRadius: '50%',
-                                                backgroundColor: isConnected ? '#16a34a' : '#94a3b8'
-                                            }} />
-                                            {isConnected ? 'Connected' : 'Not Connected'}
-                                        </span>
-                                        {app.tag && <span className="ca-tag-badge">{app.tag}</span>}
-                                    </div>
+                    {/* State A: Engine Offline Warning */}
+                    {waWebHealth === false ? (
+                        <div style={{
+                            background: '#fff1f2',
+                            border: '1.5px solid #fecdd3',
+                            borderRadius: '12px',
+                            padding: '20px',
+                            marginBottom: '16px'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                                <div style={{
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '50%',
+                                    background: '#fee2e2',
+                                    color: '#e11d48',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0
+                                }}>
+                                    <AlertCircle size={24} />
                                 </div>
-
-                                <div className="ca-app-details">
-                                    <span className="ca-app-cat-label">{app.category}</span>
-                                    <h4 className="ca-app-title">{app.name}</h4>
-                                    <p className="ca-app-desc">{app.desc}</p>
-                                    <div className="ca-app-features">
-                                        {app.features.map((feat, idx) => (
-                                            <span key={idx} className="ca-feature-chip">{feat}</span>
-                                        ))}
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#9f1239', marginBottom: '4px' }}>
+                                        WhatsApp Web Engine Microservice is Offline
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="ca-app-footer">
-                                <label className="toggle-switch" title={`Toggle ${app.name}`}>
-                                    <input
-                                        type="checkbox"
-                                        checked={isConnected}
-                                        onChange={() => handleToggleApp(app)}
-                                    />
-                                    <span className="toggle-slider"></span>
-                                </label>
-
-                                <button
-                                    className={`ca-btn-manage ${isConnected ? 'active-btn' : ''}`}
-                                    onClick={() => {
-                                        setActiveModalApp(app);
-                                        setTestOutput('');
-                                    }}
-                                >
-                                    {isConnected ? 'Configure & Test' : 'Setup Connection'}
-                                </button>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* ── App Configuration Modal ── */}
-            {activeModalApp && (
-                <div className="ca-modal-overlay" onClick={(e) => e.target === e.currentTarget && setActiveModalApp(null)}>
-                    <div className="ca-modal-dialog">
-                        {/* Header */}
-                        <div className="ca-modal-header">
-                            <div className="ca-modal-title-area">
-                                <div className="ca-modal-logo">
-                                    {activeModalApp.logo}
-                                </div>
-                                <div>
-                                    <h3>{activeModalApp.name}</h3>
-                                    <p>{activeModalApp.desc}</p>
-                                </div>
-                            </div>
-                            <button className="ca-modal-close-btn" onClick={() => setActiveModalApp(null)}>
-                                <X size={18} />
-                            </button>
-                        </div>
-
-                        {/* Body */}
-                        <div className="ca-modal-body">
-                            {/* Status Banner */}
-                            {settings[activeModalApp.connectedKey] === 'true' ? (
-                                <div className="ca-config-banner">
-                                    <CheckCircle2 size={18} />
-                                    <div>
-                                        <strong>Active & Integrated:</strong> This integration is currently active in your POS system.
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="ca-config-banner info">
-                                    <Info size={18} />
-                                    <div>
-                                        <strong>Quick Setup:</strong> Enter credentials or configure options below to activate this integration.
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* ── WhatsApp Form ── */}
-                            {activeModalApp.id === 'whatsapp' && (
-                                <>
-                                    {/* Background Auto-Send Feature Highlight Toggle */}
-                                    <div className="ca-toggle-item" style={{
-                                        background: settings.whatsappBackgroundAutoSend === 'true' ? '#ecfdf5' : '#f8fafc',
-                                        border: `1.5px solid ${settings.whatsappBackgroundAutoSend === 'true' ? '#10b981' : '#e2e8f0'}`,
-                                        borderRadius: '10px',
-                                        padding: '14px 18px',
-                                        marginBottom: '18px',
-                                        transition: 'all 0.2s ease'
-                                    }}>
-                                        <div className="ca-toggle-label">
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <div style={{
-                                                    background: settings.whatsappBackgroundAutoSend === 'true' ? '#10b981' : '#94a3b8',
-                                                    color: '#fff',
-                                                    borderRadius: '6px',
-                                                    width: '26px',
-                                                    height: '26px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}>
-                                                    <Zap size={15} />
-                                                </div>
-                                                <span className="ca-toggle-label-title" style={{
-                                                    fontSize: '0.94rem',
-                                                    color: settings.whatsappBackgroundAutoSend === 'true' ? '#065f46' : '#1e293b',
-                                                    fontWeight: '700'
-                                                }}>
-                                                    Auto-Send in Background (Without Opening WhatsApp)
-                                                </span>
-                                            </div>
-                                            <span className="ca-toggle-label-sub" style={{ marginTop: '4px', fontSize: '0.8rem', color: '#64748b' }}>
-                                                Directly delivers invoice receipts via API in the background. Zero browser tabs, windows, or WhatsApp Web screens will ever open!
-                                            </span>
-                                        </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.whatsappBackgroundAutoSend === 'true'}
-                                                onChange={(e) => {
-                                                    const isChecked = e.target.checked;
-                                                    handleChange('whatsappBackgroundAutoSend', isChecked ? 'true' : 'false');
-                                                    if (isChecked && (!settings.whatsappMode || settings.whatsappMode === 'direct' || settings.whatsappMode === 'desktop')) {
-                                                        handleChange('whatsappMode', 'whatsapp_web');
-                                                    }
-                                                }}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
-
-                                    {/* Visual Mode / Provider Selector */}
-                                    <div className="ca-form-group" style={{ marginBottom: '16px' }}>
-                                        <label>Integration Method</label>
-                                        <div className="ca-wa-method-grid">
-                                            {[
-                                                {
-                                                    id: 'whatsapp_web',
-                                                    title: 'WhatsApp Web (QR Scan)',
-                                                    badge: '⭐ Recommended',
-                                                    desc: 'Pair via QR scan with whatsapp-web.js. Free, zero Meta verification, sends from your phone.',
-                                                    icon: <QrCode size={16} />
-                                                },
-                                                {
-                                                    id: 'direct',
-                                                    title: 'Direct Click-to-Chat',
-                                                    badge: 'Manual (wa.me)',
-                                                    desc: 'Opens wa.me link in browser tab on bill completion. Zero server background setup.',
-                                                    icon: <ExternalLink size={16} />
-                                                }
-                                            ].map((m) => {
-                                                const effectiveMode = settings.whatsappMode === 'direct' ? 'direct' : 'whatsapp_web';
-                                                const isSelected = effectiveMode === m.id;
-                                                return (
-                                                    <button
-                                                        key={m.id}
-                                                        type="button"
-                                                        className={`ca-wa-method-btn ${isSelected ? 'active' : ''}`}
-                                                        onClick={() => {
-                                                            handleChange('whatsappMode', m.id);
-                                                            if (m.id === 'whatsapp_web') {
-                                                                handleChange('whatsappBackgroundAutoSend', 'true');
-                                                            } else {
-                                                                handleChange('whatsappBackgroundAutoSend', 'false');
-                                                            }
-                                                        }}
-                                                    >
-                                                        <div className="ca-wa-method-top">
-                                                            <div className="ca-wa-method-title">
-                                                                {m.icon}
-                                                                <span>{m.title}</span>
-                                                            </div>
-                                                            {m.badge && (
-                                                                <span className="ca-wa-method-tag" style={{
-                                                                    backgroundColor: isSelected ? '#dcfce7' : '#f1f5f9',
-                                                                    color: isSelected ? '#15803d' : '#64748b',
-                                                                    borderColor: isSelected ? '#86efac' : '#e2e8f0'
-                                                                }}>
-                                                                    {m.badge}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <div className="ca-wa-method-desc">{m.desc}</div>
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-
-                                    {/* ── SECTION 1: WhatsApp Web (whatsapp-web.js) Hub & QR Scanner ── */}
-                                    {(settings.whatsappMode === 'whatsapp_web' || !settings.whatsappMode) && (
-                                        <div className="ca-wa-hub-box" style={{ marginBottom: '20px' }}>
-                                            {/* Hub Header */}
-                                            <div className="ca-wa-hub-header">
-                                                <div className="ca-wa-hub-title-group">
-                                                    <div className="ca-wa-hub-icon-wrap">
-                                                        <QrCode size={22} />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="ca-wa-hub-title">
-                                                            WhatsApp Business Device Link & QR Scan
-                                                            <span style={{ fontSize: '0.72rem', background: '#ecfdf5', color: '#047857', padding: '2px 8px', borderRadius: '12px', fontWeight: '700', border: '1px solid #a7f3d0' }}>
-                                                                whatsapp-web.js
-                                                            </span>
-                                                        </h4>
-                                                        <p className="ca-wa-hub-subtitle">
-                                                            Scan the QR code with WhatsApp on your phone to link your business number and deliver instant bills.
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                {/* Live Indicators & Controls */}
-                                                <div className="ca-wa-hub-badge-group">
-                                                    {/* Service Health */}
-                                                    <span className={`ca-wa-service-pill ${waWebHealth === true ? 'online' : (waWebHealth === false ? 'offline' : '')}`}>
-                                                        <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: waWebHealth === true ? '#10b981' : (waWebHealth === false ? '#ef4444' : '#94a3b8'), display: 'inline-block' }}></span>
-                                                        {waWebHealth === true ? 'Engine: Online (3005)' : (waWebHealth === false ? 'Engine: Offline' : 'Checking Engine...')}
-                                                    </span>
-
-                                                    {/* Session State Badge (shown when engine is alive) */}
-                                                    {waWebHealth !== false && (
-                                                        <span className={`ca-wa-status-badge ${waWebStatus === 'ready' ? 'connected' : (waWebStatus === 'qr' ? 'qr' : (waWebStatus === 'initializing' ? 'initializing' : 'disconnected'))}`}>
-                                                            {waWebStatus === 'ready' ? (
-                                                                <>
-                                                                    <CheckCircle2 size={13} />
-                                                                    Connected & Active
-                                                                </>
-                                                            ) : waWebStatus === 'qr' ? (
-                                                                <>
-                                                                    <QrCode size={13} />
-                                                                    Waiting for QR Scan
-                                                                </>
-                                                            ) : waWebStatus === 'initializing' ? (
-                                                                <>
-                                                                    <Loader2 size={13} className="spin" />
-                                                                    Launching Engine...
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <Smartphone size={13} />
-                                                                    Not Linked
-                                                                </>
-                                                            )}
-                                                        </span>
-                                                    )}
-
-                                                    {/* Manual Refresh Button */}
-                                                    <button
-                                                        type="button"
-                                                        className="ca-wa-icon-btn"
-                                                        title="Refresh WhatsApp Engine Status"
-                                                        onClick={() => checkWaWebStatus(true)}
-                                                        disabled={waWebLoading}
-                                                    >
-                                                        <RefreshCw size={14} className={waWebLoading ? 'spin' : ''} />
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Body depending on state */}
-                                            {waWebHealth === false ? (
-                                                /* State 0: ENGINE OFFLINE BANNER */
-                                                <div style={{
-                                                    background: '#fff1f2',
-                                                    border: '1.5px solid #fecdd3',
-                                                    borderRadius: '12px',
-                                                    padding: '18px 20px',
-                                                    marginBottom: '4px'
-                                                }}>
-                                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-                                                        <div style={{
-                                                            width: '42px',
-                                                            height: '42px',
-                                                            borderRadius: '50%',
-                                                            background: '#fee2e2',
-                                                            color: '#e11d48',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            flexShrink: 0
-                                                        }}>
-                                                            <AlertCircle size={22} />
-                                                        </div>
-                                                        <div style={{ flex: 1 }}>
-                                                            <div style={{ fontWeight: 700, fontSize: '0.98rem', color: '#9f1239', marginBottom: '4px' }}>
-                                                                WhatsApp Web Engine Service is Offline
-                                                            </div>
-                                                            <p style={{ margin: 0, fontSize: '0.84rem', color: '#881337', lineHeight: 1.5 }}>
-                                                                {/* The background WhatsApp service is currently not reachable on <code>http://localhost:3005</code>. */}
-                                                                Live automated delivery of invoices, receipts, and Khata reminders is paused until the service is running.
-                                                            </p>
-                                                            {(waWebInfo?.phone || settings.whatsappPhone) && (
-                                                                <div style={{ marginTop: '8px', fontSize: '0.82rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                                    <Smartphone size={14} color="#64748b" />
-                                                                    <span>Preserved Account: <strong>+{waWebInfo?.phone || settings.whatsappPhone}</strong> {waWebInfo?.pushname ? `(${waWebInfo.pushname})` : ''} (session saved)</span>
-                                                                </div>
-                                                            )}
-                                                            <div style={{
-                                                                marginTop: '12px',
-                                                                background: '#0f172a',
-                                                                color: '#f8fafc',
-                                                                padding: '8px 14px',
-                                                                borderRadius: '8px',
-                                                                fontFamily: 'monospace',
-                                                                fontSize: '0.82rem',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'space-between',
-                                                                flexWrap: 'wrap',
-                                                                gap: '10px'
-                                                            }}>
-                                                                <span style={{ color: '#94a3b8' }}>Start engine in your terminal:</span>
-                                                                <code style={{ color: '#38bdf8', fontWeight: 600 }}>cd whatsapp-service && npm start</code>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '14px', borderTop: '1px solid #ffe4e6', paddingTop: '12px' }}>
-                                                        {(waWebInfo?.phone || settings.whatsappPhone) && (
-                                                            <button
-                                                                type="button"
-                                                                className="ca-wa-btn-unlink"
-                                                                onClick={handleLogoutWaWeb}
-                                                                disabled={waWebActionLoading}
-                                                                style={{ fontSize: '0.78rem', padding: '6px 12px' }}
-                                                            >
-                                                                <LogOut size={13} />
-                                                                Reset Session
-                                                            </button>
-                                                        )}
-                                                        <button
-                                                            type="button"
-                                                            className="ca-btn-test"
-                                                            onClick={() => checkWaWebStatus(true)}
-                                                            disabled={waWebLoading}
-                                                            style={{ fontSize: '0.8rem', padding: '6px 14px' }}
-                                                        >
-                                                            <RefreshCw size={13} className={waWebLoading ? 'spin' : ''} />
-                                                            Retry Service Connection
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ) : waWebStatus === 'ready' ? (
-                                                <div className="ca-wa-connected-banner">
-                                                    <div className="ca-wa-connected-left">
-                                                        <div className="ca-wa-connected-icon">
-                                                            <CheckCircle2 size={24} />
-                                                        </div>
-                                                        <div>
-                                                            <div style={{ fontWeight: 700, fontSize: '0.98rem', color: '#065f46' }}>
-                                                                WhatsApp Business Connected Successfully
-                                                            </div>
-                                                            <div className="ca-wa-connected-meta">
-                                                                {waWebInfo?.phone && (
-                                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                                                                        <PhoneCall size={13} /> +{waWebInfo.phone}
-                                                                    </span>
-                                                                )}
-                                                                {waWebInfo?.pushname && (
-                                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                                                                        <UserCheck size={13} /> {waWebInfo.pushname}
-                                                                    </span>
-                                                                )}
-                                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', opacity: 0.9 }}>
-                                                                    <ShieldCheck size={13} /> Encrypted Direct Session (Zero Windows Opened)
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                                        <button
-                                                            type="button"
-                                                            className="ca-wa-btn-unlink"
-                                                            onClick={handleLogoutWaWeb}
-                                                            disabled={waWebActionLoading}
-                                                        >
-                                                            <LogOut size={14} />
-                                                            {waWebActionLoading ? 'Disconnecting...' : 'Disconnect WhatsApp'}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ) : (waWebStatus === 'qr' && waWebQr) ? (
-                                                /* State B: QR CODE SCANNER VIEW */
-                                                <div className="ca-wa-qr-grid">
-                                                    <div className="ca-wa-qr-display">
-                                                        <div className="ca-wa-qr-frame">
-                                                            <img
-                                                                src={waWebQr}
-                                                                alt="Scan this WhatsApp QR Code with phone"
-                                                                className="ca-wa-qr-img"
-                                                            />
-                                                            <div className="ca-wa-qr-center-logo" title="WhatsApp">
-                                                                <div className="ca-wa-qr-logo-inner">
-                                                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
-                                                                        <path fillRule="evenodd" clipRule="evenodd" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.4-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.44 1.03 2.61c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z" />
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="ca-wa-qr-indicator">
-                                                            <Loader2 size={12} className="spin" />
-                                                            Auto-refreshing live QR code...
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            style={{
-                                                                marginTop: '8px',
-                                                                background: '#f8fafc',
-                                                                border: '1px solid #cbd5e1',
-                                                                borderRadius: '6px',
-                                                                padding: '4px 10px',
-                                                                fontSize: '0.74rem',
-                                                                cursor: 'pointer',
-                                                                display: 'inline-flex',
-                                                                alignItems: 'center',
-                                                                gap: '4px',
-                                                                color: '#475569'
-                                                            }}
-                                                            onClick={() => checkWaWebStatus(true)}
-                                                        >
-                                                            <RefreshCw size={11} /> Refresh QR
-                                                        </button>
-                                                    </div>
-
-                                                    <div>
-                                                        <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                            <span style={{ display: 'inline-flex', alignItems: 'center' }}>{Logos.whatsapp}</span>
-                                                            Scan QR Code to Link WhatsApp Business
-                                                        </div>
-                                                        <ol className="ca-wa-qr-steps-list">
-                                                            <li>Open <strong>WhatsApp</strong> on your mobile phone.</li>
-                                                            <li>
-                                                                Tap <strong>Menu</strong> (Android <span style={{ color: '#64748b' }}>⋮</span>) or <strong>Settings</strong> (iPhone <span style={{ color: '#64748b' }}>⚙️</span>).
-                                                            </li>
-                                                            <li>
-                                                                Select <strong>Linked Devices</strong>, then tap <strong>Link a Device</strong>.
-                                                            </li>
-                                                            <li>Point your phone camera at this QR code to complete pairing.</li>
-                                                        </ol>
-
-                                                        <div className="ca-wa-security-pill">
-                                                            <ShieldCheck size={18} color="#2563eb" style={{ flexShrink: 0 }} />
-                                                            <span>
-                                                                <strong>End-to-End Encrypted:</strong> Session credentials remain locally stored in your service directory. Zero third-party cloud data forwarding.
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ) : waWebStatus === 'initializing' ? (
-                                                /* State C: INITIALIZING ENGINE */
-                                                <div className="ca-wa-cta-box" style={{ padding: '36px 20px', borderStyle: 'dashed' }}>
-                                                    <Loader2 size={36} color="#25D366" className="spin" style={{ margin: '0 auto 12px' }} />
-                                                    <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#0f172a' }}>
-                                                        Launching Headless WhatsApp Engine...
-                                                    </div>
-                                                    <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: '440px', margin: '6px auto 0' }}>
-                                                        Establishing encrypted connection and launching Chrome. Your pairing QR code will appear in seconds...
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                /* State D: NOT LINKED / DISCONNECTED CTA */
-                                                <div className="ca-wa-cta-box">
-                                                    <div className="ca-wa-cta-avatar">
-                                                        <QrCode size={28} />
-                                                    </div>
-                                                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#0f172a' }}>
-                                                        Link Your WhatsApp Business via QR Scan
-                                                    </div>
-                                                    <p style={{ fontSize: '0.85rem', color: '#64748b', maxWidth: '520px', margin: '6px auto 18px', lineHeight: '1.55' }}>
-                                                        Connect your store phone in seconds. Automated tax invoices, billing receipts, and Khata ledger reminders will be delivered directly from your phone without opening any browser tabs!
-                                                    </p>
-                                                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                                                        <button
-                                                            type="button"
-                                                            className="ca-wa-primary-btn"
-                                                            onClick={handleStartWaWeb}
-                                                            disabled={waWebActionLoading}
-                                                        >
-                                                            {waWebActionLoading ? (
-                                                                <>
-                                                                    <Loader2 size={16} className="spin" />
-                                                                    Launching Scanner Engine...
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <QrCode size={18} />
-                                                                    📱 Scan QR Code to Link WhatsApp Business
-                                                                </>
-                                                            )}
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="ca-btn-test"
-                                                            onClick={() => checkWaWebStatus(true)}
-                                                            disabled={waWebLoading}
-                                                        >
-                                                            <RefreshCw size={14} className={waWebLoading ? 'spin' : ''} />
-                                                            Check Service Health
-                                                        </button>
-                                                    </div>
-                                                    {waWebHealth === false && (
-                                                        <div style={{ marginTop: '14px', fontSize: '0.78rem', color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca', padding: '8px 14px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                                                            <AlertCircle size={14} />
-                                                            WhatsApp microservice appears offline. Ensure <code>npm start</code> is running in <code>whatsapp-service/</code> on port 3005.
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {/* Section B: Testing Connection & Live Message */}
-                                            <div className="ca-wa-test-hub">
-                                                <div className="ca-wa-test-hub-header">
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <Send size={16} color="#2563eb" />
-                                                        <strong style={{ fontSize: '0.92rem', color: '#0f172a' }}>
-                                                            Test Connection & Live Message
-                                                        </strong>
-                                                    </div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <button
-                                                            type="button"
-                                                            className="ca-btn-test"
-                                                            style={{ fontSize: '0.76rem', padding: '5px 10px' }}
-                                                            onClick={() => checkWaWebStatus(true)}
-                                                            disabled={waWebLoading}
-                                                        >
-                                                            <Zap size={13} color="#f59e0b" />
-                                                            Test Service Connection
-                                                        </button>
-                                                        <span style={{
-                                                            fontSize: '0.74rem',
-                                                            fontWeight: 700,
-                                                            padding: '3px 8px',
-                                                            borderRadius: '12px',
-                                                            backgroundColor: waWebHealth === false ? '#fef2f2' : (waWebStatus === 'ready' ? '#ecfdf5' : '#fff1f2'),
-                                                            color: waWebHealth === false ? '#b91c1c' : (waWebStatus === 'ready' ? '#059669' : '#e11d48'),
-                                                            border: `1px solid ${waWebHealth === false ? '#fecaca' : (waWebStatus === 'ready' ? '#a7f3d0' : '#fecdd3')}`
-                                                        }}>
-                                                            {waWebHealth === false ? '⚠️ Engine Offline' : (waWebStatus === 'ready' ? '✓ WhatsApp Linked' : '⚠️ Device Not Linked')}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Test Inputs */}
-                                                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 2fr', gap: '12px', marginBottom: '12px' }}>
-                                                    <div>
-                                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
-                                                            Recipient Phone Number <span className="hint">with country code</span>
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            placeholder={`e.g. ${settings.whatsappCountryCode || '91'}9876543210`}
-                                                            value={testPhone}
-                                                            onChange={(e) => setTestPhone(e.target.value)}
-                                                            style={{
-                                                                width: '100%',
-                                                                padding: '8px 12px',
-                                                                borderRadius: '6px',
-                                                                border: '1px solid #cbd5e1',
-                                                                fontSize: '0.85rem',
-                                                                boxSizing: 'border-box'
-                                                            }}
-                                                        />
-                                                        <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                                                            {settings.whatsappPhone && (
-                                                                <button
-                                                                    type="button"
-                                                                    className="ca-wa-test-chip"
-                                                                    onClick={() => setTestPhone(settings.whatsappPhone)}
-                                                                    title="Fill Store Phone"
-                                                                >
-                                                                    Store Phone
-                                                                </button>
-                                                            )}
-                                                            {user?.phone && (
-                                                                <button
-                                                                    type="button"
-                                                                    className="ca-wa-test-chip"
-                                                                    onClick={() => setTestPhone(user.phone)}
-                                                                    title="Fill My Account Phone"
-                                                                >
-                                                                    My Phone
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                                            <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155', margin: 0 }}>
-                                                                Test Message Content
-                                                            </label>
-                                                            <div style={{ display: 'flex', gap: '4px' }}>
-                                                                <button
-                                                                    type="button"
-                                                                    className="ca-wa-test-chip"
-                                                                    onClick={() => setWaCustomTestMsg('🧾 *TAX INVOICE / RECEIPT*\nInvoice: #POS-2024-8841\nAmount: ₹1,499.00 (PAID)\nStore: ' + (settings.companyName || 'Samrajya Store') + '\nThank you for shopping with us! ✨')}
-                                                                >
-                                                                    Receipt
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    className="ca-wa-test-chip"
-                                                                    onClick={() => setWaCustomTestMsg('⚠️ *KHATA PAYMENT REMINDER*\nDear Customer, an outstanding balance of ₹2,450.00 is due for ' + (settings.companyName || 'Samrajya Store') + '. Please clear via UPI: pay@upi')}
-                                                                >
-                                                                    Khata
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    className="ca-wa-test-chip"
-                                                                    onClick={() => setWaCustomTestMsg('Hello! This is a test message from ' + (settings.companyName || 'Samrajya Store') + ' via WhatsApp Web. 🧾✨')}
-                                                                >
-                                                                    Hello
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <textarea
-                                                            rows="3"
-                                                            value={waCustomTestMsg}
-                                                            onChange={(e) => setWaCustomTestMsg(e.target.value)}
-                                                            style={{
-                                                                width: '100%',
-                                                                padding: '8px 12px',
-                                                                borderRadius: '6px',
-                                                                border: '1px solid #cbd5e1',
-                                                                fontSize: '0.82rem',
-                                                                boxSizing: 'border-box',
-                                                                fontFamily: 'inherit'
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                {/* Action Button Row */}
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                                                    <div style={{ fontSize: '0.76rem', color: '#64748b' }}>
-                                                        💡 Delivered directly through your linked WhatsApp number. Zero browser tabs or windows will open.
-                                                    </div>
-
-                                                    <button
-                                                        type="button"
-                                                        className="ca-wa-primary-btn"
-                                                        style={{ padding: '8px 20px', fontSize: '0.86rem' }}
-                                                        disabled={isTesting}
-                                                        onClick={() => handleSendWaWebTest(testPhone)}
-                                                    >
-                                                        {isTesting ? (
-                                                            <>
-                                                                <Loader2 size={15} className="spin" />
-                                                                Dispatching Message...
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Send size={15} />
-                                                                Send Live Test Message
-                                                            </>
-                                                        )}
-                                                    </button>
-                                                </div>
-
-                                                {/* Live Test Feedback Result Card */}
-                                                {testOutput && typeof testOutput === 'object' && testOutput.type === 'whatsapp_web' && testOutput.success && (
-                                                    <div style={{
-                                                        marginTop: '12px',
-                                                        background: '#f0fdf4',
-                                                        border: '1.5px solid #a7f3d0',
-                                                        borderRadius: '8px',
-                                                        padding: '12px 16px',
-                                                        color: '#065f46'
-                                                    }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '0.88rem' }}>
-                                                                <CheckCircle2 size={16} color="#10b981" />
-                                                                Message Delivered Successfully to +{testOutput.phone}!
-                                                            </div>
-                                                            <span style={{ fontSize: '0.72rem', background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                                                                ✓ Zero Windows Open
-                                                            </span>
-                                                        </div>
-                                                        <div style={{ fontSize: '0.8rem', color: '#047857' }}>
-                                                            {testOutput.note || `Delivered from your linked WhatsApp account.`}
-                                                            {testOutput.messageId && (
-                                                                <div style={{ marginTop: '4px', fontSize: '0.74rem', color: '#059669' }}>
-                                                                    WhatsApp Message ID: <code>{testOutput.messageId}</code>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Error Output Card */}
-                                                {testOutput && typeof testOutput === 'object' && (testOutput.error || testOutput.type === 'error') && (
-                                                    <div style={{
-                                                        marginTop: '12px',
-                                                        background: '#fef2f2',
-                                                        border: '1.5px solid #fecaca',
-                                                        borderRadius: '8px',
-                                                        padding: '12px 16px',
-                                                        color: '#991b1b'
-                                                    }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '0.86rem', marginBottom: '4px' }}>
-                                                            <AlertCircle size={16} color="#ef4444" />
-                                                            Delivery Failed
-                                                        </div>
-                                                        <div style={{ fontSize: '0.8rem' }}>
-                                                            {testOutput.message}
-                                                        </div>
-                                                        {waWebStatus !== 'ready' && (
-                                                            <div style={{ marginTop: '6px', fontSize: '0.76rem', color: '#b91c1c', fontWeight: 600 }}>
-                                                                👉 Please scan the QR code above to link your WhatsApp before sending live messages.
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-
-                                                {/* Live Delivery Audit Trail (Multi-Tenant Stored Data) */}
-                                                <div style={{ marginTop: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                                                        <button
-                                                            type="button"
-                                                            style={{
-                                                                background: 'none',
-                                                                border: 'none',
-                                                                color: '#2563eb',
-                                                                fontSize: '0.82rem',
-                                                                fontWeight: 700,
-                                                                cursor: 'pointer',
-                                                                display: 'inline-flex',
-                                                                alignItems: 'center',
-                                                                gap: '6px',
-                                                                padding: 0
-                                                            }}
-                                                            onClick={() => {
-                                                                setShowWaLogs(!showWaLogs);
-                                                                if (!showWaLogs) loadWaLogs();
-                                                            }}
-                                                        >
-                                                            <Clock size={14} />
-                                                            {showWaLogs ? 'Hide Message Audit Trail' : `View WhatsApp Message Audit Trail (${waLogs.length})`}
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="ca-wa-test-chip"
-                                                            onClick={loadWaLogs}
-                                                            disabled={loadingWaLogs}
-                                                            title="Refresh logs from database"
-                                                        >
-                                                            <RefreshCw size={11} className={loadingWaLogs ? 'spin' : ''} /> Refresh Logs
-                                                        </button>
-                                                    </div>
-
-                                                    {showWaLogs && (
-                                                        <div style={{ marginTop: '10px', maxHeight: '220px', overflowY: 'auto', background: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '10px' }}>
-                                                            {loadingWaLogs ? (
-                                                                <div style={{ textAlign: 'center', padding: '14px', color: '#64748b', fontSize: '0.82rem' }}>
-                                                                    <Loader2 size={16} className="spin" style={{ display: 'inline-block', marginRight: '6px' }} />
-                                                                    Loading message logs from database...
-                                                                </div>
-                                                            ) : waLogs.length === 0 ? (
-                                                                <div style={{ textAlign: 'center', padding: '14px', color: '#94a3b8', fontSize: '0.8rem' }}>
-                                                                    No messages logged yet for this tenant workspace.
-                                                                </div>
-                                                            ) : (
-                                                                <table style={{ width: '100%', fontSize: '0.78rem', borderCollapse: 'collapse' }}>
-                                                                    <thead>
-                                                                        <tr style={{ borderBottom: '1px solid #e2e8f0', color: '#475569', textAlign: 'left' }}>
-                                                                            <th style={{ padding: '6px 8px' }}>Time</th>
-                                                                            <th style={{ padding: '6px 8px' }}>Recipient</th>
-                                                                            <th style={{ padding: '6px 8px' }}>Trigger</th>
-                                                                            <th style={{ padding: '6px 8px' }}>Status</th>
-                                                                            <th style={{ padding: '6px 8px' }}>Message ID</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {waLogs.map((log) => (
-                                                                            <tr key={log.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                                                                <td style={{ padding: '6px 8px', color: '#64748b' }}>
-                                                                                    {log.createdAt ? new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
-                                                                                </td>
-                                                                                <td style={{ padding: '6px 8px', fontWeight: 600, color: '#0f172a' }}>
-                                                                                    +{log.recipientPhone}
-                                                                                </td>
-                                                                                <td style={{ padding: '6px 8px' }}>
-                                                                                    <span style={{ fontSize: '0.7rem', padding: '1px 6px', borderRadius: '8px', background: '#f1f5f9', color: '#475569' }}>
-                                                                                        {log.triggerType || 'MANUAL'}
-                                                                                    </span>
-                                                                                </td>
-                                                                                <td style={{ padding: '6px 8px' }}>
-                                                                                    <span style={{
-                                                                                        fontSize: '0.7rem',
-                                                                                        fontWeight: 700,
-                                                                                        padding: '1px 6px',
-                                                                                        borderRadius: '8px',
-                                                                                        background: log.status === 'SENT' ? '#dcfce7' : '#fee2e2',
-                                                                                        color: log.status === 'SENT' ? '#15803d' : '#b91c1c'
-                                                                                    }}>
-                                                                                        {log.status}
-                                                                                    </span>
-                                                                                </td>
-                                                                                <td style={{ padding: '6px 8px', fontFamily: 'monospace', fontSize: '0.72rem', color: '#64748b' }}>
-                                                                                    {log.messageId ? (log.messageId.length > 20 ? log.messageId.slice(0, 20) + '...' : log.messageId) : '-'}
-                                                                                </td>
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                                    <p style={{ margin: 0, fontSize: '0.86rem', color: '#881337', lineHeight: 1.5 }}>
+                                        The background WhatsApp engine on port 3005 is not reachable. Live automated background delivery of receipts and Khata reminders is currently paused.
+                                    </p>
+                                    {(waWebInfo?.phone || settings.whatsappPhone) && (
+                                        <div style={{ marginTop: '10px', fontSize: '0.84rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Smartphone size={14} color="#64748b" />
+                                            <span>Saved Business Account: <strong>+{waWebInfo?.phone || settings.whatsappPhone}</strong> (session preserved on disk)</span>
                                         </div>
                                     )}
-
-
-
-                                    {/* Country Code & Presets */}
-                                    <div className="ca-form-group">
-                                        <label>Default Country Code <span className="hint">e.g. 91 for India, 1 for USA</span></label>
-                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                            <input
-                                                type="text"
-                                                placeholder="91"
-                                                value={settings.whatsappCountryCode || '91'}
-                                                onChange={(e) => handleChange('whatsappCountryCode', e.target.value.replace(/[^0-9]/g, ''))}
-                                                style={{ width: '100px' }}
-                                            />
-                                            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Quick Select:</span>
-                                        </div>
-                                        <div className="ca-country-presets">
-                                            {[
-                                                { code: '91', label: '🇮🇳 +91 India' },
-                                                { code: '1', label: '🇺🇸 +1 USA / Canada' },
-                                                { code: '44', label: '🇬🇧 +44 UK' },
-                                                { code: '971', label: '🇦🇪 +971 UAE' },
-                                                { code: '61', label: '🇦🇺 +61 Australia' },
-                                                { code: '65', label: '🇸🇬 +65 Singapore' },
-                                                { code: '966', label: '🇸🇦 +966 Saudi' }
-                                            ].map(item => (
-                                                <button
-                                                    key={item.code}
-                                                    type="button"
-                                                    className={`ca-country-pill ${(settings.whatsappCountryCode || '91') === item.code ? 'active' : ''}`}
-                                                    onClick={() => handleChange('whatsappCountryCode', item.code)}
-                                                >
-                                                    {item.label}
-                                                </button>
-                                            ))}
-                                        </div>
+                                    <div style={{
+                                        marginTop: '14px',
+                                        background: '#0f172a',
+                                        color: '#f8fafc',
+                                        padding: '10px 16px',
+                                        borderRadius: '8px',
+                                        fontFamily: 'monospace',
+                                        fontSize: '0.84rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        flexWrap: 'wrap',
+                                        gap: '10px'
+                                    }}>
+                                        <span style={{ color: '#94a3b8' }}>Start engine in your terminal:</span>
+                                        <code style={{ color: '#38bdf8', fontWeight: 600 }}>cd whatsapp-service && npm start</code>
                                     </div>
-
-                                    <div className="ca-form-group">
-                                        <label>Store Sender Phone (Optional) <span className="hint">e.g. 9876543210</span></label>
-                                        <input
-                                            type="text"
-                                            placeholder="9876543210"
-                                            value={settings.whatsappPhone || ''}
-                                            onChange={(e) => handleChange('whatsappPhone', e.target.value)}
-                                        />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '16px', borderTop: '1px solid #ffe4e6', paddingTop: '12px' }}>
+                                {(waWebInfo?.phone || settings.whatsappPhone) && (
+                                    <button
+                                        type="button"
+                                        className="ca-wa-btn-unlink"
+                                        onClick={handleLogoutWaWeb}
+                                        disabled={waWebActionLoading}
+                                        style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+                                    >
+                                        <LogOut size={14} /> Reset Saved Session
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    className="ca-btn-test"
+                                    onClick={() => checkWaWebStatus(true)}
+                                    disabled={waWebLoading}
+                                    style={{ fontSize: '0.82rem', padding: '7px 16px' }}
+                                >
+                                    <RefreshCw size={14} className={waWebLoading ? 'spin' : ''} />
+                                    Retry Service Connection
+                                </button>
+                            </div>
+                        </div>
+                    ) : waWebStatus === 'ready' ? (
+                        /* State B: Connected & Active Banner */
+                        <div>
+                            <div className="ca-wa-connected-banner">
+                                <div className="ca-wa-connected-left">
+                                    <div className="ca-wa-connected-icon">
+                                        <CheckCircle2 size={24} />
                                     </div>
-
-                                    {/* Template & Variables */}
-                                    <div className="ca-form-group">
-                                        <div className="ca-tokens-bar">
-                                            <span className="ca-tokens-title">Insert Variables:</span>
-                                            {[
-                                                { tag: '{customer_name}', label: '👤 Customer' },
-                                                { tag: '{store_name}', label: '🏪 Store' },
-                                                { tag: '{invoice_no}', label: '🧾 Invoice #' },
-                                                { tag: '{amount}', label: '💰 Amount' },
-                                                { tag: '{items}', label: '📦 Items' },
-                                                { tag: '{payment_status}', label: '💳 Status' },
-                                                { tag: '{date}', label: '📅 Date' },
-                                                { tag: '{due_amount}', label: '⚠️ Due' },
-                                                { tag: '{payment_link}', label: '📲 UPI Pay' }
-                                            ].map(item => (
-                                                <button
-                                                    key={item.tag}
-                                                    type="button"
-                                                    className="ca-token-chip"
-                                                    onClick={() => {
-                                                        const cur = settings.whatsappTemplate !== undefined
-                                                            ? settings.whatsappTemplate
-                                                            : activeModalApp.defaultSettings.whatsappTemplate;
-                                                        handleChange('whatsappTemplate', cur + ' ' + item.tag);
-                                                    }}
-                                                    title={`Insert ${item.tag}`}
-                                                >
-                                                    {item.label}
-                                                </button>
-                                            ))}
-
-                                            <button
-                                                type="button"
-                                                className="ca-reset-template-btn"
-                                                onClick={() => handleChange('whatsappTemplate', activeModalApp.defaultSettings.whatsappTemplate)}
-                                            >
-                                                Reset Default
-                                            </button>
-                                        </div>
-
-                                        <label>Invoice WhatsApp Message Template</label>
-                                        <textarea
-                                            rows="5"
-                                            value={settings.whatsappTemplate !== undefined ? settings.whatsappTemplate : activeModalApp.defaultSettings.whatsappTemplate}
-                                            onChange={(e) => handleChange('whatsappTemplate', e.target.value)}
-                                            placeholder="Enter WhatsApp invoice message template..."
-                                            style={{ fontFamily: 'inherit', fontSize: '0.84rem' }}
-                                        />
-                                    </div>
-
-                                    {/* Real-time WhatsApp Chat Preview */}
-                                    <div className="ca-wa-preview-box">
-                                        <div className="ca-wa-preview-header">
-                                            <div className="ca-wa-avatar">
-                                                {(settings.companyName || 'Samrajya Store').charAt(0).toUpperCase()}
-                                            </div>
-                                            <div className="ca-wa-header-info">
-                                                <span className="ca-wa-header-name">{settings.companyName || 'Samrajya Store'} (Official)</span>
-                                                <span className="ca-wa-header-status">Online • WhatsApp Verified</span>
-                                            </div>
-                                        </div>
-                                        <div className="ca-wa-chat-canvas">
-                                            <div className="ca-wa-bubble">
-                                                {(() => {
-                                                    const rawTpl = settings.whatsappTemplate !== undefined
-                                                        ? settings.whatsappTemplate
-                                                        : activeModalApp.defaultSettings.whatsappTemplate;
-                                                    return compileWhatsAppTemplate(rawTpl, {
-                                                        customerName: 'Aarav Sharma',
-                                                        storeName: settings.companyName || 'Samrajya Store',
-                                                        invoiceNo: 'POS-2024-8841',
-                                                        amount: '₹3,498.00',
-                                                        items: '• Cotton Casual Shirt (x1) - ₹1,499.00\n• Slim Fit Trousers (x1) - ₹1,999.00',
-                                                        paymentStatus: 'PAID',
-                                                        date: new Date().toLocaleDateString()
-                                                    });
-                                                })()}
-                                                <div className="ca-wa-bubble-footer">
-                                                    <span>12:45 PM</span>
-                                                    <span className="ca-wa-ticks">✓✓</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="ca-toggle-item" style={{ marginTop: '14px' }}>
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Auto-Prompt on POS Checkout</span>
-                                            <span className="ca-toggle-label-sub">
-                                                {settings.whatsappBackgroundAutoSend === 'true'
-                                                    ? 'Automatically dispatches background WhatsApp bill upon completing sale'
-                                                    : 'Shows quick "Send WhatsApp Receipt" button on bill completion'}
+                                    <div>
+                                        <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#065f46', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <span>WhatsApp Business Connected & Active</span>
+                                            <span style={{ fontSize: '0.74rem', background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '12px' }}>
+                                                Verified Ready
                                             </span>
                                         </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.whatsappAutoSendInvoice !== 'false'}
-                                                onChange={(e) => handleChange('whatsappAutoSendInvoice', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
-
-                                    {/* Test Actions */}
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">
-                                            {(settings.whatsappMode === 'whatsapp_web' || !settings.whatsappMode)
-                                                ? 'Test Invoice Template via WhatsApp Web'
-                                                : 'Live Test WhatsApp Dispatcher'}
-                                        </span>
-
-                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                            <input
-                                                type="text"
-                                                placeholder={`Enter any recipient mobile (e.g. ${settings.whatsappCountryCode || '91'}XXXXXXXXXX)`}
-                                                value={testPhone}
-                                                onChange={(e) => setTestPhone(e.target.value)}
-                                                style={{ flex: 1, minWidth: '200px', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.84rem' }}
-                                            />
-                                            {settings.whatsappPhone && (
-                                                <button
-                                                    type="button"
-                                                    className="ca-btn-test"
-                                                    onClick={() => setTestPhone(settings.whatsappPhone)}
-                                                    title="Use Store Phone Number"
-                                                >
-                                                    Use Store Phone
-                                                </button>
+                                        <div className="ca-wa-connected-meta" style={{ marginTop: '6px' }}>
+                                            {waWebInfo?.phone && (
+                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600, color: '#064e3b' }}>
+                                                    <PhoneCall size={14} /> +{waWebInfo.phone}
+                                                </span>
                                             )}
-                                            {user?.phone && (
-                                                <button
-                                                    type="button"
-                                                    className="ca-btn-test"
-                                                    onClick={() => setTestPhone(user.phone)}
-                                                    title="Use My Account Phone"
-                                                >
-                                                    Use My Phone
-                                                </button>
+                                            {waWebInfo?.pushname && (
+                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#047857' }}>
+                                                    <UserCheck size={14} /> {waWebInfo.pushname}
+                                                </span>
                                             )}
-
-                                            {/* Direct Web link fallback */}
-                                            {(settings.whatsappMode === 'direct' || settings.whatsappMode === 'desktop' || settings.whatsappBackgroundAutoSend === 'true') && (
-                                                <button
-                                                    type="button"
-                                                    className="ca-btn-test"
-                                                    disabled={isTesting}
-                                                    onClick={() => testWhatsApp(testPhone, true)}
-                                                    title="Test with browser Click-to-Chat"
-                                                >
-                                                    <ExternalLink size={14} /> Test via Web (wa.me)
-                                                </button>
-                                            )}
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', opacity: 0.9 }}>
+                                                <ShieldCheck size={14} /> End-to-End Encrypted Session
+                                            </span>
                                         </div>
+                                    </div>
+                                </div>
 
-                                        {/* Background Meta Test Result — Unified Dynamic Card */}
-                                        {testOutput && typeof testOutput === 'object' && testOutput.type === 'whatsapp_background' && testOutput.success && (
-                                            <div className="ca-wa-test-result" style={{
-                                                borderLeft: `4px solid ${testOutput.wasAutoFallback ? '#f59e0b' : '#10b981'}`,
-                                                background: testOutput.wasAutoFallback ? 'rgba(30,15,0,0.9)' : 'rgba(15,25,20,0.9)'
-                                            }}>
-                                                {/* Header */}
-                                                <div className="ca-wa-result-header">
-                                                    <span className="ca-wa-result-badge">
-                                                        <CheckCircle2 size={13} />
-                                                        {testOutput.headerMsg || testOutput.phone}
-                                                    </span>
-                                                    <span style={{ fontSize: '0.74rem', color: testOutput.wasAutoFallback ? '#fcd34d' : '#86efac', fontWeight: '700' }}>
-                                                        {testOutput.isSandboxFallback ? '⚠️ Sandbox → Auto-Sent' : testOutput.is24hFallback ? '⚠️ 24h → Auto-Sent' : '✓ Zero Windows'}
-                                                    </span>
-                                                </div>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button
+                                        type="button"
+                                        className="ca-btn-test"
+                                        onClick={() => setActiveTab('tester')}
+                                        style={{ fontSize: '0.82rem', padding: '8px 14px' }}
+                                    >
+                                        <Send size={14} /> Send Test Message
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="ca-wa-btn-unlink"
+                                        onClick={handleLogoutWaWeb}
+                                        disabled={waWebActionLoading}
+                                    >
+                                        <LogOut size={14} />
+                                        {waWebActionLoading ? 'Disconnecting...' : 'Disconnect WhatsApp'}
+                                    </button>
+                                </div>
+                            </div>
 
-                                                {/* Provider & Message ID */}
-                                                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: '8px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                                                    <span>Provider: <strong style={{ color: '#f8fafc' }}>{testOutput.provider}</strong></span>
-                                                    {testOutput.messageId && testOutput.messageId !== 'DELIVERED' && (
-                                                        <span>ID: <code style={{ color: '#38bdf8', fontSize: '0.76rem' }}>{testOutput.messageId}</code></span>
-                                                    )}
-                                                    {testOutput.messageId === 'DELIVERED' && (
-                                                        <span style={{ color: '#4ade80' }}>✓ Delivered</span>
-                                                    )}
-                                                </div>
-
-                                                {/* Note / Explanation */}
-                                                {testOutput.noteMsg && (
-                                                    <div style={{
-                                                        fontSize: '0.76rem',
-                                                        color: testOutput.wasAutoFallback ? '#fbbf24' : '#86efac',
-                                                        background: testOutput.wasAutoFallback ? 'rgba(251,191,36,0.08)' : 'rgba(134,239,172,0.07)',
-                                                        border: `1px solid ${testOutput.wasAutoFallback ? 'rgba(251,191,36,0.25)' : 'rgba(134,239,172,0.2)'}`,
-                                                        borderRadius: '6px',
-                                                        padding: '7px 10px',
-                                                        marginBottom: '10px',
-                                                        lineHeight: '1.5'
-                                                    }}>
-                                                        {testOutput.noteMsg}
-                                                    </div>
-                                                )}
-
-                                                {/* Invoice / Message Bubble Preview */}
-                                                {testOutput.compiledInvoice && (
-                                                    <div>
-                                                        <div style={{ fontSize: '0.71rem', color: '#64748b', fontWeight: '700', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                            📋 {testOutput.mode === 'invoice' && !testOutput.wasAutoFallback
-                                                                ? 'Full Invoice Text Sent Directly:'
-                                                                : 'Invoice Text (hello_world sent now — this sends when window opens):'}
-                                                        </div>
-                                                        <div style={{
-                                                            background: '#dcf8c6',
-                                                            color: '#111827',
-                                                            borderRadius: '12px 12px 4px 12px',
-                                                            padding: '11px 14px',
-                                                            fontSize: '0.79rem',
-                                                            whiteSpace: 'pre-wrap',
-                                                            maxHeight: '220px',
-                                                            overflowY: 'auto',
-                                                            fontFamily: 'inherit',
-                                                            lineHeight: '1.55',
-                                                            boxShadow: '0 1px 4px rgba(0,0,0,0.15)'
-                                                        }}>
-                                                            {testOutput.compiledInvoice}
-                                                        </div>
-                                                        <div style={{ fontSize: '0.7rem', color: '#475569', marginTop: '4px', textAlign: 'right' }}>
-                                                            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · ✓✓
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                            {/* Quick Live Message Box inside Pairing view for instant gratification */}
+                            <div className="ca-wa-test-hub">
+                                <div className="ca-wa-test-hub-header">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Send size={16} color="#2563eb" />
+                                        <strong style={{ fontSize: '0.92rem', color: '#0f172a' }}>
+                                            Quick Live Test Dispatch
+                                        </strong>
+                                    </div>
+                                    <span style={{ fontSize: '0.74rem', color: '#059669', background: '#ecfdf5', padding: '3px 8px', borderRadius: '10px', border: '1px solid #a7f3d0', fontWeight: 700 }}>
+                                        ✓ Linked and Ready to Send
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                    <input
+                                        type="text"
+                                        placeholder={`Recipient Mobile Number (e.g. ${settings.whatsappCountryCode || '91'}XXXXXXXXXX)`}
+                                        value={testPhone}
+                                        onChange={(e) => setTestPhone(e.target.value)}
+                                        style={{ flex: 1, minWidth: '220px', padding: '9px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="ca-wa-primary-btn"
+                                        style={{ padding: '9px 20px', fontSize: '0.85rem' }}
+                                        onClick={() => handleSendWaWebTest(testPhone)}
+                                        disabled={isTesting}
+                                    >
+                                        {isTesting ? (
+                                            <>
+                                                <Loader2 size={15} className="spin" /> Sending...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Send size={15} /> Send Quick Receipt Test
+                                            </>
                                         )}
-
-                                        {/* Web Click-to-Chat Test Result */}
-                                        {testOutput && typeof testOutput === 'object' && testOutput.type === 'whatsapp' && (
-                                            <div className="ca-wa-test-result">
-                                                <div className="ca-wa-result-header">
-                                                    <span className="ca-wa-result-badge">
-                                                        <CheckCircle2 size={13} />
-                                                        WhatsApp Link Generated for {testOutput.phone}
-                                                    </span>
-                                                    <a
-                                                        href={testOutput.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ca-wa-open-link"
-                                                    >
-                                                        <ExternalLink size={13} /> Open WhatsApp Chat
-                                                    </a>
-                                                </div>
-                                                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: '8px' }}>
-                                                    URL: <span style={{ color: '#38bdf8' }}>{testOutput.url?.slice(0, 60)}...</span>
-                                                </div>
-                                                <div style={{ fontSize: '0.71rem', color: '#64748b', fontWeight: '700', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>📋 Invoice Message (pre-filled in WhatsApp):</div>
-                                                <div style={{
-                                                    background: '#dcf8c6',
-                                                    color: '#111827',
-                                                    borderRadius: '12px 12px 4px 12px',
-                                                    padding: '10px 14px',
-                                                    fontSize: '0.79rem',
-                                                    whiteSpace: 'pre-wrap',
-                                                    maxHeight: '200px',
-                                                    overflowY: 'auto',
-                                                    lineHeight: '1.5',
-                                                    fontFamily: 'inherit',
-                                                    boxShadow: '0 1px 4px rgba(0,0,0,0.12)'
-                                                }}>
-                                                    {testOutput.message}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Error Output */}
-                                        {testOutput && typeof testOutput === 'object' && testOutput.error && (
-                                            <div className="alert alert-danger py-2 px-3 small mt-2 mb-0">
-                                                <AlertCircle size={14} className="me-1" />
-                                                <span style={{ whiteSpace: 'pre-line' }}>{testOutput.message}</span>
-                                            </div>
-                                        )}
-
-                                        {testOutput && typeof testOutput === 'string' && (
-                                            <div className="ca-test-output">{testOutput}</div>
-                                        )}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── Google Calendar Form ── */}
-                            {activeModalApp.id === 'googleCalendar' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Google Account Email</label>
-                                        <input
-                                            type="email"
-                                            placeholder="manager@store.com"
-                                            value={settings.googleCalendarEmail || ''}
-                                            onChange={(e) => handleChange('googleCalendarEmail', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-toggle-item">
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Sync Sales Delivery Dates</span>
-                                            <span className="ca-toggle-label-sub">Add order delivery deadlines to Google Calendar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (waWebStatus === 'qr' && waWebQr) ? (
+                        /* State C: QR Code Scanner View */
+                        <div className="ca-wa-qr-grid" style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                            <div className="ca-wa-qr-display">
+                                <div className="ca-wa-qr-frame">
+                                    <img
+                                        src={waWebQr}
+                                        alt="Scan this WhatsApp QR Code with phone"
+                                        className="ca-wa-qr-img"
+                                    />
+                                    <div className="ca-wa-qr-center-logo" title="WhatsApp">
+                                        <div className="ca-wa-qr-logo-inner">
+                                            {Logos.whatsapp}
                                         </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.googleCalendarSyncSales !== 'false'}
-                                                onChange={(e) => handleChange('googleCalendarSyncSales', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
                                     </div>
+                                </div>
+                                <div className="ca-wa-qr-indicator">
+                                    <Loader2 size={12} className="spin" /> Auto-refreshing live QR code...
+                                </div>
+                                <button
+                                    type="button"
+                                    style={{
+                                        marginTop: '10px',
+                                        background: '#ffffff',
+                                        border: '1px solid #cbd5e1',
+                                        borderRadius: '6px',
+                                        padding: '5px 12px',
+                                        fontSize: '0.78rem',
+                                        cursor: 'pointer',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        color: '#334155',
+                                        fontWeight: 600
+                                    }}
+                                    onClick={() => checkWaWebStatus(true)}
+                                >
+                                    <RefreshCw size={12} /> Refresh QR Code
+                                </button>
+                            </div>
 
-                                    <div className="ca-toggle-item">
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Sync Khata Payment Due Reminders</span>
-                                            <span className="ca-toggle-label-sub">Create calendar events for pending customer debt due dates</span>
-                                        </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.googleCalendarSyncKhata !== 'false'}
-                                                onChange={(e) => handleChange('googleCalendarSyncKhata', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
+                            <div>
+                                <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>{Logos.whatsapp}</span>
+                                    Scan QR Code to Pair WhatsApp Business
+                                </div>
+                                <ol className="ca-wa-qr-steps-list">
+                                    <li>Open <strong>WhatsApp</strong> on your mobile device.</li>
+                                    <li>Tap <strong>Menu</strong> (Android <span style={{ color: '#64748b' }}>⋮</span>) or <strong>Settings</strong> (iPhone <span style={{ color: '#64748b' }}>⚙️</span>).</li>
+                                    <li>Select <strong>Linked Devices</strong>, then tap <strong>Link a Device</strong>.</li>
+                                    <li>Point your camera at this QR code to complete pairing.</li>
+                                </ol>
 
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Live Actions</span>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test"
-                                                onClick={exportGoogleCalendarIcs}
-                                            >
-                                                <CalendarIcon size={14} /> Export .ICS Calendar File
-                                            </button>
-                                            <button
-                                                className="ca-btn-test"
-                                                onClick={() => window.open('https://calendar.google.com/calendar/r', '_blank')}
-                                            >
-                                                <ExternalLink size={14} /> Open Google Calendar
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── Slack Form ── */}
-                            {activeModalApp.id === 'slack' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Slack Incoming Webhook URL</label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://hooks.slack.com/services/T00/B00/XXXX"
-                                            value={settings.slackWebhookUrl || ''}
-                                            onChange={(e) => handleChange('slackWebhookUrl', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-form-group">
-                                        <label>Channel Name</label>
-                                        <input
-                                            type="text"
-                                            placeholder="#pos-orders"
-                                            value={settings.slackChannel || '#pos-orders'}
-                                            onChange={(e) => handleChange('slackChannel', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-toggle-item">
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Notify on New POS Sale</span>
-                                            <span className="ca-toggle-label-sub">Posts instant receipt snippet when cashier bills an order</span>
-                                        </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.slackNotifySales !== 'false'}
-                                                onChange={(e) => handleChange('slackNotifySales', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
-
-                                    <div className="ca-toggle-item">
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Low Stock Alert</span>
-                                            <span className="ca-toggle-label-sub">Alerts staff channel when product inventory drops below threshold</span>
-                                        </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.slackNotifyStock !== 'false'}
-                                                onChange={(e) => handleChange('slackNotifyStock', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
-
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Test Slack Notification</span>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={testSlackWebhook}
-                                                disabled={isTesting}
-                                            >
-                                                <Send size={14} /> Send Test Slack Notification
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── Discord Form ── */}
-                            {activeModalApp.id === 'discord' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Discord Webhook URL</label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://discord.com/api/webhooks/1234/abcd"
-                                            value={settings.discordWebhookUrl || ''}
-                                            onChange={(e) => handleChange('discordWebhookUrl', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-form-group">
-                                        <label>Bot Display Name</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Samrajya POS Bot"
-                                            value={settings.discordBotName || 'Samrajya POS Bot'}
-                                            onChange={(e) => handleChange('discordBotName', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-toggle-item">
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Notify on New POS Sales</span>
-                                        </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.discordNotifySales !== 'false'}
-                                                onChange={(e) => handleChange('discordNotifySales', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
-
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Test Discord Dispatch</span>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={testDiscordWebhook}
-                                                disabled={isTesting}
-                                            >
-                                                <Send size={14} /> Send Test Discord Alert
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── Zapier / Webhooks Form ── */}
-                            {activeModalApp.id === 'zapier' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Target Webhook URL (Zapier / Make / Custom)</label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://hooks.zapier.com/hooks/catch/..."
-                                            value={settings.zapierWebhookUrl || ''}
-                                            onChange={(e) => handleChange('zapierWebhookUrl', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-form-group">
-                                        <label>Secret Signing Key (Optional)</label>
-                                        <input
-                                            type="password"
-                                            placeholder="secret_key_for_hmac_header"
-                                            value={settings.zapierSecret || ''}
-                                            onChange={(e) => handleChange('zapierSecret', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-form-group">
-                                        <label>Subscribed Events</label>
-                                        <input
-                                            type="text"
-                                            placeholder="pos.sale_completed, inventory.low_stock"
-                                            value={settings.zapierEvents || 'pos.sale_completed, inventory.low_stock'}
-                                            onChange={(e) => handleChange('zapierEvents', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Webhook Test Runner</span>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={testZapierWebhook}
-                                                disabled={isTesting}
-                                            >
-                                                <Zap size={14} /> Send Test Webhook Ping
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── Cloud Data Backup Form ── */}
-                            {activeModalApp.id === 'cloudBackup' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Backup Frequency</label>
-                                        <select
-                                            value={settings.cloudBackupFrequency || 'daily'}
-                                            onChange={(e) => handleChange('cloudBackupFrequency', e.target.value)}
-                                        >
-                                            <option value="daily">Daily Automatic Snapshot (Midnight)</option>
-                                            <option value="weekly">Weekly Archive</option>
-                                            <option value="manual">Manual On-Demand Only</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="ca-toggle-item">
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Include Complete Financial Records</span>
-                                            <span className="ca-toggle-label-sub">Backs up Sales Invoices, POS Bills, Customers & Khata</span>
-                                        </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.cloudBackupAutoExport !== 'false'}
-                                                onChange={(e) => handleChange('cloudBackupAutoExport', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
-
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Instant Backup Action</span>
-                                        <p style={{ margin: '0 0 6px 0', fontSize: '0.8rem', color: '#64748b' }}>
-                                            Compile and download a comprehensive JSON snapshot of your current database right now.
-                                        </p>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={runCloudBackup}
-                                                disabled={isTesting}
-                                            >
-                                                <Download size={14} /> Backup Database Now & Download JSON
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── WooCommerce Form ── */}
-                            {activeModalApp.id === 'woocommerce' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>WordPress Store URL</label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://mystore.com"
-                                            value={settings.woocommerceStoreUrl || ''}
-                                            onChange={(e) => handleChange('woocommerceStoreUrl', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>Consumer Key (ck_...)</label>
-                                        <input
-                                            type="text"
-                                            placeholder="ck_xxxxxxxxxxxxxxxx"
-                                            value={settings.woocommerceConsumerKey || ''}
-                                            onChange={(e) => handleChange('woocommerceConsumerKey', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>Consumer Secret (cs_...)</label>
-                                        <input
-                                            type="password"
-                                            placeholder="cs_xxxxxxxxxxxxxxxx"
-                                            value={settings.woocommerceConsumerSecret || ''}
-                                            onChange={(e) => handleChange('woocommerceConsumerSecret', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-toggle-item">
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Two-Way Inventory Sync</span>
-                                            <span className="ca-toggle-label-sub">Deduct WooCommerce stock when items are sold in POS terminal</span>
-                                        </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.woocommerceAutoSync !== 'false'}
-                                                onChange={(e) => handleChange('woocommerceAutoSync', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
-
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Store Connection Test</span>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={() => testEcommerceSync('woocommerce')}
-                                                disabled={isTesting}
-                                            >
-                                                <RefreshCw size={14} className={isTesting ? 'spin' : ''} /> Test Store Connection &amp; Sync Stock
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── Shopify Form ── */}
-                            {activeModalApp.id === 'shopify' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Shopify Store Domain</label>
-                                        <input
-                                            type="text"
-                                            placeholder="your-shop-name.myshopify.com"
-                                            value={settings.shopifyStoreDomain || ''}
-                                            onChange={(e) => handleChange('shopifyStoreDomain', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>Admin API Access Token (shpat_...)</label>
-                                        <input
-                                            type="password"
-                                            placeholder="shpat_xxxxxxxxxxxxxxxx"
-                                            value={settings.shopifyAccessToken || ''}
-                                            onChange={(e) => handleChange('shopifyAccessToken', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-toggle-item">
-                                        <div className="ca-toggle-label">
-                                            <span className="ca-toggle-label-title">Auto Stock Sync</span>
-                                        </div>
-                                        <label className="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={settings.shopifyAutoSync !== 'false'}
-                                                onChange={(e) => handleChange('shopifyAutoSync', e.target.checked ? 'true' : 'false')}
-                                            />
-                                            <span className="toggle-slider"></span>
-                                        </label>
-                                    </div>
-
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Shopify Store Verification</span>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={() => testEcommerceSync('shopify')}
-                                                disabled={isTesting}
-                                            >
-                                                <RefreshCw size={14} className={isTesting ? 'spin' : ''} /> Verify Shopify Connection &amp; Sync
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── Meta Catalog Form ── */}
-                            {activeModalApp.id === 'facebookAds' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Meta Pixel ID</label>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. 1928471928471"
-                                            value={settings.metaPixelId || ''}
-                                            onChange={(e) => handleChange('metaPixelId', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>Catalog ID (Commerce Manager)</label>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. 849204810294"
-                                            value={settings.metaCatalogId || ''}
-                                            onChange={(e) => handleChange('metaCatalogId', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>System User Access Token</label>
-                                        <input
-                                            type="password"
-                                            placeholder="EAAG..."
-                                            value={settings.metaAccessToken || ''}
-                                            onChange={(e) => handleChange('metaAccessToken', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Meta Catalog Feed Exporter</span>
-                                        <p style={{ margin: '0 0 8px 0', fontSize: '0.8rem', color: '#64748b' }}>
-                                            Compile your POS products and export a CSV feed formatted for Meta Commerce Manager.
-                                        </p>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={exportMetaCatalogFeed}
-                                                disabled={isTesting}
-                                            >
-                                                <Download size={14} /> Export Facebook Catalog CSV
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── SMS Gateway Form ── */}
-                            {activeModalApp.id === 'smsGateway' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Gateway Provider</label>
-                                        <select
-                                            value={settings.smsProvider || 'twilio'}
-                                            onChange={(e) => handleChange('smsProvider', e.target.value)}
-                                        >
-                                            <option value="twilio">Twilio</option>
-                                            <option value="fast2sms">Fast2SMS (India)</option>
-                                            <option value="msg91">MSG91</option>
-                                        </select>
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>API Key / Auth Token</label>
-                                        <input
-                                            type="password"
-                                            placeholder="Enter API Key or Auth Token"
-                                            value={settings.smsApiKey || ''}
-                                            onChange={(e) => handleChange('smsApiKey', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>Sender ID / Header (e.g. NAMUST)</label>
-                                        <input
-                                            type="text"
-                                            placeholder="NAMUST"
-                                            value={settings.smsSenderId || 'NAMUST'}
-                                            onChange={(e) => handleChange('smsSenderId', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">SMS Dispatch Simulation</span>
-                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                                            <input
-                                                type="text"
-                                                placeholder="Recipient Mobile (e.g. 919876543210)"
-                                                value={testPhone}
-                                                onChange={(e) => setTestPhone(e.target.value)}
-                                                style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.84rem' }}
-                                            />
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={testSmsGateway}
-                                            >
-                                                <Send size={14} /> Send Sample SMS
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ── Tally ERP Form ── */}
-                            {activeModalApp.id === 'tally' && (
-                                <>
-                                    <div className="ca-form-group">
-                                        <label>Tally Company Name</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Samrajya Store Pvt Ltd"
-                                            value={settings.tallyCompany || ''}
-                                            onChange={(e) => handleChange('tallyCompany', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>Tally Sales Ledger Name</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Sales Account"
-                                            value={settings.tallySalesLedger || 'Sales Account'}
-                                            onChange={(e) => handleChange('tallySalesLedger', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-form-group">
-                                        <label>Tally Cash / Bank Ledger Name</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Cash-in-Hand"
-                                            value={settings.tallyCashLedger || 'Cash-in-Hand'}
-                                            onChange={(e) => handleChange('tallyCashLedger', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="ca-test-actions-box">
-                                        <span className="ca-test-actions-title">Export Tally Vouchers</span>
-                                        <p style={{ margin: '0 0 8px 0', fontSize: '0.8rem', color: '#64748b' }}>
-                                            Generate an XML voucher file of recent POS sales ready for Tally Prime / ERP 9.
-                                        </p>
-                                        <div className="ca-test-buttons-row">
-                                            <button
-                                                className="ca-btn-test green"
-                                                onClick={exportTallyXml}
-                                                disabled={isTesting}
-                                            >
-                                                <Download size={14} /> Export Tally Sales XML
-                                            </button>
-                                        </div>
-                                        {testOutput && <div className="ca-test-output">{testOutput}</div>}
-                                    </div>
-                                </>
+                                <div className="ca-wa-security-pill" style={{ marginTop: '20px' }}>
+                                    <ShieldCheck size={20} color="#2563eb" style={{ flexShrink: 0 }} />
+                                    <span>
+                                        <strong>End-to-End Encrypted Session:</strong> Credentials stay strictly inside your local server directory. Invoices deliver directly from your phone with no third-party cloud forwarding.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ) : waWebStatus === 'initializing' ? (
+                        /* State D: Initializing Engine */
+                        <div className="ca-wa-cta-box" style={{ padding: '40px 20px', borderStyle: 'dashed' }}>
+                            <Loader2 size={40} color="#25D366" className="spin" style={{ margin: '0 auto 14px' }} />
+                            <div style={{ fontWeight: 700, fontSize: '1.15rem', color: '#0f172a' }}>
+                                Launching Headless WhatsApp Engine...
+                            </div>
+                            <p style={{ fontSize: '0.88rem', color: '#64748b', maxWidth: '460px', margin: '8px auto 0' }}>
+                                Initializing secure browser session. Your pairing QR code will appear right here in seconds...
+                            </p>
+                        </div>
+                    ) : (
+                        /* State E: Not Linked / Disconnected Hero CTA */
+                        <div className="ca-wa-cta-box" style={{ padding: '36px 24px', background: '#f8fafc', border: '1.5px dashed #cbd5e1' }}>
+                            <div className="ca-wa-cta-avatar" style={{ width: '60px', height: '60px' }}>
+                                <QrCode size={32} />
+                            </div>
+                            <div style={{ fontWeight: 700, fontSize: '1.25rem', color: '#0f172a', letterSpacing: '-0.02em' }}>
+                                Link Your WhatsApp Business via QR Code
+                            </div>
+                            <p style={{ fontSize: '0.9rem', color: '#64748b', maxWidth: '540px', margin: '8px auto 20px', lineHeight: '1.6' }}>
+                                Pair your store phone in seconds. Automated tax invoices, digital receipts, and Khata ledger reminders will be delivered directly from your phone with zero browser tabs or popups!
+                            </p>
+                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                <button
+                                    type="button"
+                                    className="ca-wa-primary-btn"
+                                    onClick={handleStartWaWeb}
+                                    disabled={waWebActionLoading}
+                                >
+                                    {waWebActionLoading ? (
+                                        <>
+                                            <Loader2 size={18} className="spin" /> Launching Engine...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <QrCode size={18} /> 📱 Scan QR Code to Link WhatsApp Business
+                                        </>
+                                    )}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="ca-btn-test"
+                                    onClick={() => checkWaWebStatus(true)}
+                                    disabled={waWebLoading}
+                                    style={{ padding: '10px 18px', fontSize: '0.88rem' }}
+                                >
+                                    <RefreshCw size={15} className={waWebLoading ? 'spin' : ''} />
+                                    Check Service Health
+                                </button>
+                            </div>
+                            {waWebHealth === false && (
+                                <div style={{ marginTop: '16px', fontSize: '0.82rem', color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca', padding: '10px 16px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                    <AlertCircle size={16} />
+                                    WhatsApp microservice is offline. Ensure <code>npm start</code> is running in <code>whatsapp-service/</code> on port 3005.
+                                </div>
                             )}
                         </div>
+                    )}
+                </div>
+            )}
 
-                        {/* Footer */}
-                        <div className="ca-modal-footer">
-                            {settings[activeModalApp.connectedKey] === 'true' ? (
+            {/* ── 5. Tab 2: Automation & Settings ── */}
+            {activeTab === 'automation' && (
+                <div className="ca-wa-panel-body">
+                    <div className="ca-wa-panel-title-area">
+                        <h3 className="ca-wa-panel-title">Automated Receipt Delivery & Methods</h3>
+                        <p className="ca-wa-panel-desc">
+                            Configure how receipts are dispatched during POS checkout and default phone parameters.
+                        </p>
+                    </div>
+
+                    {/* Auto-Send in Background Toggle */}
+                    <div className="ca-toggle-item" style={{
+                        background: settings.whatsappBackgroundAutoSend === 'true' ? '#ecfdf5' : '#f8fafc',
+                        border: `1.5px solid ${settings.whatsappBackgroundAutoSend === 'true' ? '#10b981' : '#e2e8f0'}`,
+                        borderRadius: '12px',
+                        padding: '16px 20px',
+                        marginBottom: '20px',
+                        transition: 'all 0.2s ease'
+                    }}>
+                        <div className="ca-toggle-label">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{
+                                    background: settings.whatsappBackgroundAutoSend === 'true' ? '#10b981' : '#94a3b8',
+                                    color: '#fff',
+                                    borderRadius: '8px',
+                                    width: '30px',
+                                    height: '30px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <Zap size={18} />
+                                </div>
+                                <span className="ca-toggle-label-title" style={{
+                                    fontSize: '1rem',
+                                    color: settings.whatsappBackgroundAutoSend === 'true' ? '#065f46' : '#1e293b',
+                                    fontWeight: '700'
+                                }}>
+                                    Auto-Send in Background (Without Opening WhatsApp Tabs)
+                                </span>
+                            </div>
+                            <span className="ca-toggle-label-sub" style={{ marginTop: '6px', fontSize: '0.84rem', color: '#64748b', lineHeight: 1.5 }}>
+                                Invoices are delivered silently via background service upon POS checkout. Zero browser windows, popups, or external tabs will ever open on cashier screens!
+                            </span>
+                        </div>
+                        <label className="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={settings.whatsappBackgroundAutoSend === 'true'}
+                                onChange={(e) => {
+                                    const isChecked = e.target.checked;
+                                    handleChange('whatsappBackgroundAutoSend', isChecked ? 'true' : 'false');
+                                    if (isChecked && (!settings.whatsappMode || settings.whatsappMode === 'direct')) {
+                                        handleChange('whatsappMode', 'whatsapp_web');
+                                    }
+                                }}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    {/* Method Selector */}
+                    <div className="ca-form-group" style={{ marginBottom: '20px' }}>
+                        <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a', marginBottom: '8px' }}>
+                            Dispatch Method
+                        </label>
+                        <div className="ca-wa-method-grid">
+                            {[
+                                {
+                                    id: 'whatsapp_web',
+                                    title: 'WhatsApp Web (whatsapp-web.js)',
+                                    badge: '⭐ Recommended',
+                                    desc: 'Automated background delivery via linked phone. Free, instant, zero Meta API approvals.',
+                                    icon: <QrCode size={18} />
+                                },
+                                {
+                                    id: 'direct',
+                                    title: 'Direct Click-to-Chat (wa.me)',
+                                    badge: 'Browser Fallback',
+                                    desc: 'Generates wa.me click-to-chat links for cashiers to click. Useful if running without microservice.',
+                                    icon: <ExternalLink size={18} />
+                                }
+                            ].map((m) => {
+                                const effectiveMode = settings.whatsappMode === 'direct' ? 'direct' : 'whatsapp_web';
+                                const isSelected = effectiveMode === m.id;
+                                return (
+                                    <button
+                                        key={m.id}
+                                        type="button"
+                                        className={`ca-wa-method-btn ${isSelected ? 'active' : ''}`}
+                                        onClick={() => {
+                                            handleChange('whatsappMode', m.id);
+                                            handleChange('whatsappBackgroundAutoSend', m.id === 'whatsapp_web' ? 'true' : 'false');
+                                        }}
+                                        style={{ padding: '16px' }}
+                                    >
+                                        <div className="ca-wa-method-top">
+                                            <div className="ca-wa-method-title" style={{ fontSize: '0.95rem' }}>
+                                                {m.icon}
+                                                <span>{m.title}</span>
+                                            </div>
+                                            {m.badge && (
+                                                <span className="ca-wa-method-tag" style={{
+                                                    backgroundColor: isSelected ? '#dcfce7' : '#f1f5f9',
+                                                    color: isSelected ? '#15803d' : '#64748b',
+                                                    borderColor: isSelected ? '#86efac' : '#e2e8f0'
+                                                }}>
+                                                    {m.badge}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="ca-wa-method-desc" style={{ marginTop: '6px' }}>{m.desc}</div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Country Code & Fast-Pills */}
+                    <div className="ca-form-group" style={{ marginBottom: '20px' }}>
+                        <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a' }}>
+                            Default Country Code <span className="hint">Prefix applied when mobile numbers are entered without country code</span>
+                        </label>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
+                            <input
+                                type="text"
+                                placeholder="91"
+                                value={settings.whatsappCountryCode || '91'}
+                                onChange={(e) => handleChange('whatsappCountryCode', e.target.value.replace(/[^0-9]/g, ''))}
+                                style={{ width: '110px', padding: '9px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', fontWeight: 700 }}
+                            />
+                            <span style={{ fontSize: '0.84rem', color: '#64748b' }}>Quick Select:</span>
+                        </div>
+                        <div className="ca-country-presets" style={{ marginTop: '10px' }}>
+                            {[
+                                { code: '91', label: '🇮🇳 +91 India' },
+                                { code: '1', label: '🇺🇸 +1 USA / Canada' },
+                                { code: '44', label: '🇬🇧 +44 UK' },
+                                { code: '971', label: '🇦🇪 +971 UAE' },
+                                { code: '966', label: '🇸🇦 +966 Saudi Arabia' },
+                                { code: '65', label: '🇸🇬 +65 Singapore' },
+                                { code: '61', label: '🇦🇺 +61 Australia' }
+                            ].map(item => (
                                 <button
-                                    className="ca-btn-disconnect"
-                                    onClick={() => handleDisconnectApp(activeModalApp)}
+                                    key={item.code}
+                                    type="button"
+                                    className={`ca-country-pill ${(settings.whatsappCountryCode || '91') === item.code ? 'active' : ''}`}
+                                    onClick={() => handleChange('whatsappCountryCode', item.code)}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Store Sender Phone */}
+                    <div className="ca-form-group" style={{ marginBottom: '20px' }}>
+                        <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a' }}>
+                            Store Sender Phone (Optional) <span className="hint">Displayed on customer receipts</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g. 9876543210"
+                            value={settings.whatsappPhone || ''}
+                            onChange={(e) => handleChange('whatsappPhone', e.target.value)}
+                            style={{ padding: '9px 14px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                        />
+                    </div>
+
+                    {/* Auto Prompt on POS Checkout Toggle */}
+                    <div className="ca-toggle-item" style={{
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        padding: '16px 20px',
+                        marginBottom: '24px'
+                    }}>
+                        <div className="ca-toggle-label">
+                            <span className="ca-toggle-label-title" style={{ fontSize: '0.95rem', fontWeight: 700 }}>
+                                Auto-Dispatch Receipts Upon POS Sale Completion
+                            </span>
+                            <span className="ca-toggle-label-sub" style={{ marginTop: '4px', fontSize: '0.82rem', color: '#64748b' }}>
+                                When enabled, successfully completed sales immediately trigger a WhatsApp receipt to the customer's phone number without additional confirmation prompts.
+                            </span>
+                        </div>
+                        <label className="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={settings.whatsappAutoSendInvoice !== 'false'}
+                                onChange={(e) => handleChange('whatsappAutoSendInvoice', e.target.checked ? 'true' : 'false')}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                            type="button"
+                            className="ca-wa-primary-btn"
+                            onClick={handleSaveAll}
+                            disabled={saving}
+                        >
+                            <CheckCircle2 size={16} />
+                            {saving ? 'Saving...' : 'Save Automation Settings'}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* ── 6. Tab 3: Invoice Template & Live Preview ── */}
+            {activeTab === 'template' && (
+                <div className="ca-wa-panel-body">
+                    <div className="ca-wa-panel-title-area">
+                        <h3 className="ca-wa-panel-title">Invoice Message Template & Live Chat Mockup</h3>
+                        <p className="ca-wa-panel-desc">
+                            Customize the message format sent to customers. Dynamic variables are resolved in real-time from checkout data.
+                        </p>
+                    </div>
+
+                    <div className="ca-wa-split-grid">
+                        {/* Left: Template Editor */}
+                        <div>
+                            {/* Variable Token Bar */}
+                            <div style={{ marginBottom: '12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155' }}>
+                                        Insert Dynamic Variable Chips:
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="ca-reset-template-btn"
+                                        onClick={() => handleChange('whatsappTemplate', DEFAULT_WHATSAPP_TEMPLATE)}
+                                    >
+                                        Reset to Default
+                                    </button>
+                                </div>
+                                <div className="ca-tokens-bar" style={{ flexWrap: 'wrap', gap: '6px' }}>
+                                    {[
+                                        { tag: '{customer_name}', label: '👤 Customer' },
+                                        { tag: '{store_name}', label: '🏪 Store' },
+                                        { tag: '{invoice_no}', label: '🧾 Invoice #' },
+                                        { tag: '{amount}', label: '💰 Amount' },
+                                        { tag: '{items}', label: '📦 Items' },
+                                        { tag: '{payment_status}', label: '💳 Status' },
+                                        { tag: '{date}', label: '📅 Date' },
+                                        { tag: '{time}', label: '⏰ Time' },
+                                        { tag: '{due_amount}', label: '⚠️ Due' },
+                                        { tag: '{payment_link}', label: '📲 UPI Pay' }
+                                    ].map(item => (
+                                        <button
+                                            key={item.tag}
+                                            type="button"
+                                            className="ca-token-chip"
+                                            onClick={() => insertToken(item.tag)}
+                                            title={`Click to insert ${item.tag} into template`}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Template Textarea */}
+                            <div className="ca-form-group">
+                                <label style={{ fontSize: '0.88rem', fontWeight: 600, color: '#0f172a' }}>
+                                    Template Content <span className="hint">Supports WhatsApp *bold*, _italics_, and line breaks</span>
+                                </label>
+                                <textarea
+                                    ref={templateTextareaRef}
+                                    rows="9"
+                                    value={settings.whatsappTemplate !== undefined ? settings.whatsappTemplate : DEFAULT_WHATSAPP_TEMPLATE}
+                                    onChange={(e) => handleChange('whatsappTemplate', e.target.value)}
+                                    placeholder="Enter your custom WhatsApp invoice message format..."
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 14px',
+                                        borderRadius: '8px',
+                                        border: '1.5px solid #cbd5e1',
+                                        fontSize: '0.86rem',
+                                        fontFamily: 'inherit',
+                                        lineHeight: 1.55,
+                                        boxSizing: 'border-box'
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '14px' }}>
+                                <button
+                                    type="button"
+                                    className="ca-wa-primary-btn"
+                                    onClick={handleSaveAll}
                                     disabled={saving}
                                 >
-                                    Disconnect App
+                                    <CheckCircle2 size={16} />
+                                    {saving ? 'Saving...' : 'Save Template Changes'}
                                 </button>
-                            ) : (
-                                <div />
-                            )}
+                            </div>
+                        </div>
 
-                            <button
-                                className="ca-btn-save"
-                                onClick={() => handleSaveAppConfig(activeModalApp)}
-                                disabled={saving}
-                            >
-                                <CheckCircle2 size={16} />
-                                {saving ? 'Saving...' : 'Save & Connect'}
-                            </button>
+                        {/* Right: Authentic WhatsApp Chat Simulator */}
+                        <div>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Sparkles size={14} color="#16a34a" /> Live Dynamic Customer Preview:
+                            </div>
+
+                            <div className="ca-wa-preview-box">
+                                <div className="ca-wa-preview-header">
+                                    <div className="ca-wa-avatar">
+                                        {(storeName).charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="ca-wa-header-info">
+                                        <span className="ca-wa-header-name">{storeName} (Official)</span>
+                                        <span className="ca-wa-header-status">Online • WhatsApp Verified ✓</span>
+                                    </div>
+                                </div>
+                                <div className="ca-wa-chat-canvas">
+                                    <div className="ca-wa-bubble">
+                                        {previewCompiled}
+                                        <div className="ca-wa-bubble-footer">
+                                            <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span className="ca-wa-ticks">✓✓</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style={{ marginTop: '10px', fontSize: '0.76rem', color: '#64748b', textAlign: 'center' }}>
+                                💡 Placeholders above reflect actual POS checkout data in production.
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Toast feedback */}
+            {/* ── 7. Tab 4: Live Message Tester ── */}
+            {activeTab === 'tester' && (
+                <div className="ca-wa-panel-body">
+                    <div className="ca-wa-panel-title-area">
+                        <h3 className="ca-wa-panel-title">Live Message Dispatch & Engine Verification</h3>
+                        <p className="ca-wa-panel-desc">
+                            Send test receipts or custom WhatsApp messages to verify your linked phone and engine health in real time.
+                        </p>
+                    </div>
+
+                    {waWebStatus !== 'ready' && (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: '12px',
+                            background: '#fffbeb',
+                            border: '1.5px solid #fde68a',
+                            borderRadius: '8px',
+                            padding: '12px 16px',
+                            marginBottom: '16px',
+                            color: '#92400e'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+                                <AlertCircle size={18} color="#d97706" />
+                                <div>
+                                    <strong>Device Not Paired:</strong> Your WhatsApp engine is currently <em>{waWebStatus === 'qr' ? 'waiting for QR scan' : (waWebStatus || 'not initialized')}</em>. Pair your phone in the QR tab to test live messages.
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                className="ca-btn-save"
+                                style={{ padding: '6px 14px', fontSize: '0.8rem', background: '#d97706', display: 'flex', alignItems: 'center', gap: '6px' }}
+                                onClick={() => setActiveTab('qr')}
+                            >
+                                <QrCode size={14} /> Link Device Now
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="ca-wa-test-hub" style={{ margin: 0 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) 2fr', gap: '16px', marginBottom: '16px' }}>
+                            {/* Left Input: Recipient */}
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                                    Recipient Mobile Number <span className="hint">with country code</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder={`e.g. ${settings.whatsappCountryCode || '91'}XXXXXXXXXX`}
+                                    value={testPhone}
+                                    onChange={(e) => setTestPhone(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '9px 12px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #cbd5e1',
+                                        fontSize: '0.88rem',
+                                        boxSizing: 'border-box'
+                                    }}
+                                />
+                                <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                                    {settings.whatsappPhone && (
+                                        <button
+                                            type="button"
+                                            className="ca-wa-test-chip"
+                                            onClick={() => setTestPhone(settings.whatsappPhone)}
+                                        >
+                                            Use Store Phone
+                                        </button>
+                                    )}
+                                    {user?.phone && (
+                                        <button
+                                            type="button"
+                                            className="ca-wa-test-chip"
+                                            onClick={() => setTestPhone(user.phone)}
+                                        >
+                                            Use My Phone
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Right Input: Message content */}
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                    <label style={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155', margin: 0 }}>
+                                        Test Message Content
+                                    </label>
+                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                        <button
+                                            type="button"
+                                            className="ca-wa-test-chip"
+                                            onClick={() => setWaCustomTestMsg('🧾 *TAX INVOICE / RECEIPT*\nInvoice: #POS-2024-8841\nAmount: ₹1,499.00 (PAID)\nStore: ' + storeName + '\nThank you for shopping with us! ✨')}
+                                        >
+                                            Receipt
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="ca-wa-test-chip"
+                                            onClick={() => setWaCustomTestMsg('⚠️ *KHATA PAYMENT REMINDER*\nDear Customer, an outstanding balance of ₹2,450.00 is due for ' + storeName + '. Please clear via UPI: pay@upi')}
+                                        >
+                                            Khata
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="ca-wa-test-chip"
+                                            onClick={() => setWaCustomTestMsg('Hello! This is a test message from ' + storeName + ' via WhatsApp Web. ✨')}
+                                        >
+                                            Hello
+                                        </button>
+                                    </div>
+                                </div>
+                                <textarea
+                                    rows="4"
+                                    value={waCustomTestMsg}
+                                    onChange={(e) => setWaCustomTestMsg(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '9px 12px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #cbd5e1',
+                                        fontSize: '0.85rem',
+                                        boxSizing: 'border-box',
+                                        fontFamily: 'inherit'
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Dispatch Button & Disclaimer */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', borderTop: '1px solid #e2e8f0', paddingTop: '14px' }}>
+                            <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                                💡 Delivered directly through your linked WhatsApp number with zero browser tabs or popups.
+                            </div>
+
+                            <button
+                                type="button"
+                                className="ca-wa-primary-btn"
+                                style={{ padding: '9px 24px', fontSize: '0.9rem' }}
+                                disabled={isTesting}
+                                onClick={() => handleSendWaWebTest(testPhone)}
+                            >
+                                {isTesting ? (
+                                    <>
+                                        <Loader2 size={16} className="spin" /> Dispatching Message...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send size={16} /> Send Live Test Message
+                                    </>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Success Feedback Card */}
+                        {testOutput && typeof testOutput === 'object' && testOutput.type === 'whatsapp_web' && testOutput.success && (
+                            <div style={{
+                                marginTop: '16px',
+                                background: '#f0fdf4',
+                                border: '1.5px solid #a7f3d0',
+                                borderRadius: '10px',
+                                padding: '14px 18px',
+                                color: '#065f46'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '0.92rem' }}>
+                                        <CheckCircle2 size={18} color="#10b981" />
+                                        Message Delivered Successfully to +{testOutput.phone}!
+                                    </div>
+                                    <span style={{ fontSize: '0.74rem', background: '#dcfce7', color: '#15803d', padding: '3px 10px', borderRadius: '12px', fontWeight: 700 }}>
+                                        ✓ Zero Windows Open
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: '0.84rem', color: '#047857' }}>
+                                    {testOutput.note || `Delivered from your linked WhatsApp phone.`}
+                                    {testOutput.messageId && (
+                                        <div style={{ marginTop: '6px', fontSize: '0.78rem', color: '#059669' }}>
+                                            WhatsApp Message ID: <code>{testOutput.messageId}</code>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Error Feedback Card */}
+                        {testOutput && typeof testOutput === 'object' && (testOutput.error || testOutput.type === 'error') && (
+                            <div style={{
+                                marginTop: '16px',
+                                background: '#fef2f2',
+                                border: '1.5px solid #fecaca',
+                                borderRadius: '10px',
+                                padding: '14px 18px',
+                                color: '#991b1b'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '0.92rem' }}>
+                                        <AlertCircle size={18} color="#ef4444" />
+                                        {testOutput.notLinked ? 'WhatsApp Device Not Linked' : 'Delivery Failed'}
+                                    </div>
+                                    {(testOutput.notLinked || waWebStatus !== 'ready') && (
+                                        <button
+                                            type="button"
+                                            className="ca-btn-save"
+                                            style={{ padding: '4px 12px', fontSize: '0.78rem', background: '#dc2626', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                            onClick={() => setActiveTab('qr')}
+                                        >
+                                            <QrCode size={13} /> Link Device Now
+                                        </button>
+                                    )}
+                                </div>
+                                <div style={{ fontSize: '0.84rem' }}>
+                                    {testOutput.message}
+                                </div>
+                                {(testOutput.notLinked || waWebStatus !== 'ready') && (
+                                    <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#b91c1c', fontWeight: 600 }}>
+                                        👉 Please head to the "Device Pairing & QR" tab and link your WhatsApp device before sending.
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ── 8. Tab 5: Message Audit Trail ── */}
+            {activeTab === 'logs' && (
+                <div className="ca-wa-panel-body">
+                    <div className="ca-wa-panel-title-area" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                        <div>
+                            <h3 className="ca-wa-panel-title">WhatsApp Message Delivery Audit Trail</h3>
+                            <p className="ca-wa-panel-desc">
+                                Database log of all transactional receipts and messages dispatched for this store workspace.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            className="ca-btn-test"
+                            onClick={loadWaLogs}
+                            disabled={loadingWaLogs}
+                            style={{ padding: '7px 14px', fontSize: '0.82rem' }}
+                        >
+                            <RefreshCw size={13} className={loadingWaLogs ? 'spin' : ''} />
+                            <span>Refresh Logs</span>
+                        </button>
+                    </div>
+
+                    {loadingWaLogs ? (
+                        <div style={{ textAlign: 'center', padding: '36px', color: '#64748b', fontSize: '0.88rem' }}>
+                            <Loader2 size={22} className="spin" style={{ display: 'inline-block', marginRight: '8px' }} />
+                            Fetching real-time logs from database...
+                        </div>
+                    ) : waLogs.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8', background: '#f8fafc', borderRadius: '10px', border: '1px dashed #cbd5e1' }}>
+                            <FileText size={32} style={{ margin: '0 auto 10px', opacity: 0.6 }} />
+                            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#475569' }}>No WhatsApp Messages Logged Yet</div>
+                            <p style={{ margin: '4px 0 0', fontSize: '0.82rem' }}>
+                                Messages sent during POS checkout or via the Live Tester will automatically appear in this audit log.
+                            </p>
+                        </div>
+                    ) : (
+                        <div style={{ overflowX: 'auto', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                            <table style={{ width: '100%', fontSize: '0.84rem', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                <thead>
+                                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 700 }}>
+                                        <th style={{ padding: '10px 14px' }}>Time</th>
+                                        <th style={{ padding: '10px 14px' }}>Recipient</th>
+                                        <th style={{ padding: '10px 14px' }}>Trigger</th>
+                                        <th style={{ padding: '10px 14px' }}>Status</th>
+                                        <th style={{ padding: '10px 14px' }}>Message ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {waLogs.map((log) => (
+                                        <tr key={log.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                            <td style={{ padding: '10px 14px', color: '#64748b' }}>
+                                                {log.createdAt ? new Date(log.createdAt).toLocaleString() : '-'}
+                                            </td>
+                                            <td style={{ padding: '10px 14px', fontWeight: 600, color: '#0f172a' }}>
+                                                +{log.recipientPhone}
+                                            </td>
+                                            <td style={{ padding: '10px 14px' }}>
+                                                <span style={{ fontSize: '0.74rem', padding: '3px 8px', borderRadius: '8px', background: '#f1f5f9', color: '#475569', fontWeight: 600 }}>
+                                                    {log.triggerType || 'MANUAL'}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '10px 14px' }}>
+                                                <span style={{
+                                                    fontSize: '0.74rem',
+                                                    fontWeight: 700,
+                                                    padding: '3px 10px',
+                                                    borderRadius: '12px',
+                                                    background: log.status === 'SENT' ? '#dcfce7' : '#fee2e2',
+                                                    color: log.status === 'SENT' ? '#15803d' : '#b91c1c'
+                                                }}>
+                                                    {log.status === 'SENT' ? '✓ SENT' : 'FAILED'}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '0.78rem', color: '#64748b' }}>
+                                                {log.messageId ? log.messageId : '-'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ── Toast Notification ── */}
             {toastMessage && (
                 <div className={`ca-toast ${toastMessage.type}`}>
                     <CheckCircle2 size={16} />
