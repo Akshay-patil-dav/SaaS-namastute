@@ -2,10 +2,12 @@
  * WhatsApp Messaging & Auto-Dispatch Service
  * 
  * Supports:
- * 1. Meta WhatsApp Cloud API (Automated background dispatch, zero windows)
- * 2. Custom HTTP Gateway (UltraMsg, Maytapi, GreenAPI, Baileys Webhook)
- * 3. High-compatibility Direct Web / Mobile Dispatch (Popup-safe anchor click)
+ * 1. WhatsApp Web (whatsapp-web.js microservice — QR scan link, no Meta dev account)
+ * 2. Meta WhatsApp Cloud API (Automated background dispatch, zero windows)
+ * 3. Custom HTTP Gateway (UltraMsg, Maytapi, GreenAPI, Baileys Webhook)
+ * 4. High-compatibility Direct Web / Mobile Dispatch (Popup-safe anchor click)
  */
+import { sendWhatsAppWebMessage } from './whatsappWebService';
 
 /**
  * Default Reference Meta Cloud API Credentials (From verified Meta Developer App)
@@ -214,7 +216,8 @@ export const compileWhatsAppTemplate = (template, data = {}) => {
  * 3. Fallback to Click-to-Chat with popup-safe dispatcher
  */
 export const isWhatsAppBackgroundReady = (settings = {}) => {
-    const mode = settings.whatsappMode || 'cloud_api';
+    const mode = settings.whatsappMode || 'whatsapp_web';
+    if (mode === 'whatsapp_web') return true;
     if (mode === 'cloud_api') return !!(settings.whatsappPhoneId && settings.whatsappToken);
     if (mode === 'gateway') return !!settings.whatsappGatewayUrl;
     return false;
@@ -231,7 +234,8 @@ export const sendWhatsAppMessage = async ({
     templateName = null,
     templateLanguage = 'en_US',
     fallbackTemplateOn24h = true,
-    _fallbackReason = null
+    _fallbackReason = null,
+    triggerType = 'INVOICE'
 }) => {
     const defaultCountry = settings.whatsappCountryCode || '91';
     const cleanPhone = formatWhatsAppPhone(phone, defaultCountry);
@@ -240,7 +244,36 @@ export const sendWhatsAppMessage = async ({
         throw new Error('Valid recipient mobile number with country code is required.');
     }
 
-    const mode = settings.whatsappMode || 'cloud_api';
+    const mode = settings.whatsappMode || 'whatsapp_web';
+
+    // ── 0. WhatsApp Web via whatsapp-web.js Microservice (Zero popup, direct from linked phone) ──
+    if (!forceWeb && (mode === 'whatsapp_web' || settings.whatsappBackgroundProvider === 'whatsapp_web')) {
+        try {
+            const sid = settings.whatsappSessionId || '';
+            const webRes = await sendWhatsAppWebMessage({
+                to: cleanPhone,
+                message,
+                sessionId: sid,
+                triggerType
+            });
+            return {
+                success: true,
+                provider: 'whatsapp_web',
+                messageId: webRes.messageId || 'sent',
+                phone: cleanPhone,
+                background: true,
+                response: webRes
+            };
+        } catch (webErr) {
+            console.error('[WhatsAppService] WhatsApp Web send error:', webErr.message);
+            // If user explicitly configured fallback or forceWeb, fallback to click-to-chat
+            if (forceWeb || settings.whatsappFallbackToWeb === 'true') {
+                console.warn('[WhatsAppService] Falling back to WhatsApp Click-to-Chat URL...');
+            } else {
+                throw new Error(webErr.response?.data?.error || webErr.message || 'WhatsApp Web message dispatch failed.');
+            }
+        }
+    }
 
     // Determine if custom settings are provided
     const isCustomMetaSet = !!(settings.whatsappPhoneId && settings.whatsappToken);

@@ -76,6 +76,7 @@ public class SecurityConfig {
                         // AI Helper endpoints require a valid JWT — each user can only access their own
                         // data
                         .requestMatchers("/api/ai/**").authenticated()
+                        .requestMatchers("/api/whatsapp/**").authenticated()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e
                         .defaultAuthenticationEntryPointFor(

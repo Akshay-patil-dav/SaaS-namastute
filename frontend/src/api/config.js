@@ -95,6 +95,9 @@ export const API = {
   // AI Helper (per-user, JWT-protected)
   AI: `${ENV.API_BASE_URL}/ai`,
 
+  // WhatsApp (proxied to whatsapp-web.js microservice)
+  WHATSAPP: `${ENV.API_BASE_URL}/whatsapp`,
+
   // Notes and Users
   NOTES: `${ENV.API_BASE_URL}/notes`,
   USERS: `${ENV.API_BASE_URL}/users`,

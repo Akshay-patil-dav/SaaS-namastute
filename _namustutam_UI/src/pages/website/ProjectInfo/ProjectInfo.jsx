@@ -11,6 +11,7 @@ import {
     Clock, Shield, Wrench, ChevronDown, Check,
     Layers, Cpu, Sparkles, Monitor, X
 } from 'lucide-react';
+
 import './ProjectInfo.css';
 
 // Slug helper — must match ProjectWorks and landing page navigation

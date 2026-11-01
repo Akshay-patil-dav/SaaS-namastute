@@ -82,3 +82,9 @@ ai:
 razorpay:
   key-id: ${RAZORPAY_KEY_ID:rzp_live_TlhdhUdp6GdfK3}
   key-secret: ${RAZORPAY_KEY_SECRET:rPr8ue0iQ4A7ajeLCf54GuXl}
+
+# ── WhatsApp Web.js Microservice ──────────────────────────────────────────────
+whatsapp:
+  service:
+    url: ${WHATSAPP_SERVICE_URL:http://localhost:3005}
+    api-key: ${WHATSAPP_SERVICE_API_KEY:wa_sec_9f7a8b3e2d1c4b5a6f7e8d9c0b1a2f3e}

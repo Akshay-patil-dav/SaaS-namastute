@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     CheckCircle2,
     X,
@@ -18,7 +18,13 @@ import {
     Layers,
     AlertCircle,
     Info,
-    Smartphone
+    Smartphone,
+    QrCode,
+    Loader2,
+    LogOut,
+    PhoneCall,
+    UserCheck,
+    Clock
 } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
 import { useAuth } from '../../../context/AuthContext';
@@ -33,6 +39,16 @@ import {
     dispatchWhatsAppLink,
     getWhatsAppDirectUrl
 } from '../../../services/whatsappService';
+import {
+    getWhatsAppSessionStatus,
+    getWhatsAppSessionQr,
+    startWhatsAppSession,
+    logoutWhatsAppSession,
+    sendWhatsAppWebMessage,
+    getWhatsAppServiceStatus,
+    getWhatsAppLogs,
+    getWhatsAppConfig
+} from '../../../services/whatsappWebService';
 import './connected-apps.css';
 
 // ── App Brand Logos (Clean SVGs) ──────────────────────────────
@@ -104,6 +120,200 @@ export const ConnectedApps = () => {
     const [testPhone, setTestPhone] = useState('');
     const [metaDemoType, setMetaDemoType] = useState('template'); // 'template' (hello_world) | 'invoice'
 
+    // ── WhatsApp Web.js Session State (Multi-Tenant & RBAC) ────────────────
+    const [waWebStatus, setWaWebStatus] = useState('not_initialized'); // 'not_initialized' | 'initializing' | 'qr' | 'authenticated' | 'ready' | 'disconnected'
+    const [waWebQr, setWaWebQr] = useState(null);
+    const [waWebInfo, setWaWebInfo] = useState(null);
+    const [waWebLoading, setWaWebLoading] = useState(false);
+    const [waWebActionLoading, setWaWebActionLoading] = useState(false);
+    const [waWebHealth, setWaWebHealth] = useState(null);
+    const [waCustomTestMsg, setWaCustomTestMsg] = useState('🧾 Namustutam POS: Tax Invoice #INV-1001 for ₹1,499.00 sent successfully! Thank you for your business ✨');
+
+    // Audit logs state
+    const [waLogs, setWaLogs] = useState([]);
+    const [showWaLogs, setShowWaLogs] = useState(false);
+    const [loadingWaLogs, setLoadingWaLogs] = useState(false);
+
+    // Multi-tenant & RBAC context
+    const tenantId = user?.activeProjectId || user?.id || 'default';
+    const tenantSessionId = `tenant_${tenantId}`;
+    const isOwnerOrAdmin = !user?.activeProjectId || user.activeProjectId === user.id || user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+
+    // Fetch tenant message audit logs from database
+    const loadWaLogs = useCallback(async () => {
+        setLoadingWaLogs(true);
+        try {
+            const res = await getWhatsAppLogs();
+            if (res.success && Array.isArray(res.data)) {
+                setWaLogs(res.data);
+            }
+        } catch {
+        } finally {
+            setLoadingWaLogs(false);
+        }
+    }, []);
+
+    // WhatsApp Web Session status polling when modal is open
+    const checkWaWebStatus = useCallback(async (isManual = false) => {
+        if (isManual) setWaWebLoading(true);
+        try {
+            const sid = settings.whatsappSessionId || tenantSessionId;
+            const res = await getWhatsAppSessionStatus(sid);
+            if (res.success) {
+                setWaWebHealth(true);
+                const s = res.data?.status || 'not_initialized';
+                setWaWebStatus(s);
+                setWaWebInfo(res.data?.info || null);
+
+                if (s === 'ready') {
+                    setWaWebQr(null);
+                    if (settings.whatsappConnected !== 'true') {
+                        handleChange('whatsappConnected', 'true');
+                    }
+                    if (res.data?.info?.phone && settings.whatsappPhone !== res.data.info.phone) {
+                        handleChange('whatsappPhone', res.data.info.phone);
+                    }
+                } else if (s === 'qr' || res.data?.hasQr || s === 'initializing') {
+                    const qrRes = await getWhatsAppSessionQr(sid);
+                    if (qrRes.success && qrRes.data?.qr) {
+                        setWaWebQr(qrRes.data.qr);
+                    }
+                }
+                if (isManual) {
+                    showToast(`WhatsApp Web connection status: ${s.toUpperCase()}`, 'info');
+                    loadWaLogs();
+                }
+            } else {
+                const health = await getWhatsAppServiceStatus();
+                setWaWebHealth(health.success);
+                if (!health.success) {
+                    setWaWebStatus('offline');
+                }
+                if (isManual) {
+                    showToast('WhatsApp microservice on port 3005 is offline or unreachable.', 'error');
+                }
+            }
+        } catch {
+            setWaWebHealth(false);
+            setWaWebStatus('offline');
+        } finally {
+            if (isManual) setWaWebLoading(false);
+        }
+    }, [settings.whatsappSessionId, tenantSessionId, handleChange, loadWaLogs]);
+
+    const handleStartWaWeb = async () => {
+        setWaWebActionLoading(true);
+        try {
+            const sid = settings.whatsappSessionId || tenantSessionId;
+            const res = await startWhatsAppSession(sid);
+            if (res.success) {
+                setWaWebStatus(res.data?.status || 'initializing');
+                if (res.data?.qr) setWaWebQr(res.data.qr);
+                showToast('Starting WhatsApp Web engine... QR will appear shortly.', 'info');
+                setTimeout(() => checkWaWebStatus(), 1200);
+            } else {
+                showToast(res.error || 'Failed to start WhatsApp Web session.', 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        } finally {
+            setWaWebActionLoading(false);
+        }
+    };
+
+    const handleLogoutWaWeb = async () => {
+        if (!window.confirm('Disconnect this WhatsApp Web session? You will need to scan the QR code again.')) return;
+        setWaWebActionLoading(true);
+        try {
+            const sid = settings.whatsappSessionId || tenantSessionId;
+            await logoutWhatsAppSession(sid);
+            setWaWebStatus('disconnected');
+            setWaWebQr(null);
+            setWaWebInfo(null);
+            handleChange('whatsappConnected', 'false');
+            showToast('WhatsApp Web session disconnected.');
+        } catch (err) {
+            showToast('Failed to disconnect: ' + err.message, 'error');
+        } finally {
+            setWaWebActionLoading(false);
+        }
+    };
+
+    const handleSendWaWebTest = async (phoneToUse) => {
+        const defaultCode = settings.whatsappCountryCode || '91';
+        let rawPhone = phoneToUse || testPhone || settings.whatsappPhone || user?.phone || '';
+        let cleanPhone = formatWhatsAppPhone(rawPhone, defaultCode);
+
+        if (!cleanPhone) {
+            setTestOutput({
+                error: true,
+                message: 'Please enter a valid recipient mobile number with country code.'
+            });
+            showToast('Please enter a recipient phone number first.', 'error');
+            return;
+        }
+
+        if (waWebHealth === false) {
+            setTestOutput({
+                error: true,
+                type: 'error',
+                message: 'WhatsApp engine service on port 3005 is offline. Start the service (npm start in whatsapp-service/) to send live messages.'
+            });
+            showToast('WhatsApp engine is offline. Please start port 3005 service first.', 'error');
+            return;
+        }
+
+        setIsTesting(true);
+        setTestOutput(`Dispatching live message to +${cleanPhone} via WhatsApp Web...`);
+
+        try {
+            const msgToSend = waCustomTestMsg.trim() || '🧾 Namustutam POS Receipt: Test message verified!';
+            const sid = settings.whatsappSessionId || tenantSessionId;
+            const res = await sendWhatsAppWebMessage({
+                to: cleanPhone,
+                message: msgToSend,
+                sessionId: sid,
+                triggerType: 'TEST_MESSAGE'
+            });
+
+            setTestOutput({
+                type: 'whatsapp_web',
+                success: true,
+                phone: cleanPhone,
+                messageId: res.messageId,
+                note: `Dispatched directly from your linked WhatsApp! Message ID: ${res.messageId || 'delivered'}`
+            });
+            showToast(`Test message sent to +${cleanPhone} via WhatsApp Web!`);
+            loadWaLogs();
+        } catch (err) {
+            setTestOutput({
+                error: true,
+                type: 'error',
+                message: err.response?.data?.error || err.message || 'Failed to send via WhatsApp Web. Please ensure WhatsApp is linked.'
+            });
+            showToast('Send failed: ' + (err.response?.data?.error || err.message), 'error');
+        } finally {
+            setIsTesting(false);
+        }
+    };
+
+    const checkWaWebStatusRef = useRef(checkWaWebStatus);
+    checkWaWebStatusRef.current = checkWaWebStatus;
+    const loadWaLogsRef = useRef(loadWaLogs);
+    loadWaLogsRef.current = loadWaLogs;
+
+    useEffect(() => {
+        if (activeModalApp?.id !== 'whatsapp') return;
+        checkWaWebStatusRef.current();
+        loadWaLogsRef.current();
+
+        const interval = setInterval(() => {
+            checkWaWebStatusRef.current();
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [activeModalApp?.id]);
+
     // Automatically set test phone from dynamic settings or current user phone when available
     useEffect(() => {
         if (!testPhone) {
@@ -121,19 +331,20 @@ export const ConnectedApps = () => {
     const apps = [
         {
             id: 'whatsapp',
-            name: 'WhatsApp Business',
+            name: 'WhatsApp Business & Web',
             category: 'MESSAGING',
             tag: 'Popular',
             desc: 'Send instant invoice receipts, billing links, and automated Khata payment reminders.',
             connectedKey: 'whatsappConnected',
             logo: Logos.whatsapp,
-            features: ['POS Receipts', 'Background Auto-Send', 'Meta Cloud API', 'HTTP Gateway', 'Zero Window Opening'],
+            features: ['WhatsApp Web QR (No Meta Setup)', 'POS Receipts', 'Background Auto-Send', 'Direct Click-to-Chat', 'Zero Window Opening'],
             defaultSettings: {
                 whatsappPhone: '',
                 whatsappCountryCode: '91',
-                whatsappMode: 'cloud_api', // 'direct', 'desktop', 'cloud_api', 'gateway'
+                whatsappMode: 'whatsapp_web', // 'whatsapp_web' | 'direct'
                 whatsappBackgroundAutoSend: 'true', // 'true' | 'false' - send in background without opening
-                whatsappBackgroundProvider: 'cloud_api', // 'cloud_api' | 'gateway'
+                whatsappBackgroundProvider: 'whatsapp_web', // 'whatsapp_web' | 'cloud_api' | 'gateway'
+                whatsappSessionId: 'default',
                 whatsappToken: '',
                 whatsappPhoneId: '',
                 whatsappApiVersion: 'v22.0',
@@ -383,6 +594,38 @@ export const ConnectedApps = () => {
             date: sampleDate,
             time: sampleTime
         });
+
+        // ── 0. WhatsApp Web (whatsapp-web.js) Background Dispatch ──
+        if (!forceWeb && (settings.whatsappMode === 'whatsapp_web' || !settings.whatsappMode)) {
+            setIsTesting(true);
+            setTestOutput(`Dispatching live invoice to +${cleanPhone} via WhatsApp Web...`);
+            try {
+                const sid = settings.whatsappSessionId || 'default';
+                const res = await sendWhatsAppWebMessage({
+                    to: cleanPhone,
+                    message: compiledMessage,
+                    sessionId: sid
+                });
+                setTestOutput({
+                    type: 'whatsapp_web',
+                    success: true,
+                    phone: cleanPhone,
+                    messageId: res.messageId,
+                    note: `Invoice bill dispatched directly through your linked WhatsApp phone! (Message ID: ${res.messageId || 'delivered'})`
+                });
+                showToast(`Invoice delivered to +${cleanPhone} via WhatsApp Web!`);
+            } catch (err) {
+                setTestOutput({
+                    error: true,
+                    type: 'error',
+                    message: err.response?.data?.error || err.message || 'WhatsApp Web dispatch failed. Please ensure your WhatsApp is linked via QR scan.'
+                });
+                showToast('Send failed: ' + (err.response?.data?.error || err.message), 'error');
+            } finally {
+                setIsTesting(false);
+            }
+            return;
+        }
 
         // Determine if Meta Official Demo Template (hello_world) should be used
         const isUsingMetaTemplate = forceDemoTemplate === true || (forceDemoTemplate === null && metaDemoType === 'template');
@@ -1123,7 +1366,7 @@ export const ConnectedApps = () => {
                                                     const isChecked = e.target.checked;
                                                     handleChange('whatsappBackgroundAutoSend', isChecked ? 'true' : 'false');
                                                     if (isChecked && (!settings.whatsappMode || settings.whatsappMode === 'direct' || settings.whatsappMode === 'desktop')) {
-                                                        handleChange('whatsappMode', 'cloud_api');
+                                                        handleChange('whatsappMode', 'whatsapp_web');
                                                     }
                                                 }}
                                             />
@@ -1131,112 +1374,690 @@ export const ConnectedApps = () => {
                                         </label>
                                     </div>
 
-                                    {/* Mode / Provider Selector */}
-                                    <div className="ca-form-group">
+                                    {/* Visual Mode / Provider Selector */}
+                                    <div className="ca-form-group" style={{ marginBottom: '16px' }}>
                                         <label>Integration Method</label>
-                                        <select
-                                            value={settings.whatsappMode || 'direct'}
-                                            onChange={(e) => {
-                                                const val = e.target.value;
-                                                handleChange('whatsappMode', val);
-                                                if (val === 'cloud_api' || val === 'gateway') {
-                                                    handleChange('whatsappBackgroundAutoSend', 'true');
-                                                } else {
-                                                    handleChange('whatsappBackgroundAutoSend', 'false');
+                                        <div className="ca-wa-method-grid">
+                                            {[
+                                                {
+                                                    id: 'whatsapp_web',
+                                                    title: 'WhatsApp Web (QR Scan)',
+                                                    badge: '⭐ Recommended',
+                                                    desc: 'Pair via QR scan with whatsapp-web.js. Free, zero Meta verification, sends from your phone.',
+                                                    icon: <QrCode size={16} />
+                                                },
+                                                {
+                                                    id: 'direct',
+                                                    title: 'Direct Click-to-Chat',
+                                                    badge: 'Manual (wa.me)',
+                                                    desc: 'Opens wa.me link in browser tab on bill completion. Zero server background setup.',
+                                                    icon: <ExternalLink size={16} />
                                                 }
-                                            }}
-                                        >
-                                            <option value="direct">Direct WhatsApp Web / Click-to-Chat (Opens wa.me in browser)</option>
-                                            <option value="desktop">WhatsApp Desktop Application (Opens local app via whatsapp://)</option>
-                                            <option value="cloud_api">Meta WhatsApp Cloud API (Automated Background Send, No Window)</option>
-                                            <option value="gateway">Custom WhatsApp Gateway / Webhook (UltraMsg, Maytapi, GreenAPI, Baileys)</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Meta Cloud API Configuration */}
-                                    {settings.whatsappMode === 'cloud_api' && (
-                                        <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '14px', marginBottom: '14px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#0668E1' }} />
-                                                <strong style={{ fontSize: '0.85rem', color: '#1e293b' }}>Dynamic Meta WhatsApp Cloud API Settings</strong>
-                                                <span style={{ fontSize: '0.72rem', background: '#dbeafe', color: '#1e40af', padding: '2px 8px', borderRadius: '10px', fontWeight: '600', marginLeft: 'auto' }}>
-                                                    Official Meta API
-                                                </span>
-                                            </div>
-                                            <div className="ca-form-group" style={{ marginBottom: '10px' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <label>Phone Number ID <span className="hint">from Meta for Developers App</span></label>
+                                            ].map((m) => {
+                                                const effectiveMode = settings.whatsappMode === 'direct' ? 'direct' : 'whatsapp_web';
+                                                const isSelected = effectiveMode === m.id;
+                                                return (
                                                     <button
+                                                        key={m.id}
                                                         type="button"
-                                                        style={{ background: 'none', border: 'none', color: '#0284c7', fontSize: '0.73rem', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                                                        className={`ca-wa-method-btn ${isSelected ? 'active' : ''}`}
                                                         onClick={() => {
-                                                            handleChange('whatsappPhoneId', DEFAULT_META_PHONE_ID);
-                                                            handleChange('whatsappToken', DEFAULT_META_TOKEN);
-                                                            handleChange('whatsappApiVersion', 'v22.0');
-                                                            showToast('Filled verified sample Meta credentials!');
+                                                            handleChange('whatsappMode', m.id);
+                                                            if (m.id === 'whatsapp_web') {
+                                                                handleChange('whatsappBackgroundAutoSend', 'true');
+                                                            } else {
+                                                                handleChange('whatsappBackgroundAutoSend', 'false');
+                                                            }
                                                         }}
                                                     >
-                                                        Use Sample / Reference Meta API Key
+                                                        <div className="ca-wa-method-top">
+                                                            <div className="ca-wa-method-title">
+                                                                {m.icon}
+                                                                <span>{m.title}</span>
+                                                            </div>
+                                                            {m.badge && (
+                                                                <span className="ca-wa-method-tag" style={{
+                                                                    backgroundColor: isSelected ? '#dcfce7' : '#f1f5f9',
+                                                                    color: isSelected ? '#15803d' : '#64748b',
+                                                                    borderColor: isSelected ? '#86efac' : '#e2e8f0'
+                                                                }}>
+                                                                    {m.badge}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="ca-wa-method-desc">{m.desc}</div>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* ── SECTION 1: WhatsApp Web (whatsapp-web.js) Hub & QR Scanner ── */}
+                                    {(settings.whatsappMode === 'whatsapp_web' || !settings.whatsappMode) && (
+                                        <div className="ca-wa-hub-box" style={{ marginBottom: '20px' }}>
+                                            {/* Hub Header */}
+                                            <div className="ca-wa-hub-header">
+                                                <div className="ca-wa-hub-title-group">
+                                                    <div className="ca-wa-hub-icon-wrap">
+                                                        <QrCode size={22} />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="ca-wa-hub-title">
+                                                            WhatsApp Business Device Link & QR Scan
+                                                            <span style={{ fontSize: '0.72rem', background: '#ecfdf5', color: '#047857', padding: '2px 8px', borderRadius: '12px', fontWeight: '700', border: '1px solid #a7f3d0' }}>
+                                                                whatsapp-web.js
+                                                            </span>
+                                                        </h4>
+                                                        <p className="ca-wa-hub-subtitle">
+                                                            Scan the QR code with WhatsApp on your phone to link your business number and deliver instant bills.
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Live Indicators & Controls */}
+                                                <div className="ca-wa-hub-badge-group">
+                                                    {/* Service Health */}
+                                                    <span className={`ca-wa-service-pill ${waWebHealth === true ? 'online' : (waWebHealth === false ? 'offline' : '')}`}>
+                                                        <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: waWebHealth === true ? '#10b981' : (waWebHealth === false ? '#ef4444' : '#94a3b8'), display: 'inline-block' }}></span>
+                                                        {waWebHealth === true ? 'Engine: Online (3005)' : (waWebHealth === false ? 'Engine: Offline' : 'Checking Engine...')}
+                                                    </span>
+
+                                                    {/* Session State Badge (shown when engine is alive) */}
+                                                    {waWebHealth !== false && (
+                                                        <span className={`ca-wa-status-badge ${waWebStatus === 'ready' ? 'connected' : (waWebStatus === 'qr' ? 'qr' : (waWebStatus === 'initializing' ? 'initializing' : 'disconnected'))}`}>
+                                                            {waWebStatus === 'ready' ? (
+                                                                <>
+                                                                    <CheckCircle2 size={13} />
+                                                                    Connected & Active
+                                                                </>
+                                                            ) : waWebStatus === 'qr' ? (
+                                                                <>
+                                                                    <QrCode size={13} />
+                                                                    Waiting for QR Scan
+                                                                </>
+                                                            ) : waWebStatus === 'initializing' ? (
+                                                                <>
+                                                                    <Loader2 size={13} className="spin" />
+                                                                    Launching Engine...
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Smartphone size={13} />
+                                                                    Not Linked
+                                                                </>
+                                                            )}
+                                                        </span>
+                                                    )}
+
+                                                    {/* Manual Refresh Button */}
+                                                    <button
+                                                        type="button"
+                                                        className="ca-wa-icon-btn"
+                                                        title="Refresh WhatsApp Engine Status"
+                                                        onClick={() => checkWaWebStatus(true)}
+                                                        disabled={waWebLoading}
+                                                    >
+                                                        <RefreshCw size={14} className={waWebLoading ? 'spin' : ''} />
                                                     </button>
                                                 </div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Enter your Meta Phone Number ID (e.g. 1281932198343073)"
-                                                    value={settings.whatsappPhoneId || ''}
-                                                    onChange={(e) => handleChange('whatsappPhoneId', e.target.value)}
-                                                />
                                             </div>
-                                            <div className="ca-form-group" style={{ marginBottom: '10px' }}>
-                                                <label>Permanent Access Token <span className="hint">System User / App Token</span></label>
-                                                <input
-                                                    type="password"
-                                                    placeholder="Enter your Meta Permanent Access Token (EAAW...)"
-                                                    value={settings.whatsappToken || ''}
-                                                    onChange={(e) => handleChange('whatsappToken', e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="ca-form-group" style={{ marginBottom: 0 }}>
-                                                <label>Meta Graph API Version <span className="hint">Default: v22.0 or v25.0</span></label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="v22.0"
-                                                    value={settings.whatsappApiVersion || 'v22.0'}
-                                                    onChange={(e) => handleChange('whatsappApiVersion', e.target.value)}
-                                                />
+
+                                            {/* Body depending on state */}
+                                            {waWebHealth === false ? (
+                                                /* State 0: ENGINE OFFLINE BANNER */
+                                                <div style={{
+                                                    background: '#fff1f2',
+                                                    border: '1.5px solid #fecdd3',
+                                                    borderRadius: '12px',
+                                                    padding: '18px 20px',
+                                                    marginBottom: '4px'
+                                                }}>
+                                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                                                        <div style={{
+                                                            width: '42px',
+                                                            height: '42px',
+                                                            borderRadius: '50%',
+                                                            background: '#fee2e2',
+                                                            color: '#e11d48',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexShrink: 0
+                                                        }}>
+                                                            <AlertCircle size={22} />
+                                                        </div>
+                                                        <div style={{ flex: 1 }}>
+                                                            <div style={{ fontWeight: 700, fontSize: '0.98rem', color: '#9f1239', marginBottom: '4px' }}>
+                                                                WhatsApp Web Engine Service is Offline
+                                                            </div>
+                                                            <p style={{ margin: 0, fontSize: '0.84rem', color: '#881337', lineHeight: 1.5 }}>
+                                                                {/* The background WhatsApp service is currently not reachable on <code>http://localhost:3005</code>. */}
+                                                                Live automated delivery of invoices, receipts, and Khata reminders is paused until the service is running.
+                                                            </p>
+                                                            {(waWebInfo?.phone || settings.whatsappPhone) && (
+                                                                <div style={{ marginTop: '8px', fontSize: '0.82rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                    <Smartphone size={14} color="#64748b" />
+                                                                    <span>Preserved Account: <strong>+{waWebInfo?.phone || settings.whatsappPhone}</strong> {waWebInfo?.pushname ? `(${waWebInfo.pushname})` : ''} (session saved)</span>
+                                                                </div>
+                                                            )}
+                                                            <div style={{
+                                                                marginTop: '12px',
+                                                                background: '#0f172a',
+                                                                color: '#f8fafc',
+                                                                padding: '8px 14px',
+                                                                borderRadius: '8px',
+                                                                fontFamily: 'monospace',
+                                                                fontSize: '0.82rem',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'space-between',
+                                                                flexWrap: 'wrap',
+                                                                gap: '10px'
+                                                            }}>
+                                                                <span style={{ color: '#94a3b8' }}>Start engine in your terminal:</span>
+                                                                <code style={{ color: '#38bdf8', fontWeight: 600 }}>cd whatsapp-service && npm start</code>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '14px', borderTop: '1px solid #ffe4e6', paddingTop: '12px' }}>
+                                                        {(waWebInfo?.phone || settings.whatsappPhone) && (
+                                                            <button
+                                                                type="button"
+                                                                className="ca-wa-btn-unlink"
+                                                                onClick={handleLogoutWaWeb}
+                                                                disabled={waWebActionLoading}
+                                                                style={{ fontSize: '0.78rem', padding: '6px 12px' }}
+                                                            >
+                                                                <LogOut size={13} />
+                                                                Reset Session
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            className="ca-btn-test"
+                                                            onClick={() => checkWaWebStatus(true)}
+                                                            disabled={waWebLoading}
+                                                            style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+                                                        >
+                                                            <RefreshCw size={13} className={waWebLoading ? 'spin' : ''} />
+                                                            Retry Service Connection
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : waWebStatus === 'ready' ? (
+                                                <div className="ca-wa-connected-banner">
+                                                    <div className="ca-wa-connected-left">
+                                                        <div className="ca-wa-connected-icon">
+                                                            <CheckCircle2 size={24} />
+                                                        </div>
+                                                        <div>
+                                                            <div style={{ fontWeight: 700, fontSize: '0.98rem', color: '#065f46' }}>
+                                                                WhatsApp Business Connected Successfully
+                                                            </div>
+                                                            <div className="ca-wa-connected-meta">
+                                                                {waWebInfo?.phone && (
+                                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                                                        <PhoneCall size={13} /> +{waWebInfo.phone}
+                                                                    </span>
+                                                                )}
+                                                                {waWebInfo?.pushname && (
+                                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                                                        <UserCheck size={13} /> {waWebInfo.pushname}
+                                                                    </span>
+                                                                )}
+                                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', opacity: 0.9 }}>
+                                                                    <ShieldCheck size={13} /> Encrypted Direct Session (Zero Windows Opened)
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        <button
+                                                            type="button"
+                                                            className="ca-wa-btn-unlink"
+                                                            onClick={handleLogoutWaWeb}
+                                                            disabled={waWebActionLoading}
+                                                        >
+                                                            <LogOut size={14} />
+                                                            {waWebActionLoading ? 'Disconnecting...' : 'Disconnect WhatsApp'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (waWebStatus === 'qr' && waWebQr) ? (
+                                                /* State B: QR CODE SCANNER VIEW */
+                                                <div className="ca-wa-qr-grid">
+                                                    <div className="ca-wa-qr-display">
+                                                        <div className="ca-wa-qr-frame">
+                                                            <img
+                                                                src={waWebQr}
+                                                                alt="Scan this WhatsApp QR Code with phone"
+                                                                className="ca-wa-qr-img"
+                                                            />
+                                                            <div className="ca-wa-qr-center-logo" title="WhatsApp">
+                                                                <div className="ca-wa-qr-logo-inner">
+                                                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
+                                                                        <path fillRule="evenodd" clipRule="evenodd" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.4-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.44 1.03 2.61c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z" />
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="ca-wa-qr-indicator">
+                                                            <Loader2 size={12} className="spin" />
+                                                            Auto-refreshing live QR code...
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            style={{
+                                                                marginTop: '8px',
+                                                                background: '#f8fafc',
+                                                                border: '1px solid #cbd5e1',
+                                                                borderRadius: '6px',
+                                                                padding: '4px 10px',
+                                                                fontSize: '0.74rem',
+                                                                cursor: 'pointer',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '4px',
+                                                                color: '#475569'
+                                                            }}
+                                                            onClick={() => checkWaWebStatus(true)}
+                                                        >
+                                                            <RefreshCw size={11} /> Refresh QR
+                                                        </button>
+                                                    </div>
+
+                                                    <div>
+                                                        <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                            <span style={{ display: 'inline-flex', alignItems: 'center' }}>{Logos.whatsapp}</span>
+                                                            Scan QR Code to Link WhatsApp Business
+                                                        </div>
+                                                        <ol className="ca-wa-qr-steps-list">
+                                                            <li>Open <strong>WhatsApp</strong> on your mobile phone.</li>
+                                                            <li>
+                                                                Tap <strong>Menu</strong> (Android <span style={{ color: '#64748b' }}>⋮</span>) or <strong>Settings</strong> (iPhone <span style={{ color: '#64748b' }}>⚙️</span>).
+                                                            </li>
+                                                            <li>
+                                                                Select <strong>Linked Devices</strong>, then tap <strong>Link a Device</strong>.
+                                                            </li>
+                                                            <li>Point your phone camera at this QR code to complete pairing.</li>
+                                                        </ol>
+
+                                                        <div className="ca-wa-security-pill">
+                                                            <ShieldCheck size={18} color="#2563eb" style={{ flexShrink: 0 }} />
+                                                            <span>
+                                                                <strong>End-to-End Encrypted:</strong> Session credentials remain locally stored in your service directory. Zero third-party cloud data forwarding.
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : waWebStatus === 'initializing' ? (
+                                                /* State C: INITIALIZING ENGINE */
+                                                <div className="ca-wa-cta-box" style={{ padding: '36px 20px', borderStyle: 'dashed' }}>
+                                                    <Loader2 size={36} color="#25D366" className="spin" style={{ margin: '0 auto 12px' }} />
+                                                    <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#0f172a' }}>
+                                                        Launching Headless WhatsApp Engine...
+                                                    </div>
+                                                    <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: '440px', margin: '6px auto 0' }}>
+                                                        Establishing encrypted connection and launching Chrome. Your pairing QR code will appear in seconds...
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                /* State D: NOT LINKED / DISCONNECTED CTA */
+                                                <div className="ca-wa-cta-box">
+                                                    <div className="ca-wa-cta-avatar">
+                                                        <QrCode size={28} />
+                                                    </div>
+                                                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#0f172a' }}>
+                                                        Link Your WhatsApp Business via QR Scan
+                                                    </div>
+                                                    <p style={{ fontSize: '0.85rem', color: '#64748b', maxWidth: '520px', margin: '6px auto 18px', lineHeight: '1.55' }}>
+                                                        Connect your store phone in seconds. Automated tax invoices, billing receipts, and Khata ledger reminders will be delivered directly from your phone without opening any browser tabs!
+                                                    </p>
+                                                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                                        <button
+                                                            type="button"
+                                                            className="ca-wa-primary-btn"
+                                                            onClick={handleStartWaWeb}
+                                                            disabled={waWebActionLoading}
+                                                        >
+                                                            {waWebActionLoading ? (
+                                                                <>
+                                                                    <Loader2 size={16} className="spin" />
+                                                                    Launching Scanner Engine...
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <QrCode size={18} />
+                                                                    📱 Scan QR Code to Link WhatsApp Business
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="ca-btn-test"
+                                                            onClick={() => checkWaWebStatus(true)}
+                                                            disabled={waWebLoading}
+                                                        >
+                                                            <RefreshCw size={14} className={waWebLoading ? 'spin' : ''} />
+                                                            Check Service Health
+                                                        </button>
+                                                    </div>
+                                                    {waWebHealth === false && (
+                                                        <div style={{ marginTop: '14px', fontSize: '0.78rem', color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca', padding: '8px 14px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                                            <AlertCircle size={14} />
+                                                            WhatsApp microservice appears offline. Ensure <code>npm start</code> is running in <code>whatsapp-service/</code> on port 3005.
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Section B: Testing Connection & Live Message */}
+                                            <div className="ca-wa-test-hub">
+                                                <div className="ca-wa-test-hub-header">
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <Send size={16} color="#2563eb" />
+                                                        <strong style={{ fontSize: '0.92rem', color: '#0f172a' }}>
+                                                            Test Connection & Live Message
+                                                        </strong>
+                                                    </div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <button
+                                                            type="button"
+                                                            className="ca-btn-test"
+                                                            style={{ fontSize: '0.76rem', padding: '5px 10px' }}
+                                                            onClick={() => checkWaWebStatus(true)}
+                                                            disabled={waWebLoading}
+                                                        >
+                                                            <Zap size={13} color="#f59e0b" />
+                                                            Test Service Connection
+                                                        </button>
+                                                        <span style={{
+                                                            fontSize: '0.74rem',
+                                                            fontWeight: 700,
+                                                            padding: '3px 8px',
+                                                            borderRadius: '12px',
+                                                            backgroundColor: waWebHealth === false ? '#fef2f2' : (waWebStatus === 'ready' ? '#ecfdf5' : '#fff1f2'),
+                                                            color: waWebHealth === false ? '#b91c1c' : (waWebStatus === 'ready' ? '#059669' : '#e11d48'),
+                                                            border: `1px solid ${waWebHealth === false ? '#fecaca' : (waWebStatus === 'ready' ? '#a7f3d0' : '#fecdd3')}`
+                                                        }}>
+                                                            {waWebHealth === false ? '⚠️ Engine Offline' : (waWebStatus === 'ready' ? '✓ WhatsApp Linked' : '⚠️ Device Not Linked')}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Test Inputs */}
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 2fr', gap: '12px', marginBottom: '12px' }}>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                                                            Recipient Phone Number <span className="hint">with country code</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder={`e.g. ${settings.whatsappCountryCode || '91'}9876543210`}
+                                                            value={testPhone}
+                                                            onChange={(e) => setTestPhone(e.target.value)}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '8px 12px',
+                                                                borderRadius: '6px',
+                                                                border: '1px solid #cbd5e1',
+                                                                fontSize: '0.85rem',
+                                                                boxSizing: 'border-box'
+                                                            }}
+                                                        />
+                                                        <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
+                                                            {settings.whatsappPhone && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="ca-wa-test-chip"
+                                                                    onClick={() => setTestPhone(settings.whatsappPhone)}
+                                                                    title="Fill Store Phone"
+                                                                >
+                                                                    Store Phone
+                                                                </button>
+                                                            )}
+                                                            {user?.phone && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="ca-wa-test-chip"
+                                                                    onClick={() => setTestPhone(user.phone)}
+                                                                    title="Fill My Account Phone"
+                                                                >
+                                                                    My Phone
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                                            <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155', margin: 0 }}>
+                                                                Test Message Content
+                                                            </label>
+                                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                                <button
+                                                                    type="button"
+                                                                    className="ca-wa-test-chip"
+                                                                    onClick={() => setWaCustomTestMsg('🧾 *TAX INVOICE / RECEIPT*\nInvoice: #POS-2024-8841\nAmount: ₹1,499.00 (PAID)\nStore: ' + (settings.companyName || 'Samrajya Store') + '\nThank you for shopping with us! ✨')}
+                                                                >
+                                                                    Receipt
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className="ca-wa-test-chip"
+                                                                    onClick={() => setWaCustomTestMsg('⚠️ *KHATA PAYMENT REMINDER*\nDear Customer, an outstanding balance of ₹2,450.00 is due for ' + (settings.companyName || 'Samrajya Store') + '. Please clear via UPI: pay@upi')}
+                                                                >
+                                                                    Khata
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className="ca-wa-test-chip"
+                                                                    onClick={() => setWaCustomTestMsg('Hello! This is a test message from ' + (settings.companyName || 'Samrajya Store') + ' via WhatsApp Web. 🧾✨')}
+                                                                >
+                                                                    Hello
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <textarea
+                                                            rows="3"
+                                                            value={waCustomTestMsg}
+                                                            onChange={(e) => setWaCustomTestMsg(e.target.value)}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '8px 12px',
+                                                                borderRadius: '6px',
+                                                                border: '1px solid #cbd5e1',
+                                                                fontSize: '0.82rem',
+                                                                boxSizing: 'border-box',
+                                                                fontFamily: 'inherit'
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Action Button Row */}
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                                                    <div style={{ fontSize: '0.76rem', color: '#64748b' }}>
+                                                        💡 Delivered directly through your linked WhatsApp number. Zero browser tabs or windows will open.
+                                                    </div>
+
+                                                    <button
+                                                        type="button"
+                                                        className="ca-wa-primary-btn"
+                                                        style={{ padding: '8px 20px', fontSize: '0.86rem' }}
+                                                        disabled={isTesting}
+                                                        onClick={() => handleSendWaWebTest(testPhone)}
+                                                    >
+                                                        {isTesting ? (
+                                                            <>
+                                                                <Loader2 size={15} className="spin" />
+                                                                Dispatching Message...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Send size={15} />
+                                                                Send Live Test Message
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+
+                                                {/* Live Test Feedback Result Card */}
+                                                {testOutput && typeof testOutput === 'object' && testOutput.type === 'whatsapp_web' && testOutput.success && (
+                                                    <div style={{
+                                                        marginTop: '12px',
+                                                        background: '#f0fdf4',
+                                                        border: '1.5px solid #a7f3d0',
+                                                        borderRadius: '8px',
+                                                        padding: '12px 16px',
+                                                        color: '#065f46'
+                                                    }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '0.88rem' }}>
+                                                                <CheckCircle2 size={16} color="#10b981" />
+                                                                Message Delivered Successfully to +{testOutput.phone}!
+                                                            </div>
+                                                            <span style={{ fontSize: '0.72rem', background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                                                                ✓ Zero Windows Open
+                                                            </span>
+                                                        </div>
+                                                        <div style={{ fontSize: '0.8rem', color: '#047857' }}>
+                                                            {testOutput.note || `Delivered from your linked WhatsApp account.`}
+                                                            {testOutput.messageId && (
+                                                                <div style={{ marginTop: '4px', fontSize: '0.74rem', color: '#059669' }}>
+                                                                    WhatsApp Message ID: <code>{testOutput.messageId}</code>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Error Output Card */}
+                                                {testOutput && typeof testOutput === 'object' && (testOutput.error || testOutput.type === 'error') && (
+                                                    <div style={{
+                                                        marginTop: '12px',
+                                                        background: '#fef2f2',
+                                                        border: '1.5px solid #fecaca',
+                                                        borderRadius: '8px',
+                                                        padding: '12px 16px',
+                                                        color: '#991b1b'
+                                                    }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '0.86rem', marginBottom: '4px' }}>
+                                                            <AlertCircle size={16} color="#ef4444" />
+                                                            Delivery Failed
+                                                        </div>
+                                                        <div style={{ fontSize: '0.8rem' }}>
+                                                            {testOutput.message}
+                                                        </div>
+                                                        {waWebStatus !== 'ready' && (
+                                                            <div style={{ marginTop: '6px', fontSize: '0.76rem', color: '#b91c1c', fontWeight: 600 }}>
+                                                                👉 Please scan the QR code above to link your WhatsApp before sending live messages.
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Live Delivery Audit Trail (Multi-Tenant Stored Data) */}
+                                                <div style={{ marginTop: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                                                        <button
+                                                            type="button"
+                                                            style={{
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                color: '#2563eb',
+                                                                fontSize: '0.82rem',
+                                                                fontWeight: 700,
+                                                                cursor: 'pointer',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px',
+                                                                padding: 0
+                                                            }}
+                                                            onClick={() => {
+                                                                setShowWaLogs(!showWaLogs);
+                                                                if (!showWaLogs) loadWaLogs();
+                                                            }}
+                                                        >
+                                                            <Clock size={14} />
+                                                            {showWaLogs ? 'Hide Message Audit Trail' : `View WhatsApp Message Audit Trail (${waLogs.length})`}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="ca-wa-test-chip"
+                                                            onClick={loadWaLogs}
+                                                            disabled={loadingWaLogs}
+                                                            title="Refresh logs from database"
+                                                        >
+                                                            <RefreshCw size={11} className={loadingWaLogs ? 'spin' : ''} /> Refresh Logs
+                                                        </button>
+                                                    </div>
+
+                                                    {showWaLogs && (
+                                                        <div style={{ marginTop: '10px', maxHeight: '220px', overflowY: 'auto', background: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '10px' }}>
+                                                            {loadingWaLogs ? (
+                                                                <div style={{ textAlign: 'center', padding: '14px', color: '#64748b', fontSize: '0.82rem' }}>
+                                                                    <Loader2 size={16} className="spin" style={{ display: 'inline-block', marginRight: '6px' }} />
+                                                                    Loading message logs from database...
+                                                                </div>
+                                                            ) : waLogs.length === 0 ? (
+                                                                <div style={{ textAlign: 'center', padding: '14px', color: '#94a3b8', fontSize: '0.8rem' }}>
+                                                                    No messages logged yet for this tenant workspace.
+                                                                </div>
+                                                            ) : (
+                                                                <table style={{ width: '100%', fontSize: '0.78rem', borderCollapse: 'collapse' }}>
+                                                                    <thead>
+                                                                        <tr style={{ borderBottom: '1px solid #e2e8f0', color: '#475569', textAlign: 'left' }}>
+                                                                            <th style={{ padding: '6px 8px' }}>Time</th>
+                                                                            <th style={{ padding: '6px 8px' }}>Recipient</th>
+                                                                            <th style={{ padding: '6px 8px' }}>Trigger</th>
+                                                                            <th style={{ padding: '6px 8px' }}>Status</th>
+                                                                            <th style={{ padding: '6px 8px' }}>Message ID</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {waLogs.map((log) => (
+                                                                            <tr key={log.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                                                                <td style={{ padding: '6px 8px', color: '#64748b' }}>
+                                                                                    {log.createdAt ? new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
+                                                                                </td>
+                                                                                <td style={{ padding: '6px 8px', fontWeight: 600, color: '#0f172a' }}>
+                                                                                    +{log.recipientPhone}
+                                                                                </td>
+                                                                                <td style={{ padding: '6px 8px' }}>
+                                                                                    <span style={{ fontSize: '0.7rem', padding: '1px 6px', borderRadius: '8px', background: '#f1f5f9', color: '#475569' }}>
+                                                                                        {log.triggerType || 'MANUAL'}
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td style={{ padding: '6px 8px' }}>
+                                                                                    <span style={{
+                                                                                        fontSize: '0.7rem',
+                                                                                        fontWeight: 700,
+                                                                                        padding: '1px 6px',
+                                                                                        borderRadius: '8px',
+                                                                                        background: log.status === 'SENT' ? '#dcfce7' : '#fee2e2',
+                                                                                        color: log.status === 'SENT' ? '#15803d' : '#b91c1c'
+                                                                                    }}>
+                                                                                        {log.status}
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td style={{ padding: '6px 8px', fontFamily: 'monospace', fontSize: '0.72rem', color: '#64748b' }}>
+                                                                                    {log.messageId ? (log.messageId.length > 20 ? log.messageId.slice(0, 20) + '...' : log.messageId) : '-'}
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    {/* Custom HTTP Gateway Configuration */}
-                                    {settings.whatsappMode === 'gateway' && (
-                                        <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '14px', marginBottom: '14px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
-                                                <strong style={{ fontSize: '0.85rem', color: '#1e293b' }}>HTTP Gateway / Webhook Settings</strong>
-                                                <span style={{ fontSize: '0.72rem', background: '#ecfdf5', color: '#065f46', padding: '2px 8px', borderRadius: '10px', fontWeight: '600', marginLeft: 'auto' }}>
-                                                    UltraMsg / Maytapi / Custom
-                                                </span>
-                                            </div>
-                                            <div className="ca-form-group" style={{ marginBottom: '10px' }}>
-                                                <label>Gateway Endpoint URL <span className="hint">POST endpoint to send messages</span></label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="https://api.ultramsg.com/instance123/messages/chat"
-                                                    value={settings.whatsappGatewayUrl || ''}
-                                                    onChange={(e) => handleChange('whatsappGatewayUrl', e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="ca-form-group" style={{ marginBottom: 0 }}>
-                                                <label>API Key / Instance Token <span className="hint">Secret token for authentication</span></label>
-                                                <input
-                                                    type="password"
-                                                    placeholder="Enter Gateway token or API key..."
-                                                    value={settings.whatsappGatewayToken || ''}
-                                                    onChange={(e) => handleChange('whatsappGatewayToken', e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
+
 
                                     {/* Country Code & Presets */}
                                     <div className="ca-form-group">
@@ -1390,50 +2211,10 @@ export const ConnectedApps = () => {
                                     {/* Test Actions */}
                                     <div className="ca-test-actions-box">
                                         <span className="ca-test-actions-title">
-                                            {settings.whatsappBackgroundAutoSend === 'true'
-                                                ? 'Test Background WhatsApp Dispatch (No Windows Open)'
+                                            {(settings.whatsappMode === 'whatsapp_web' || !settings.whatsappMode)
+                                                ? 'Test Invoice Template via WhatsApp Web'
                                                 : 'Live Test WhatsApp Dispatcher'}
                                         </span>
-                                        {/* Demo Message Format Selector for Meta API Key Test */}
-                                        <div style={{
-                                            background: '#f8fafc',
-                                            border: '1px solid #e2e8f0',
-                                            borderRadius: '8px',
-                                            padding: '10px 14px',
-                                            marginBottom: '10px'
-                                        }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
-                                                <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#1e293b' }}>
-                                                    Demo Message Format (Meta API Key Test):
-                                                </span>
-                                                <span style={{ fontSize: '0.72rem', color: '#0284c7', background: '#e0f2fe', padding: '2px 8px', borderRadius: '10px', fontWeight: '600' }}>
-                                                    Meta Cloud API Ready
-                                                </span>
-                                            </div>
-                                            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.82rem', color: '#1e293b' }}>
-                                                    <input
-                                                        type="radio"
-                                                        name="metaDemoType"
-                                                        value="template"
-                                                        checked={metaDemoType === 'template'}
-                                                        onChange={() => setMetaDemoType('template')}
-                                                    />
-                                                    <strong style={{ color: '#0369a1' }}>Meta Demo Template (<code>hello_world</code>)</strong>
-                                                    <span style={{ fontSize: '0.74rem', color: '#16a34a', fontWeight: '600' }}>[Recommended for Meta API Key test - Bypasses 24h limit]</span>
-                                                </label>
-                                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.82rem', color: '#1e293b' }}>
-                                                    <input
-                                                        type="radio"
-                                                        name="metaDemoType"
-                                                        value="invoice"
-                                                        checked={metaDemoType === 'invoice'}
-                                                        onChange={() => setMetaDemoType('invoice')}
-                                                    />
-                                                    <span>POS Invoice Demo Bill (Full Custom Text)</span>
-                                                </label>
-                                            </div>
-                                        </div>
 
                                         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
                                             <input
@@ -1463,27 +2244,9 @@ export const ConnectedApps = () => {
                                                     Use My Phone
                                                 </button>
                                             )}
-                                            <button
-                                                type="button"
-                                                className="ca-btn-test green"
-                                                disabled={isTesting}
-                                                onClick={() => testWhatsApp(testPhone, false)}
-                                                title="Automatically dispatch message to recipient via Meta WhatsApp Cloud API in the background (Zero windows opened)"
-                                            >
-                                                {isTesting ? <RefreshCw size={14} className="spin" /> : <Zap size={14} />}
-                                                Send Background Test (No Window)
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="ca-btn-test"
-                                                style={{ background: '#f0fdf4', color: '#15803d', borderColor: '#bbf7d0' }}
-                                                disabled={isTesting}
-                                                onClick={() => testWhatsApp(testPhone, false, true)}
-                                                title="Dispatch official Meta hello_world demo template immediately using your Meta API key"
-                                            >
-                                                <Send size={13} /> Send Meta 'hello_world' Demo
-                                            </button>
-                                            {settings.whatsappBackgroundAutoSend === 'true' && (
+
+                                            {/* Direct Web link fallback */}
+                                            {(settings.whatsappMode === 'direct' || settings.whatsappMode === 'desktop' || settings.whatsappBackgroundAutoSend === 'true') && (
                                                 <button
                                                     type="button"
                                                     className="ca-btn-test"
@@ -1496,7 +2259,7 @@ export const ConnectedApps = () => {
                                             )}
                                         </div>
 
-                                        {/* Background Test Result — Unified Dynamic Card */}
+                                        {/* Background Meta Test Result — Unified Dynamic Card */}
                                         {testOutput && typeof testOutput === 'object' && testOutput.type === 'whatsapp_background' && testOutput.success && (
                                             <div className="ca-wa-test-result" style={{
                                                 borderLeft: `4px solid ${testOutput.wasAutoFallback ? '#f59e0b' : '#10b981'}`,

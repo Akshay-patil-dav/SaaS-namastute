@@ -81,6 +81,40 @@ public class PermissionInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // WhatsApp Business & Web Integration Access Control (Multi-Tenant & RBAC)
+        if (path.startsWith("/api/whatsapp")) {
+            try {
+                if (member.getPermissions() == null || member.getPermissions().isBlank()) {
+                    return sendForbidden(response, "No permissions assigned.");
+                }
+                JsonNode perms = objectMapper.readTree(member.getPermissions());
+
+                // Sending messages (invoices, receipts, khata): allowed for POS, Sales, Khata, or Settings staff
+                if (path.startsWith("/api/whatsapp/send")) {
+                    if (perms.has("pos") || perms.has("sales") || perms.has("khata") || perms.has("settings")) {
+                        return true;
+                    }
+                    return sendForbidden(response, "Missing permission to send WhatsApp messages (requires pos, sales, khata, or settings permission).");
+                }
+
+                // Viewing status or logs: allowed for POS, Sales, Khata, or Settings staff
+                if ("GET".equalsIgnoreCase(method) && (path.endsWith("/status") || path.contains("/status") || path.endsWith("/logs") || path.equals("/api/whatsapp"))) {
+                    if (perms.has("pos") || perms.has("sales") || perms.has("khata") || perms.has("settings")) {
+                        return true;
+                    }
+                    return sendForbidden(response, "Missing permission to view WhatsApp status.");
+                }
+
+                // Managing session (QR scan start, QR view, logout): strictly settings permission
+                if (!perms.has("settings")) {
+                    return sendForbidden(response, "Only workspace owners and staff with Settings permissions can manage WhatsApp device pairing.");
+                }
+                return true;
+            } catch (Exception e) {
+                return sendForbidden(response, "Failed to evaluate permissions: " + e.getMessage());
+            }
+        }
+
         // Determine module based on path
         String module = determineModule(path);
         if (module == null) {
