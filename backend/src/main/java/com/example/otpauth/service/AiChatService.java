@@ -64,8 +64,8 @@ public class AiChatService {
         String p = (provider == null || provider.isBlank()) ? "groq" : provider.trim().toLowerCase();
         String m = (model == null || model.isBlank()) ? getDefaultModelForProvider(p) : model.trim();
 
-        log.info("Dispatching AI call to provider: '{}', model: '{}', keyPrefix: '{}...'",
-                p, m, apiKey.length() > 6 ? apiKey.substring(0, 6) : "***");
+        log.info("Dispatching AI call to provider: '{}', model: '{}'", p, m);
+
 
         return switch (p) {
             case "gemini", "google", "google-ai-studio" -> callGemini(apiKey, m, messages);
@@ -103,7 +103,7 @@ public class AiChatService {
         try {
             String reply = callProvider(p, m, apiKey, testMessages);
             long duration = System.currentTimeMillis() - start;
-            log.info("AI Test Connection PASSED: provider={}, model={}, time={}ms, reply='{}'", p, m, duration, reply);
+            log.info("AI Test Connection PASSED: provider={}, model={}, time={}ms", p, m, duration);
 
             return Map.of(
                 "ok", true,
@@ -115,7 +115,7 @@ public class AiChatService {
             );
         } catch (HttpClientErrorException e) {
             String errBody = e.getResponseBodyAsString();
-            log.error("AI Test FAILED: provider={}, status={}, body={}", p, e.getStatusCode(), errBody);
+            log.error("AI Test FAILED: provider={}, status={}", p, e.getStatusCode());
             String friendly = parseFriendlyError(errBody, p, e.getStatusCode().value());
             return Map.of(
                 "ok", false,

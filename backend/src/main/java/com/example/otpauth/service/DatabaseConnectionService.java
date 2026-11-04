@@ -122,11 +122,11 @@ public class DatabaseConnectionService {
                     if (!exists) {
                         try (Statement stmt = conn.createStatement()) {
                             stmt.executeUpdate("CREATE DATABASE \"" + targetDb.replace("\"", "\"\"") + "\" WITH ENCODING 'UTF8'");
-                            log.info("[DatabaseConnectionService] Successfully created database: \"{}\"", targetDb);
+                            log.info("[DatabaseConnectionService] Successfully created database.");
                             return true;
                         }
                     } else {
-                        log.info("[DatabaseConnectionService] Database \"{}\" already exists.", targetDb);
+                        log.info("[DatabaseConnectionService] Database already exists.");
                         return true;
                     }
                 } catch (Exception ignored) {

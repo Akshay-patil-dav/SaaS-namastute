@@ -249,10 +249,10 @@ public class BuilderService {
         FolderInvitation inv = new FolderInvitation(folder, targetEmail, token);
         inviteRepo.save(inv);
         
-        // Log the token to the console so the developer can click it
-        System.out.println("====== INVITATION LINK GENERATED ======");
-        System.out.println(frontendUrl + "/invite/accept/" + token);
-        System.out.println("=======================================");
+
+
+
+
 
         // Push a real-time SSE notification to the invitee
         java.util.Map<String, Object> ssePayload = new java.util.HashMap<>();

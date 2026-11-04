@@ -3,6 +3,8 @@ package com.example.otpauth.service;
 import com.example.otpauth.dto.VerificationRequest;
 import com.example.otpauth.model.User;
 import com.example.otpauth.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import java.util.Random;
 
 @Service
 public class VerificationService {
+
+    private static final Logger log = LoggerFactory.getLogger(VerificationService.class);
 
     private final UserRepository userRepository;
     private final JavaMailSender mailSender;
@@ -37,14 +41,14 @@ public class VerificationService {
                 message.setSubject("Your Verification Code - Samrajya Software");
                 message.setText("Your OTP code is: " + otp + "\n\nPlease enter this code to verify your account.");
                 mailSender.send(message);
-                System.out.println("Sent Email OTP to " + email);
+                log.info("Sent Email OTP successfully.");
             } catch (Exception e) {
-                System.err.println("Failed to send Email OTP: " + e.getMessage());
+                log.error("Failed to send Email OTP: {}", e.getMessage());
                 throw new RuntimeException("Failed to send Email OTP. Check server mail configuration: " + e.getMessage());
             }
         } else {
             // SMS logic goes here
-            System.out.println("Generated OTP for " + email + " (" + type + "): " + otp);
+            log.info("Generated OTP for verification ({})", type);
         }
         
         return otp;

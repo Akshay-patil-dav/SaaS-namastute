@@ -152,9 +152,9 @@ public class AiController {
             // 2. Encrypt with AES-256-GCM and store as Base64 TEXT (no binary columns)
             String encrypted = encryptor.encrypt(cleanKey);
             settings.setAiApiKeyEnc(encrypted);
-            log.info("Saved encrypted AI API key for user: {} (provider: {}, model: {}, keyPrefix: {})",
-                    email, settings.getAiProvider(), settings.getAiModel(),
-                    cleanKey.length() > 8 ? cleanKey.substring(0, 8) + "..." : "***");
+            log.info("Saved encrypted AI API key (provider: {}, model: {})", settings.getAiProvider(), settings.getAiModel());
+
+
         }
 
         aiSettingsRepo.save(settings);
@@ -192,7 +192,7 @@ public class AiController {
         aiSettingsRepo.findByUserEmail(email).ifPresent(s -> {
             s.setAiApiKeyEnc(null);
             aiSettingsRepo.save(s);
-            log.info("Removed AI API key for user: {}", email);
+            log.info("Removed AI API key.");
         });
         return ResponseEntity.ok(Map.of("success", true, "hasKey", false));
     }
@@ -218,7 +218,7 @@ public class AiController {
         try {
             apiKey = sanitizeApiKey(encryptor.decrypt(settings.getAiApiKeyEnc()));
         } catch (Exception e) {
-            log.error("Failed to decrypt API key for user: {}: {}", email, e.getMessage());
+            log.error("Failed to decrypt API key: {}", e.getMessage());
             return ResponseEntity.ok(Map.of(
                 "ok", false,
                 "message", "Stored key is corrupted or encryption secret changed. Please re-enter it in Settings → AI Settings."
@@ -228,9 +228,9 @@ public class AiController {
         String provider = Optional.ofNullable(settings.getAiProvider()).orElse("openai").toLowerCase().trim();
         String model    = Optional.ofNullable(settings.getAiModel()).orElse("gpt-4o-mini").trim();
 
-        log.info("Testing AI key for user: {}, provider: {}, model: {}, keyLen: {}, keyPrefix: {}",
-                email, provider, model, apiKey.length(),
-                apiKey.length() > 8 ? apiKey.substring(0, 8) + "..." : "***");
+        log.info("Testing AI key connection (provider: {}, model: {})", provider, model);
+
+
 
         if (apiKey.isEmpty()) {
             return ResponseEntity.ok(Map.of(
@@ -254,7 +254,7 @@ public class AiController {
                 case "openrouter"                           -> callOpenRouter(apiKey, model, testMessages);
                 default                                     -> callOpenAI(apiKey, model, testMessages);
             };
-            log.info("AI key test PASSED for user: {}, provider: {}, reply: {}", email, provider, reply);
+            log.info("AI key test PASSED (provider: {})", provider);
             return ResponseEntity.ok(Map.of(
                 "ok",       true,
                 "provider", provider,
@@ -264,8 +264,8 @@ public class AiController {
             ));
         } catch (HttpClientErrorException e) {
             String errBody = e.getResponseBodyAsString();
-            log.error("AI key test FAILED for user: {}, provider: {}, status: {}, body: {}",
-                    email, provider, e.getStatusCode(), errBody);
+            log.error("AI key test FAILED (provider: {}, status: {})", provider, e.getStatusCode());
+
             String friendly = parseFriendlyError(errBody, provider, e.getStatusCode().value());
             return ResponseEntity.ok(Map.of(
                 "ok",       false,
@@ -275,7 +275,7 @@ public class AiController {
                 "message",  friendly
             ));
         } catch (Exception e) {
-            log.error("AI key test error for user: {}, provider: {}: {}", email, provider, e.getMessage());
+            log.error("AI key test error (provider: {}): {}", provider, e.getMessage());
             return ResponseEntity.ok(Map.of(
                 "ok",      false,
                 "provider", provider,
@@ -318,7 +318,7 @@ public class AiController {
         try {
             apiKey = sanitizeApiKey(encryptor.decrypt(settings.getAiApiKeyEnc()));
         } catch (Exception e) {
-            log.error("Failed to decrypt API key for user {}: {}", email, e.getMessage());
+            log.error("Failed to decrypt API key: {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                 "error", "Stored API key is corrupted. Please re-enter it in Settings → AI Settings."
             ));
@@ -332,9 +332,9 @@ public class AiController {
         String provider = Optional.ofNullable(settings.getAiProvider()).orElse("openai").toLowerCase().trim();
         String model    = Optional.ofNullable(settings.getAiModel()).orElse("gpt-4o-mini").trim();
 
-        log.debug("Chat request for user: {}, provider: {}, model: {}, keyPrefix: {}",
-                email, provider, model,
-                apiKey.length() > 8 ? apiKey.substring(0, 8) + "..." : "***");
+        log.debug("Chat request (provider: {}, model: {})", provider, model);
+
+
 
         // 3. Extract messages
         @SuppressWarnings("unchecked")
@@ -358,14 +358,14 @@ public class AiController {
 
         } catch (HttpClientErrorException e) {
             String body2 = e.getResponseBodyAsString();
-            log.error("AI API client error for user {}: {} — {}", email, e.getStatusCode(), body2);
+            log.error("AI API client error (status: {})", e.getStatusCode());
 
             // Parse a friendly error from the AI provider's response
             String friendly = parseFriendlyError(body2, provider, e.getStatusCode().value());
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of("error", friendly));
 
         } catch (Exception e) {
-            log.error("AI API error for user {}: {}", email, e.getMessage(), e);
+            log.error("AI API error: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                     .body(Map.of("error", "AI API error: " + e.getMessage()));
         }
@@ -498,9 +498,9 @@ public class AiController {
         String url = "https://generativelanguage.googleapis.com/v1/models/"
                 + geminiModel + ":generateContent?key=" + encodedKey;
 
-        log.debug("Gemini request: model={}, keyLength={}, keyPrefix={}",
-                geminiModel, apiKey.length(),
-                apiKey.length() > 8 ? apiKey.substring(0, 8) + "..." : "***");
+        log.debug("Gemini request: model={}", geminiModel);
+
+
 
         ObjectNode requestBody = objectMapper.createObjectNode();
         ArrayNode  contents    = requestBody.putArray("contents");
@@ -599,7 +599,7 @@ public class AiController {
         JsonNode root       = objectMapper.readTree(response.getBody());
         JsonNode candidates = root.path("candidates");
         if (!candidates.isArray() || candidates.isEmpty()) {
-            log.error("Gemini empty candidates. Raw response: {}", response.getBody());
+            log.error("Gemini empty candidates in response.");
             throw new RuntimeException("Gemini returned no response. The model may have blocked the content.");
         }
         String reply = candidates.get(0).path("content").path("parts").get(0).path("text").asText("").trim();

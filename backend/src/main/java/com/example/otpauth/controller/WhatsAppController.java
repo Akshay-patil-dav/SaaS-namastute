@@ -7,6 +7,8 @@ import com.example.otpauth.repository.WhatsAppMessageLogRepository;
 import com.example.otpauth.util.SecurityUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -35,8 +37,13 @@ import java.util.*;
 @RequestMapping("/api/whatsapp")
 public class WhatsAppController {
 
+    private static final Logger log = LoggerFactory.getLogger(WhatsAppController.class);
+
     @Value("${whatsapp.service.url:http://localhost:3005}")
     private String waServiceUrl;
+
+    @Value("${whatsapp.service.fallback-url:}")
+    private String waServiceFallbackUrl;
 
     @Value("${whatsapp.service.api-key:wa_sec_9f7a8b3e2d1c4b5a6f7e8d9c0b1a2f3e}")
     private String waServiceApiKey;
@@ -47,26 +54,75 @@ public class WhatsAppController {
     @Autowired
     private WhatsAppMessageLogRepository messageLogRepository;
 
+    @Autowired
+    private com.example.otpauth.service.WhatsAppServiceLauncher whatsAppServiceLauncher;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
+            .connectTimeout(Duration.ofMillis(1500))
             .build();
 
-    // ── Helper to resolve target URL ──────────────────────────────────────────
-    private String resolveUrl(String path) {
-        String base = waServiceUrl != null ? waServiceUrl.trim() : "http://localhost:3005";
+    // ── Helper to resolve target base URLs with automatic fallback ──────────────
+    private List<String> getCandidateBaseUrls() {
+        LinkedHashSet<String> urls = new LinkedHashSet<>();
+
+        // Add primary URLs (handles comma or semicolon-separated values if provided)
+        if (waServiceUrl != null && !waServiceUrl.isBlank()) {
+            for (String part : waServiceUrl.split("[,;]")) {
+                String clean = cleanBaseUrl(part);
+                if (!clean.isEmpty()) {
+                    urls.add(clean);
+                }
+            }
+        }
+
+        // Add fallback URLs
+        if (waServiceFallbackUrl != null && !waServiceFallbackUrl.isBlank()) {
+            for (String part : waServiceFallbackUrl.split("[,;]")) {
+                String clean = cleanBaseUrl(part);
+                if (!clean.isEmpty()) {
+                    urls.add(clean);
+                }
+            }
+        }
+
+        // Default to localhost:3005 if no URL configured
+        if (urls.isEmpty()) {
+            urls.add("http://localhost:3005");
+
+
+
+        }
+
+        return new ArrayList<>(urls);
+    }
+
+    private String cleanBaseUrl(String url) {
+        if (url == null) return "";
+        String base = url.trim();
         while (base.endsWith("/")) {
             base = base.substring(0, base.length() - 1);
         }
         if (base.endsWith("/api/whatsapp")) {
             base = base.substring(0, base.length() - "/api/whatsapp".length());
         }
+        return base;
+    }
+
+    private String resolveUrl(String baseUrl, String path) {
+        String base = cleanBaseUrl(baseUrl);
         String cleanPath = path != null ? path.trim() : "";
         if (!cleanPath.startsWith("/")) {
             cleanPath = "/" + cleanPath;
         }
         return base + cleanPath;
+    }
+
+    private String resolveUrl(String path) {
+        List<String> candidates = getCandidateBaseUrls();
+        String primary = candidates.isEmpty() ? "http://localhost:3005" : candidates.get(0);
+        return resolveUrl(primary, path);
     }
 
     /**
@@ -102,7 +158,7 @@ public class WhatsAppController {
                 settingRepository.save(s);
             }
         } catch (Exception e) {
-            System.err.println("[WhatsAppController] Failed to sync setting " + key + ": " + e.getMessage());
+            log.warn("[WhatsAppController] Failed to sync setting '{}': {}", key, e.getMessage());
         }
     }
 
@@ -329,78 +385,113 @@ public class WhatsAppController {
             );
             messageLogRepository.save(log);
         } catch (Exception e) {
-            System.err.println("[WhatsAppController] Failed to save message audit log: " + e.getMessage());
+            log.warn("[WhatsAppController] Failed to save message audit log: {}", e.getMessage());
         }
 
         return resp;
     }
 
-    // ── Proxy helpers ─────────────────────────────────────────────────────────
+    // ── Proxy helpers with Automatic Failover ─────────────────────────────────
+
+    private ResponseEntity<String> executeProxy(String method, String path, String jsonBody, Duration timeout) {
+        List<String> candidateUrls = getCandidateBaseUrls();
+        Exception lastException = null;
+        HttpResponse<String> lastResponse = null;
+        boolean triedAutoStart = false;
+
+        for (int i = 0; i < candidateUrls.size(); i++) {
+            String baseUrl = candidateUrls.get(i);
+            String targetUrl = resolveUrl(baseUrl, path);
+            boolean isLast = (i == candidateUrls.size() - 1);
+
+            try {
+                HttpRequest.Builder reqBuilder = HttpRequest.newBuilder()
+                        .uri(URI.create(targetUrl))
+                        .header("X-WA-API-Key", waServiceApiKey)
+                        .header("Content-Type", "application/json")
+                        .timeout(timeout);
+
+                if ("POST".equalsIgnoreCase(method)) {
+                    reqBuilder.POST(HttpRequest.BodyPublishers.ofString(jsonBody != null ? jsonBody : ""));
+                } else if ("DELETE".equalsIgnoreCase(method)) {
+                    reqBuilder.DELETE();
+                } else {
+                    reqBuilder.GET();
+                }
+
+                HttpResponse<String> resp = HTTP_CLIENT.send(reqBuilder.build(), HttpResponse.BodyHandlers.ofString());
+                int status = resp.statusCode();
+
+                // If gateway/service unavailable (502, 503, 504), failover to next candidate if available
+                if ((status == 502 || status == 503 || status == 504) && !isLast) {
+                    log.warn("[WhatsAppController] Endpoint '{}' returned HTTP {} for {} {}. Failing over to fallback '{}'",
+                            targetUrl, status, method, path, candidateUrls.get(i + 1));
+                    lastResponse = resp;
+                    continue;
+                }
+
+                if (i > 0) {
+                    log.info("[WhatsAppController] Successfully routed {} {} via fallback '{}' (HTTP {})",
+                            method, path, baseUrl, status);
+                }
+
+                return ResponseEntity.status(status)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(resp.body());
+
+            } catch (IOException | InterruptedException e) {
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                lastException = e;
+
+                // Auto-start local microservice if port 3005 is offline
+                if (!triedAutoStart && baseUrl.contains("localhost") && whatsAppServiceLauncher != null) {
+                    triedAutoStart = true;
+                    log.info("[WhatsAppController] Port 3005 is offline. Auto-starting local WhatsApp microservice...");
+                    boolean started = whatsAppServiceLauncher.ensureRunning();
+                    if (started) {
+                        log.info("[WhatsAppController] Local WhatsApp engine online. Retrying {} {}...", method, path);
+                        i--;
+                        continue;
+                    }
+                }
+                if (!isLast) {
+                    log.warn("[WhatsAppController] Primary endpoint '{}' unavailable ({}) for {} {}. Failing over to fallback '{}'",
+                            targetUrl, e.getMessage(), method, path, candidateUrls.get(i + 1));
+                }
+            }
+        }
+
+        // All candidate endpoints failed
+        if (lastResponse != null) {
+            return ResponseEntity.status(lastResponse.statusCode())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(lastResponse.body());
+        }
+
+        String cleanMsg = lastException != null && lastException.getMessage() != null
+                ? lastException.getMessage().replace("\"", "'").replace("\n", " ")
+                : "Connection refused";
+
+        log.error("[WhatsAppController] All configured WhatsApp service endpoints {} are unavailable for {} {}: {}",
+                candidateUrls, method, path, cleanMsg);
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{\"error\":\"WhatsApp service is unavailable on all configured endpoints (" + String.join(", ", candidateUrls) + "): " + cleanMsg + "\"}");
+    }
 
     private ResponseEntity<String> proxyGet(String path) {
-        try {
-            HttpRequest req = HttpRequest.newBuilder()
-                    .uri(URI.create(resolveUrl(path)))
-                    .header("X-WA-API-Key", waServiceApiKey)
-                    .header("Content-Type", "application/json")
-                    .timeout(Duration.ofSeconds(15))
-                    .GET()
-                    .build();
-            HttpResponse<String> resp = HTTP_CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
-            return ResponseEntity.status(resp.statusCode())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(resp.body());
-        } catch (IOException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            String cleanMsg = e.getMessage() != null ? e.getMessage().replace("\"", "'").replace("\n", " ") : "Connection refused";
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{\"error\":\"WhatsApp service on port 3005 is unavailable: " + cleanMsg + "\"}");
-        }
+        return executeProxy("GET", path, null, Duration.ofSeconds(6));
     }
 
     private ResponseEntity<String> proxyPost(String path, String jsonBody) {
-        try {
-            HttpRequest req = HttpRequest.newBuilder()
-                    .uri(URI.create(resolveUrl(path)))
-                    .header("X-WA-API-Key", waServiceApiKey)
-                    .header("Content-Type", "application/json")
-                    .timeout(Duration.ofSeconds(30))
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
-            HttpResponse<String> resp = HTTP_CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
-            return ResponseEntity.status(resp.statusCode())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(resp.body());
-        } catch (IOException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            String cleanMsg = e.getMessage() != null ? e.getMessage().replace("\"", "'").replace("\n", " ") : "Connection refused";
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{\"error\":\"WhatsApp service on port 3005 is unavailable: " + cleanMsg + "\"}");
-        }
+        return executeProxy("POST", path, jsonBody, Duration.ofSeconds(15));
     }
 
     private ResponseEntity<String> proxyDelete(String path) {
-        try {
-            HttpRequest req = HttpRequest.newBuilder()
-                    .uri(URI.create(resolveUrl(path)))
-                    .header("X-WA-API-Key", waServiceApiKey)
-                    .header("Content-Type", "application/json")
-                    .timeout(Duration.ofSeconds(15))
-                    .DELETE()
-                    .build();
-            HttpResponse<String> resp = HTTP_CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
-            return ResponseEntity.status(resp.statusCode())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(resp.body());
-        } catch (IOException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            String cleanMsg = e.getMessage() != null ? e.getMessage().replace("\"", "'").replace("\n", " ") : "Connection refused";
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{\"error\":\"WhatsApp service on port 3005 is unavailable: " + cleanMsg + "\"}");
-        }
+        return executeProxy("DELETE", path, null, Duration.ofSeconds(6));
     }
 
     private String toJson(Object obj) {

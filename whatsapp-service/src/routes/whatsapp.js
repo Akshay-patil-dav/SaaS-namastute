@@ -47,12 +47,25 @@ export function createWhatsAppRouter(waManager) {
 
         try {
             const session = await waManager.getOrCreateSession(sessionId);
+
+            // Wait up to 3.5s for initial QR event if currently initializing
+            if (!session.qrCode && session.status === 'initializing') {
+                await new Promise((resolve) => {
+                    const timer = setTimeout(resolve, 3500);
+                    const onEvent = () => {
+                        clearTimeout(timer);
+                        resolve();
+                    };
+                    waManager.once(`qr:${sessionId}`, onEvent);
+                    waManager.once(`ready:${sessionId}`, onEvent);
+                });
+            }
             res.json({
                 success: true,
                 sessionId,
-                status: session.status,
-                hasQr: !!session.qrCode,
-                qr: session.qrCode || null
+                status: waManager.getStatus(sessionId),
+                hasQr: !!waManager.getQr(sessionId),
+                qr: waManager.getQr(sessionId) || null
             });
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -79,6 +92,8 @@ export function createWhatsAppRouter(waManager) {
             status,
             isReady: status === 'ready',
             hasQr: !!qr,
+            qr: qr || null,
+
             hasSavedSession: waManager.hasSessionOnDisk(sessionId),
             info
         });
@@ -98,7 +113,9 @@ export function createWhatsAppRouter(waManager) {
             sessionId,
             status,
             hasQr: !!qr,
-            qr: qr || null
+            qr: qr || null,
+
+
         });
     });
 

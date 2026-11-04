@@ -15,6 +15,7 @@ spring:
     # driver-class-name: org.postgresql.Driver
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     show-sql: false
@@ -87,4 +88,12 @@ razorpay:
 whatsapp:
   service:
     url: ${WHATSAPP_SERVICE_URL:http://localhost:3005}
+    fallback-url: ${WHATSAPP_SERVICE_FALLBACK_URL:}
+    auto-start: ${WHATSAPP_SERVICE_AUTO_START:true}
     api-key: ${WHATSAPP_SERVICE_API_KEY:wa_sec_9f7a8b3e2d1c4b5a6f7e8d9c0b1a2f3e}
+
+
+# Suppress invalid cookie warning from Google Identity (g_state) on localhost
+logging:
+  level:
+    org.apache.tomcat.util.http.parser.Cookie: WARN

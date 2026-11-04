@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events';
 import whatsappWeb from 'whatsapp-web.js';
 const { Client, LocalAuth } = whatsappWeb;
 import qrcode from 'qrcode';
-import { mkdirSync, existsSync, readdirSync } from 'node:fs';
+import { mkdirSync, existsSync, readdirSync, unlinkSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,12 +22,17 @@ function resolveChromePath() {
     if (process.env.PUPPETEER_EXECUTABLE_PATH && existsSync(process.env.PUPPETEER_EXECUTABLE_PATH)) {
         return process.env.PUPPETEER_EXECUTABLE_PATH;
     }
-    const commonWindowsPaths = [
+    const commonPaths = [
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/google-chrome',
+        '/usr/bin/chromium',
+        '/usr/bin/chromium-browser',
+        '/snap/bin/chromium',
         'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
         'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
         'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
     ];
-    for (const p of commonWindowsPaths) {
+    for (const p of commonPaths) {
         if (existsSync(p)) return p;
     }
     return undefined; // Puppeteer uses its own installed Chromium
@@ -90,6 +95,21 @@ export class WhatsAppManager extends EventEmitter {
      * @param {string} sessionId
      */
     async _createSession(sessionId) {
+        // Auto-clean stale Chrome lock files from previous crashed sessions
+        const sessionDir = join(WA_SESSION_DIR, `session-${sessionId}`);
+        if (existsSync(sessionDir)) {
+            const staleLocks = ['DevToolsActivePort', 'SingletonLock', 'SingletonCookie', 'SingletonSocket', 'lockfile'];
+            for (const lockFile of staleLocks) {
+                const lp = join(sessionDir, lockFile);
+                try {
+                    if (existsSync(lp)) {
+                        unlinkSync(lp);
+                        console.log(`[WhatsApp Manager] Cleaned stale lock: ${lockFile}`);
+                    }
+                } catch (ignored) {}
+            }
+        }
+
         const chromeExe = resolveChromePath();
         const puppeteerArgs = [
             '--no-sandbox',
@@ -103,6 +123,16 @@ export class WhatsAppManager extends EventEmitter {
             '--disable-site-isolation-trials',
             '--disable-web-security',
             '--disable-blink-features=AutomationControlled',
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-renderer-backgrounding',
+            '--disable-component-update',
+            '--disable-sync',
+            '--disable-default-apps',
+            '--no-default-browser-check',
+            '--mute-audio',
+            '--disable-domain-reliability',
+            '--disable-ipc-flooding-protection',
             '--js-flags=--max-old-space-size=1024',
             '--renderer-process-limit=2',
             '--disable-extensions'
@@ -124,7 +154,9 @@ export class WhatsAppManager extends EventEmitter {
                 executablePath: chromeExe || undefined,
             },
             webVersionCache: {
-                type: 'none',
+                type: 'local',
+                path: join(WA_SESSION_DIR, '..', '.wwebjs_cache'),
+                strict: false,
             },
         });
 
@@ -148,8 +180,8 @@ export class WhatsAppManager extends EventEmitter {
             try {
                 const qrDataUrl = await qrcode.toDataURL(qr, {
                     margin: 2,
-                    scale: 7,
-                    errorCorrectionLevel: 'H'
+                    scale: 6,
+                    errorCorrectionLevel: 'M'
                 });
                 session.qrCode = qrDataUrl;
                 this.emit(`qr:${sessionId}`, qrDataUrl);

@@ -144,9 +144,13 @@ export const ConnectedApps = () => {
                         handleChange('whatsappPhone', res.data.info.phone);
                     }
                 } else if (s === 'qr' || res.data?.hasQr || s === 'initializing') {
-                    const qrRes = await getWhatsAppSessionQr(sid);
-                    if (qrRes.success && qrRes.data?.qr) {
-                        setWaWebQr(qrRes.data.qr);
+                    if (res.data?.qr) {
+                        setWaWebQr(res.data.qr);
+                    } else {
+                        const qrRes = await getWhatsAppSessionQr(sid);
+                        if (qrRes.success && qrRes.data?.qr) {
+                            setWaWebQr(qrRes.data.qr);
+                        }
                     }
                 }
                 if (isManual) {
@@ -177,10 +181,15 @@ export const ConnectedApps = () => {
             const sid = settings.whatsappSessionId || tenantSessionId;
             const res = await startWhatsAppSession(sid);
             if (res.success) {
-                setWaWebStatus(res.data?.status || 'initializing');
-                if (res.data?.qr) setWaWebQr(res.data.qr);
-                showToast('Starting WhatsApp Web engine... QR code will appear shortly.', 'info');
-                setTimeout(() => checkWaWebStatus(), 1200);
+                const s = res.data?.status || 'initializing';
+                setWaWebStatus(s);
+                if (res.data?.qr) {
+                    setWaWebQr(res.data.qr);
+                    showToast('QR code ready! Please scan with WhatsApp.', 'success');
+                } else {
+                    showToast('Starting WhatsApp Web engine... QR code will appear shortly.', 'info');
+                }
+                setTimeout(() => checkWaWebStatus(), 800);
             } else {
                 showToast(res.error || 'Failed to start WhatsApp Web session.', 'error');
             }
@@ -341,13 +350,24 @@ export const ConnectedApps = () => {
     useEffect(() => {
         checkWaWebStatusRef.current();
         loadWaLogsRef.current();
-
-        const interval = setInterval(() => {
-            checkWaWebStatusRef.current();
-        }, 6000);
-
-        return () => clearInterval(interval);
     }, []);
+
+    // Fast adaptive polling: 1.2s when initializing, 2.5s when QR is displayed, 15s when ready
+    useEffect(() => {
+        const intervalDelay = (waWebStatus === 'initializing')
+            ? 1200
+            : (waWebStatus === 'qr')
+                ? 2500
+                : (waWebStatus === 'ready')
+                    ? 15000
+                    : 8000;
+
+        const timer = setTimeout(() => {
+            checkWaWebStatusRef.current();
+        }, intervalDelay);
+
+        return () => clearTimeout(timer);
+    }, [waWebStatus]);
 
     // Prefill test phone
     useEffect(() => {
@@ -832,6 +852,16 @@ export const ConnectedApps = () => {
                             <p style={{ fontSize: '0.88rem', color: '#64748b', maxWidth: '460px', margin: '8px auto 0' }}>
                                 Initializing secure browser session. Your pairing QR code will appear right here in seconds...
                             </p>
+                            <div style={{ marginTop: '14px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                <button
+                                    type="button"
+                                    className="ca-btn-test"
+                                    onClick={() => checkWaWebStatus(true)}
+                                    style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                                >
+                                    <RefreshCw size={13} /> Check Status
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         /* State E: Not Linked / Disconnected Hero CTA */

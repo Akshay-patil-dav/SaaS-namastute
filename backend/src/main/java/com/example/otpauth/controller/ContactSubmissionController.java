@@ -76,7 +76,7 @@ public class ContactSubmissionController {
             submission.setIpAddress(clientIp);
 
             ContactSubmission saved = contactSubmissionRepository.save(submission);
-            log.info("[ContactSubmission] New inquiry received from '{}' <{}> (ID: {})", saved.getName(), saved.getEmail(), saved.getId());
+            log.info("[ContactSubmission] New inquiry received (ID: {})", saved.getId());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     "success", true,

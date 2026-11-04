@@ -10,9 +10,9 @@ public class SmsService {
 
     public void sendOtpSms(String toPhone, String otpCode) {
         // Dummy implementation logging to console
-        logger.info("===========================================");
-        logger.info("Sending DUMMY SMS to: {}", toPhone);
-        logger.info("Your OTP is: {}", otpCode);
-        logger.info("===========================================");
+
+        String maskedPhone = (toPhone != null && toPhone.length() > 4) ? "*".repeat(toPhone.length() - 4) + toPhone.substring(toPhone.length() - 4) : "****";
+        logger.info("SMS OTP dispatched to registered phone: {}", maskedPhone);
+
     }
 }

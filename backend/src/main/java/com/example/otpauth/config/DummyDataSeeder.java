@@ -14,12 +14,13 @@ import java.util.Optional;
 
 @Configuration
 public class DummyDataSeeder {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DummyDataSeeder.class);
 
     @Bean
     public CommandLineRunner initDummyData(ProductRepository productRepository, UserRepository userRepository) {
         return args -> {
             if (productRepository.count() == 0) {
-                System.out.println("No products found in DB. Seeding dummy data for ecomm storefront...");
+                log.debug("No products found in DB. Seeding initial storefront items...");
 
                 Long adminId = null;
                 Optional<User> adminOpt = userRepository.findByEmail("admin@gmail.com");
@@ -68,7 +69,7 @@ public class DummyDataSeeder {
                 p3.setUserId(adminId);
                 
                 productRepository.saveAll(List.of(p1, p2, p3));
-                System.out.println("Dummy products seeded successfully with admin user ID.");
+                log.debug("Storefront products seeded.");
             }
         };
     }

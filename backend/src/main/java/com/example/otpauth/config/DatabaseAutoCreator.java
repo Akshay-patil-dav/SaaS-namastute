@@ -60,10 +60,10 @@ public class DatabaseAutoCreator implements BeanFactoryPostProcessor, Environmen
 
         // 1. Test if target database is directly accessible
         try (Connection testConn = DriverManager.getConnection(rawUrl, username, password)) {
-            log.info("✅ [DatabaseAutoCreator] Target database is already available and connected: {}", rawUrl);
+            log.info("✅ [DatabaseAutoCreator] Target database is already available and connected.");
             return;
         } catch (Exception connEx) {
-            log.info("⚠️ [DatabaseAutoCreator] Target database not directly accessible, initiating auto-creation. Reason: {}", connEx.getMessage());
+            log.info("⚠️ [DatabaseAutoCreator] Target database not directly accessible, initiating auto-creation.");
         }
 
         // 2. Provision target database via administrative connection
@@ -125,23 +125,23 @@ public class DatabaseAutoCreator implements BeanFactoryPostProcessor, Environmen
                     if (!exists) {
                         try (Statement stmt = conn.createStatement()) {
                             stmt.executeUpdate("CREATE DATABASE \"" + dbName.replace("\"", "\"\"") + "\" WITH ENCODING 'UTF8'");
-                            log.info("🎉 [DatabaseAutoCreator] Successfully created PostgreSQL database: \"{}\"", dbName);
+                            log.info("🎉 [DatabaseAutoCreator] Successfully created PostgreSQL database.");
                             createdOrExists = true;
                             break;
                         }
                     } else {
-                        log.info("ℹ️ [DatabaseAutoCreator] PostgreSQL database \"{}\" already exists in pg_database.", dbName);
+                        log.info("ℹ️ [DatabaseAutoCreator] PostgreSQL database already exists in pg_database.");
                         createdOrExists = true;
                         break;
                     }
                 } catch (Exception ex) {
-                    log.debug("[DatabaseAutoCreator] Administrative connection via '{}/{}' failed: {}", maintDb, creds[0], ex.getMessage());
+                    log.debug("[DatabaseAutoCreator] Administrative connection check failed.");
                 }
             }
         }
 
         if (!createdOrExists) {
-            log.warn("⚠️ [DatabaseAutoCreator] Could not auto-create database \"{}\" via maintenance databases. Verify PostgreSQL is running on host.", dbName);
+            log.warn("⚠️ [DatabaseAutoCreator] Could not auto-create database via maintenance databases. Verify PostgreSQL is running on host.");
         }
     }
 
@@ -169,7 +169,7 @@ public class DatabaseAutoCreator implements BeanFactoryPostProcessor, Environmen
         try (Connection conn = DriverManager.getConnection(maintenanceUrl, username, password)) {
             try (Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS `" + dbName.replace("`", "``") + "`");
-                log.info("[DatabaseAutoCreator] Successfully verified/created MySQL database: `{}`", dbName);
+                log.info("[DatabaseAutoCreator] Successfully verified/created MySQL database.");
             }
         } catch (Exception ex) {
             log.warn("[DatabaseAutoCreator] MySQL auto-creation failed: {}", ex.getMessage());

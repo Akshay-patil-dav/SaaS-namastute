@@ -124,7 +124,7 @@ public class DataSeeder {
             if (updatedAdmin) {
                 superAdmin = userRepository.save(superAdmin);
             }
-            log.info("DataSeeder: Super Admin user verified (Email: {}).", superAdminEmail);
+            log.info("DataSeeder: Super Admin user verified.");
 
             Long superAdminId = superAdmin.getId();
 
