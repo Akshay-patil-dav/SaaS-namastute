@@ -1,0 +1,1656 @@
+/* ==========================================================================
+   NAMUSTUTAM POS SOFTWARE PAGE — EXACT DESIGN SYSTEM
+   Matches Reference UI: Modern Indigo/Purple, Soft Pastels, Crisp Whites,
+   Raspberry Crimson Stats Banner, Chartreuse Accents, and Fanned 3D Mockups
+   ========================================================================== */
+
+:root {
+  --nm-primary: #5e48eb;
+  --nm-primary-hover: #4d37db;
+  --nm-primary-light: #eeebfd;
+  --nm-primary-glow: rgba(94, 72, 235, 0.25);
+
+  --nm-amber: #f59e0b;
+  --nm-amber-light: #fef3c7;
+  
+  --nm-pink: #f43f5e;
+  --nm-pink-light: #ffe4e6;
+
+  --nm-crimson: #e11458;
+  --nm-crimson-dark: #cc0d4c;
+
+  --nm-lime: #bef264;
+  --nm-lime-hover: #a3e635;
+  --nm-lime-dark: #1e293b;
+
+  --nm-mint: #10b981;
+  --nm-mint-light: #d1fae5;
+
+  --nm-dark: #0f172a;
+  --nm-dark-soft: #1e293b;
+  --nm-gray: #64748b;
+  --nm-gray-light: #94a3b8;
+  --nm-border: #f1f5f9;
+  --nm-border-strong: #e2e8f0;
+  --nm-bg-soft: #fcfcfd;
+  --nm-bg-card: #ffffff;
+
+  --nm-radius-sm: 8px;
+  --nm-radius-md: 14px;
+  --nm-radius-lg: 20px;
+  --nm-radius-pill: 9999px;
+
+  --nm-shadow-xs: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --nm-shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.04);
+  --nm-shadow-md: 0 12px 32px rgba(15, 23, 42, 0.07);
+  --nm-shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.10);
+  --nm-shadow-xl: 0 25px 65px -12px rgba(15, 23, 42, 0.15);
+}
+
+/* Page Root */
+.pos-exact-root {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: var(--nm-dark);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Container */
+.pos-exact-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   1. NAVIGATION BAR
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--nm-border);
+  transition: all 0.2s ease;
+}
+
+.pos-exact-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+
+.pos-exact-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--nm-dark);
+}
+
+.pos-exact-logo-badge {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 17px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+}
+
+.pos-exact-brand-text {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--nm-dark);
+}
+
+.pos-exact-brand-text span {
+  color: var(--nm-primary);
+}
+
+.pos-exact-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pos-exact-nav-links a {
+  text-decoration: none;
+  color: var(--nm-dark-soft);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pos-exact-nav-links a:hover {
+  color: var(--nm-primary);
+}
+
+.pos-exact-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.pos-exact-lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--nm-gray);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.pos-exact-lang-selector:hover {
+  color: var(--nm-dark);
+}
+
+.pos-exact-btn-login {
+  background: none;
+  border: none;
+  color: var(--nm-dark-soft);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 8px 14px;
+  transition: color 0.15s ease;
+}
+
+.pos-exact-btn-login:hover {
+  color: var(--nm-primary);
+}
+
+.pos-exact-btn-pill-primary {
+  background: var(--nm-primary);
+  color: #ffffff !important;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: var(--nm-radius-pill);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(94, 72, 235, 0.28);
+}
+
+.pos-exact-btn-pill-primary:hover {
+  background: var(--nm-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(94, 72, 235, 0.35);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   2. HERO SECTION
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-hero {
+  padding: 60px 0 40px;
+  background: radial-gradient(circle at 50% 20%, rgba(94, 72, 235, 0.04) 0%, rgba(255, 255, 255, 0) 70%);
+  text-align: center;
+  position: relative;
+}
+
+.pos-exact-hero-title {
+  font-size: 54px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--nm-dark);
+  margin: 0 auto 20px;
+  max-width: 820px;
+}
+
+.pos-exact-hero-title .highlight-amber {
+  color: var(--nm-amber);
+  display: inline-block;
+  position: relative;
+}
+
+.pos-exact-hero-subtitle {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--nm-gray);
+  max-width: 620px;
+  margin: 0 auto 32px;
+  font-weight: 400;
+}
+
+.pos-exact-hero-cta-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 50px;
+  flex-wrap: wrap;
+}
+
+.pos-exact-btn-pill-secondary {
+  background: #ffffff;
+  color: var(--nm-dark);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: var(--nm-radius-pill);
+  text-decoration: none;
+  border: 1px solid var(--nm-border-strong);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--nm-shadow-xs);
+}
+
+.pos-exact-btn-pill-secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* ── Hero Mockup Stack ───────────────────────────────────────────────── */
+.pos-exact-mockup-wrapper {
+  position: relative;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+/* Laptop / Desktop Window */
+.pos-exact-desktop-frame {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  position: relative;
+}
+
+.pos-exact-window-header {
+  height: 38px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--nm-border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+}
+
+.pos-exact-window-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.pos-exact-window-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.pos-exact-window-dot.red { background: #ff5f56; }
+.pos-exact-window-dot.yellow { background: #ffbd2e; }
+.pos-exact-window-dot.green { background: #27c93f; }
+
+.pos-exact-window-search {
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid var(--nm-border);
+  border-radius: 6px;
+  height: 22px;
+  width: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--nm-gray-light);
+  gap: 6px;
+}
+
+.pos-exact-desktop-body {
+  position: relative;
+  overflow: hidden;
+  background: #fafafc;
+}
+
+.pos-exact-desktop-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* Floating Mobile Screen Phone (Overlapping on right) */
+.pos-exact-mobile-frame {
+  position: absolute;
+  right: -24px;
+  bottom: 0px;
+  width: 250px;
+  background: #ffffff;
+  border-radius: 36px;
+  padding: 10px;
+  box-shadow: 0 25px 50px -10px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08);
+  border: 3px solid #1e293b;
+  z-index: 10;
+  animation: posFloatSlow 5s ease-in-out infinite alternate;
+}
+
+@keyframes posFloatSlow {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-8px); }
+}
+
+.pos-exact-mobile-inner {
+  background: #0f172a;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+}
+
+.pos-exact-mobile-notch {
+  width: 80px;
+  height: 18px;
+  background: #000000;
+  border-radius: 10px;
+  margin: 6px auto 4px;
+}
+
+.pos-exact-mobile-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Floating Notification Pills */
+.pos-exact-float-badge {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 8px 14px;
+  border-radius: var(--nm-radius-pill);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 12;
+}
+
+.pos-exact-float-badge.left {
+  top: 140px;
+  left: -20px;
+  color: var(--nm-mint);
+}
+
+.pos-exact-float-badge.right {
+  bottom: 80px;
+  left: 20px;
+  color: var(--nm-primary);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   3. CLIENT LOGO TRUST BAR
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-trust-bar {
+  padding: 30px 0 60px;
+  text-align: center;
+  border-bottom: 1px solid var(--nm-border);
+}
+
+.pos-exact-trust-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nm-gray-light);
+  margin-bottom: 24px;
+}
+
+.pos-exact-trust-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.pos-exact-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: -0.01em;
+  filter: grayscale(100%);
+  opacity: 0.75;
+  transition: all 0.2s ease;
+}
+
+.pos-exact-trust-item:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  color: var(--nm-dark);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   COMMON SECTION HEADER SYSTEM
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-section-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 50px;
+}
+
+.pos-exact-category-tag {
+  color: var(--nm-pink);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.pos-exact-section-title {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--nm-dark);
+  margin-bottom: 14px;
+}
+
+.pos-exact-section-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--nm-gray);
+  margin: 0 auto;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   4. ADVANTAGES SECTION (The smart choice for your team)
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-advantages {
+  padding: 80px 0;
+  background: #ffffff;
+}
+
+.pos-exact-advantages-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.pos-exact-adv-card {
+  background: #ffffff;
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-lg);
+  padding: 34px 28px;
+  box-shadow: var(--nm-shadow-xs);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.pos-exact-adv-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--nm-shadow-md);
+  border-color: rgba(94, 72, 235, 0.18);
+}
+
+.pos-exact-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.pos-exact-icon-box.purple {
+  background: #f5f3ff;
+  color: var(--nm-primary);
+}
+
+.pos-exact-icon-box.pink {
+  background: var(--nm-pink-light);
+  color: var(--nm-pink);
+}
+
+.pos-exact-icon-box.amber {
+  background: var(--nm-amber-light);
+  color: var(--nm-amber);
+}
+
+.pos-exact-icon-box.mint {
+  background: var(--nm-mint-light);
+  color: var(--nm-mint);
+}
+
+.pos-exact-adv-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--nm-dark);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.pos-exact-adv-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--nm-gray);
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.pos-exact-adv-link {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nm-dark);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.pos-exact-adv-link:hover {
+  color: var(--nm-primary);
+  gap: 9px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   5. KEY FEATURES TO BOOST PRODUCTIVITY (Pastel 3-Card Grid)
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-boost {
+  padding: 70px 0 90px;
+  background: #ffffff;
+}
+
+.pos-exact-boost-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.pos-exact-boost-card {
+  border-radius: var(--nm-radius-lg);
+  padding: 34px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.pos-exact-boost-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--nm-shadow-lg);
+}
+
+/* Tint 1: Warm Peach */
+.pos-exact-boost-card.peach {
+  background: #fff8f0;
+  border: 1px solid #fdecd6;
+}
+
+/* Tint 2: Mint Green */
+.pos-exact-boost-card.mint {
+  background: #f4fbf6;
+  border: 1px solid #def3e5;
+}
+
+/* Tint 3: Lavender */
+.pos-exact-boost-card.lavender {
+  background: #f6f4fe;
+  border: 1px solid #e9e4fc;
+}
+
+.pos-exact-step-pill {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--nm-dark);
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.pos-exact-boost-title {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--nm-dark);
+  margin-bottom: 12px;
+}
+
+.pos-exact-boost-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--nm-gray);
+  margin-bottom: 28px;
+}
+
+/* Floating UI Element inside each Boost Card */
+.pos-exact-boost-ui {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  margin-top: auto;
+}
+
+.pos-exact-boost-ui-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pos-exact-boost-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.pos-exact-boost-badge.orange {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.pos-exact-boost-badge.green {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.pos-exact-boost-badge.purple {
+  background: #f5f3ff;
+  color: var(--nm-primary);
+}
+
+.pos-exact-boost-progress-bar {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.pos-exact-boost-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.pos-exact-boost-progress-fill.orange { background: #ea580c; width: 88%; }
+.pos-exact-boost-progress-fill.green { background: #16a34a; width: 94%; }
+.pos-exact-boost-progress-fill.purple { background: var(--nm-primary); width: 100%; }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   6. POWERFUL FEATURES (4 Tabs + Sleek Laptop Display)
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-features {
+  padding: 70px 0 100px;
+  background: #ffffff;
+}
+
+.pos-exact-tabs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.pos-exact-tab-card {
+  background: #ffffff;
+  border: 1px solid var(--nm-border);
+  border-radius: 14px;
+  padding: 18px 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.pos-exact-tab-card:hover {
+  border-color: rgba(94, 72, 235, 0.3);
+  transform: translateY(-2px);
+}
+
+.pos-exact-tab-card.active {
+  background: #ffffff;
+  border-color: var(--nm-pink);
+  box-shadow: 0 8px 24px rgba(244, 63, 94, 0.12);
+}
+
+.pos-exact-tab-card.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--nm-pink);
+  border-radius: 14px 14px 0 0;
+}
+
+.pos-exact-tab-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.pos-exact-tab-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.pos-exact-tab-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--nm-dark);
+}
+
+.pos-exact-tab-sub {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--nm-gray);
+  margin: 0;
+}
+
+/* ── Laptop Mockup Frame ─────────────────────────────────────────────── */
+.pos-exact-laptop-wrapper {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.pos-exact-laptop-screen {
+  background: #111827;
+  border-radius: 20px;
+  padding: 16px 16px 0;
+  box-shadow: 0 35px 80px -20px rgba(15, 23, 42, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.pos-exact-laptop-camera {
+  width: 8px;
+  height: 8px;
+  background: #374151;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+}
+
+.pos-exact-laptop-inner-display {
+  background: #ffffff;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.pos-exact-laptop-inner-display img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Laptop Play Button Overlay */
+.pos-exact-laptop-play-btn {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border-radius: var(--nm-radius-pill);
+  padding: 8px 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nm-dark);
+  cursor: pointer;
+  z-index: 20;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  transition: all 0.2s ease;
+}
+
+.pos-exact-laptop-play-btn:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 14px 35px rgba(94, 72, 235, 0.2);
+}
+
+.pos-exact-play-circle {
+  width: 24px;
+  height: 24px;
+  background: var(--nm-pink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+/* Floating Accent Badges around Laptop */
+.pos-exact-laptop-badge-lime {
+  position: absolute;
+  right: -15px;
+  top: 60%;
+  background: var(--nm-lime);
+  color: var(--nm-dark);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: var(--nm-radius-pill);
+  box-shadow: 0 8px 20px rgba(190, 242, 100, 0.4);
+  z-index: 15;
+}
+
+.pos-exact-laptop-badge-purple {
+  position: absolute;
+  left: -20px;
+  top: 45%;
+  background: var(--nm-primary);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: var(--nm-radius-pill);
+  box-shadow: 0 8px 20px rgba(94, 72, 235, 0.35);
+  z-index: 15;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   7. TESTIMONIALS SECTION (What our users say)
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-testimonials {
+  padding: 80px 0;
+  background: #ffffff;
+}
+
+.pos-exact-testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.pos-exact-test-card {
+  background: #ffffff;
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-lg);
+  padding: 34px 28px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--nm-shadow-xs);
+  transition: all 0.25s ease;
+}
+
+.pos-exact-test-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--nm-shadow-md);
+}
+
+.pos-exact-test-quote-mark {
+  font-family: Georgia, serif;
+  font-size: 42px;
+  line-height: 1;
+  color: #ea580c;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.pos-exact-test-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--nm-dark-soft);
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.pos-exact-test-author-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--nm-border);
+  padding-top: 18px;
+}
+
+.pos-exact-test-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--nm-dark);
+}
+
+.pos-exact-test-role {
+  font-size: 12px;
+  color: var(--nm-gray);
+  margin-top: 2px;
+}
+
+.pos-exact-test-logo-badge {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--nm-dark);
+  opacity: 0.85;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   8. FULL-WIDTH CRIMSON / ROSE PINK STATS STRIP BANNER
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-crimson-strip {
+  background: var(--nm-crimson);
+  color: #ffffff;
+  padding: 44px 0;
+}
+
+.pos-exact-crimson-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.pos-exact-crimson-col {
+  padding: 0 20px;
+  position: relative;
+}
+
+.pos-exact-crimson-col:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.pos-exact-crimson-num {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.pos-exact-crimson-label {
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 400;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   9. PRICING SECTION (Flexible plans for every store)
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-pricing {
+  padding: 90px 0;
+  background: #ffffff;
+}
+
+.pos-exact-pricing-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 50px;
+}
+
+.pos-exact-toggle-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nm-gray);
+  cursor: pointer;
+}
+
+.pos-exact-toggle-label.active {
+  color: var(--nm-dark);
+}
+
+.pos-exact-switch {
+  width: 48px;
+  height: 26px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  padding: 3px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  position: relative;
+}
+
+.pos-exact-switch.on {
+  background: var(--nm-primary);
+}
+
+.pos-exact-switch-slider {
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.pos-exact-switch.on .pos-exact-switch-slider {
+  transform: translateX(22px);
+}
+
+.pos-exact-save-tag {
+  background: var(--nm-pink-light);
+  color: var(--nm-pink);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--nm-radius-pill);
+}
+
+.pos-exact-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.pos-exact-plan-card {
+  background: #ffffff;
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-lg);
+  padding: 36px 30px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+  box-shadow: var(--nm-shadow-xs);
+  position: relative;
+}
+
+.pos-exact-plan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--nm-shadow-lg);
+}
+
+.pos-exact-plan-card.featured {
+  border-color: rgba(94, 72, 235, 0.3);
+  box-shadow: 0 15px 45px rgba(94, 72, 235, 0.10);
+}
+
+.pos-exact-plan-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.pos-exact-plan-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--nm-dark);
+  margin-bottom: 8px;
+}
+
+.pos-exact-plan-sub {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--nm-gray);
+  margin-bottom: 24px;
+}
+
+.pos-exact-plan-price-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 26px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--nm-border);
+}
+
+.pos-exact-plan-currency {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--nm-dark);
+}
+
+.pos-exact-plan-amount {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--nm-dark);
+  letter-spacing: -0.02em;
+}
+
+.pos-exact-plan-period {
+  font-size: 13px;
+  color: var(--nm-gray);
+}
+
+.pos-exact-plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.pos-exact-plan-features li {
+  font-size: 13px;
+  color: var(--nm-dark-soft);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pos-exact-plan-features li svg {
+  color: var(--nm-primary);
+  flex-shrink: 0;
+}
+
+.pos-exact-plan-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: var(--nm-radius-pill);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-block;
+}
+
+.pos-exact-plan-btn.solid {
+  background: var(--nm-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(94, 72, 235, 0.25);
+}
+
+.pos-exact-plan-btn.solid:hover {
+  background: var(--nm-primary-hover);
+}
+
+.pos-exact-plan-btn.outline {
+  background: #ffffff;
+  color: var(--nm-dark);
+  border: 1px solid var(--nm-border-strong);
+}
+
+.pos-exact-plan-btn.outline:hover {
+  background: #f8fafc;
+}
+
+.pos-exact-plan-btn.soft-purple {
+  background: var(--nm-primary-light);
+  color: var(--nm-primary);
+}
+
+.pos-exact-plan-btn.soft-purple:hover {
+  background: #e0dcfc;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   10. BOTTOM STREAMLINE BANNER (Fanned-out Perspective Cards)
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-bottom-banner {
+  padding: 50px 0 70px;
+  background: #ffffff;
+}
+
+.pos-exact-streamline-card {
+  background: #f8fafc;
+  border: 1px solid var(--nm-border);
+  border-radius: 24px;
+  padding: 60px 50px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pos-exact-streamline-title {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--nm-dark);
+  margin-bottom: 16px;
+}
+
+.pos-exact-streamline-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--nm-gray);
+  margin-bottom: 30px;
+  max-width: 440px;
+}
+
+/* Fanned 3D Perspective Cards Visual */
+.pos-exact-fanned-cards-wrap {
+  position: relative;
+  height: 280px;
+  perspective: 1000px;
+}
+
+.pos-exact-fan-card {
+  position: absolute;
+  width: 220px;
+  background: #ffffff;
+  border: 1px solid var(--nm-border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+  transition: all 0.3s ease;
+}
+
+.pos-exact-fan-card.c1 {
+  top: 10px;
+  left: 20px;
+  transform: rotate(-10deg);
+  z-index: 1;
+}
+
+.pos-exact-fan-card.c2 {
+  top: 40px;
+  left: 110px;
+  transform: rotate(3deg);
+  z-index: 2;
+}
+
+.pos-exact-fan-card.c3 {
+  top: 70px;
+  left: 200px;
+  transform: rotate(14deg);
+  z-index: 3;
+}
+
+.pos-exact-fan-floating-circle {
+  position: absolute;
+  top: 80px;
+  left: 160px;
+  width: 44px;
+  height: 44px;
+  background: var(--nm-crimson);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(225, 20, 88, 0.4);
+  z-index: 10;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   11. PRE-FOOTER NEWSLETTER BAR
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-newsletter-bar {
+  border-top: 1px solid var(--nm-border);
+  border-bottom: 1px solid var(--nm-border);
+  padding: 36px 0;
+  background: #ffffff;
+}
+
+.pos-exact-news-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.pos-exact-news-left h4 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--nm-dark);
+  margin-bottom: 4px;
+}
+
+.pos-exact-news-left p {
+  font-size: 13px;
+  color: var(--nm-gray);
+  margin: 0;
+}
+
+.pos-exact-news-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pos-exact-news-input {
+  width: 280px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--nm-border-strong);
+  padding: 0 16px;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.pos-exact-news-input:focus {
+  border-color: var(--nm-primary);
+}
+
+.pos-exact-news-btn {
+  background: var(--nm-lime);
+  color: var(--nm-dark);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0 24px;
+  height: 44px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pos-exact-news-btn:hover {
+  background: var(--nm-lime-hover);
+  transform: translateY(-1px);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   12. DEMO FORM MODAL / SECTION
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-demo-section {
+  padding: 80px 0;
+  background: #fafafc;
+}
+
+.pos-exact-demo-box {
+  background: #ffffff;
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-lg);
+  padding: 50px 40px;
+  box-shadow: var(--nm-shadow-sm);
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 50px;
+}
+
+.pos-exact-demo-left h3 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--nm-dark);
+  margin: 12px 0 16px;
+  line-height: 1.3;
+}
+
+.pos-exact-demo-left p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--nm-gray);
+  margin-bottom: 24px;
+}
+
+.pos-exact-demo-perks {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pos-exact-demo-perks li {
+  font-size: 14px;
+  color: var(--nm-dark-soft);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pos-exact-demo-perks li svg {
+  color: var(--nm-mint);
+  flex-shrink: 0;
+}
+
+.pos-exact-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.pos-exact-form-group {
+  margin-bottom: 16px;
+}
+
+.pos-exact-form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--nm-dark);
+  margin-bottom: 6px;
+}
+
+.pos-exact-form-group input,
+.pos-exact-form-group select,
+.pos-exact-form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--nm-border-strong);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+  background: #ffffff;
+}
+
+.pos-exact-form-group input:focus,
+.pos-exact-form-group select:focus,
+.pos-exact-form-group textarea:focus {
+  border-color: var(--nm-primary);
+}
+
+.pos-exact-demo-submit-btn {
+  width: 100%;
+  background: var(--nm-primary);
+  color: #ffffff;
+  padding: 14px 24px;
+  border-radius: var(--nm-radius-pill);
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(94, 72, 235, 0.25);
+}
+
+.pos-exact-demo-submit-btn:hover {
+  background: var(--nm-primary-hover);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   13. FOOTER
+   ────────────────────────────────────────────────────────────────────────── */
+.pos-exact-footer {
+  padding: 70px 0 30px;
+  background: #ffffff;
+}
+
+.pos-exact-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 50px;
+}
+
+.pos-exact-footer-brand-p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--nm-gray);
+  margin: 14px 0 20px;
+  max-width: 280px;
+}
+
+.pos-exact-footer-col h5 {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--nm-dark);
+  margin-bottom: 18px;
+}
+
+.pos-exact-footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pos-exact-footer-col ul a {
+  text-decoration: none;
+  font-size: 13px;
+  color: var(--nm-gray);
+  transition: color 0.15s ease;
+}
+
+.pos-exact-footer-col ul a:hover {
+  color: var(--nm-primary);
+}
+
+.pos-exact-footer-bottom {
+  border-top: 1px solid var(--nm-border);
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--nm-gray);
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.pos-exact-footer-bottom a {
+  color: var(--nm-gray);
+  text-decoration: none;
+  margin-left: 18px;
+}
+
+.pos-exact-footer-bottom a:hover {
+  color: var(--nm-dark);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   RESPONSIVE DESIGN (Tablets & Mobile)
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .pos-exact-hero-title {
+    font-size: 42px;
+  }
+  .pos-exact-advantages-grid,
+  .pos-exact-boost-grid,
+  .pos-exact-testimonials-grid,
+  .pos-exact-pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pos-exact-tabs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pos-exact-crimson-grid {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 30px;
+  }
+  .pos-exact-streamline-card {
+    grid-template-columns: 1fr;
+  }
+  .pos-exact-fanned-cards-wrap {
+    display: none;
+  }
+  .pos-exact-mobile-frame {
+    display: none;
+  }
+  .pos-exact-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .pos-exact-nav-links {
+    display: none;
+  }
+  .pos-exact-hero-title {
+    font-size: 32px;
+  }
+  .pos-exact-hero-subtitle {
+    font-size: 14px;
+  }
+  .pos-exact-advantages-grid,
+  .pos-exact-boost-grid,
+  .pos-exact-testimonials-grid,
+  .pos-exact-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+  .pos-exact-tabs-grid {
+    grid-template-columns: 1fr;
+  }
+  .pos-exact-crimson-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .pos-exact-crimson-col:not(:last-child)::after {
+    display: none;
+  }
+  .pos-exact-demo-box {
+    grid-template-columns: 1fr;
+    padding: 30px 20px;
+  }
+  .pos-exact-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .pos-exact-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}

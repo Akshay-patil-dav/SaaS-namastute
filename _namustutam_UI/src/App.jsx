@@ -24,6 +24,7 @@ const LivePreview = lazy(() => import('./pages/website/LivePreview/LivePreview.j
 const ProjectWorks = lazy(() => import('./pages/website/ProjectWorks/ProjectWorks.jsx'));
 const ProjectInfo = lazy(() => import('./pages/website/ProjectInfo/ProjectInfo.jsx'));
 const PrivacyPolicy = lazy(() => import('./pages/website/PrivacyPolicy/PrivacyPolicy.jsx'));
+const PosSoftware = lazy(() => import('./pages/website/PosSoftware/PosSoftware.jsx'));
 const NotFound = lazy(() => import('./pages/website/NotFound/NotFound.jsx'));
 
 // Admin pages
@@ -147,6 +148,11 @@ function AppRoutes() {
                 <Route path="/services/:serviceId" element={<ServiceDetail />} />
                 <Route path="/live-preview" element={<LivePreview />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                
+                {/* ── POS & Retail SaaS Software ────────────────────────── */}
+                <Route path="/possoftware" element={<PosSoftware />} />
+                <Route path="/pos-software" element={<Navigate to="/possoftware" replace />} />
+                <Route path="/retail-saas-platform" element={<Navigate to="/possoftware" replace />} />
 
                 {/* 404 Fallback for any unknown route */}
                 <Route path="*" element={<NotFound />} />

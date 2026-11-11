@@ -20,6 +20,7 @@ const servicesDropdown = {
         {
             heading: 'Platform & E-commerce',
             items: [
+                { icon: <ShoppingCart size={20} />, title: 'Namustutam POS Software', desc: 'Retail & Multi-store Cloud POS', color: '#EA580C', link: '/possoftware' },
                 { icon: <ShoppingBag size={20} />, title: 'E-commerce Platform Development', desc: 'Online stores and marketplaces', color: '#F59E0B', link: '/services/e-commerce-platform-development' },
                 { icon: <GraduationCap size={20} />, title: 'Education Platform Development', desc: 'Institute, Startup & Market Level', color: '#10B981', link: '/services/education-platform-development' },
                 { icon: <Building2 size={20} />, title: 'Business Website Development', desc: 'Static Service & Landing Sites', color: '#3B82F6', link: '/services/business-website-development' },
@@ -86,8 +87,8 @@ const WebsiteNavbar = () => {
 
     const scrollTo = (id) => {
         setMenuOpen(false);
-        if (window.location.pathname !== '/retail-saas-platform') {
-            navigate('/retail-saas-platform');
+        if (window.location.pathname !== '/possoftware') {
+            navigate('/possoftware');
             setTimeout(() => {
                 document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
             }, 300);
@@ -168,6 +169,21 @@ const WebsiteNavbar = () => {
                             <Layers size={16} /> Services
                             <svg className={`lp-nav-chevron ${activeDropdown === 'services' ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
                         </button>
+                    </li>
+                    <li>
+                        <Link
+                            to="/possoftware"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                textDecoration: 'none',
+                                color: location.pathname === '/possoftware' ? 'var(--primary, #ff5b00)' : 'inherit',
+                                fontWeight: location.pathname === '/possoftware' ? 700 : 500
+                            }}
+                        >
+                            <ShoppingCart size={16} style={{ color: '#ea580c' }} /> POS Software
+                        </Link>
                     </li>
                     {showCTA && (
                         <>

@@ -83,6 +83,7 @@ const WebsiteFooter = () => {
                         <div className="premium-footer-col">
                             <h4>Services</h4>
                             <ul>
+                                <li><Link to="/possoftware" style={{ color: 'var(--primary, #ea580c)', fontWeight: 600 }}>Namustutam POS Software</Link></li>
                                 <li><Link to="/services/web-development">Web Development</Link></li>
                                 <li><Link to="/services/saas-applications">SaaS Applications</Link></li>
                                 <li><Link to="/services/ui-ux-design">UI/UX Design</Link></li>

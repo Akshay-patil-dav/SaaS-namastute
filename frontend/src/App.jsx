@@ -55,6 +55,7 @@ const Invoices = lazy(() => import('./pages/sales/Invoices/Invoices.jsx'));
 const FinancialReport = lazy(() => import('./pages/reports/FinancialReport/FinancialReport.jsx'));
 const KhataBook = lazy(() => import('./pages/finance/KhataBook/KhataBook.jsx'));
 const TeamManagementPage = lazy(() => import('./pages/settings/TeamManagementPage.jsx'));
+const PosSoftware = lazy(() => import('./pages/website/PosSoftware/PosSoftware.jsx'));
 
 
 // ── Role constants ───────────────────────────────────────────────────────────
@@ -113,6 +114,10 @@ function AppRoutes() {
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
                 <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+
+                {/* ── Namustutam POS Software Showcase ── */}
+                <Route path="/possoftware" element={<PosSoftware />} />
+                <Route path="/pos-software" element={<Navigate to="/possoftware" replace />} />
 
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route path="/invite/accept/:token" element={<AcceptInvite />} />
