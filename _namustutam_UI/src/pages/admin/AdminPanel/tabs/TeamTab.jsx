@@ -13,7 +13,7 @@ const TEAM_AVATAR_PRESETS = [
 
 export default function TeamTab() {
     const { landingData, addTeamMember, updateTeamMember, deleteTeamMember } = useLandingPage();
-    const team = landingData.team || [];
+    const team = useMemo(() => landingData.team || [], [landingData.team]);
 
     const [modalMode, setModalMode] = useState(null); // 'create' | 'edit'
     const [editingMember, setEditingMember] = useState(null);

@@ -41,7 +41,7 @@ const QRCodeModal = ({
                     </div>
 
                     {/* Product Sections */}
-                    <div className={`qrcode-print-area ${pageSize.replace(/[\(\)]/g, '').replace(/\s+/g, '-').toLowerCase()}`}>
+                    <div className={`qrcode-print-area ${pageSize.replace(/[()]/g, '').replace(/\s+/g, '-').toLowerCase()}`}>
                         {displayProducts.map((product, pIndex) => (
                             <div key={pIndex} className="qrcode-product-group">
                                 {showProductName && <h5 className="qrcode-product-group-title">{product.name}</h5>}

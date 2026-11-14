@@ -1,7 +1,8 @@
 import { 
     LayoutDashboard, Sparkles, FolderGit2, Wrench, Users, 
     MessageSquare, Megaphone, PhoneCall, Globe, ExternalLink,
-    CheckCircle2, AlertTriangle, ArrowUpRight, Layers, RefreshCw, Star, BookOpen, Bot
+    CheckCircle2, AlertTriangle, ArrowUpRight, Layers, RefreshCw, Star, BookOpen, Bot,
+    ShoppingBag
 } from 'lucide-react';
 import { useLandingPage } from '../../../../context/LandingPageContext';
 
@@ -11,6 +12,14 @@ export default function OverviewTab({ setActiveTab }) {
     const visibility = landingData?.sectionVisibility || {};
 
     const stats = [
+        {
+            title: 'POS Software',
+            value: '₹399+',
+            subtitle: '15+ Clients Online & Offline',
+            icon: ShoppingBag,
+            color: '#ff5b00',
+            tab: 'posSoftware'
+        },
         {
             title: 'Featured Projects',
             value: projects?.length || 0,

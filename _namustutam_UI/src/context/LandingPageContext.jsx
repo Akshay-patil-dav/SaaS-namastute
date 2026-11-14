@@ -21,8 +21,86 @@ export const LandingPageProvider = ({ children }) => {
                 return {
                     ...DEFAULT_LANDING_DATA,
                     ...parsed,
-                    hero: { ...DEFAULT_LANDING_DATA.hero, ...(parsed.hero || {}) },
-                    contact: { ...DEFAULT_LANDING_DATA.contact, ...(parsed.contact || {}) },
+                    hero: {
+                        ...DEFAULT_LANDING_DATA.hero,
+                        ...(parsed.hero || {}),
+                        badge: parsed.hero?.badge || DEFAULT_LANDING_DATA.hero.badge,
+                        titlePrefix: parsed.hero?.titlePrefix || DEFAULT_LANDING_DATA.hero.titlePrefix,
+                        rotatingWords: (parsed.hero?.rotatingWords && parsed.hero.rotatingWords.length > 0)
+                            ? parsed.hero.rotatingWords
+                            : DEFAULT_LANDING_DATA.hero.rotatingWords,
+                        titleSuffix: parsed.hero?.titleSuffix || DEFAULT_LANDING_DATA.hero.titleSuffix,
+                        subtitle: parsed.hero?.subtitle || DEFAULT_LANDING_DATA.hero.subtitle,
+                        primaryBtnText: parsed.hero?.primaryBtnText || DEFAULT_LANDING_DATA.hero.primaryBtnText,
+                        primaryBtnLink: parsed.hero?.primaryBtnLink || DEFAULT_LANDING_DATA.hero.primaryBtnLink,
+                        secondaryBtnText: parsed.hero?.secondaryBtnText || DEFAULT_LANDING_DATA.hero.secondaryBtnText,
+                        secondaryBtnLink: parsed.hero?.secondaryBtnLink || DEFAULT_LANDING_DATA.hero.secondaryBtnLink,
+                        personImage: parsed.hero?.personImage || DEFAULT_LANDING_DATA.hero.personImage,
+                        paragraphs: (parsed.hero?.paragraphs && parsed.hero.paragraphs.length > 0)
+                            ? parsed.hero.paragraphs
+                            : DEFAULT_LANDING_DATA.hero.paragraphs,
+                        milestones: (parsed.hero?.milestones && parsed.hero.milestones.length > 0)
+                            ? parsed.hero.milestones
+                            : DEFAULT_LANDING_DATA.hero.milestones,
+                    },
+                    contact: {
+                        ...DEFAULT_LANDING_DATA.contact,
+                        ...(parsed.contact || {}),
+                        email: (parsed.contact?.email && parsed.contact.email.trim()) ? parsed.contact.email : DEFAULT_LANDING_DATA.contact.email,
+                        phone: (parsed.contact?.phone && parsed.contact.phone.trim()) ? parsed.contact.phone : DEFAULT_LANDING_DATA.contact.phone,
+                        whatsapp: (parsed.contact?.whatsapp && parsed.contact.whatsapp.trim()) ? parsed.contact.whatsapp : DEFAULT_LANDING_DATA.contact.whatsapp,
+                        location: (parsed.contact?.location && parsed.contact.location.trim()) ? parsed.contact.location : DEFAULT_LANDING_DATA.contact.location,
+                        showEmail: parsed.contact?.showEmail !== undefined ? parsed.contact.showEmail : DEFAULT_LANDING_DATA.contact.showEmail,
+                        showPhone: parsed.contact?.showPhone !== undefined ? parsed.contact.showPhone : DEFAULT_LANDING_DATA.contact.showPhone,
+                        showLocation: parsed.contact?.showLocation !== undefined ? parsed.contact.showLocation : DEFAULT_LANDING_DATA.contact.showLocation,
+                        showHours: parsed.contact?.showHours !== undefined ? parsed.contact.showHours : DEFAULT_LANDING_DATA.contact.showHours,
+                    },
+                    legal: {
+                        ...DEFAULT_LANDING_DATA.legal,
+                        ...(parsed.legal || {}),
+                        privacy: {
+                            ...DEFAULT_LANDING_DATA.legal?.privacy,
+                            ...(parsed.legal?.privacy || {}),
+                            sections: (parsed.legal?.privacy?.sections && parsed.legal.privacy.sections.length > 0)
+                                ? parsed.legal.privacy.sections
+                                : DEFAULT_LANDING_DATA.legal?.privacy?.sections
+                        },
+                        terms: {
+                            ...DEFAULT_LANDING_DATA.legal?.terms,
+                            ...(parsed.legal?.terms || {}),
+                            sections: (parsed.legal?.terms?.sections && parsed.legal.terms.sections.length > 0)
+                                ? parsed.legal.terms.sections
+                                : DEFAULT_LANDING_DATA.legal?.terms?.sections
+                        },
+                        cookies: {
+                            ...DEFAULT_LANDING_DATA.legal?.cookies,
+                            ...(parsed.legal?.cookies || {}),
+                            sections: (parsed.legal?.cookies?.sections && parsed.legal.cookies.sections.length > 0)
+                                ? parsed.legal.cookies.sections
+                                : DEFAULT_LANDING_DATA.legal?.cookies?.sections
+                        },
+                        refunds: {
+                            ...DEFAULT_LANDING_DATA.legal?.refunds,
+                            ...(parsed.legal?.refunds || {}),
+                            sections: (parsed.legal?.refunds?.sections && parsed.legal.refunds.sections.length > 0)
+                                ? parsed.legal.refunds.sections
+                                : DEFAULT_LANDING_DATA.legal?.refunds?.sections
+                        }
+                    },
+                    posSoftware: {
+                        ...DEFAULT_LANDING_DATA.posSoftware,
+                        ...(parsed.posSoftware || {}),
+                        stats: (parsed.posSoftware?.stats && parsed.posSoftware.stats.length > 0)
+                            ? parsed.posSoftware.stats
+                            : DEFAULT_LANDING_DATA.posSoftware?.stats,
+                        pricingPlans: (parsed.posSoftware?.pricingPlans && parsed.posSoftware.pricingPlans.length > 0)
+                            ? parsed.posSoftware.pricingPlans
+                            : DEFAULT_LANDING_DATA.posSoftware?.pricingPlans,
+                        demoInfo: {
+                            ...DEFAULT_LANDING_DATA.posSoftware?.demoInfo,
+                            ...(parsed.posSoftware?.demoInfo || {})
+                        }
+                    },
                     marquee: { ...DEFAULT_LANDING_DATA.marquee, ...(parsed.marquee || {}) },
                     announcement: { ...DEFAULT_LANDING_DATA.announcement, ...(parsed.announcement || {}) },
                     seo: { ...DEFAULT_LANDING_DATA.seo, ...(parsed.seo || {}) },
@@ -57,10 +135,86 @@ export const LandingPageProvider = ({ children }) => {
     // ── Fetch & sync remote config from backend ──────────────────────────────
     const fetchAndSyncRemoteConfig = useCallback(async () => {
         try {
-            const res = await apiClient.get(`${ENV.API_BASE_URL}/landing-page`, { timeout: 4000 });
+            const res = await apiClient.get('/landing-page', { timeout: 5000 });
             if (res.data && typeof res.data === 'object' && res.data.hero) {
                 const cleaned = cleanLocalLinks(res.data);
-                setLandingData(() => ({ ...DEFAULT_LANDING_DATA, ...cleaned }));
+                setLandingData(() => ({
+                    ...DEFAULT_LANDING_DATA,
+                    ...cleaned,
+                    hero: {
+                        ...DEFAULT_LANDING_DATA.hero,
+                        ...(cleaned.hero || {}),
+                        paragraphs: (cleaned.hero?.paragraphs && cleaned.hero.paragraphs.length > 0)
+                            ? cleaned.hero.paragraphs
+                            : DEFAULT_LANDING_DATA.hero.paragraphs,
+                        milestones: (cleaned.hero?.milestones && cleaned.hero.milestones.length > 0)
+                            ? cleaned.hero.milestones
+                            : DEFAULT_LANDING_DATA.hero.milestones,
+                        personImage: cleaned.hero?.personImage || DEFAULT_LANDING_DATA.hero.personImage,
+                    },
+                    contact: {
+                        ...DEFAULT_LANDING_DATA.contact,
+                        ...(cleaned.contact || {}),
+                        email: (cleaned.contact?.email && cleaned.contact.email.trim()) ? cleaned.contact.email : DEFAULT_LANDING_DATA.contact.email,
+                        phone: (cleaned.contact?.phone && cleaned.contact.phone.trim()) ? cleaned.contact.phone : DEFAULT_LANDING_DATA.contact.phone,
+                        whatsapp: (cleaned.contact?.whatsapp && cleaned.contact.whatsapp.trim()) ? cleaned.contact.whatsapp : DEFAULT_LANDING_DATA.contact.whatsapp,
+                        location: (cleaned.contact?.location && cleaned.contact.location.trim()) ? cleaned.contact.location : DEFAULT_LANDING_DATA.contact.location,
+                        showEmail: cleaned.contact?.showEmail !== undefined ? cleaned.contact.showEmail : DEFAULT_LANDING_DATA.contact.showEmail,
+                        showPhone: cleaned.contact?.showPhone !== undefined ? cleaned.contact.showPhone : DEFAULT_LANDING_DATA.contact.showPhone,
+                        showLocation: cleaned.contact?.showLocation !== undefined ? cleaned.contact.showLocation : DEFAULT_LANDING_DATA.contact.showLocation,
+                        showHours: cleaned.contact?.showHours !== undefined ? cleaned.contact.showHours : DEFAULT_LANDING_DATA.contact.showHours,
+                    },
+                    sectionVisibility: {
+                        ...DEFAULT_LANDING_DATA.sectionVisibility,
+                        ...(cleaned.sectionVisibility || {})
+                    },
+                    legal: {
+                        ...DEFAULT_LANDING_DATA.legal,
+                        ...(cleaned.legal || {}),
+                        privacy: {
+                            ...DEFAULT_LANDING_DATA.legal?.privacy,
+                            ...(cleaned.legal?.privacy || {}),
+                            sections: (cleaned.legal?.privacy?.sections && cleaned.legal.privacy.sections.length > 0)
+                                ? cleaned.legal.privacy.sections
+                                : DEFAULT_LANDING_DATA.legal?.privacy?.sections
+                        },
+                        terms: {
+                            ...DEFAULT_LANDING_DATA.legal?.terms,
+                            ...(cleaned.legal?.terms || {}),
+                            sections: (cleaned.legal?.terms?.sections && cleaned.legal.terms.sections.length > 0)
+                                ? cleaned.legal.terms.sections
+                                : DEFAULT_LANDING_DATA.legal?.terms?.sections
+                        },
+                        cookies: {
+                            ...DEFAULT_LANDING_DATA.legal?.cookies,
+                            ...(cleaned.legal?.cookies || {}),
+                            sections: (cleaned.legal?.cookies?.sections && cleaned.legal.cookies.sections.length > 0)
+                                ? cleaned.legal.cookies.sections
+                                : DEFAULT_LANDING_DATA.legal?.cookies?.sections
+                        },
+                        refunds: {
+                            ...DEFAULT_LANDING_DATA.legal?.refunds,
+                            ...(cleaned.legal?.refunds || {}),
+                            sections: (cleaned.legal?.refunds?.sections && cleaned.legal.refunds.sections.length > 0)
+                                ? cleaned.legal.refunds.sections
+                                : DEFAULT_LANDING_DATA.legal?.refunds?.sections
+                        }
+                    },
+                    posSoftware: {
+                        ...DEFAULT_LANDING_DATA.posSoftware,
+                        ...(cleaned.posSoftware || {}),
+                        stats: (cleaned.posSoftware?.stats && cleaned.posSoftware.stats.length > 0)
+                            ? cleaned.posSoftware.stats
+                            : DEFAULT_LANDING_DATA.posSoftware?.stats,
+                        pricingPlans: (cleaned.posSoftware?.pricingPlans && cleaned.posSoftware.pricingPlans.length > 0)
+                            ? cleaned.posSoftware.pricingPlans
+                            : DEFAULT_LANDING_DATA.posSoftware?.pricingPlans,
+                        demoInfo: {
+                            ...DEFAULT_LANDING_DATA.posSoftware?.demoInfo,
+                            ...(cleaned.posSoftware?.demoInfo || {})
+                        }
+                    }
+                }));
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
                 return true;
             }
@@ -73,7 +227,7 @@ export const LandingPageProvider = ({ children }) => {
     // ── Check backend and DB status ──────────────────────────────────────────
     const checkBackendStatus = useCallback(async () => {
         try {
-            const res = await apiClient.get(`${ENV.API_BASE_URL}/landing-page/db-status`, { timeout: 3500 });
+            const res = await apiClient.get('/landing-page/db-status', { timeout: 3500 });
             if (res.data && res.data.connected) {
                 setBackendStatus({
                     connected: true,
@@ -109,7 +263,7 @@ export const LandingPageProvider = ({ children }) => {
         setBackendStatus(prev => ({ ...prev, checking: true }));
         try {
             // Trigger DB auto-creation
-            await apiClient.post(`${ENV.API_BASE_URL}/landing-page/ensure-db`, {}, { timeout: 8000 });
+            await apiClient.post('/landing-page/ensure-db', {}, { timeout: 8000 });
         } catch { /* backend might be starting */ }
         const ok = await checkBackendStatus();
         if (ok) {
@@ -411,7 +565,7 @@ export const LandingPageProvider = ({ children }) => {
 
             // 2. Persist to Spring Boot backend & PostgreSQL
             try {
-                const res = await apiClient.put(`${ENV.API_BASE_URL}/landing-page`, landingData, { timeout: 6000 });
+                const res = await apiClient.put('/landing-page', landingData, { timeout: 8000 });
                 if (res.data && res.data.success) {
                     savedToBackend = true;
                     backendMsg = res.data.databaseSaved

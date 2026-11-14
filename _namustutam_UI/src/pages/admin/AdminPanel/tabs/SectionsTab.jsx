@@ -2,11 +2,23 @@ import React, { useState } from 'react';
 import { 
     Layers, Eye, EyeOff, Sparkles, FolderGit2, Wrench, RefreshCw, 
     Users, Star, Megaphone, PhoneCall, BookOpen, ExternalLink,
-    CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, Check, Bot
+    CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, Check, Bot,
+    ShoppingCart, Mail
 } from 'lucide-react';
 import { useLandingPage } from '../../../../context/LandingPageContext';
 
 const SECTION_DEFINITIONS = [
+    {
+        key: 'topContactBar',
+        title: 'Top Contact Info Bar',
+        category: 'Header & Top Bar',
+        description: 'Vibrant orange header strip displaying direct contact channels (official email, phone/WhatsApp, and operating location) above the navigation bar.',
+        icon: Mail,
+        color: '#ff5b00',
+        targetTab: 'contact',
+        badge: 'Top Viewport',
+        defaultVisible: false
+    },
     {
         key: 'announcement',
         title: 'Top Announcement Bar',
@@ -126,6 +138,28 @@ const SECTION_DEFINITIONS = [
         color: '#7c3aed',
         targetTab: 'chatbot',
         badge: 'Floating AI Widget',
+        defaultVisible: true
+    },
+    {
+        key: 'posSoftware',
+        title: 'Namustutam POS Software Showcase',
+        category: 'Flagship Products',
+        description: 'Dedicated cloud retail POS software showcase page, billing register demos, feature matrices, client metrics, and pricing plans.',
+        icon: ShoppingCart,
+        color: '#ff5b00',
+        targetTab: 'services',
+        badge: 'Retail SaaS',
+        defaultVisible: true
+    },
+    {
+        key: 'legal',
+        title: 'Legal & Policy Compliance Pages',
+        category: 'Footer & Compliance',
+        description: 'Footer compliance column and public policy documents: Privacy Policy, Terms of Service, Cookie Policy, and Refund Policy.',
+        icon: ShieldCheck,
+        color: '#10b981',
+        targetTab: 'legal',
+        badge: 'Compliance CMS',
         defaultVisible: true
     }
 ];

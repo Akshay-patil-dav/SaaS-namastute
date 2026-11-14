@@ -61,11 +61,11 @@ public class SecurityConfig {
                                 "/*.png", "/*.jpg", "/*.jpeg", "/*.svg", "/*.ico", "/*.webp", "/*.json", "/*.txt", "/*.html",
                                 "/admin/**", "/blog/**", "/contact/**", "/project-works/**", "/login/**", "/register/**",
                                 "/it-portfolio/**", "/web-development/**", "/ai-automation/**", "/ecommerce/**",
-                                "/privacy-policy/**", "/terms/**")
+                                "/privacy-policy/**", "/terms-of-service/**", "/terms/**", "/cookie-policy/**", "/cookies/**", "/refund-policy/**", "/refunds/**", "/possoftware/**")
                         .permitAll()
                         .requestMatchers("/api/auth/**", "/api/verification/**", "/oauth2/**", "/login/**",
                                 "/api/upload/**", "/upload/**", "/uploads/**", "/api/categories", "/api/subcategories", "/api/brands",
-                                "/api/units", "/api/warranties", "/api/landing-page/**", "/api/blog-posts", "/api/blog-posts/**",
+                                "/api/units", "/api/warranties", "/api/landing-page", "/api/landing-page/**", "/api/blog-posts", "/api/blog-posts/**",
                                 "/api/contact-submissions", "/api/contact-submissions/**", "/api/contacts", "/api/contacts/**", "/error")
                         .permitAll()
                         // Allow public e-commerce storefront access

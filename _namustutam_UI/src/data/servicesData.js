@@ -207,5 +207,43 @@ export const servicesData = {
             'Provided in multiple file formats (PSD, AI, PNG, SVG)',
             'A/B testing variations included'
         ]
+    },
+    'saas-applications': {
+        title: 'SaaS Applications Development',
+        subtitle: 'Multi-Tenant Cloud Platforms, Subscriptions & Modern Dashboards',
+        description: 'We build end-to-end cloud SaaS platforms engineered for high concurrency, reliable billing cycles, role-based tenant isolation, and frictionless user onboarding.',
+        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200',
+        color: '#ff5b00',
+        features: [
+            { icon: '🚀', title: 'Multi-Tenant Architecture', desc: 'Secure data isolation per organization.' },
+            { icon: '💳', title: 'Automated Billing', desc: 'Razorpay, Stripe & UPI recurring subscriptions.' },
+            { icon: '📊', title: 'Executive Dashboards', desc: 'Real-time telemetry and KPI reporting.' },
+            { icon: '🛡️', title: 'Enterprise Security', desc: 'JWT, OAuth2, and role-based permissions.' }
+        ],
+        benefits: [
+            'Rapid MVP prototyping to get your product into market fast',
+            'Full database schema migrations and automated backups',
+            'Scalable microservices or modular monolith architectures',
+            '99.9% uptime SLA design with managed cloud hosting'
+        ]
+    },
+    'ui-ux-design': {
+        title: 'UI/UX Design Systems',
+        subtitle: 'Conversion-Focused Interfaces, Design Systems & High-Fidelity Prototypes',
+        description: 'Elevate your digital software with bespoke UI/UX designs that balance aesthetics with user psychology. We design clean, responsive interfaces that reduce churn and accelerate user adoption.',
+        image: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&q=80&w=1200',
+        color: '#ec4899',
+        features: [
+            { icon: '🎨', title: 'Design Systems', desc: 'Reusable component libraries in Figma & React.' },
+            { icon: '📱', title: 'Mobile-First', desc: 'Responsive across smartphones, tablets & desktops.' },
+            { icon: '⚡', title: 'Micro-Interactions', desc: 'Delightful fluid animations and state feedback.' },
+            { icon: '🔍', title: 'User Research', desc: 'Wireframing, journey mapping and usability audits.' }
+        ],
+        benefits: [
+            'Tested interactive prototypes prior to engineering investment',
+            'Pixel-perfect handoff files with design token specs',
+            'Increased conversion rates on checkouts and sign-up funnels',
+            'Accessible WCAG-compliant color palettes and typographic scales'
+        ]
     }
 };

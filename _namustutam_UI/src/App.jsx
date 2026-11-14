@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { LandingPageProvider, useLandingPage } from './context/LandingPageContext';
@@ -7,6 +7,7 @@ import { ConfirmProvider } from './context/ConfirmContext';
 import ProtectedRoute from './components/auth/ProtectedRoute/ProtectedRoute';
 import GuestRoute from './components/auth/GuestRoute/GuestRoute';
 import ChatBot from './components/ChatBot/ChatBot.jsx';
+import ErrorBoundary from './components/common/ErrorBoundary/ErrorBoundary';
 import { isAdminPanelDisabled } from './utils/domainConfig';
 
 // Public pages
@@ -24,6 +25,9 @@ const LivePreview = lazy(() => import('./pages/website/LivePreview/LivePreview.j
 const ProjectWorks = lazy(() => import('./pages/website/ProjectWorks/ProjectWorks.jsx'));
 const ProjectInfo = lazy(() => import('./pages/website/ProjectInfo/ProjectInfo.jsx'));
 const PrivacyPolicy = lazy(() => import('./pages/website/PrivacyPolicy/PrivacyPolicy.jsx'));
+const TermsOfService = lazy(() => import('./pages/website/TermsOfService/TermsOfService.jsx'));
+const CookiePolicy = lazy(() => import('./pages/website/CookiePolicy/CookiePolicy.jsx'));
+const RefundPolicy = lazy(() => import('./pages/website/RefundPolicy/RefundPolicy.jsx'));
 const PosSoftware = lazy(() => import('./pages/website/PosSoftware/PosSoftware.jsx'));
 const NotFound = lazy(() => import('./pages/website/NotFound/NotFound.jsx'));
 
@@ -148,6 +152,12 @@ function AppRoutes() {
                 <Route path="/services/:serviceId" element={<ServiceDetail />} />
                 <Route path="/live-preview" element={<LivePreview />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
+                <Route path="/terms" element={<Navigate to="/terms-of-service" replace />} />
+                <Route path="/cookie-policy" element={<CookiePolicy />} />
+                <Route path="/cookies" element={<Navigate to="/cookie-policy" replace />} />
+                <Route path="/refund-policy" element={<RefundPolicy />} />
+                <Route path="/refunds" element={<Navigate to="/refund-policy" replace />} />
                 
                 {/* ── POS & Retail SaaS Software ────────────────────────── */}
                 <Route path="/possoftware" element={<PosSoftware />} />
@@ -161,65 +171,79 @@ function AppRoutes() {
     );
 }
 
-// ── Dynamic Announcement Banner ──────────────────────────────────────────────
-const AnnouncementBanner = () => {
+// ── Dynamic Announcement Banner (Rendered only when enabled in Admin Studio) ──
+const TopHeaderBars = () => {
+    const location = useLocation();
     const { landingData } = useLandingPage();
-    const announcement = landingData?.announcement;
 
-    if (!announcement || !announcement.enabled) {
+    if (location.pathname.startsWith('/admin')) {
         return null;
     }
 
+    const visibility = landingData?.sectionVisibility || {};
+    const announcement = landingData?.announcement;
+    const isAnnouncementVisible = Boolean(announcement?.enabled) && visibility.announcement !== false && Boolean(announcement?.text);
+
+    if (!isAnnouncementVisible) return null;
+
+    const bannerHeight = 36;
+
     return (
-        <div style={{
-            background: announcement.bgColor || 'linear-gradient(135deg, rgb(255 98 11) 0%, rgb(255, 150, 102) 100%)',
-            color: announcement.textColor || '#ffffff',
-            padding: '0 16px',
-            fontWeight: '600',
-            fontSize: '13px',
-            width: '100%',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            zIndex: 99999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '36px',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
-        }}>
+        <>
             <style>{`
                 body {
-                    padding-top: 36px !important;
+                    padding-top: ${bannerHeight}px !important;
                 }
                 .lp-nav {
-                    top: 36px !important;
+                    top: ${bannerHeight}px !important;
                 }
                 .pos-sidebar {
-                    top: 36px !important;
-                    height: calc(100vh - 36px) !important;
+                    top: ${bannerHeight}px !important;
+                    height: calc(100vh - ${bannerHeight}px) !important;
                 }
                 .pos-header {
-                    top: 36px !important;
+                    top: ${bannerHeight}px !important;
                 }
             `}</style>
-            <span>{announcement.text}</span>
-            {announcement.link && (
-                <a
-                    href={announcement.link}
-                    style={{
-                        marginLeft: '12px',
-                        color: '#ffffff',
-                        textDecoration: 'underline',
-                        fontWeight: '700'
-                    }}
-                >
-                    Learn More →
-                </a>
-            )}
-        </div>
+
+            <aside
+                style={{
+                    background: announcement.bgColor || 'linear-gradient(135deg, rgb(255 98 11) 0%, rgb(255, 150, 102) 100%)',
+                    color: announcement.textColor || '#ffffff',
+                    padding: '0 16px',
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    width: '100%',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    zIndex: 99999,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: `${bannerHeight}px`,
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
+                }}
+                aria-label="Important Announcement"
+            >
+                <span>{announcement.text}</span>
+                {announcement.link && (
+                    <a
+                        href={announcement.link}
+                        style={{
+                            marginLeft: '12px',
+                            color: '#ffffff',
+                            textDecoration: 'underline',
+                            fontWeight: '700'
+                        }}
+                    >
+                        Learn More →
+                    </a>
+                )}
+            </aside>
+        </>
     );
 };
 
@@ -230,9 +254,11 @@ export default function App() {
                 <CompanyProvider>
                     <ConfirmProvider>
                         <BrowserRouter>
-                            <AnnouncementBanner />
+                            <TopHeaderBars />
                             <ChatBot />
-                            <AppRoutes />
+                            <ErrorBoundary>
+                                <AppRoutes />
+                            </ErrorBoundary>
                         </BrowserRouter>
                     </ConfirmProvider>
                 </CompanyProvider>

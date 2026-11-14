@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
     LayoutDashboard, Sparkles, FolderGit2, Wrench, RefreshCw, 
     Users, Star, Megaphone, PhoneCall, Globe, Eye, 
     Save, RotateCcw, Download, Upload, LogOut, CheckCircle2, 
-    AlertCircle, Info, ExternalLink, Database, BookOpen, Layers, Bot
+    AlertCircle, Info, ExternalLink, Database, BookOpen, Layers, Bot,
+    ShieldCheck, ShoppingBag
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useLandingPage } from '../../../context/LandingPageContext';
@@ -25,6 +26,8 @@ import LivePreviewTab from './tabs/LivePreviewTab';
 import BlogTab from './tabs/BlogTab';
 import SectionsTab from './tabs/SectionsTab';
 import ChatbotTab from './tabs/ChatbotTab';
+import LegalTab from './tabs/LegalTab';
+import PosSoftwareTab from './tabs/PosSoftwareTab';
 
 export default function AdminPanel() {
     const navigate = useNavigate();
@@ -41,7 +44,6 @@ export default function AdminPanel() {
         exportConfigJson, 
         importConfigJson,
         backendStatus,
-        checkBackendStatus,
         reconnectDatabase
     } = useLandingPage();
 
@@ -54,13 +56,14 @@ export default function AdminPanel() {
             category: 'Core Dashboard',
             items: [
                 { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard },
-                { id: 'sections', label: 'Section Visibility', icon: Layers, badge: '10' },
+                { id: 'sections', label: 'Section Visibility', icon: Layers, badge: '14' },
                 { id: 'preview', label: 'Live Simulator', icon: Eye }
             ]
         },
         {
-            category: 'Services & Automation',
+            category: 'Flagship & Services',
             items: [
+                { id: 'posSoftware', label: 'POS Software CMS', icon: ShoppingBag, badge: 'Flagship' },
                 { id: 'services', label: 'Services Catalog', icon: Wrench, badge: landingData.services?.length },
                 { id: 'chatbot', label: 'AI Chatbot Assistant', icon: Bot, badge: landingData.chatbot?.apiKey ? 'Active' : 'Setup' }
             ]
@@ -79,9 +82,10 @@ export default function AdminPanel() {
             ]
         },
         {
-            category: 'Publications & Blog',
+            category: 'Publications & Legal',
             items: [
-                { id: 'blogs', label: 'Blog Articles CMS', icon: BookOpen }
+                { id: 'blogs', label: 'Blog Articles CMS', icon: BookOpen },
+                { id: 'legal', label: 'Legal Policies CMS', icon: ShieldCheck, badge: '4 Docs' }
             ]
         }
     ];
@@ -98,6 +102,7 @@ export default function AdminPanel() {
         testimonials: { title: 'Client Reviews & Social Proof', desc: 'Highlight customer feedback and satisfaction ratings' },
         marquee: { title: 'Marquee & Announcement Banner', desc: 'Manage top alert bar and infinite growth ticker' },
         blogs: { title: 'Blog Publications & Articles CMS', desc: 'Create, edit, toggle visibility, and manage software articles' },
+        legal: { title: 'Legal Policies & Compliance CMS', desc: 'Customize Privacy Policy, Terms of Service, Cookie Policy, and Refund Policy sections' },
         contact: { title: 'Contact Inquiries & Details', desc: 'Manage client lead submissions table, official emails, phones, and channels' },
         seo: { title: 'SEO & Search Engine Optimization', desc: 'Meta tags, page title, and SERP simulation preview' },
         preview: { title: 'Live Responsive Simulator', desc: 'Test landing page layouts across Desktop, Tablet, and Mobile' }
@@ -367,6 +372,7 @@ export default function AdminPanel() {
                 <main className="admin-content">
                     {activeTab === 'overview' && <OverviewTab setActiveTab={handleTabChange} />}
                     {activeTab === 'sections' && <SectionsTab setActiveTab={handleTabChange} />}
+                    {activeTab === 'posSoftware' && <PosSoftwareTab />}
                     {activeTab === 'services' && <ServicesTab />}
                     {activeTab === 'chatbot' && <ChatbotTab />}
                     {activeTab === 'hero' && <HeroTab />}
@@ -376,6 +382,7 @@ export default function AdminPanel() {
                     {activeTab === 'testimonials' && <TestimonialsTab />}
                     {activeTab === 'marquee' && <MarqueeTab />}
                     {activeTab === 'blogs' && <BlogTab />}
+                    {activeTab === 'legal' && <LegalTab />}
                     {activeTab === 'contact' && <ContactTab />}
                     {activeTab === 'seo' && <SeoTab />}
                     {activeTab === 'preview' && <LivePreviewTab />}

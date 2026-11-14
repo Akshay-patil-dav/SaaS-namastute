@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { RefreshCw, CheckCircle, Edit2, Shield, Search, PenTool, Code2, ShieldCheck, Rocket, Users, Settings, Activity, X } from 'lucide-react';
 import { useLandingPage } from '../../../../context/LandingPageContext';
 import SectionVisibilityBanner from '../components/SectionVisibilityBanner';

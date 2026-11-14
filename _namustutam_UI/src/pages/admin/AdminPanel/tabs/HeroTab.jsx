@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Sparkles, Plus, Trash2, Eye, MoveRight, Layers, Image as ImageIcon } from 'lucide-react';
 import { useLandingPage } from '../../../../context/LandingPageContext';
 import SectionVisibilityBanner from '../components/SectionVisibilityBanner';
@@ -11,7 +11,9 @@ export default function HeroTab() {
     const [previewWordIndex, setPreviewWordIndex] = useState(0);
 
     // Live cycling of rotating words in preview
-    const rotatingWords = hero.rotatingWords || ['Excellence', 'Innovation', 'Experiences', 'Solutions'];
+    const rotatingWords = useMemo(() => {
+        return hero.rotatingWords || ['Excellence', 'Innovation', 'Experiences', 'Solutions'];
+    }, [hero.rotatingWords]);
 
     useEffect(() => {
         if (!rotatingWords.length) return;
@@ -115,14 +117,19 @@ export default function HeroTab() {
                     }}>
                         {hero.titlePrefix || 'Building Digital'}{' '}
                         <span style={{
-                            display: 'inline-block',
-                            background: 'linear-gradient(135deg, #ff8c42 0%, #ff620b 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            textShadow: '0 0 30px rgba(255, 98, 11, 0.3)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '3px 14px',
+                            borderRadius: '10px',
+                            border: '1.5px solid #ff5b00',
+                            background: 'rgba(255, 91, 0, 0.12)',
+                            color: '#ff8c42',
+                            margin: '0 4px',
+                            boxShadow: '0 0 15px rgba(255, 91, 0, 0.3)',
                             transition: 'all 0.3s ease'
                         }}>
-                            {rotatingWords[previewWordIndex] || 'Excellence'}
+                            {rotatingWords[previewWordIndex] || 'Solutions'}
                         </span>
                         <br />
                         {hero.titleSuffix || 'For Modern Businesses'}
@@ -233,6 +240,135 @@ export default function HeroTab() {
                             onChange={(e) => handleFieldChange('subtitle', e.target.value)}
                             placeholder="I build custom software, POS solutions, business websites..."
                             rows={3}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Creative Milestone Hero Configuration */}
+            <div className="admin-card">
+                <div className="admin-card-header">
+                    <div>
+                        <h3 className="admin-card-title">
+                            <Sparkles size={18} color="#b5ff00" />
+                            Personal & Creative Milestones Hero (Namaste & Team Image)
+                        </h3>
+                        <div className="admin-card-subtitle">Configure the greeting, Akshay Patil cutout image, neon stripe, and right-hand milestone card</div>
+                    </div>
+                </div>
+
+                <div className="admin-form-grid">
+                    <div className="admin-field">
+                        <label className="admin-label">Greeting</label>
+                        <input
+                            type="text"
+                            className="admin-control-input"
+                            value={hero.greeting !== undefined ? hero.greeting : 'Namaste!'}
+                            onChange={(e) => handleFieldChange('greeting', e.target.value)}
+                            placeholder="Namaste!"
+                        />
+                    </div>
+
+                    <div className="admin-field">
+                        <label className="admin-label">Full Name & Accent</label>
+                        <input
+                            type="text"
+                            className="admin-control-input"
+                            value={hero.name !== undefined ? hero.name : 'Akshay Patil'}
+                            onChange={(e) => handleFieldChange('name', e.target.value)}
+                            placeholder="Akshay Patil"
+                        />
+                    </div>
+
+                    <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+                        <label className="admin-label">Person Cutout Image Path</label>
+                        <input
+                            type="text"
+                            className="admin-control-input"
+                            value={hero.personImage || '/team/Akshay_namustutam.png'}
+                            onChange={(e) => handleFieldChange('personImage', e.target.value)}
+                            placeholder="/team/Akshay_namustutam.png"
+                        />
+                    </div>
+
+                    <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+                        <label className="admin-label">
+                            Intro Paragraph 1
+                        </label>
+                        <textarea
+                            className="admin-control-textarea"
+                            value={(hero.paragraphs && hero.paragraphs[0]) || 'a graphic designer & full-stack developer who enjoys turning ideas into clear and meaningful visuals. I work across social media, branding, digital campaigns & print design.'}
+                            onChange={(e) => {
+                                const next = [...(hero.paragraphs || ['','',''])];
+                                next[0] = e.target.value;
+                                handleFieldChange('paragraphs', next);
+                            }}
+                            rows={2}
+                        />
+                    </div>
+
+                    <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+                        <label className="admin-label">
+                            Intro Paragraph 2
+                        </label>
+                        <textarea
+                            className="admin-control-textarea"
+                            value={(hero.paragraphs && hero.paragraphs[1]) || 'My goal is simple - to create designs that not only look good, but also communicate clearly and help brands stand out.'}
+                            onChange={(e) => {
+                                const next = [...(hero.paragraphs || ['','',''])];
+                                next[1] = e.target.value;
+                                handleFieldChange('paragraphs', next);
+                            }}
+                            rows={2}
+                        />
+                    </div>
+
+                    <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+                        <label className="admin-label">
+                            Intro Paragraph 3
+                        </label>
+                        <textarea
+                            className="admin-control-textarea"
+                            value={(hero.paragraphs && hero.paragraphs[2]) || 'I focus on clean, thoughtful, and professional design that leaves a strong impression.'}
+                            onChange={(e) => {
+                                const next = [...(hero.paragraphs || ['','',''])];
+                                next[2] = e.target.value;
+                                handleFieldChange('paragraphs', next);
+                            }}
+                            rows={2}
+                        />
+                    </div>
+
+                    <div className="admin-field">
+                        <label className="admin-label">Milestones Card Title (White)</label>
+                        <input
+                            type="text"
+                            className="admin-control-input"
+                            value={hero.milestonesTitle || 'Creative'}
+                            onChange={(e) => handleFieldChange('milestonesTitle', e.target.value)}
+                            placeholder="Creative"
+                        />
+                    </div>
+
+                    <div className="admin-field">
+                        <label className="admin-label">Milestones Card Script (Neon Green)</label>
+                        <input
+                            type="text"
+                            className="admin-control-input"
+                            value={hero.milestonesScript || 'Milestones'}
+                            onChange={(e) => handleFieldChange('milestonesScript', e.target.value)}
+                            placeholder="Milestones"
+                        />
+                    </div>
+
+                    <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+                        <label className="admin-label">Milestones Card Footer Script</label>
+                        <input
+                            type="text"
+                            className="admin-control-input"
+                            value={hero.countingText || 'and still counting...'}
+                            onChange={(e) => handleFieldChange('countingText', e.target.value)}
+                            placeholder="and still counting..."
                         />
                     </div>
                 </div>

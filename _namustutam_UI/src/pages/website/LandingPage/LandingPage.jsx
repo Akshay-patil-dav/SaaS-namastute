@@ -29,6 +29,7 @@ function FeatureCard({ icon, title, desc, delay = 0 }) {
 /* ── Pricing Card ───────────────────────────────────────────────────────── */
 function PricingCard({ plan, price, desc, features, popular, cta }) {
     const navigate = useNavigate();
+    const { currencySymbol } = useCurrency();
     return (
         <div className={`lp-pricing-card lp-reveal ${popular ? 'popular' : ''}`}>
             {popular && <div className="lp-pricing-badge">Most Popular</div>}
@@ -100,6 +101,7 @@ function DashboardShowcase() {
 /* ── Main Landing Page ──────────────────────────────────────────────────── */
 export default function LandingPage() {
     const navigate = useNavigate();
+    const { currencySymbol } = useCurrency();
 
     useEffect(() => {
         window.scrollTo(0, 0);

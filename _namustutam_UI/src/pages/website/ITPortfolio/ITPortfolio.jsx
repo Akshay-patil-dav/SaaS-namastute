@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Code2, Smartphone, Server, Database, Cloud, ShieldCheck, MonitorPlay, Component, ArrowRight, Star, ExternalLink } from 'lucide-react';
+import { Code2, Smartphone, Server, Database, Cloud, ShieldCheck, MonitorPlay, Component, ArrowRight, ArrowUpRight, Star, ExternalLink } from 'lucide-react';
 import '../BlogDetail/LandingPage.css';
 import './ITPortfolio.css';
 import '../ProjectWorks/ProjectWorks.css';
@@ -17,9 +17,11 @@ export default function ITPortfolio() {
     const { landingData } = useLandingPage();
 
     const hero = landingData?.hero || {};
-    const rotatingWords = (hero.rotatingWords && hero.rotatingWords.length > 0)
-        ? hero.rotatingWords
-        : ['Excellence', 'Innovation', 'Experiences', 'Solutions'];
+    const rotatingWords = useMemo(() => {
+        return (hero.rotatingWords && hero.rotatingWords.length > 0)
+            ? hero.rotatingWords
+            : ['Excellence', 'Innovation', 'Experiences', 'Solutions'];
+    }, [hero.rotatingWords]);
 
     // Rotating Text State
     const [wordIndex, setWordIndex] = useState(0);
@@ -58,8 +60,18 @@ export default function ITPortfolio() {
     }, [landingData]);
 
     const scrollTo = (id) => {
-        const cleanId = (id || '').replace(/^#/, '');
-        document.getElementById(cleanId)?.scrollIntoView({ behavior: 'smooth' });
+        if (!id) return;
+        if (id.startsWith('/')) {
+            navigate(id);
+            return;
+        }
+        const cleanId = id.replace(/^#/, '');
+        const elem = document.getElementById(cleanId);
+        if (elem) {
+            elem.scrollIntoView({ behavior: 'smooth' });
+        } else if (cleanId === 'contact') {
+            document.querySelector('.premium-footer')?.scrollIntoView({ behavior: 'smooth' });
+        }
     };
 
     // Services from landingData
@@ -107,119 +119,130 @@ export default function ITPortfolio() {
         if (visibility[key] !== undefined) return Boolean(visibility[key]);
         return def;
     };
-    const showAnnouncement = (visibility.announcement !== undefined ? visibility.announcement : false) || Boolean(landingData?.announcement?.enabled);
-
     return (
         <div className="portfolio-root">
-            {/* Top Announcement Banner (Dynamic from Admin Panel) */}
-            {showAnnouncement && landingData?.announcement?.text && (
-                <div style={{
-                    backgroundColor: landingData.announcement.bgColor || '#ff620b',
-                    color: landingData.announcement.textColor || '#ffffff',
-                    padding: '9px 16px',
-                    textAlign: 'center',
-                    fontSize: '13.5px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '12px',
-                    position: 'relative',
-                    zIndex: 9999,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                }}>
-                    <span>{landingData.announcement.text}</span>
-                    {landingData.announcement.link && (
-                        <a 
-                            href={landingData.announcement.link} 
-                            style={{ 
-                                color: '#ffffff', 
-                                textDecoration: 'underline', 
-                                fontWeight: '700',
-                                marginLeft: '6px'
-                            }}
-                        >
-                            Learn More →
-                        </a>
-                    )}
-                </div>
-            )}
-
             <WebsiteNavbar />
 
-            {/* ── Hero Section (Redesigned) ──────────────────────── */}
+            {/* ── Hero Section (Light Namustutam Theme: Content Side-by-Side with Akshay Patil) ── */}
             {isVisible('hero') && (
-                <section className="portfolio-hero-redesigned">
-                    {/* Floating Background Cards */}
-                    <div className="hero-floating-background">
-                        {floatingImages.map((imgUrl, index) => (
-                            <div
-                                key={`img-${index}`}
-                                className={`floating-project-card floating-card-${index + 1}`}
-                                style={{ backgroundImage: `url(${imgUrl})` }}
-                            ></div>
-                        ))}
-                        {floatingImages.map((imgUrl, index) => (
-                            <div
-                                key={`dup-${index}`}
-                                className={`floating-project-card floating-card-dup-${index + 1}`}
-                                style={{ backgroundImage: `url(${imgUrl})` }}
-                            ></div>
-                        ))}
+                <section className="portfolio-hero-section" id="hero">
+                    {/* Background Radial Warm Glow & Dotted Matrix Mesh */}
+                    <div className="hero-bg-glow" />
+                    <div className="hero-grid-mesh" />
 
-                        {/* Floating Tech Icons */}
-                        <div className="floating-icon-card floating-icon-1"><Code2 size={36} color="#ff8c42" /></div>
-                        <div className="floating-icon-card floating-icon-2"><Smartphone size={32} color="#3b82f6" /></div>
-                        <div className="floating-icon-card floating-icon-3"><Server size={40} color="#10b981" /></div>
-                        <div className="floating-icon-card floating-icon-4"><Database size={30} color="#f43f5e" /></div>
-                        <div className="floating-icon-card floating-icon-5"><Cloud size={44} color="#8b5cf6" /></div>
-                        <div className="floating-icon-card floating-icon-6"><ShieldCheck size={38} color="#f59e0b" /></div>
-                        <div className="floating-icon-card floating-icon-7"><MonitorPlay size={34} color="#0ea5e9" /></div>
-                        <div className="floating-icon-card floating-icon-8"><Component size={42} color="#ec4899" /></div>
+                    {/* Ambient Floating Mockup Cards from Reference Design */}
+                    <div className="hero-floating-mockups" aria-hidden="true">
+                        <div className="hero-mockup-card mockup-1">
+                            <img src={floatingImages[0] || '/dashboard1.png'} alt="App Preview" />
+                        </div>
+                        <div className="hero-mockup-card mockup-2">
+                            <img src={floatingImages[1] || '/dashboard2.png'} alt="Analytics Preview" />
+                        </div>
+                        <div className="hero-mockup-card mockup-3">
+                            <img src="/edge_shot.png" alt="Device Preview" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                        </div>
+                        <div className="hero-mockup-card mockup-4">
+                            <img src="/edge_shot2.png" alt="Dashboard Preview" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                        </div>
                     </div>
 
-                    <div className="hero-light-overlay"></div>
-
-                    <div className="portfolio-hero-content reveal-up" style={{ position: 'relative', zIndex: 2 }}>
-                        <div className="portfolio-badge">
-                            <span className="portfolio-badge-dot"></span>
-                            {hero.badge || 'Freelance Software Developer • IT Solutions'}
-                        </div>
-                        <h1 className="portfolio-hero-title">
-                            {hero.titlePrefix || 'Building Digital'}
-                            <div className="rotating-text-wrapper">
-                                {rotatingWords.map((word, index) => {
-                                    const isActive = index === wordIndex;
-                                    const isPrevious = index === (wordIndex - 1 + rotatingWords.length) % rotatingWords.length;
-
-                                    return (
-                                        <span
-                                            key={index}
-                                            className={`portfolio-gradient-text rotating-text-item ${isActive ? 'active' : ''} ${isPrevious && !isActive ? 'previous' : ''}`}
-                                        >
-                                            {word}
-                                        </span>
-                                    );
-                                })}
+                    <div className="portfolio-hero-container">
+                        {/* ── Left Side: Content & Actions from Reference Design ── */}
+                        <div className="portfolio-hero-content">
+                            {/* Pill Badge with Glowing Orange Dot */}
+                            <div className="hero-badge-pill">
+                                <span className="hero-badge-dot" />
+                                <span className="hero-badge-text">
+                                    {hero.badge || 'Freelance Software Developer • IT Solutions'}
+                                </span>
                             </div>
-                            <br />
-                            {hero.titleSuffix || 'For Modern Businesses'}
-                        </h1>
-                        <p className="portfolio-hero-subtitle">
-                            {hero.subtitle || 'I build custom software, POS solutions, business websites, and web applications tailored to your business needs — from idea to deployment'}
-                        </p>
-                        <div className="portfolio-hero-actions">
-                            <button className="portfolio-btn-primary" onClick={() => scrollTo(hero.primaryBtnLink || 'portfolio')}>
-                                {hero.primaryBtnText || 'View Our Work'}
-                            </button>
-                            <button className="portfolio-btn-outline" onClick={() => scrollTo(hero.secondaryBtnLink || 'contact')}>
-                                {hero.secondaryBtnText || 'Discuss Your Project'}
-                            </button>
+
+                            {/* Main Headline with Boxed Rotating Word */}
+                            <h1 className="hero-headline">
+                                <span className="hero-title-prefix">{hero.titlePrefix || 'Building Digital'}</span>{' '}
+                                <span className="hero-rotating-box">
+                                    <span key={wordIndex} className="hero-rotating-word">
+                                        {rotatingWords[wordIndex] || 'Solutions'}
+                                    </span>
+                                </span>
+                                <br />
+                                <span className="hero-title-suffix">{hero.titleSuffix || 'For Modern Businesses'}</span>
+                            </h1>
+
+                            {/* Subtitle Description */}
+                            <p className="hero-subtitle">
+                                {hero.subtitle || 'I build custom software, POS solutions, business websites, and web applications tailored to your business needs — from idea to deployment'}
+                            </p>
+
+                            {/* Action Buttons */}
+                            <div className="hero-actions">
+                                <button
+                                    className="hero-btn-primary"
+                                    onClick={() => scrollTo(hero.primaryBtnLink || '#portfolio')}
+                                >
+                                    {hero.primaryBtnText || 'View Our Work'}
+                                </button>
+                                <button
+                                    className="hero-btn-outline"
+                                    onClick={() => scrollTo(hero.secondaryBtnLink || '#contact')}
+                                >
+                                    {hero.secondaryBtnText || 'Discuss Your Project'}
+                                </button>
+                            </div>
+
+                            {/* Micro-Trust & Highlights */}
+                            <div className="hero-trust-row">
+                                <div className="hero-trust-chip">
+                                    <span className="trust-chip-dot" />
+                                    <span>21,000+ Screen Hours</span>
+                                </div>
+                                <div className="hero-trust-chip">
+                                    <span className="trust-chip-dot" />
+                                    <span>30+ Delivered Projects</span>
+                                </div>
+                                <div className="hero-trust-chip">
+                                    <span className="trust-chip-dot" />
+                                    <span>100% On-Time Delivery</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── Right Side: Akshay Patil Portrait & Glow Elements ── */}
+                        <div className="portfolio-hero-visual">
+                            {/* Radiant Sun Glow behind Akshay */}
+                            <div className="hero-sun-glow" />
+
+                            {/* Akshay Portrait Stage */}
+                            <div className="hero-person-stage">
+                                <img
+                                    src={hero.personImage || '/team/Akshay_namustutam.png'}
+                                    alt={hero.name || 'Akshay Patil - Namustutam'}
+                                    className="hero-person-portrait"
+                                    onError={(e) => { e.currentTarget.src = '/team/Akshay_namustutam.png'; }}
+                                />
+
+                                {/* Subtle Floating Glass Experience Chip */}
+                                <div className="hero-stat-badge stat-badge-bottom">
+                                    <div className="stat-badge-icon">✦</div>
+                                    <div className="stat-badge-text">
+                                        <span className="stat-badge-strong">4+ Years</span>
+                                        <span className="stat-badge-sub">Creating & Designing</span>
+                                    </div>
+                                </div>
+
+                                <div className="hero-stat-badge stat-badge-top">
+                                    <ArrowUpRight className="stat-badge-arrow" size={16} />
+                                    <div className="stat-badge-text">
+                                        <span className="stat-badge-strong">30+ Clients</span>
+                                        <span className="stat-badge-sub">Worked With Globally</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Gradient transition to next section */}
-                    <div className="hero-bottom-transition"></div>
+                    {/* Smooth Bottom Section Transition */}
+                    <div className="portfolio-hero-bottom-transition" />
                 </section>
             )}
 

@@ -3,7 +3,7 @@ import { Monitor, Tablet, Smartphone, ExternalLink, RefreshCw } from 'lucide-rea
 
 export default function LivePreviewTab() {
     const [device, setDevice] = useState('desktop'); // 'desktop' | 'tablet' | 'mobile'
-    const [iframeKey, setIframeKey] = useState(Date.now());
+    const [iframeKey, setIframeKey] = useState(() => Date.now());
 
     const deviceWidths = {
         desktop: '100%',

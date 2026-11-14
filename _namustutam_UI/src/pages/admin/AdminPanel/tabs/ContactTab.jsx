@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
     PhoneCall, Mail, MapPin, Clock, Globe, Shield, Send, 
     MessageSquare, Eye, Trash2, Search, Filter, RefreshCw, 
@@ -11,9 +11,10 @@ import SectionVisibilityBanner from '../components/SectionVisibilityBanner';
 import apiClient, { ENV } from '../../../../api/config';
 
 export default function ContactTab() {
-    const { landingData, updateSection } = useLandingPage();
+    const { landingData, updateSection, setSectionVisibility } = useLandingPage();
     const contact = landingData.contact || {};
     const socials = contact.socials || {};
+    const isTopBarVisible = landingData?.sectionVisibility?.topContactBar !== false;
 
     // Sub-tab selection: 'inquiries' | 'settings'
     const [subTab, setSubTab] = useState('inquiries');
@@ -49,7 +50,7 @@ export default function ContactTab() {
     const [feedback, setFeedback] = useState(null);
 
     // ── Fetch Inquiries from Backend ──────────────────────────────────────────
-    const fetchSubmissions = async () => {
+    const fetchSubmissions = useCallback(async () => {
         setLoading(true);
         try {
             const params = {
@@ -87,13 +88,13 @@ export default function ContactTab() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentPage, pageSize, selectedStatus, searchQuery]);
 
     useEffect(() => {
         if (subTab === 'inquiries') {
             fetchSubmissions();
         }
-    }, [currentPage, pageSize, selectedStatus, subTab]);
+    }, [subTab, fetchSubmissions]);
 
     // Handle search on submit or debounce
     const handleSearchSubmit = (e) => {
@@ -843,6 +844,111 @@ export default function ContactTab() {
                                 />
                             </div>
                         </div>
+                    </div>
+
+                    {/* Top Contact Bar Settings & Live Preview */}
+                    <div className="admin-card" style={{
+                        background: 'linear-gradient(135deg, rgba(255, 91, 0, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+                        borderColor: 'rgba(255, 91, 0, 0.3)'
+                    }}>
+                        <div className="admin-card-header">
+                            <div>
+                                <h3 className="admin-card-title">
+                                    <Sparkles size={18} color="#ff5b00" />
+                                    Top Header Contact Bar (Brand Orange Strip)
+                                </h3>
+                                <div className="admin-card-subtitle">
+                                    Fixed direct contact touchpoint displayed at the very top of all public pages
+                                </div>
+                            </div>
+
+                            <label style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                cursor: 'pointer',
+                                background: 'rgba(15, 23, 42, 0.8)',
+                                padding: '6px 14px',
+                                borderRadius: '20px',
+                                border: '1px solid rgba(255, 255, 255, 0.1)'
+                            }}>
+                                <input
+                                    type="checkbox"
+                                    checked={isTopBarVisible}
+                                    onChange={(e) => setSectionVisibility('topContactBar', e.target.checked)}
+                                    style={{ accentColor: '#ff5b00', width: '16px', height: '16px', cursor: 'pointer' }}
+                                />
+                                <span style={{
+                                    fontSize: '12.5px',
+                                    fontWeight: '700',
+                                    color: isTopBarVisible ? '#34d399' : '#94a3b8'
+                                }}>
+                                    {isTopBarVisible ? 'Live on Website' : 'Disabled'}
+                                </span>
+                            </label>
+                        </div>
+
+                        {/* Live Visual Preview of the Orange Strip */}
+                        <div style={{ marginTop: '12px', marginBottom: '16px' }}>
+                            <div style={{
+                                fontSize: '11.5px',
+                                fontWeight: '700',
+                                textTransform: 'uppercase',
+                                color: '#94a3b8',
+                                letterSpacing: '0.5px',
+                                marginBottom: '8px'
+                            }}>
+                                Live Top Bar Preview {!isTopBarVisible && '(Currently Hidden on Public Site)'}:
+                            </div>
+
+                            <div style={{
+                                background: isTopBarVisible ? 'linear-gradient(90deg, #ff5b00 0%, #ea580c 100%)' : '#334155',
+                                borderRadius: '8px',
+                                padding: '10px 18px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '24px',
+                                flexWrap: 'wrap',
+                                color: '#ffffff',
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                opacity: isTopBarVisible ? 1 : 0.6,
+                                transition: 'all 0.2s ease'
+                            }}>
+                                {contact.showEmail !== false && (
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                        <Mail size={14} color="#ffffff" />
+                                        <span>{contact.email || 'namustutam@gmail.com'}</span>
+                                    </span>
+                                )}
+
+                                {contact.showPhone !== false && (
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                        <Phone size={14} color="#ffffff" />
+                                        <span>{contact.phone || '+91 98765 43210'}</span>
+                                    </span>
+                                )}
+
+                                {contact.showLocation !== false && (
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                        <MapPin size={14} color="#ffffff" />
+                                        <span>{contact.location || 'Remote / Global Software Consultancy'}</span>
+                                    </span>
+                                )}
+
+                                {contact.showEmail === false && contact.showPhone === false && contact.showLocation === false && (
+                                    <span style={{ fontSize: '12px', color: '#cbd5e1', fontStyle: 'italic' }}>
+                                        All three channels are currently set to "Hide" below. Turn on at least one channel to display the top bar.
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <p style={{ margin: 0, fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5 }}>
+                            ✦ You can toggle individual channels (Email, Phone, Location) using the "Show / Hide" switches in the section below.
+                        </p>
                     </div>
 
                     {/* Direct Channels */}

@@ -41,8 +41,8 @@ const AkshayPatil = () => {
                     </div>
                     <div className="hero-visual">
                         <div className="image-container">
-                            {/* We can use a placeholder or the actual image from vercel app */}
-                            <img src="https://akshay-patil-dev.vercel.app/assets/pic-BFAmhDAK.jpg" alt="Akshay Patil" />
+                            {/* Local Team Akshay asset */}
+                            <img src="/team/Akshay.png" alt="Akshay Patil" onError={(e) => { e.currentTarget.src = "https://akshay-patil-dev.vercel.app/assets/pic-BFAmhDAK.jpg"; }} />
                             <div className="shape shape-1"></div>
                             <div className="shape shape-2"></div>
                         </div>

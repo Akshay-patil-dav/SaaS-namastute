@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette, Linkedin, Github, Instagram, Twitter, Shield } from 'lucide-react';
 import logo from '../../../assets/logo.svg';
 import '../../../pages/website/BlogDetail/LandingPage.css';
+import { useLandingPage } from '../../../context/LandingPageContext';
 import { isAdminPanelDisabled } from '@/utils/domainConfig';
 
 
@@ -44,6 +45,9 @@ export const NavLogo = () => (
 const WebsiteNavbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { landingData } = useLandingPage();
+    const contact = landingData?.contact || {};
+    const socials = contact?.socials || {};
     const showCTA = false;
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -225,11 +229,10 @@ const WebsiteNavbar = () => {
 
                 {/* Social Icons & Admin link */}
                 <div className="lp-nav-socials">
-                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Linkedin size={20} /></a>
-                    <a href="https://github.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Github size={20} /></a>
-                    <a href="https://instagram.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Instagram size={20} /></a>
-                    <a href="https://x.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Twitter size={20} /></a>
-
+                    <a href={socials.linkedin || 'https://linkedin.com'} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="lp-social-icon"><Linkedin size={20} /></a>
+                    <a href={socials.github || 'https://github.com'} target="_blank" rel="noreferrer" aria-label="GitHub" className="lp-social-icon"><Github size={20} /></a>
+                    <a href={socials.instagram || 'https://instagram.com'} target="_blank" rel="noreferrer" aria-label="Instagram" className="lp-social-icon"><Instagram size={20} /></a>
+                    <a href={socials.twitter || 'https://x.com'} target="_blank" rel="noreferrer" aria-label="Twitter / X" className="lp-social-icon"><Twitter size={20} /></a>
                 </div>
 
                 {showCTA && (
@@ -292,6 +295,23 @@ const WebsiteNavbar = () => {
                 <div className="lp-mobile-scroll">
                     <Link to="/project-works" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text)', textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--border-soft)', fontWeight: 600, fontSize: 15 }}><Briefcase size={16} /> Project Works</Link>
                     {renderMobileAccordion('services', 'Services')}
+                    <Link
+                        to="/possoftware"
+                        onClick={() => setMenuOpen(false)}
+                        style={{
+                            color: location.pathname === '/possoftware' ? 'var(--primary, #ff5b00)' : 'var(--text)',
+                            fontWeight: 700,
+                            textDecoration: 'none',
+                            padding: '12px 0',
+                            borderBottom: '1px solid var(--border-soft)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            fontSize: 15
+                        }}
+                    >
+                        <ShoppingCart size={16} style={{ color: '#ea580c' }} /> POS Software
+                    </Link>
                     {showCTA && (
                         <>
                             <a href="#features" onClick={() => scrollTo('features')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Star size={16} /> Features</a>

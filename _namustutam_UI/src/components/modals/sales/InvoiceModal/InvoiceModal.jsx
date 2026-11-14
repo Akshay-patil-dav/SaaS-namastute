@@ -1,4 +1,4 @@
-﻿import React, { useRef } from 'react';
+import React, { useRef } from 'react';
 import { X, Printer, Download, ArrowLeft, FileText } from 'lucide-react';
 import './invoice-modal.css';
 import { useCurrency } from '../../../../hooks/useCurrency';
@@ -16,9 +16,7 @@ const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'
 const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
 function numToWords(num) {
-    const { currencySymbol } = useCurrency();
-
-    if (!num || isNaN(num)) return 'Zero Dollars';
+    if (!num || isNaN(num)) return 'Zero Rupees';
     const n = Math.floor(parseFloat(num));
     if (n === 0) return 'Zero Dollars';
     const toWords = x => {

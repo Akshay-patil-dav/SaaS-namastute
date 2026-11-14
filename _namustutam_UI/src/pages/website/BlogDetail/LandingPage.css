@@ -410,7 +410,7 @@
   .lp-hamburger { display: flex; }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
   .lp-nav-dropdown-trigger { display: none; } /* Mobile uses accordion */
   
   .lp-mobile-scroll {

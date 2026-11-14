@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { X, Printer } from 'lucide-react';
 import './barcode-modal.css';
 import '../../sales/AddPosModal/add-sales-modal.css'; // Reuse modal-overlay
@@ -44,7 +44,7 @@ const BarcodeModal = ({
                     </div>
 
                     {/* Product Groups */}
-                    <div className={`barcode-print-area ${pageSize.replace(/[\(\)]/g, '').replace(/\s+/g, '-').toLowerCase()}`}>
+                    <div className={`barcode-print-area ${pageSize.replace(/[()]/g, '').replace(/\s+/g, '-').toLowerCase()}`}>
                         {displayProducts.map((product, pIndex) => (
                         <div key={pIndex} className="product-group">
                             <h5 className="product-group-title">{product.name}</h5>

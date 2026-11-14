@@ -51,7 +51,7 @@ const SERVICE_TEMPLATES = [
 
 export default function ServicesTab() {
     const { landingData, addService, updateService, deleteService } = useLandingPage();
-    const services = landingData.services || [];
+    const services = useMemo(() => landingData.services || [], [landingData.services]);
 
     const [modalMode, setModalMode] = useState(null); // 'create' | 'edit' | null
     const [editingSrv, setEditingSrv] = useState(null);

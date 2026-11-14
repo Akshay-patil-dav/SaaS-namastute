@@ -6,7 +6,7 @@ import SectionVisibilityBanner from '../components/SectionVisibilityBanner';
 
 export default function TestimonialsTab() {
     const { landingData, addTestimonial, updateTestimonial, deleteTestimonial } = useLandingPage();
-    const testimonials = landingData.testimonials || [];
+    const testimonials = useMemo(() => landingData.testimonials || [], [landingData.testimonials]);
 
     const [modalMode, setModalMode] = useState(null); // 'create' | 'edit'
     const [editingItem, setEditingItem] = useState(null);
