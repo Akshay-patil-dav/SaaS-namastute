@@ -1,6 +1,42 @@
 {
   "hero": {
-    "badge": "Freelance Software Developer â€¢ IT Solutions",
+    "greeting": "Namaste!",
+    "namePrefix": "I'm",
+    "name": "Akshay Patil",
+    "roleHighlight": "Akshay Patil",
+    "paragraphs": [
+      "a graphic designer & full-stack developer who enjoys turning ideas into clear and meaningful visuals. I work across social media, branding, digital campaigns & print design.",
+      "My goal is simple - to create designs that not only look good, but also communicate clearly and help brands stand out.",
+      "I focus on clean, thoughtful, and professional design that leaves a strong impression."
+    ],
+    "personImage": "/team/Akshay_namustutam.png",
+    "milestonesTitle": "Creative",
+    "milestonesScript": "Milestones",
+    "milestones": [
+      {
+        "num": "21000+",
+        "label": "Hours Behind the Screen"
+      },
+      {
+        "num": "2500+",
+        "label": "Social Media Designs"
+      },
+      {
+        "num": "2+ Years",
+        "label": "Software & Web Dev "
+      },
+      {
+        "num": "30+",
+        "label": "Clients Worked With"
+      },
+      {
+        "num": "Designing for Multiple",
+        "label": "MLAs of Assam",
+        "isSpecial": true
+      }
+    ],
+    "countingText": "and still counting...",
+    "badge": "Freelance Software Developer • IT Solutions",
     "titlePrefix": "Building Digital",
     "rotatingWords": [
       "Solutions",
@@ -9,7 +45,7 @@
       "Experiences"
     ],
     "titleSuffix": "For Modern Businesses",
-    "subtitle": "I build custom software, POS solutions, business websites, and web applications tailored to your business needs â€” from idea to deployment",
+    "subtitle": "I build custom software, POS solutions, business websites, and web applications tailored to your business needs — from idea to deployment",
     "primaryBtnText": "View Our Work",
     "primaryBtnLink": "#portfolio",
     "secondaryBtnText": "Discuss Your Project",
@@ -26,15 +62,23 @@
   "services": [
     {
       "id": "srv-1",
-      "icon": "ðŸŒ",
+      "icon": "BsGlobe2",
       "title": "Web Development",
       "desc": "Custom WordPress & Shopify themes built for performance, conversion and scalability.",
       "link": "/services/web-development",
       "active": true
     },
     {
+      "id": "srv-2",
+      "icon": "BsLaptop",
+      "title": "SaaS Applications",
+      "desc": "End-to-end multi-tenant application development with React and Spring Boot microservices.",
+      "link": "/services/saas-applications",
+      "active": true
+    },
+    {
       "id": "srv-3",
-      "icon": "ðŸ“±",
+      "icon": "BsPalette",
       "title": "UI/UX Design",
       "desc": "Premium, user-centric interfaces crafted with modern glassmorphic and responsive aesthetics.",
       "link": "/services/ui-ux-design",
@@ -42,7 +86,7 @@
     },
     {
       "id": "srv-4",
-      "icon": "ðŸ›ï¸",
+      "icon": "BsBagCheck",
       "title": "E-commerce Solutions",
       "desc": "High-converting online stores engineered for maximum sales, instant loading and seamless checkout.",
       "link": "/services/e-commerce-platform-development",
@@ -50,7 +94,7 @@
     },
     {
       "id": "srv-5",
-      "icon": "ðŸ¤–",
+      "icon": "BsRobot",
       "title": "AI Automation",
       "desc": "Integrate intelligent chatbots, voice automation and automated workflows to streamline operations.",
       "link": "/services/ai-automation",
@@ -58,18 +102,10 @@
     },
     {
       "id": "srv-6",
-      "icon": "ðŸ› ï¸",
+      "icon": "BsTools",
       "title": "Dedicated Support",
       "desc": "24/7 technical assistance, monitoring and post-launch maintenance to keep your business running smoothly.",
       "link": "/contact",
-      "active": true
-    },
-    {
-      "id": "srv-1792597333261",
-      "icon": "ðŸ”’Login",
-      "title": "Login",
-      "desc": "NA",
-      "link": "/services/custom-development",
       "active": true
     }
   ],
@@ -79,6 +115,40 @@
     "subtitle": "Explore some of our recent flagship projects and enterprise solutions."
   },
   "projects": [
+    {
+      "id": "proj-1792579126686",
+      "title": "10 life lessons from Neem Karoli Baba to teach your children",
+      "category": "E-Commerce",
+      "filter": "Web Application",
+      "price": "$99 USD",
+      "img": "https://img-s-msn-com.akamaized.net/tenant/amp/entityid/AA2265RL.img?w=1012&h=569&m=6&x=412&y=124&s=172&d=172",
+      "techStack": [
+        "React",
+        "Spring Boot",
+        "PostgreSQL"
+      ],
+      "description": "",
+      "liveLink": "http://localhost:5174",
+      "githubLink": "#",
+      "featured": true
+    },
+    {
+      "id": "proj-2",
+      "title": "Shopify Web Design & Consulting",
+      "category": "Consulting",
+      "filter": "Business Page",
+      "price": "$129 USD",
+      "img": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
+      "techStack": [
+        "React",
+        "Next.js",
+        "Node.js"
+      ],
+      "description": "Growth consulting solutions designed to drive scalable commercial results.",
+      "liveLink": "https://namustutam.vercel.app",
+      "githubLink": "#",
+      "featured": true
+    },
     {
       "id": "proj-3",
       "title": "Clothing E-commerce Templates",
@@ -92,7 +162,7 @@
         "Framer Motion"
       ],
       "description": "Explore curated shopping experiences with travelers sharing authentic moments.",
-      "liveLink": "http://localhost:4000",
+      "liveLink": "https://namustutam.vercel.app",
       "githubLink": "#",
       "featured": true
     },
@@ -109,7 +179,7 @@
         "PostgreSQL"
       ],
       "description": "We blend financial security, automation, and intuitive visuals that convert.",
-      "liveLink": "http://localhost:4000",
+      "liveLink": "https://namustutam.vercel.app",
       "githubLink": "#",
       "featured": true
     },
@@ -127,7 +197,7 @@
         "Docker"
       ],
       "description": "A modern origin template for futuristic brands with real-time stock and billing.",
-      "liveLink": "http://localhost:4000",
+      "liveLink": "https://namustutam.vercel.app",
       "githubLink": "#",
       "featured": true
     },
@@ -144,7 +214,7 @@
         "Analytics"
       ],
       "description": "Building ideas, shaping identities, and creating meaningful shopping experiences.",
-      "liveLink": "http://localhost:4000",
+      "liveLink": "https://namustutam.vercel.app",
       "githubLink": "#",
       "featured": true
     }
@@ -205,13 +275,37 @@
       "name": "Akshay Patil",
       "role": "Founder & Full-Stack / AI Engineer",
       "badge": "Freelance Architect",
-      "image": "/team/Akshay.png",
+      "image": "/team/Akshay_namustutam.png",
       "bio": "Passionate developer dedicated to delivering excellence in modern SaaS, POS, and AI architectures.",
       "socials": {
         "linkedin": "https://linkedin.com",
         "github": "https://github.com",
         "twitter": "https://twitter.com",
         "instagram": "https://instagram.com"
+      }
+    },
+    {
+      "id": "tm-2",
+      "name": "Santosh Patil",
+      "role": "Business Strategy & Growth Lead",
+      "badge": "Business Partner",
+      "image": "/team/sp.png",
+      "bio": "Expert in client relationships, product-market fit, and scaling retail and digital ventures.",
+      "socials": {
+        "linkedin": "https://linkedin.com",
+        "twitter": "https://twitter.com"
+      }
+    },
+    {
+      "id": "tm-3",
+      "name": "Amol Wagh",
+      "role": "Senior Backend Engineer",
+      "badge": "Core Contributor",
+      "image": "/team/wagh.png",
+      "bio": "Specialist in Spring Boot microservices, high-throughput databases, and cloud security.",
+      "socials": {
+        "linkedin": "https://linkedin.com",
+        "github": "https://github.com"
       }
     }
   ],
@@ -242,12 +336,12 @@
     }
   ],
   "marquee": {
-    "text": "IT Services âœ¦ SaaS Development âœ¦ E-commerce Solutions âœ¦ Digital Transformation âœ¦ AI Automation âœ¦ Enterprise Cloud âœ¦ Custom POS âœ¦",
+    "text": "IT Services ✦ SaaS Development ✦ E-commerce Solutions ✦ Digital Transformation ✦ AI Automation ✦ Enterprise Cloud ✦ Custom POS ✦",
     "speed": 40
   },
   "announcement": {
     "enabled": false,
-    "text": "âš ï¸ Welcome to Namustutam â€” Custom Web Applications & Enterprise Software tailored to your scale! ðŸš€",
+    "text": "⚠️ Welcome to Namustutam — Custom Web Applications & Enterprise Software tailored to your scale! 🚀",
     "bgColor": "#ff620b",
     "textColor": "#ffffff",
     "link": "/contact"
@@ -259,34 +353,30 @@
     "phone": "+91 98765 43210",
     "whatsapp": "+91 98765 43210",
     "location": "Remote / Global Software Consultancy",
-    "supportHours": "",
-    "copyright": "",
+    "supportHours": "Available 24/7 for Global Inquiries",
+    "copyright": "© 2026 Namustutam. All rights reserved.",
     "socials": {
       "github": "https://github.com",
       "linkedin": "https://linkedin.com",
-      "twitter": "",
-      "instagram": "",
+      "twitter": "https://twitter.com",
+      "instagram": "https://instagram.com",
       "discord": "https://discord.com"
-    },
-    "showEmail": true,
-    "showPhone": true,
-    "showLocation": true,
-    "showHours": true
+    }
   },
   "seo": {
     "pageTitle": "Namustutam | Software Dev & Freelancer",
-    "metaDescription": "I build custom software, POS solutions, business websites, and web applications tailored to your business needs â€” from idea to deployment.",
+    "metaDescription": "I build custom software, POS solutions, business websites, and web applications tailored to your business needs — from idea to deployment.",
     "keywords": "software development, react, saas, freelance developer, pos, spring boot, e-commerce",
     "author": "Namustutam"
   },
   "chatbot": {
     "enabled": true,
     "botName": "Namustutam AI",
-    "botSubtitle": "Online â€¢ AI Consultant",
-    "welcomeMessage": "Hello! ðŸ‘‹ I'm the Namustutam AI Assistant. Ask me anything about our software engineering services, SaaS platforms, or custom development!",
+    "botSubtitle": "Online • AI Consultant",
+    "welcomeMessage": "Hello! 👋 I'm the Namustutam AI Assistant. Ask me anything about our software engineering services, SaaS platforms, or custom development!",
     "provider": "groq",
-    "model": "openai/gpt-oss-120b",
-    "apiKey": "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",
+    "model": "llama-3.3-70b-versatile",
+    "apiKey": "",
     "systemPrompt": "",
     "quickPrompts": [
       "What services do you offer?",
@@ -844,7 +934,7 @@
     "sdlc": true,
     "services": true,
     "projects": true,
-    "testimonials": false,
+    "testimonials": true,
     "team": true,
     "marquee": true,
     "blogs": true,

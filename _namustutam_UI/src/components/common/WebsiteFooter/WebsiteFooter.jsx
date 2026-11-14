@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NavLogo } from '../WebsiteNavbar/WebsiteNavbar';
 import {
-    FaTwitter, FaGithub, FaDiscord, FaInstagram, FaLinkedinIn,
     FaMapMarkerAlt, FaEnvelope, FaRegClock, FaLock, FaShieldAlt,
     FaRegCreditCard, FaCode, FaTrophy, FaHandshake
 } from 'react-icons/fa';
+import { BsLinkedin, BsGithub, BsInstagram, BsTwitterX, BsDiscord } from 'react-icons/bs';
 import { Shield } from 'lucide-react';
 import { useLandingPage } from '../../../context/LandingPageContext';
 import { resolveContactChannels } from '../../../utils/contactChannels';
@@ -18,6 +18,14 @@ const DEFAULT_LEGAL_LINKS = [
     { label: 'Cookie Policy', path: '/cookie-policy' },
     { label: 'Refund Policy', path: '/refund-policy' },
 ];
+
+const formatExternalUrl = (url) => {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (!trimmed || trimmed === '#' || trimmed === 'https://' || trimmed === 'http://') return '';
+    if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) return trimmed;
+    return `https://${trimmed}`;
+};
 
 const WebsiteFooter = () => {
     const location = useLocation();
@@ -226,7 +234,7 @@ const WebsiteFooter = () => {
                                         to="/possoftware"
                                         className={isRouteActive('/possoftware') ? 'active' : ''}
                                     >
-                                        Namustutam POS Software
+                                         POS Software
                                     </Link>
                                 </li>
                                 <li>
@@ -283,29 +291,29 @@ const WebsiteFooter = () => {
                         )}
 
                         <div className="premium-footer-socials">
-                            {socials.twitter && (
-                                <a href={socials.twitter} target="_blank" rel="noreferrer" className="social-icon" aria-label="Twitter">
-                                    <FaTwitter />
+                            {Boolean(formatExternalUrl(socials.linkedin)) && (
+                                <a href={formatExternalUrl(socials.linkedin)} target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn" title="LinkedIn">
+                                    <BsLinkedin />
                                 </a>
                             )}
-                            {socials.github && (
-                                <a href={socials.github} target="_blank" rel="noreferrer" className="social-icon" aria-label="GitHub">
-                                    <FaGithub />
+                            {Boolean(formatExternalUrl(socials.github)) && (
+                                <a href={formatExternalUrl(socials.github)} target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="GitHub" title="GitHub">
+                                    <BsGithub />
                                 </a>
                             )}
-                            {socials.discord && (
-                                <a href={socials.discord} target="_blank" rel="noreferrer" className="social-icon" aria-label="Discord">
-                                    <FaDiscord />
+                            {Boolean(formatExternalUrl(socials.instagram)) && (
+                                <a href={formatExternalUrl(socials.instagram)} target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram" title="Instagram">
+                                    <BsInstagram />
                                 </a>
                             )}
-                            {socials.instagram && (
-                                <a href={socials.instagram} target="_blank" rel="noreferrer" className="social-icon" aria-label="Instagram">
-                                    <FaInstagram />
+                            {Boolean(formatExternalUrl(socials.twitter)) && (
+                                <a href={formatExternalUrl(socials.twitter)} target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Twitter / X" title="Twitter / X">
+                                    <BsTwitterX />
                                 </a>
                             )}
-                            {socials.linkedin && (
-                                <a href={socials.linkedin} target="_blank" rel="noreferrer" className="social-icon" aria-label="LinkedIn">
-                                    <FaLinkedinIn />
+                            {Boolean(formatExternalUrl(socials.discord)) && (
+                                <a href={formatExternalUrl(socials.discord)} target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Discord" title="Discord">
+                                    <BsDiscord />
                                 </a>
                             )}
                         </div>

@@ -169,28 +169,59 @@
 .lp-nav-socials {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-left: 20px;
+  gap: 8px;
+  margin-left: 18px;
 }
 
 .lp-social-icon {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  color: var(--text-2);
-  background-color: transparent;
-  transition: all 0.3s ease;
+  border-radius: 10px;
+  color: var(--text-2, #475569);
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.lp-social-icon svg {
+  display: block;
+  transition: transform 0.25s ease;
 }
 
 .lp-social-icon:hover {
-  color: white;
-  background-color: var(--primary);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px var(--primary-glow);
+  color: #ffffff;
+  background-color: var(--primary, #ff5b00);
+  background-image: linear-gradient(135deg, #ff5b00 0%, #ff782d 100%);
+  border-color: #ff5b00;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(255, 91, 0, 0.28);
+}
+
+.lp-social-icon:hover svg {
+  transform: scale(1.12);
+}
+
+.lp-social-icon:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.lp-mobile-socials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0 12px;
+}
+
+.lp-mobile-socials .lp-social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
 }
 .lp-hamburger {
   display: none;

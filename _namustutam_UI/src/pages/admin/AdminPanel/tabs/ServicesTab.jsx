@@ -7,6 +7,7 @@ import {
 import { useLandingPage } from '../../../../context/LandingPageContext';
 import AdminPagination from '../components/AdminPagination';
 import SectionVisibilityBanner from '../components/SectionVisibilityBanner';
+import ServiceIcon from '../../../../components/common/ServiceIcon';
 
 const EMOJI_PRESETS = ['🌐', '💻', '📱', '🛍️', '🤖', '🛠️', '⚡', '☁️', '🔒', '📊', '🚀', '🎯', '🎓', '🎨'];
 
@@ -359,9 +360,9 @@ export default function ServicesTab() {
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        fontSize: '24px'
+                                        color: isLive ? '#818cf8' : '#94a3b8'
                                     }}>
-                                        {srv.icon}
+                                        <ServiceIcon icon={srv.icon} title={srv.title} size={22} />
                                     </div>
 
                                     {/* Status Toggle Switch */}
@@ -518,14 +519,29 @@ export default function ServicesTab() {
                         <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <div className="admin-form-grid">
                                 <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
-                                    <label className="admin-label">Service Icon (Emoji)</label>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <label className="admin-label">Service Icon (Emoji or Bootstrap Icon)</label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                        <div style={{
+                                            width: '44px',
+                                            height: '44px',
+                                            borderRadius: '12px',
+                                            background: 'rgba(99, 102, 241, 0.15)',
+                                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: '#818cf8',
+                                            flexShrink: 0
+                                        }}>
+                                            <ServiceIcon icon={formData.icon} title={formData.title} size={22} />
+                                        </div>
                                         <input
                                             type="text"
                                             className="admin-control-input"
-                                            style={{ fontSize: '20px', width: '70px', textAlign: 'center' }}
+                                            style={{ fontSize: '14px', width: '130px', textAlign: 'center' }}
                                             value={formData.icon}
                                             onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                                            placeholder="e.g. BsGlobe2 or 🌐"
                                             required
                                         />
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>

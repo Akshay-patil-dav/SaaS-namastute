@@ -4,7 +4,7 @@ import { Facebook, Twitter, Linkedin, Instagram, Github, MoveLeft, MoveRight } f
 import { useLandingPage } from '../../../context/LandingPageContext';
 
 const DEFAULT_MEMBERS = [
-    { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: '/team/Akshay.png', badge: 'Freelancer', bio: 'Passionate professional dedicated to delivering excellence and driving innovation.' }
+    { name: 'Akshay Patil', role: 'Vibe Coder / AI Engineer', image: '/team/Akshay_namustutam.png', badge: 'Freelancer', bio: 'Passionate professional dedicated to delivering excellence and driving innovation.' }
 ];
 
 const TeamCard = ({ member }) => (
@@ -14,10 +14,10 @@ const TeamCard = ({ member }) => (
                 <div className="card-decoration"></div>
                 <div className="team-image-container">
                     <img 
-                        src={member.image || '/team/Akshay.png'} 
+                        src={member.image || '/team/Akshay_namustutam.png'} 
                         alt={member.name} 
                         className="team-image"
-                        onError={(e) => { e.target.src = '/team/Akshay.png'; }}
+                        onError={(e) => { e.target.src = '/team/Akshay_namustutam.png'; }}
                     />
                 </div>
                 <div className="team-info-label">

@@ -22,7 +22,7 @@ export const DEFAULT_LANDING_DATA = {
         milestones: [
             { num: '21000+', label: 'Hours Behind the Screen' },
             { num: '2500+', label: 'Social Media Designs' },
-            { num: '4+ Years', label: 'Creating & Designing' },
+            { num: '2+ Years', label: 'Software & Web Dev ' },
             { num: '30+', label: 'Clients Worked With' },
             { num: 'Designing for Multiple', label: 'MLAs of Assam', isSpecial: true }
         ],
@@ -50,7 +50,7 @@ export const DEFAULT_LANDING_DATA = {
     services: [
         {
             id: 'srv-1',
-            icon: '🌐',
+            icon: 'BsGlobe2',
             title: 'Web Development',
             desc: 'Custom WordPress & Shopify themes built for performance, conversion and scalability.',
             link: '/services/web-development',
@@ -58,7 +58,7 @@ export const DEFAULT_LANDING_DATA = {
         },
         {
             id: 'srv-2',
-            icon: '💻',
+            icon: 'BsLaptop',
             title: 'SaaS Applications',
             desc: 'End-to-end multi-tenant application development with React and Spring Boot microservices.',
             link: '/services/saas-applications',
@@ -66,7 +66,7 @@ export const DEFAULT_LANDING_DATA = {
         },
         {
             id: 'srv-3',
-            icon: '📱',
+            icon: 'BsPalette',
             title: 'UI/UX Design',
             desc: 'Premium, user-centric interfaces crafted with modern glassmorphic and responsive aesthetics.',
             link: '/services/ui-ux-design',
@@ -74,7 +74,7 @@ export const DEFAULT_LANDING_DATA = {
         },
         {
             id: 'srv-4',
-            icon: '🛍️',
+            icon: 'BsBagCheck',
             title: 'E-commerce Solutions',
             desc: 'High-converting online stores engineered for maximum sales, instant loading and seamless checkout.',
             link: '/services/e-commerce-platform-development',
@@ -82,7 +82,7 @@ export const DEFAULT_LANDING_DATA = {
         },
         {
             id: 'srv-5',
-            icon: '🤖',
+            icon: 'BsRobot',
             title: 'AI Automation',
             desc: 'Integrate intelligent chatbots, voice automation and automated workflows to streamline operations.',
             link: '/services/ai-automation',
@@ -90,7 +90,7 @@ export const DEFAULT_LANDING_DATA = {
         },
         {
             id: 'srv-6',
-            icon: '🛠️',
+            icon: 'BsTools',
             title: 'Dedicated Support',
             desc: '24/7 technical assistance, monitoring and post-launch maintenance to keep your business running smoothly.',
             link: '/contact',
@@ -206,7 +206,7 @@ export const DEFAULT_LANDING_DATA = {
             name: 'Akshay Patil',
             role: 'Founder & Full-Stack / AI Engineer',
             badge: 'Freelance Architect',
-            image: '/team/Akshay.png',
+            image: '/team/Akshay_namustutam.png',
             bio: 'Passionate developer dedicated to delivering excellence in modern SaaS, POS, and AI architectures.',
             socials: {
                 linkedin: 'https://linkedin.com',

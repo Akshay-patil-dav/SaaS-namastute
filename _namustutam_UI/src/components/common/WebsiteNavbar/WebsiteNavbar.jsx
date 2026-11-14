@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette, Linkedin, Github, Instagram, Twitter, Shield } from 'lucide-react';
+import { Package, Briefcase, Layers, Star, Tag, BookOpen, Phone, ShoppingCart, Image, Globe, Monitor, Code, Wrench, ShoppingBag, GraduationCap, Building2, Bot, FileText, FileCode, Palette, Shield } from 'lucide-react';
+import { BsLinkedin, BsGithub, BsInstagram, BsTwitterX, BsDiscord } from 'react-icons/bs';
 import logo from '../../../assets/logo.svg';
 import '../../../pages/website/BlogDetail/LandingPage.css';
 import { useLandingPage } from '../../../context/LandingPageContext';
@@ -42,12 +43,19 @@ export const NavLogo = () => (
     </Link>
 );
 
+const formatExternalUrl = (url) => {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (!trimmed || trimmed === '#' || trimmed === 'https://' || trimmed === 'http://') return '';
+    if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) return trimmed;
+    return `https://${trimmed}`;
+};
+
 const WebsiteNavbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { landingData } = useLandingPage();
     const contact = landingData?.contact || {};
-    const socials = contact?.socials || {};
     const showCTA = false;
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -57,6 +65,18 @@ const WebsiteNavbar = () => {
     const dropdownTimeout = useRef(null);
     const navRef = useRef(null);
     const linkRefs = useRef({});
+
+    const activeSocials = useMemo(() => {
+        const contactSocials = contact?.socials || {};
+        const channels = [
+            { key: 'linkedin', label: 'LinkedIn', Icon: BsLinkedin, url: formatExternalUrl(contactSocials.linkedin) },
+            { key: 'github', label: 'GitHub', Icon: BsGithub, url: formatExternalUrl(contactSocials.github) },
+            { key: 'instagram', label: 'Instagram', Icon: BsInstagram, url: formatExternalUrl(contactSocials.instagram) },
+            { key: 'twitter', label: 'Twitter / X', Icon: BsTwitterX, url: formatExternalUrl(contactSocials.twitter) },
+            { key: 'discord', label: 'Discord', Icon: BsDiscord, url: formatExternalUrl(contactSocials.discord) },
+        ];
+        return channels.filter(ch => Boolean(ch.url));
+    }, [contact?.socials]);
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20);
@@ -227,13 +247,24 @@ const WebsiteNavbar = () => {
                     </li>
                 </ul>
 
-                {/* Social Icons & Admin link */}
-                <div className="lp-nav-socials">
-                    <a href={socials.linkedin || 'https://linkedin.com'} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="lp-social-icon"><Linkedin size={20} /></a>
-                    <a href={socials.github || 'https://github.com'} target="_blank" rel="noreferrer" aria-label="GitHub" className="lp-social-icon"><Github size={20} /></a>
-                    <a href={socials.instagram || 'https://instagram.com'} target="_blank" rel="noreferrer" aria-label="Instagram" className="lp-social-icon"><Instagram size={20} /></a>
-                    <a href={socials.twitter || 'https://x.com'} target="_blank" rel="noreferrer" aria-label="Twitter / X" className="lp-social-icon"><Twitter size={20} /></a>
-                </div>
+                {/* Social Icons dynamically populated from Backend Admin */}
+                {activeSocials.length > 0 && (
+                    <div className="lp-nav-socials" aria-label="Social media profiles">
+                        {activeSocials.map(({ key, label, Icon, url }) => (
+                            <a
+                                key={key}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={label}
+                                title={label}
+                                className="lp-social-icon"
+                            >
+                                <Icon size={16} />
+                            </a>
+                        ))}
+                    </div>
+                )}
 
                 {showCTA && (
                     <div className="lp-nav-cta">
@@ -331,13 +362,24 @@ const WebsiteNavbar = () => {
                     </div>
                 )}
 
-                {/* Mobile Social Icons */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '24px 0 10px' }}>
-                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Linkedin size={22} /></a>
-                    <a href="https://github.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Github size={22} /></a>
-                    <a href="https://instagram.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Instagram size={22} /></a>
-                    <a href="https://x.com" target="_blank" rel="noreferrer" className="lp-social-icon"><Twitter size={22} /></a>
-                </div>
+                {/* Mobile Social Icons dynamically populated from Backend Admin */}
+                {activeSocials.length > 0 && (
+                    <div className="lp-mobile-socials" aria-label="Social media profiles">
+                        {activeSocials.map(({ key, label, Icon, url }) => (
+                            <a
+                                key={key}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={label}
+                                title={label}
+                                className="lp-social-icon"
+                            >
+                                <Icon size={18} />
+                            </a>
+                        ))}
+                    </div>
+                )}
             </div>
         </>
     );

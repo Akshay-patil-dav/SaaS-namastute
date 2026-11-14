@@ -66,6 +66,16 @@ export default class ErrorBoundary extends React.Component {
                         <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: '1.6', marginBottom: '24px' }}>
                             We encountered a display issue while rendering. You can reload the page or return to the Namustutam homepage.
                         </p>
+                        {this.state.error && (
+                            <details style={{ textAlign: 'left', margin: '0 auto 24px', padding: '12px', background: 'rgba(0,0,0,0.5)', borderRadius: '8px', color: '#fca5a5', fontSize: '12px', overflowX: 'auto', maxWidth: '500px' }}>
+                                <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#f87171' }}>
+                                    {this.state.error.name}: {this.state.error.message}
+                                </summary>
+                                <pre style={{ marginTop: '8px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                                    {this.state.error.stack}
+                                </pre>
+                            </details>
+                        )}
                         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                             <button
                                 onClick={this.handleReload}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Code2, Smartphone, Server, Database, Cloud, ShieldCheck, MonitorPlay, Component, ArrowRight, ArrowUpRight, Star, ExternalLink } from 'lucide-react';
+import { BsArrowRight } from 'react-icons/bs';
 import '../BlogDetail/LandingPage.css';
 import './ITPortfolio.css';
 import '../ProjectWorks/ProjectWorks.css';
@@ -11,6 +12,7 @@ import WebsiteFooter from '../../../components/common/WebsiteFooter/WebsiteFoote
 import ExpertiseSection from '../../../components/common/ExpertiseSection/ExpertiseSection';
 import TeamSection from '../../../components/common/TeamSection/TeamSection';
 import BlogPreviewSection from '../../../components/common/BlogPreviewSection/BlogPreviewSection';
+import ServiceIcon from '../../../components/common/ServiceIcon';
 
 export default function ITPortfolio() {
     const navigate = useNavigate();
@@ -76,12 +78,12 @@ export default function ITPortfolio() {
 
     // Services from landingData
     const services = landingData?.services || [
-        { icon: '🌐', title: 'Web Development', desc: 'Custom WordPress & Shopify themes built for performance and scalability.', link: '/services/web-development', active: true },
-        { icon: '💻', title: 'SaaS Applications', desc: 'End-to-end multi-tenant application development with React and Spring Boot.', link: '/services/saas-applications', active: true },
-        { icon: '📱', title: 'UI/UX Design', desc: 'Premium, user-centric interfaces with responsive and modern aesthetics.', link: '/services/ui-ux-design', active: true },
-        { icon: '🛍️', title: 'E-commerce Solutions', desc: 'High-converting online stores engineered for maximum sales and seamless checkout.', link: '/services/e-commerce-platform-development', active: true },
-        { icon: '🤖', title: 'AI Automation', desc: 'Integrate intelligent chatbots and automated workflows to streamline operations.', link: '/services/ai-automation', active: true },
-        { icon: '🛠️', title: 'Dedicated Support', desc: '24/7 technical assistance and post-launch maintenance to keep you running smoothly.', link: '/contact', active: true }
+        { icon: 'BsGlobe2', title: 'Web Development', desc: 'Custom WordPress & Shopify themes built for performance and scalability.', link: '/services/web-development', active: true },
+        { icon: 'BsLaptop', title: 'SaaS Applications', desc: 'End-to-end multi-tenant application development with React and Spring Boot.', link: '/services/saas-applications', active: true },
+        { icon: 'BsPalette', title: 'UI/UX Design', desc: 'Premium, user-centric interfaces with responsive and modern aesthetics.', link: '/services/ui-ux-design', active: true },
+        { icon: 'BsBagCheck', title: 'E-commerce Solutions', desc: 'High-converting online stores engineered for maximum sales and seamless checkout.', link: '/services/e-commerce-platform-development', active: true },
+        { icon: 'BsRobot', title: 'AI Automation', desc: 'Integrate intelligent chatbots and automated workflows to streamline operations.', link: '/services/ai-automation', active: true },
+        { icon: 'BsTools', title: 'Dedicated Support', desc: '24/7 technical assistance and post-launch maintenance to keep you running smoothly.', link: '/contact', active: true }
     ];
 
     // Projects from landingData
@@ -104,7 +106,7 @@ export default function ITPortfolio() {
             'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800'
         ];
 
-    const marqueeText = landingData?.marquee?.text || 
+    const marqueeText = landingData?.marquee?.text ||
         'IT Services ✦ SaaS Development ✦ E-commerce Solutions ✦ Digital Transformation ✦ AI Integration ✦ Cloud Architecture ✦';
 
     // Showcase of Brilliance section header
@@ -225,15 +227,15 @@ export default function ITPortfolio() {
                                 <div className="hero-stat-badge stat-badge-bottom">
                                     <div className="stat-badge-icon">✦</div>
                                     <div className="stat-badge-text">
-                                        <span className="stat-badge-strong">4+ Years</span>
-                                        <span className="stat-badge-sub">Creating & Designing</span>
+                                        <span className="stat-badge-strong">2+ Years</span>
+                                        <span className="stat-badge-sub">Software & Web Dev </span>
                                     </div>
                                 </div>
 
                                 <div className="hero-stat-badge stat-badge-top">
                                     <ArrowUpRight className="stat-badge-arrow" size={16} />
                                     <div className="stat-badge-text">
-                                        <span className="stat-badge-strong">30+ Clients</span>
+                                        <span className="stat-badge-strong">10+ Clients</span>
                                         <span className="stat-badge-sub">Worked With Globally</span>
                                     </div>
                                 </div>
@@ -252,6 +254,9 @@ export default function ITPortfolio() {
             {/* ── Services Section ────────────────────────────────────── */}
             {isVisible('services') && (
                 <section className="portfolio-services-section" id="services">
+                    {/* Background subtle radiant ambient glow */}
+                    <div className="portfolio-services-ambient-glow" />
+
                     <div className="portfolio-section-header reveal-up">
                         <div className="portfolio-section-label">Capabilities & Solutions</div>
                         <h2 className="portfolio-section-title">End-To-End Engineering Services</h2>
@@ -259,7 +264,7 @@ export default function ITPortfolio() {
                     </div>
 
                     <div className="portfolio-services-grid">
-                        {services.filter(s => s.active !== false).map((srv, i) => (
+                        {(Array.isArray(services) ? services : []).filter(s => s && s.active !== false).map((srv, i) => (
                             <div
                                 key={srv.id || i}
                                 className="portfolio-service-card reveal-up"
@@ -269,8 +274,13 @@ export default function ITPortfolio() {
                                 tabIndex={0}
                                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') srv.link && (srv.link.startsWith('#') ? scrollTo(srv.link) : navigate(srv.link)); }}
                             >
-                                <div className="portfolio-service-icon">
-                                    {srv.icon}
+                                <div className="portfolio-service-card-top">
+                                    <div className="portfolio-service-icon">
+                                        <ServiceIcon icon={srv.icon} title={srv.title} size={28} />
+                                    </div>
+                                    <span className="portfolio-service-badge">
+                                        {String(i + 1).padStart(2, '0')}
+                                    </span>
                                 </div>
                                 <h3 className="portfolio-service-title">
                                     {srv.title}
@@ -280,7 +290,7 @@ export default function ITPortfolio() {
                                 </p>
                                 <div className="portfolio-service-link">
                                     <span>Explore Service</span>
-                                    <span>→</span>
+                                    <BsArrowRight className="portfolio-service-arrow" />
                                 </div>
                             </div>
                         ))}
@@ -413,7 +423,7 @@ export default function ITPortfolio() {
                                 style={{ transitionDelay: `${i * 100}ms` }}
                             >
                                 <div className="portfolio-testimonial-stars">
-                                    {Array(t.rating || 5).fill(0).map((_, idx) => (
+                                    {Array(Math.max(1, Math.min(5, Math.round(Number(t.rating) || 5)))).fill(0).map((_, idx) => (
                                         <span key={idx}>⭐</span>
                                     ))}
                                 </div>
