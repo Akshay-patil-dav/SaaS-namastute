@@ -80,6 +80,8 @@ export const ConnectedApps = () => {
     const [waWebLoading, setWaWebLoading] = useState(false);
     const [waWebActionLoading, setWaWebActionLoading] = useState(false);
     const [waWebHealth, setWaWebHealth] = useState(null);
+    const [isUsingBackup, setIsUsingBackup] = useState(false);
+    const [activeWaUrl, setActiveWaUrl] = useState('http://localhost:3005');
     const [waCustomTestMsg, setWaCustomTestMsg] = useState('🧾 Namustutam POS: Tax Invoice #INV-1001 for ₹1,499.00 sent successfully! Thank you for your business ✨');
 
     // Audit logs state
@@ -131,6 +133,10 @@ export const ConnectedApps = () => {
             const res = await getWhatsAppSessionStatus(sid);
             if (res.success) {
                 setWaWebHealth(true);
+                const isBackup = !!(res.isBackup || res.data?.isBackupEndpoint || res.data?.activeEndpoint?.includes('vercel.app'));
+                setIsUsingBackup(isBackup);
+                setActiveWaUrl(res.endpoint || res.data?.activeEndpoint || (isBackup ? 'https://whatsapp-service-chi.vercel.app' : 'http://localhost:3005'));
+
                 const s = res.data?.status || 'not_initialized';
                 setWaWebStatus(s);
                 setWaWebInfo(res.data?.info || null);
@@ -154,17 +160,22 @@ export const ConnectedApps = () => {
                     }
                 }
                 if (isManual) {
-                    showToast(`WhatsApp Web connection status: ${s.toUpperCase()}`, 'info');
+                    const srcLabel = isBackup ? 'Cloud Backup (Vercel)' : 'Local Engine (Port 3005)';
+                    showToast(`WhatsApp status: ${s.toUpperCase()} [${srcLabel}]`, 'info');
                     loadWaLogs();
                 }
             } else {
                 const health = await getWhatsAppServiceStatus();
                 setWaWebHealth(health.success);
-                if (!health.success) {
+                if (health.success) {
+                    const isBackup = !!(health.isBackup || health.data?.isBackupEndpoint || health.data?.activeEndpoint?.includes('vercel.app'));
+                    setIsUsingBackup(isBackup);
+                    setActiveWaUrl(health.endpoint || health.data?.activeEndpoint || (isBackup ? 'https://whatsapp-service-chi.vercel.app' : 'http://localhost:3005'));
+                } else {
                     setWaWebStatus('offline');
                 }
                 if (isManual) {
-                    showToast('WhatsApp microservice on port 3005 is offline or unreachable.', 'error');
+                    showToast('WhatsApp microservice is offline on both port 3005 and backup link.', 'error');
                 }
             }
         } catch {
@@ -236,9 +247,9 @@ export const ConnectedApps = () => {
             setTestOutput({
                 error: true,
                 type: 'error',
-                message: 'WhatsApp engine microservice on port 3005 is offline. Please start the service (npm start in whatsapp-service/) to send live messages.'
+                message: 'WhatsApp engine service is unreachable on localhost:3005 and cloud backup (https://whatsapp-service-chi.vercel.app). Please check connection or start the local service.'
             });
-            showToast('WhatsApp engine is offline. Start port 3005 service first.', 'error');
+            showToast('WhatsApp engine is offline.', 'error');
             return;
         }
 
@@ -481,10 +492,10 @@ export const ConnectedApps = () => {
                     <div className="ca-wa-kpi-content">
                         <span className="ca-wa-kpi-title">WhatsApp Engine</span>
                         <span className="ca-wa-kpi-val" style={{ color: waWebHealth === true ? '#059669' : (waWebHealth === false ? '#dc2626' : '#2563eb') }}>
-                            {waWebHealth === true ? 'Online (Port 3005)' : (waWebHealth === false ? 'Engine Offline' : 'Checking Engine...')}
+                            {waWebHealth === true ? (isUsingBackup ? 'Online (Cloud Backup)' : 'Online (Port 3005)') : (waWebHealth === false ? 'Engine Offline' : 'Checking Engine...')}
                         </span>
                         <span className="ca-wa-kpi-sub">
-                            {waWebHealth === true ? 'Headless Puppeteer Service' : 'Run: cd whatsapp-service && npm start'}
+                            {waWebHealth === true ? (isUsingBackup ? 'whatsapp-service-chi.vercel.app' : 'Headless Puppeteer Engine') : 'Port 3005 & Cloud Backup Unreachable'}
                         </span>
                     </div>
                 </div>
@@ -607,6 +618,25 @@ export const ConnectedApps = () => {
                         </p>
                     </div>
 
+                    {/* Backup Active Notice */}
+                    {isUsingBackup && waWebHealth === true && (
+                        <div style={{
+                            background: '#eff6ff',
+                            border: '1.5px solid #bfdbfe',
+                            borderRadius: '12px',
+                            padding: '14px 18px',
+                            marginBottom: '16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px'
+                        }}>
+                            <Zap size={20} color="#2563eb" style={{ flexShrink: 0 }} />
+                            <div style={{ fontSize: '0.85rem', color: '#1e40af', lineHeight: 1.4 }}>
+                                <strong>Cloud Backup Connected:</strong> Local port 3005 is offline, so requests are seamlessly routing to the backup engine at <code>whatsapp-service-chi.vercel.app</code>.
+                            </div>
+                        </div>
+                    )}
+
                     {/* State A: Engine Offline Warning */}
                     {waWebHealth === false ? (
                         <div style={{
@@ -635,7 +665,7 @@ export const ConnectedApps = () => {
                                         WhatsApp Web Engine Microservice is Offline
                                     </div>
                                     <p style={{ margin: 0, fontSize: '0.86rem', color: '#881337', lineHeight: 1.5 }}>
-                                        The background WhatsApp engine on port 3005 is not reachable. Live automated background delivery of receipts and Khata reminders is currently paused.
+                                        The WhatsApp engine is unreachable on localhost:3005 and cloud backup (https://whatsapp-service-chi.vercel.app). Live automated background delivery of receipts and Khata reminders is currently paused.
                                     </p>
                                     {(waWebInfo?.phone || settings.whatsappPhone) && (
                                         <div style={{ marginTop: '10px', fontSize: '0.84rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -906,7 +936,7 @@ export const ConnectedApps = () => {
                             {waWebHealth === false && (
                                 <div style={{ marginTop: '16px', fontSize: '0.82rem', color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca', padding: '10px 16px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                                     <AlertCircle size={16} />
-                                    WhatsApp microservice is offline. Ensure <code>npm start</code> is running in <code>whatsapp-service/</code> on port 3005.
+                                    WhatsApp microservice is offline on both port 3005 and backup (whatsapp-service-chi.vercel.app).
                                 </div>
                             )}
                         </div>

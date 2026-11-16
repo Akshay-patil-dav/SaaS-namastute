@@ -3,12 +3,83 @@ import apiClient from '@/api/config';
 /**
  * WhatsApp Web Service (Client-Side)
  * 
- * Communicates with the Spring Boot backend (`/api/whatsapp/*`), which in turn
- * proxies to the internal `whatsapp-web.js` microservice.
- * All requests are automatically authenticated via the user's JWT token.
- * Sessions are strictly isolated per tenant in multi-tenant mode.
- * Internal microservice API keys are never exposed in browser requests.
+ * Communicates with:
+ * 1. Spring Boot backend proxy (`/api/whatsapp/*`), which auto-fails over between
+ *    local microservice (port 3005) and cloud backup (`https://whatsapp-service-chi.vercel.app`).
+ * 2. Seamless client-side direct fallback:
+ *    - Primary direct: `http://localhost:3005`
+ *    - Backup direct: `https://whatsapp-service-chi.vercel.app`
+ * 
+ * If the local service is offline or unreachable, traffic automatically switches
+ * to the backup cloud instance without disruption.
  */
+
+const LOCAL_URL = (import.meta.env?.VITE_WHATSAPP_LOCAL_URL || 'http://localhost:3005').replace(/\/+$/, '');
+const BACKUP_URL = (import.meta.env?.VITE_WHATSAPP_FALLBACK_URL || 'https://whatsapp-service-chi.vercel.app').replace(/\/+$/, '');
+const API_KEY = (import.meta.env?.VITE_WHATSAPP_API_KEY || 'wa_sec_9f7a8b3e2d1c4b5a6f7e8d9c0b1a2f3e').trim();
+
+// Track active endpoint discovered dynamically: { url, isBackup, mode }
+let activeEndpoint = {
+    url: LOCAL_URL,
+    isBackup: false,
+    mode: 'backend'
+};
+
+export function getWhatsAppActiveEndpoint() {
+    return activeEndpoint;
+}
+
+/**
+ * Direct fetch with timeout and standard WhatsApp service headers
+ */
+async function fetchDirect(baseUrl, path, options = {}, timeoutMs = 2500) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        const url = `${baseUrl}${cleanPath}`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-WA-API-Key': API_KEY,
+            ...(options.headers || {})
+        };
+        const res = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+            headers
+        });
+        clearTimeout(timer);
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`HTTP ${res.status}: ${errText || res.statusText}`);
+        }
+        return await res.json();
+    } catch (err) {
+        clearTimeout(timer);
+        throw err;
+    }
+}
+
+/**
+ * Execute direct request with automatic failover (localhost:3005 -> Vercel backup)
+ */
+async function fetchWithFailover(path, options = {}) {
+    // 1. Try local port 3005 first (fast timeout)
+    try {
+        const data = await fetchDirect(LOCAL_URL, path, options, 1500);
+        activeEndpoint = { url: LOCAL_URL, isBackup: false, mode: 'direct_local' };
+        return { data, isBackup: false, endpoint: LOCAL_URL };
+    } catch (localErr) {
+        // 2. Automatic switch to cloud backup
+        try {
+            const data = await fetchDirect(BACKUP_URL, path, options, 8000);
+            activeEndpoint = { url: BACKUP_URL, isBackup: true, mode: 'direct_backup' };
+            return { data, isBackup: true, endpoint: BACKUP_URL };
+        } catch (backupErr) {
+            throw new Error(`WhatsApp service unreachable on both localhost:3005 and backup (${BACKUP_URL})`);
+        }
+    }
+}
 
 /**
  * Check overall WhatsApp microservice health and status
@@ -16,12 +87,21 @@ import apiClient from '@/api/config';
 export async function getWhatsAppServiceStatus() {
     try {
         const res = await apiClient.get('/whatsapp/status');
-        return { success: true, data: res.data };
+        const isBackup = res.headers?.['x-whatsapp-fallback'] === 'true' || !!res.data?.isBackupEndpoint;
+        const endpoint = res.headers?.['x-whatsapp-endpoint'] || res.data?.activeEndpoint || (isBackup ? BACKUP_URL : LOCAL_URL);
+        activeEndpoint = { url: endpoint, isBackup, mode: 'backend' };
+        return { success: true, data: res.data, isBackup, endpoint };
     } catch (err) {
-        return {
-            success: false,
-            error: err.response?.data?.error || err.message || 'WhatsApp service unreachable'
-        };
+        // Direct browser failover if backend proxy call failed
+        try {
+            const direct = await fetchWithFailover('/status');
+            return { success: true, data: direct.data, isBackup: direct.isBackup, endpoint: direct.endpoint };
+        } catch (directErr) {
+            return {
+                success: false,
+                error: err.response?.data?.error || directErr.message || 'WhatsApp service unreachable'
+            };
+        }
     }
 }
 
@@ -31,13 +111,20 @@ export async function getWhatsAppServiceStatus() {
 export async function getWhatsAppSessions() {
     try {
         const res = await apiClient.get('/whatsapp/sessions');
-        return { success: true, sessions: res.data?.sessions || [] };
+        const isBackup = res.headers?.['x-whatsapp-fallback'] === 'true' || !!res.data?.isBackupEndpoint;
+        const endpoint = res.headers?.['x-whatsapp-endpoint'] || (isBackup ? BACKUP_URL : LOCAL_URL);
+        return { success: true, sessions: res.data?.sessions || [], isBackup, endpoint };
     } catch (err) {
-        return {
-            success: false,
-            sessions: [],
-            error: err.response?.data?.error || err.message
-        };
+        try {
+            const direct = await fetchWithFailover('/sessions');
+            return { success: true, sessions: direct.data?.sessions || [], isBackup: direct.isBackup, endpoint: direct.endpoint };
+        } catch (directErr) {
+            return {
+                success: false,
+                sessions: [],
+                error: err.response?.data?.error || directErr.message
+            };
+        }
     }
 }
 
@@ -79,12 +166,22 @@ export async function getWhatsAppLogs() {
 export async function startWhatsAppSession(sessionId = '') {
     try {
         const res = await apiClient.post('/whatsapp/session/start', { sessionId });
-        return { success: true, data: res.data };
+        const isBackup = res.headers?.['x-whatsapp-fallback'] === 'true' || !!res.data?.isBackupEndpoint;
+        const endpoint = res.headers?.['x-whatsapp-endpoint'] || (isBackup ? BACKUP_URL : LOCAL_URL);
+        return { success: true, data: res.data, isBackup, endpoint };
     } catch (err) {
-        return {
-            success: false,
-            error: err.response?.data?.error || err.message || 'Failed to start WhatsApp session'
-        };
+        try {
+            const direct = await fetchWithFailover('/session/start', {
+                method: 'POST',
+                body: JSON.stringify({ sessionId })
+            });
+            return { success: true, data: direct.data, isBackup: direct.isBackup, endpoint: direct.endpoint };
+        } catch (directErr) {
+            return {
+                success: false,
+                error: err.response?.data?.error || directErr.message || 'Failed to start WhatsApp session'
+            };
+        }
     }
 }
 
@@ -93,15 +190,24 @@ export async function startWhatsAppSession(sessionId = '') {
  * @param {string} sessionId
  */
 export async function getWhatsAppSessionStatus(sessionId = '') {
+    const apiPath = sessionId ? `/whatsapp/session/${encodeURIComponent(sessionId)}/status` : '/whatsapp/session/status';
+    const directPath = sessionId ? `/session/${encodeURIComponent(sessionId)}/status` : '/session/status';
     try {
-        const url = sessionId ? `/whatsapp/session/${encodeURIComponent(sessionId)}/status` : '/whatsapp/session/status';
-        const res = await apiClient.get(url);
-        return { success: true, data: res.data };
+        const res = await apiClient.get(apiPath);
+        const isBackup = res.headers?.['x-whatsapp-fallback'] === 'true' || !!res.data?.isBackupEndpoint;
+        const endpoint = res.headers?.['x-whatsapp-endpoint'] || res.data?.activeEndpoint || (isBackup ? BACKUP_URL : LOCAL_URL);
+        activeEndpoint = { url: endpoint, isBackup, mode: 'backend' };
+        return { success: true, data: res.data, isBackup, endpoint };
     } catch (err) {
-        return {
-            success: false,
-            error: err.response?.data?.error || err.message
-        };
+        try {
+            const direct = await fetchWithFailover(directPath);
+            return { success: true, data: direct.data, isBackup: direct.isBackup, endpoint: direct.endpoint };
+        } catch (directErr) {
+            return {
+                success: false,
+                error: err.response?.data?.error || directErr.message
+            };
+        }
     }
 }
 
@@ -110,15 +216,23 @@ export async function getWhatsAppSessionStatus(sessionId = '') {
  * @param {string} sessionId
  */
 export async function getWhatsAppSessionQr(sessionId = '') {
+    const apiPath = sessionId ? `/whatsapp/session/${encodeURIComponent(sessionId)}/qr` : '/whatsapp/session/qr';
+    const directPath = sessionId ? `/session/${encodeURIComponent(sessionId)}/qr` : '/session/qr';
     try {
-        const url = sessionId ? `/whatsapp/session/${encodeURIComponent(sessionId)}/qr` : '/whatsapp/session/qr';
-        const res = await apiClient.get(url);
-        return { success: true, data: res.data };
+        const res = await apiClient.get(apiPath);
+        const isBackup = res.headers?.['x-whatsapp-fallback'] === 'true' || !!res.data?.isBackupEndpoint;
+        const endpoint = res.headers?.['x-whatsapp-endpoint'] || (isBackup ? BACKUP_URL : LOCAL_URL);
+        return { success: true, data: res.data, isBackup, endpoint };
     } catch (err) {
-        return {
-            success: false,
-            error: err.response?.data?.error || err.message
-        };
+        try {
+            const direct = await fetchWithFailover(directPath);
+            return { success: true, data: direct.data, isBackup: direct.isBackup, endpoint: direct.endpoint };
+        } catch (directErr) {
+            return {
+                success: false,
+                error: err.response?.data?.error || directErr.message
+            };
+        }
     }
 }
 
@@ -127,15 +241,21 @@ export async function getWhatsAppSessionQr(sessionId = '') {
  * @param {string} sessionId
  */
 export async function logoutWhatsAppSession(sessionId = '') {
+    const apiPath = sessionId ? `/whatsapp/session/${encodeURIComponent(sessionId)}/logout` : '/whatsapp/session/logout';
+    const directPath = sessionId ? `/session/${encodeURIComponent(sessionId)}/logout` : '/session/logout';
     try {
-        const url = sessionId ? `/whatsapp/session/${encodeURIComponent(sessionId)}/logout` : '/whatsapp/session/logout';
-        const res = await apiClient.delete(url);
+        const res = await apiClient.delete(apiPath);
         return { success: true, data: res.data };
     } catch (err) {
-        return {
-            success: false,
-            error: err.response?.data?.error || err.message
-        };
+        try {
+            const direct = await fetchWithFailover(directPath, { method: 'DELETE' });
+            return { success: true, data: direct.data };
+        } catch (directErr) {
+            return {
+                success: false,
+                error: err.response?.data?.error || directErr.message
+            };
+        }
     }
 }
 
@@ -152,13 +272,28 @@ export async function sendWhatsAppWebMessage({ to, message, sessionId = '', trig
         throw new Error('Both recipient number and message are required.');
     }
     const cleanTo = String(to).replace(/[^0-9]/g, '');
-    const res = await apiClient.post('/whatsapp/send', {
+    const payload = {
         sessionId,
         to: cleanTo,
         message: String(message).trim(),
         triggerType
-    });
-    return res.data;
+    };
+
+    try {
+        const res = await apiClient.post('/whatsapp/send', payload);
+        return res.data;
+    } catch (err) {
+        // If backend proxy failed, try direct send with failover
+        try {
+            const direct = await fetchWithFailover('/send', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            return direct.data;
+        } catch (directErr) {
+            throw err;
+        }
+    }
 }
 
 /**
@@ -170,15 +305,15 @@ export function parseWhatsAppError(err, defaultMsg = 'Failed to send WhatsApp me
 
     // Check if network / connection error
     if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
-        return 'Network connection error: Unable to reach the backend server. Please verify your internet or local server.';
+        return 'Network connection error: Unable to reach the server. Please verify your internet connection.';
     }
 
     const status = err.response?.status;
     const data = err.response?.data;
 
-    // 503 or port 3005 service down
+    // 503 or service unavailable
     if (status === 503 || (typeof data?.error === 'string' && data.error.includes('unavailable'))) {
-        return 'WhatsApp engine service on port 3005 is offline. Please start it using "npm start" in the whatsapp-service/ folder.';
+        return 'WhatsApp engine is unreachable on both localhost:3005 and backup (whatsapp-service-chi.vercel.app). Please verify local service or internet connectivity.';
     }
 
     let extracted = '';
@@ -187,7 +322,6 @@ export function parseWhatsAppError(err, defaultMsg = 'Failed to send WhatsApp me
             const parsed = JSON.parse(data);
             extracted = parsed.error || parsed.message || '';
         } catch {
-            // HTML error page or raw text
             if (data.includes('Internal Server Error')) {
                 extracted = '';
             } else if (data.length < 300) {
@@ -210,7 +344,7 @@ export function parseWhatsAppError(err, defaultMsg = 'Failed to send WhatsApp me
 
     // Handle frame detachment / page transition gracefully
     if (extracted.includes('detached Frame') || extracted.includes('Execution context was destroyed') || extracted.includes('Target closed')) {
-        return 'WhatsApp engine was refreshing its internal page frame. Connection has been re-synchronized. Please click "Send Live Test Message" once more.';
+        return 'WhatsApp engine refreshed its internal frame. Connection re-synchronized. Please click "Send Live Test Message" once more.';
     }
 
     // Shield from generic "Internal Server Error"
@@ -231,5 +365,6 @@ export default {
     getWhatsAppSessionQr,
     logoutWhatsAppSession,
     sendWhatsAppWebMessage,
-    parseWhatsAppError
+    parseWhatsAppError,
+    getWhatsAppActiveEndpoint
 };

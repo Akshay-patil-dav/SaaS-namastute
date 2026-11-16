@@ -37,6 +37,8 @@ public class WhatsAppServiceLauncher {
 
     private Process processInstance;
     private final AtomicBoolean isStarting = new AtomicBoolean(false);
+    private volatile long lastFailedLaunch = 0;
+    private static final long RETRY_COOLDOWN_MS = 60_000;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofMillis(800))
             .build();
@@ -84,10 +86,16 @@ public class WhatsAppServiceLauncher {
      */
     public synchronized boolean ensureRunning() {
         if (isHealthy()) {
+            lastFailedLaunch = 0;
             return true;
         }
 
         if (!autoStart || !isLocalhost(waServiceUrl)) {
+            return false;
+        }
+
+        // Avoid repeated startup stalls if launching already failed recently; allows instant failover
+        if (System.currentTimeMillis() - lastFailedLaunch < RETRY_COOLDOWN_MS) {
             return false;
         }
 
@@ -100,6 +108,7 @@ public class WhatsAppServiceLauncher {
         try {
             File waDir = resolveWhatsAppServiceDir();
             if (waDir == null || !waDir.exists()) {
+                lastFailedLaunch = System.currentTimeMillis();
                 log.warn("[WhatsAppServiceLauncher] Cannot auto-start: 'whatsapp-service' directory not found.");
                 return false;
             }
@@ -111,6 +120,7 @@ public class WhatsAppServiceLauncher {
             }
 
             if (!indexJs.exists()) {
+                lastFailedLaunch = System.currentTimeMillis();
                 log.warn("[WhatsAppServiceLauncher] Cannot find entry point in {}", waDir.getAbsolutePath());
                 return false;
             }
@@ -145,14 +155,17 @@ public class WhatsAppServiceLauncher {
 
             boolean healthy = waitForHealth(5000);
             if (healthy) {
+                lastFailedLaunch = 0;
                 log.info("[WhatsAppServiceLauncher] Local WhatsApp engine successfully started and online on port 3005!");
                 return true;
             } else {
+                lastFailedLaunch = System.currentTimeMillis();
                 log.warn("[WhatsAppServiceLauncher] WhatsApp service was spawned but did not respond to /health in time.");
                 return false;
             }
 
         } catch (Exception e) {
+            lastFailedLaunch = System.currentTimeMillis();
             log.error("[WhatsAppServiceLauncher] Failed to launch WhatsApp microservice: {}", e.getMessage());
             return false;
         } finally {

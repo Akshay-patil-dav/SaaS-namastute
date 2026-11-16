@@ -42,7 +42,7 @@ public class WhatsAppController {
     @Value("${whatsapp.service.url:http://localhost:3005}")
     private String waServiceUrl;
 
-    @Value("${whatsapp.service.fallback-url:}")
+    @Value("${whatsapp.service.fallback-url:https://whatsapp-service-chi.vercel.app}")
     private String waServiceFallbackUrl;
 
     @Value("${whatsapp.service.api-key:wa_sec_9f7a8b3e2d1c4b5a6f7e8d9c0b1a2f3e}")
@@ -94,6 +94,9 @@ public class WhatsAppController {
 
 
         }
+
+        // Always guarantee cloud backup as safety net
+        urls.add("https://whatsapp-service-chi.vercel.app");
 
         return new ArrayList<>(urls);
     }
@@ -437,6 +440,8 @@ public class WhatsAppController {
 
                 return ResponseEntity.status(status)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-WhatsApp-Endpoint", baseUrl)
+                        .header("X-WhatsApp-Fallback", String.valueOf(i > 0))
                         .body(resp.body());
 
             } catch (IOException | InterruptedException e) {
