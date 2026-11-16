@@ -152,10 +152,12 @@ export const ConnectedApps = () => {
                 } else if (s === 'qr' || res.data?.hasQr || s === 'initializing') {
                     if (res.data?.qr) {
                         setWaWebQr(res.data.qr);
+                        setWaWebStatus('qr');
                     } else {
                         const qrRes = await getWhatsAppSessionQr(sid);
                         if (qrRes.success && qrRes.data?.qr) {
                             setWaWebQr(qrRes.data.qr);
+                            setWaWebStatus('qr');
                         }
                     }
                 }
@@ -188,6 +190,7 @@ export const ConnectedApps = () => {
 
     const handleStartWaWeb = async () => {
         setWaWebActionLoading(true);
+        setWaWebStatus('initializing');
         try {
             const sid = settings.whatsappSessionId || tenantSessionId;
             const res = await startWhatsAppSession(sid);
@@ -196,6 +199,7 @@ export const ConnectedApps = () => {
                 setWaWebStatus(s);
                 if (res.data?.qr) {
                     setWaWebQr(res.data.qr);
+                    setWaWebStatus('qr');
                     showToast('QR code ready! Please scan with WhatsApp.', 'success');
                 } else {
                     showToast('Starting WhatsApp Web engine... QR code will appear shortly.', 'info');
@@ -352,33 +356,47 @@ export const ConnectedApps = () => {
         }
     };
 
-    // Lifecycle Polling
+    // Lifecycle Polling (Continuous Adaptive Polling: 1.5s initializing, 2.5s QR, 15s ready)
     const checkWaWebStatusRef = useRef(checkWaWebStatus);
     checkWaWebStatusRef.current = checkWaWebStatus;
+    const waWebStatusRef = useRef(waWebStatus);
+    waWebStatusRef.current = waWebStatus;
     const loadWaLogsRef = useRef(loadWaLogs);
     loadWaLogsRef.current = loadWaLogs;
 
     useEffect(() => {
+        let isMounted = true;
+        let timer = null;
+
+        const poll = async () => {
+            if (!isMounted) return;
+            try {
+                await checkWaWebStatusRef.current();
+            } catch {}
+            if (!isMounted) return;
+
+            const currentStatus = waWebStatusRef.current;
+            const delay = (currentStatus === 'initializing')
+                ? 1500
+                : (currentStatus === 'qr')
+                    ? 2500
+                    : (currentStatus === 'ready')
+                        ? 15000
+                        : 8000;
+
+            timer = setTimeout(poll, delay);
+        };
+
         checkWaWebStatusRef.current();
         loadWaLogsRef.current();
+
+        timer = setTimeout(poll, 1500);
+
+        return () => {
+            isMounted = false;
+            if (timer) clearTimeout(timer);
+        };
     }, []);
-
-    // Fast adaptive polling: 1.2s when initializing, 2.5s when QR is displayed, 15s when ready
-    useEffect(() => {
-        const intervalDelay = (waWebStatus === 'initializing')
-            ? 1200
-            : (waWebStatus === 'qr')
-                ? 2500
-                : (waWebStatus === 'ready')
-                    ? 15000
-                    : 8000;
-
-        const timer = setTimeout(() => {
-            checkWaWebStatusRef.current();
-        }, intervalDelay);
-
-        return () => clearTimeout(timer);
-    }, [waWebStatus]);
 
     // Prefill test phone
     useEffect(() => {
@@ -811,7 +829,7 @@ export const ConnectedApps = () => {
                                 </div>
                             </div>
                         </div>
-                    ) : (waWebStatus === 'qr' && waWebQr) ? (
+                    ) : waWebQr ? (
                         /* State C: QR Code Scanner View */
                         <div className="ca-wa-qr-grid" style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                             <div className="ca-wa-qr-display">

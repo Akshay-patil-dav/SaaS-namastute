@@ -2,6 +2,7 @@ import { EventEmitter } from 'node:events';
 import whatsappWeb from 'whatsapp-web.js';
 const { Client, LocalAuth } = whatsappWeb;
 import qrcode from 'qrcode';
+import puppeteer from 'puppeteer';
 import { mkdirSync, existsSync, readdirSync, unlinkSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,6 +23,12 @@ function resolveChromePath() {
     if (process.env.PUPPETEER_EXECUTABLE_PATH && existsSync(process.env.PUPPETEER_EXECUTABLE_PATH)) {
         return process.env.PUPPETEER_EXECUTABLE_PATH;
     }
+    try {
+        const pPath = puppeteer.executablePath();
+        if (pPath && existsSync(pPath)) {
+            return pPath;
+        }
+    } catch {}
     const commonPaths = [
         '/usr/bin/google-chrome-stable',
         '/usr/bin/google-chrome',
@@ -99,14 +106,18 @@ export class WhatsAppManager extends EventEmitter {
         const sessionDir = join(WA_SESSION_DIR, `session-${sessionId}`);
         if (existsSync(sessionDir)) {
             const staleLocks = ['DevToolsActivePort', 'SingletonLock', 'SingletonCookie', 'SingletonSocket', 'lockfile'];
-            for (const lockFile of staleLocks) {
-                const lp = join(sessionDir, lockFile);
-                try {
-                    if (existsSync(lp)) {
-                        unlinkSync(lp);
-                        console.log(`[WhatsApp Manager] Cleaned stale lock: ${lockFile}`);
-                    }
-                } catch (ignored) {}
+            const dirsToCheck = [sessionDir, join(sessionDir, 'Default')];
+            for (const d of dirsToCheck) {
+                if (!existsSync(d)) continue;
+                for (const lockFile of staleLocks) {
+                    const lp = join(d, lockFile);
+                    try {
+                        if (existsSync(lp)) {
+                            unlinkSync(lp);
+                            console.log(`[WhatsApp Manager] Cleaned stale lock: ${lp}`);
+                        }
+                    } catch (ignored) {}
+                }
             }
         }
 
