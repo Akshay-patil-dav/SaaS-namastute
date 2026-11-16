@@ -3,7 +3,7 @@ import whatsappWeb from 'whatsapp-web.js';
 const { Client, LocalAuth } = whatsappWeb;
 import qrcode from 'qrcode';
 import puppeteer from 'puppeteer';
-import { mkdirSync, existsSync, readdirSync, unlinkSync } from 'node:fs';
+import { mkdirSync, existsSync, readdirSync, unlinkSync, rmSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -66,12 +66,12 @@ export class WhatsAppManager extends EventEmitter {
     }
 
     /**
-     * Check if saved credentials exist for a session on disk
+     * Check if saved credentials exist for a session on disk (must have completed authentication)
      * @param {string} sessionId
      */
     hasSessionOnDisk(sessionId) {
         if (!sessionId) return false;
-        return existsSync(join(WA_SESSION_DIR, `session-${sessionId}`));
+        return existsSync(join(WA_SESSION_DIR, `session-${sessionId}`, '.ready'));
     }
 
     /**
@@ -85,10 +85,17 @@ export class WhatsAppManager extends EventEmitter {
                 if (entry.isDirectory() && entry.name.startsWith('session-')) {
                     const sessionId = entry.name.slice('session-'.length);
                     if (sessionId && !sessionId.includes('_tenant_') && !this._sessions.has(sessionId)) {
-                        console.log(`[WhatsApp Manager] Auto-restoring preserved session [${sessionId}] from disk...`);
-                        this.getOrCreateSession(sessionId).catch(err => {
-                            console.warn(`[WhatsApp Manager] Auto-restore session [${sessionId}] failed:`, err.message);
-                        });
+                        if (this.hasSessionOnDisk(sessionId)) {
+                            console.log(`[WhatsApp Manager] Auto-restoring preserved authenticated session [${sessionId}] from disk...`);
+                            this.getOrCreateSession(sessionId).catch(err => {
+                                console.warn(`[WhatsApp Manager] Auto-restore session [${sessionId}] failed:`, err.message);
+                            });
+                        } else {
+                            console.log(`[WhatsApp Manager] Cleaning unlinked/stale directory session-${sessionId}`);
+                            try {
+                                rmSync(join(WA_SESSION_DIR, entry.name), { recursive: true, force: true });
+                            } catch {}
+                        }
                     }
                 }
             }
@@ -102,9 +109,19 @@ export class WhatsAppManager extends EventEmitter {
      * @param {string} sessionId
      */
     async _createSession(sessionId) {
-        // Auto-clean stale Chrome lock files from previous crashed sessions
         const sessionDir = join(WA_SESSION_DIR, `session-${sessionId}`);
-        if (existsSync(sessionDir)) {
+        const isPreserved = this.hasSessionOnDisk(sessionId);
+
+        // If not a verified ready session, wipe any partial/corrupt browser files to guarantee a clean pairing
+        if (!isPreserved && existsSync(sessionDir)) {
+            try {
+                rmSync(sessionDir, { recursive: true, force: true });
+                console.log(`[WhatsApp Manager] Purged unauthenticated/stale session directory for [${sessionId}]`);
+            } catch (err) {
+                console.warn(`[WhatsApp Manager] Could not purge stale session directory: ${err.message}`);
+            }
+        } else if (isPreserved && existsSync(sessionDir)) {
+            // Auto-clean stale Chrome lock files from previous crashed sessions
             const staleLocks = ['DevToolsActivePort', 'SingletonLock', 'SingletonCookie', 'SingletonSocket', 'lockfile'];
             const dirsToCheck = [sessionDir, join(sessionDir, 'Default')];
             for (const d of dirsToCheck) {
@@ -122,6 +139,7 @@ export class WhatsAppManager extends EventEmitter {
         }
 
         const chromeExe = resolveChromePath();
+        const userAgentStr = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
         const puppeteerArgs = [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -130,10 +148,6 @@ export class WhatsAppManager extends EventEmitter {
             '--no-first-run',
             '--no-zygote',
             '--disable-gpu',
-            '--disable-features=IsolateOrigins,site-per-process',
-            '--disable-site-isolation-trials',
-            '--disable-web-security',
-            '--disable-blink-features=AutomationControlled',
             '--disable-background-timer-throttling',
             '--disable-backgrounding-occluded-windows',
             '--disable-renderer-backgrounding',
@@ -146,7 +160,9 @@ export class WhatsAppManager extends EventEmitter {
             '--disable-ipc-flooding-protection',
             '--js-flags=--max-old-space-size=1024',
             '--renderer-process-limit=2',
-            '--disable-extensions'
+            '--disable-extensions',
+            `--user-agent=${userAgentStr}`,
+            '--lang=en-US,en'
         ];
 
         console.log(`[WhatsApp Manager] Initializing session [${sessionId}]...`);
@@ -164,9 +180,10 @@ export class WhatsAppManager extends EventEmitter {
                 args: puppeteerArgs,
                 executablePath: chromeExe || undefined,
             },
+            userAgent: userAgentStr,
             webVersionCache: {
-                type: 'local',
-                path: join(WA_SESSION_DIR, '..', '.wwebjs_cache'),
+                type: 'remote',
+                remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.3000.1054721061-alpha.html',
                 strict: false,
             },
         });
@@ -209,6 +226,15 @@ export class WhatsAppManager extends EventEmitter {
             session.qrRaw = null;
             session.info = client.info || null;
             session.readyAt = new Date().toISOString();
+            try {
+                writeFileSync(join(sessionDir, '.ready'), JSON.stringify({
+                    readyAt: session.readyAt,
+                    user: client.info?.wid?.user || null,
+                    pushname: client.info?.pushname || null
+                }));
+            } catch (e) {
+                console.warn(`[WhatsApp Manager] Could not write .ready marker: ${e.message}`);
+            }
             console.log(`[WhatsApp Manager] Session [${sessionId}] is READY! Phone: ${client.info?.wid?.user || 'unknown'}`);
             this.emit(`ready:${sessionId}`, session.info);
         });
@@ -229,7 +255,14 @@ export class WhatsAppManager extends EventEmitter {
             session.error = msg;
             console.error(`[WhatsApp Manager] Session [${sessionId}] auth failure:`, msg);
             this.emit(`auth_failure:${sessionId}`, msg);
-            this._cleanupClient(sessionId);
+            try {
+                if (existsSync(sessionDir)) {
+                    rmSync(sessionDir, { recursive: true, force: true });
+                }
+            } catch {}
+            setTimeout(() => {
+                this._cleanupClient(sessionId);
+            }, 3000);
         });
 
         // ── Event: Disconnected ──────────────────────────────────────────────
@@ -239,7 +272,15 @@ export class WhatsAppManager extends EventEmitter {
             session.info = null;
             console.warn(`[WhatsApp Manager] Session [${sessionId}] disconnected:`, reason);
             this.emit(`disconnected:${sessionId}`, reason);
-            this._cleanupClient(sessionId);
+            const isReady = existsSync(join(sessionDir, '.ready'));
+            if (!isReady) {
+                try {
+                    if (existsSync(sessionDir)) rmSync(sessionDir, { recursive: true, force: true });
+                } catch {}
+            }
+            setTimeout(() => {
+                this._cleanupClient(sessionId);
+            }, 2000);
         });
 
         // ── Event: Message ACK ───────────────────────────────────────────────
@@ -412,15 +453,22 @@ export class WhatsAppManager extends EventEmitter {
      */
     async logoutSession(sessionId = 'default') {
         const session = this._sessions.get(sessionId);
-        if (!session) return;
+        if (session) {
+            try {
+                await session.client.logout();
+            } catch {}
+            try {
+                await session.client.destroy();
+            } catch {}
+            this._sessions.delete(sessionId);
+        }
+        const sessionDir = join(WA_SESSION_DIR, `session-${sessionId}`);
         try {
-            await session.client.logout();
+            if (existsSync(sessionDir)) {
+                rmSync(sessionDir, { recursive: true, force: true });
+            }
         } catch {}
-        try {
-            await session.client.destroy();
-        } catch {}
-        this._sessions.delete(sessionId);
-        console.log(`[WhatsApp Manager] Session [${sessionId}] logged out and removed.`);
+        console.log(`[WhatsApp Manager] Session [${sessionId}] logged out and purged from disk.`);
     }
 
     /**

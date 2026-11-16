@@ -149,6 +149,10 @@ export const ConnectedApps = () => {
                     if (res.data?.info?.phone && settings.whatsappPhone !== res.data.info.phone) {
                         handleChange('whatsappPhone', res.data.info.phone);
                     }
+                } else if (s === 'authenticated' || s === 'loading') {
+                    setWaWebQr(null);
+                } else if (s === 'auth_failure') {
+                    setWaWebQr(null);
                 } else if (s === 'qr' || res.data?.hasQr || s === 'initializing') {
                     if (res.data?.qr) {
                         setWaWebQr(res.data.qr);
@@ -188,12 +192,13 @@ export const ConnectedApps = () => {
         }
     }, [settings.whatsappSessionId, tenantSessionId, settings.whatsappConnected, settings.whatsappPhone, handleChange, loadWaLogs]);
 
-    const handleStartWaWeb = async () => {
+    const handleStartWaWeb = async (force = false) => {
         setWaWebActionLoading(true);
         setWaWebStatus('initializing');
+        setWaWebQr(null);
         try {
             const sid = settings.whatsappSessionId || tenantSessionId;
-            const res = await startWhatsAppSession(sid);
+            const res = await startWhatsAppSession(sid, force);
             if (res.success) {
                 const s = res.data?.status || 'initializing';
                 setWaWebStatus(s);
@@ -829,6 +834,17 @@ export const ConnectedApps = () => {
                                 </div>
                             </div>
                         </div>
+                    ) : (waWebStatus === 'authenticated' || waWebStatus === 'loading') ? (
+                        /* State B2: Pairing Approved & Syncing */
+                        <div className="ca-wa-cta-box" style={{ padding: '40px 20px', background: '#ecfdf5', border: '1.5px solid #10b981', borderRadius: '12px' }}>
+                            <Loader2 size={42} color="#059669" className="spin" style={{ margin: '0 auto 14px' }} />
+                            <div style={{ fontWeight: 700, fontSize: '1.2rem', color: '#065f46' }}>
+                                Pairing Approved! Syncing WhatsApp Web...
+                            </div>
+                            <p style={{ fontSize: '0.88rem', color: '#047857', maxWidth: '480px', margin: '8px auto 0', lineHeight: '1.5' }}>
+                                Your phone accepted the QR code. Syncing device keys and preparing background dispatch. This will turn active in a moment...
+                            </p>
+                        </div>
                     ) : waWebQr ? (
                         /* State C: QR Code Scanner View */
                         <div className="ca-wa-qr-grid" style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
@@ -864,7 +880,7 @@ export const ConnectedApps = () => {
                                         color: '#334155',
                                         fontWeight: 600
                                     }}
-                                    onClick={() => checkWaWebStatus(true)}
+                                    onClick={() => handleStartWaWeb(true)}
                                 >
                                     <RefreshCw size={12} /> Refresh QR Code
                                 </button>
@@ -888,6 +904,37 @@ export const ConnectedApps = () => {
                                         <strong>End-to-End Encrypted Session:</strong> Credentials stay strictly inside your local server directory. Invoices deliver directly from your phone with no third-party cloud forwarding.
                                     </span>
                                 </div>
+                            </div>
+                        </div>
+                    ) : waWebStatus === 'auth_failure' ? (
+                        /* State C2: Device Link Rejected or Timed Out */
+                        <div className="ca-wa-cta-box" style={{ padding: '36px 24px', background: '#fef2f2', border: '1.5px solid #f87171', borderRadius: '12px' }}>
+                            <div className="ca-wa-cta-avatar" style={{ width: '60px', height: '60px', background: '#fee2e2', color: '#dc2626' }}>
+                                <AlertCircle size={32} />
+                            </div>
+                            <div style={{ fontWeight: 700, fontSize: '1.25rem', color: '#991b1b', letterSpacing: '-0.02em' }}>
+                                Device Pairing Was Not Completed
+                            </div>
+                            <p style={{ fontSize: '0.9rem', color: '#b91c1c', maxWidth: '540px', margin: '8px auto 20px', lineHeight: '1.6' }}>
+                                WhatsApp rejected the handshake or the scan was interrupted. Click below to generate a fresh, clean QR code and try again.
+                            </p>
+                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                <button
+                                    type="button"
+                                    className="ca-wa-primary-btn"
+                                    onClick={() => handleStartWaWeb(true)}
+                                    disabled={waWebActionLoading}
+                                >
+                                    {waWebActionLoading ? (
+                                        <>
+                                            <Loader2 size={18} className="spin" /> Generating Clean QR...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <RefreshCw size={18} /> Generate Fresh QR Code
+                                        </>
+                                    )}
+                                </button>
                             </div>
                         </div>
                     ) : waWebStatus === 'initializing' ? (
@@ -927,7 +974,7 @@ export const ConnectedApps = () => {
                                 <button
                                     type="button"
                                     className="ca-wa-primary-btn"
-                                    onClick={handleStartWaWeb}
+                                    onClick={() => handleStartWaWeb(false)}
                                     disabled={waWebActionLoading}
                                 >
                                     {waWebActionLoading ? (

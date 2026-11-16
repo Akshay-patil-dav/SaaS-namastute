@@ -38,14 +38,18 @@ export function createWhatsAppRouter(waManager) {
     });
 
     // POST /session/start — initialize (or re-use) a session
-    // Body: { sessionId?: string }
+    // Body: { sessionId?: string, force?: boolean }
     router.post('/session/start', async (req, res) => {
         const sessionId = (req.body?.sessionId || 'default').trim();
+        const force = Boolean(req.body?.force);
         if (!isValidSessionId(sessionId)) {
             return res.status(400).json({ error: 'Invalid sessionId format. Use alphanumeric, dashes, or underscores (max 64 chars).' });
         }
 
         try {
+            if (force) {
+                await waManager.logoutSession(sessionId);
+            }
             const session = await waManager.getOrCreateSession(sessionId);
 
             // Wait up to 3.5s for initial QR event if currently initializing

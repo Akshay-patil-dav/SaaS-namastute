@@ -162,10 +162,11 @@ export async function getWhatsAppLogs() {
 /**
  * Start/initialize a WhatsApp Web session (launches browser and prepares QR code)
  * @param {string} sessionId
+ * @param {boolean} force Force refresh/purge existing session
  */
-export async function startWhatsAppSession(sessionId = '') {
+export async function startWhatsAppSession(sessionId = '', force = false) {
     try {
-        const res = await apiClient.post('/whatsapp/session/start', { sessionId });
+        const res = await apiClient.post('/whatsapp/session/start', { sessionId, force });
         const isBackup = res.headers?.['x-whatsapp-fallback'] === 'true' || !!res.data?.isBackupEndpoint;
         const endpoint = res.headers?.['x-whatsapp-endpoint'] || (isBackup ? BACKUP_URL : LOCAL_URL);
         return { success: true, data: res.data, isBackup, endpoint };
@@ -173,7 +174,7 @@ export async function startWhatsAppSession(sessionId = '') {
         try {
             const direct = await fetchWithFailover('/session/start', {
                 method: 'POST',
-                body: JSON.stringify({ sessionId })
+                body: JSON.stringify({ sessionId, force })
             });
             return { success: true, data: direct.data, isBackup: direct.isBackup, endpoint: direct.endpoint };
         } catch (directErr) {
