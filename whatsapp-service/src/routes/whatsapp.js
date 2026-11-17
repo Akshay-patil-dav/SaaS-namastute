@@ -52,24 +52,40 @@ export function createWhatsAppRouter(waManager) {
             }
             const session = await waManager.getOrCreateSession(sessionId);
 
-            // Wait up to 3.5s for initial QR event if currently initializing
+            // If QR is already generated or session ready, return immediately
+            if (session.qrCode || session.status === 'ready') {
+                return res.json({
+                    success: true,
+                    sessionId,
+                    status: waManager.getStatus(sessionId),
+                    hasQr: !!waManager.getQr(sessionId),
+                    qr: waManager.getQr(sessionId) || null
+                });
+            }
+
+            // Wait up to 10s for initial QR, ready, or error event if currently initializing
             if (!session.qrCode && session.status === 'initializing') {
                 await new Promise((resolve) => {
-                    const timer = setTimeout(resolve, 3500);
+                    const timer = setTimeout(resolve, 10000);
                     const onEvent = () => {
                         clearTimeout(timer);
                         resolve();
                     };
                     waManager.once(`qr:${sessionId}`, onEvent);
                     waManager.once(`ready:${sessionId}`, onEvent);
+                    waManager.once(`error:${sessionId}`, onEvent);
                 });
             }
-            res.json({
-                success: true,
+
+            const currentStatus = waManager.getStatus(sessionId);
+            const isErr = currentStatus === 'error';
+            res.status(isErr ? 500 : 200).json({
+                success: !isErr,
                 sessionId,
-                status: waManager.getStatus(sessionId),
+                status: currentStatus,
                 hasQr: !!waManager.getQr(sessionId),
-                qr: waManager.getQr(sessionId) || null
+                qr: waManager.getQr(sessionId) || null,
+                error: session.error || null
             });
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -92,13 +108,14 @@ export function createWhatsAppRouter(waManager) {
         const qr = waManager.getQr(sessionId);
 
         res.json({
+            success: true,
             sessionId,
             status,
             isReady: status === 'ready',
             hasQr: !!qr,
             qr: qr || null,
-
             hasSavedSession: waManager.hasSessionOnDisk(sessionId),
+            error: info?.error || null,
             info
         });
     });
@@ -114,12 +131,11 @@ export function createWhatsAppRouter(waManager) {
         const qr = waManager.getQr(sessionId);
 
         res.json({
+            success: true,
             sessionId,
             status,
             hasQr: !!qr,
-            qr: qr || null,
-
-
+            qr: qr || null
         });
     });
 

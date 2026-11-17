@@ -90,6 +90,7 @@ export const ConnectedApps = () => {
 
     // Textarea ref for template variable injection
     const templateTextareaRef = useRef(null);
+    const activePollIntervalRef = useRef(null);
 
     // Multi-tenant & RBAC context
     const tenantId = user?.activeProjectId || user?.id || 'default';
@@ -138,7 +139,12 @@ export const ConnectedApps = () => {
                 setActiveWaUrl(res.endpoint || res.data?.activeEndpoint || (isBackup ? 'https://whatsapp-service-chi.vercel.app' : 'http://localhost:3005'));
 
                 const s = res.data?.status || 'not_initialized';
-                setWaWebStatus(s);
+                // Never downgrade 'initializing' to 'not_initialized' if engine is currently starting
+                if (waWebStatusRef.current === 'initializing' && (s === 'not_initialized' || s === '')) {
+                    // Keep initializing state active in UI
+                } else {
+                    setWaWebStatus(s);
+                }
                 setWaWebInfo(res.data?.info || null);
 
                 if (s === 'ready') {
@@ -193,27 +199,92 @@ export const ConnectedApps = () => {
     }, [settings.whatsappSessionId, tenantSessionId, settings.whatsappConnected, settings.whatsappPhone, handleChange, loadWaLogs]);
 
     const handleStartWaWeb = async (force = false) => {
+        if (activePollIntervalRef.current) {
+            clearInterval(activePollIntervalRef.current);
+            activePollIntervalRef.current = null;
+        }
+
         setWaWebActionLoading(true);
         setWaWebStatus('initializing');
         setWaWebQr(null);
         try {
             const sid = settings.whatsappSessionId || tenantSessionId;
+            showToast('Starting WhatsApp Web engine... QR code will appear shortly.', 'info');
             const res = await startWhatsAppSession(sid, force);
             if (res.success) {
-                const s = res.data?.status || 'initializing';
-                setWaWebStatus(s);
                 if (res.data?.qr) {
                     setWaWebQr(res.data.qr);
                     setWaWebStatus('qr');
                     showToast('QR code ready! Please scan with WhatsApp.', 'success');
-                } else {
-                    showToast('Starting WhatsApp Web engine... QR code will appear shortly.', 'info');
+                    return;
+                } else if (res.data?.status === 'ready') {
+                    setWaWebStatus('ready');
+                    showToast('WhatsApp Business is already connected and ready!', 'success');
+                    return;
                 }
-                setTimeout(() => checkWaWebStatus(), 800);
+
+                // Status is initializing - keep 'initializing' visible in UI and poll actively
+                setWaWebStatus('initializing');
+
+                let attempts = 0;
+                activePollIntervalRef.current = setInterval(async () => {
+                    attempts++;
+                    try {
+                        const qrRes = await getWhatsAppSessionQr(sid);
+                        if (qrRes?.success && qrRes.data?.qr) {
+                            setWaWebQr(qrRes.data.qr);
+                            setWaWebStatus('qr');
+                            if (activePollIntervalRef.current) {
+                                clearInterval(activePollIntervalRef.current);
+                                activePollIntervalRef.current = null;
+                            }
+                            return;
+                        }
+
+                        const pollRes = await getWhatsAppSessionStatus(sid);
+                        if (pollRes?.success) {
+                            if (pollRes.data?.qr) {
+                                setWaWebQr(pollRes.data.qr);
+                                setWaWebStatus('qr');
+                                if (activePollIntervalRef.current) {
+                                    clearInterval(activePollIntervalRef.current);
+                                    activePollIntervalRef.current = null;
+                                }
+                                return;
+                            } else if (pollRes.data?.status === 'ready') {
+                                setWaWebStatus('ready');
+                                if (activePollIntervalRef.current) {
+                                    clearInterval(activePollIntervalRef.current);
+                                    activePollIntervalRef.current = null;
+                                }
+                                return;
+                            } else if (pollRes.data?.status === 'error') {
+                                setWaWebStatus('auth_failure');
+                                showToast(pollRes.data?.error || 'WhatsApp engine error. Click Restart to retry.', 'error');
+                                if (activePollIntervalRef.current) {
+                                    clearInterval(activePollIntervalRef.current);
+                                    activePollIntervalRef.current = null;
+                                }
+                                return;
+                            }
+                        }
+                    } catch {}
+
+                    if (attempts >= 30) {
+                        if (activePollIntervalRef.current) {
+                            clearInterval(activePollIntervalRef.current);
+                            activePollIntervalRef.current = null;
+                        }
+                        setWaWebStatus('auth_failure');
+                        showToast('WhatsApp engine took too long to generate QR. Click Restart to retry.', 'warning');
+                    }
+                }, 1500);
             } else {
+                setWaWebStatus('auth_failure');
                 showToast(res.error || 'Failed to start WhatsApp Web session.', 'error');
             }
         } catch (err) {
+            setWaWebStatus('auth_failure');
             showToast('Error: ' + err.message, 'error');
         } finally {
             setWaWebActionLoading(false);
@@ -400,6 +471,7 @@ export const ConnectedApps = () => {
         return () => {
             isMounted = false;
             if (timer) clearTimeout(timer);
+            if (activePollIntervalRef.current) clearInterval(activePollIntervalRef.current);
         };
     }, []);
 
@@ -642,7 +714,7 @@ export const ConnectedApps = () => {
                     </div>
 
                     {/* Backup Active Notice */}
-                    {isUsingBackup && waWebHealth === true && (
+                    {/* {isUsingBackup && waWebHealth === true && (
                         <div style={{
                             background: '#eff6ff',
                             border: '1.5px solid #bfdbfe',
@@ -658,7 +730,7 @@ export const ConnectedApps = () => {
                                 <strong>Cloud Backup Connected:</strong> Local port 3005 is offline, so requests are seamlessly routing to the backup engine at <code>whatsapp-service-chi.vercel.app</code>.
                             </div>
                         </div>
-                    )}
+                    )} */}
 
                     {/* State A: Engine Offline Warning */}
                     {waWebHealth === false ? (
@@ -955,6 +1027,14 @@ export const ConnectedApps = () => {
                                     style={{ padding: '6px 14px', fontSize: '0.8rem' }}
                                 >
                                     <RefreshCw size={13} /> Check Status
+                                </button>
+                                <button
+                                    type="button"
+                                    className="ca-btn-test"
+                                    onClick={() => handleStartWaWeb(true)}
+                                    style={{ padding: '6px 14px', fontSize: '0.8rem', color: '#0284c7' }}
+                                >
+                                    <RefreshCw size={13} /> Restart Engine
                                 </button>
                             </div>
                         </div>

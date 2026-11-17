@@ -94,8 +94,13 @@ public class WhatsAppServiceLauncher {
             return false;
         }
 
-        // Avoid repeated startup stalls if launching already failed recently; allows instant failover
-        if (System.currentTimeMillis() - lastFailedLaunch < RETRY_COOLDOWN_MS) {
+        // If process is already spawned and alive, wait for health check
+        if (processInstance != null && processInstance.isAlive()) {
+            return waitForHealth(6000);
+        }
+
+        // Avoid repeated rapid startup attempts if launch threw error within last 15s
+        if (System.currentTimeMillis() - lastFailedLaunch < 15_000) {
             return false;
         }
 
@@ -153,7 +158,7 @@ public class WhatsAppServiceLauncher {
             // Register JVM shutdown hook to cleanly terminate the microservice
             Runtime.getRuntime().addShutdownHook(new Thread(this::stopService, "whatsapp-service-shutdown"));
 
-            boolean healthy = waitForHealth(5000);
+            boolean healthy = waitForHealth(15000);
             if (healthy) {
                 lastFailedLaunch = 0;
                 log.info("[WhatsAppServiceLauncher] Local WhatsApp engine successfully started and online on port 3005!");
@@ -199,19 +204,17 @@ public class WhatsAppServiceLauncher {
         String userDir = System.getProperty("user.dir", ".");
         File current = new File(userDir);
 
-        File[] candidates = new File[] {
-                new File(current, "whatsapp-service"),
-                new File(current, "../whatsapp-service"),
-                new File(current.getParentFile(), "whatsapp-service"),
-                new File(current, "../../whatsapp-service")
-        };
-
-        for (File candidate : candidates) {
-            try {
-                if (candidate.exists() && candidate.isDirectory() && new File(candidate, "package.json").exists()) {
-                    return candidate.getCanonicalFile();
+        File p = current;
+        for (int i = 0; i < 5 && p != null; i++) {
+            File c = new File(p, "whatsapp-service");
+            if (c.exists() && c.isDirectory() && new File(c, "package.json").exists()) {
+                try {
+                    return c.getCanonicalFile();
+                } catch (Exception ignored) {
+                    return c;
                 }
-            } catch (Exception ignored) {}
+            }
+            p = p.getParentFile();
         }
         return null;
     }

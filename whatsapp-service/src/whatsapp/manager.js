@@ -23,25 +23,26 @@ function resolveChromePath() {
     if (process.env.PUPPETEER_EXECUTABLE_PATH && existsSync(process.env.PUPPETEER_EXECUTABLE_PATH)) {
         return process.env.PUPPETEER_EXECUTABLE_PATH;
     }
+    const commonPaths = [
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+        'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/google-chrome',
+        '/usr/bin/chromium',
+        '/usr/bin/chromium-browser',
+        '/snap/bin/chromium'
+    ];
+    for (const p of commonPaths) {
+        if (existsSync(p)) return p;
+    }
     try {
         const pPath = puppeteer.executablePath();
         if (pPath && existsSync(pPath)) {
             return pPath;
         }
     } catch {}
-    const commonPaths = [
-        '/usr/bin/google-chrome-stable',
-        '/usr/bin/google-chrome',
-        '/usr/bin/chromium',
-        '/usr/bin/chromium-browser',
-        '/snap/bin/chromium',
-        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
-    ];
-    for (const p of commonPaths) {
-        if (existsSync(p)) return p;
-    }
     return undefined; // Puppeteer uses its own installed Chromium
 }
 
@@ -139,30 +140,12 @@ export class WhatsAppManager extends EventEmitter {
         }
 
         const chromeExe = resolveChromePath();
-        const userAgentStr = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
         const puppeteerArgs = [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--disable-gpu',
-            '--disable-background-timer-throttling',
-            '--disable-backgrounding-occluded-windows',
-            '--disable-renderer-backgrounding',
-            '--disable-component-update',
-            '--disable-sync',
-            '--disable-default-apps',
-            '--no-default-browser-check',
-            '--mute-audio',
-            '--disable-domain-reliability',
-            '--disable-ipc-flooding-protection',
-            '--js-flags=--max-old-space-size=1024',
-            '--renderer-process-limit=2',
             '--disable-extensions',
-            `--user-agent=${userAgentStr}`,
-            '--lang=en-US,en'
+            '--no-first-run'
         ];
 
         console.log(`[WhatsApp Manager] Initializing session [${sessionId}]...`);
@@ -177,14 +160,12 @@ export class WhatsAppManager extends EventEmitter {
             }),
             puppeteer: {
                 headless: true,
+                pipe: true,
                 args: puppeteerArgs,
                 executablePath: chromeExe || undefined,
             },
-            userAgent: userAgentStr,
             webVersionCache: {
-                type: 'remote',
-                remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.3000.1054721061-alpha.html',
-                strict: false,
+                type: 'none',
             },
         });
 
@@ -294,7 +275,7 @@ export class WhatsAppManager extends EventEmitter {
             console.error(`[WhatsApp Manager] Session [${sessionId}] initialization failed:`, err.message);
             session.status = 'error';
             session.error = err.message;
-            this._cleanupClient(sessionId);
+            this.emit(`error:${sessionId}`, err.message);
         });
 
         return session;

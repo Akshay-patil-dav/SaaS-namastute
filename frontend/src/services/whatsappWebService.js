@@ -15,7 +15,7 @@ import apiClient from '@/api/config';
  */
 
 const LOCAL_URL = (import.meta.env?.VITE_WHATSAPP_LOCAL_URL || 'http://localhost:3005').replace(/\/+$/, '');
-const BACKUP_URL = (import.meta.env?.VITE_WHATSAPP_FALLBACK_URL || 'https://whatsapp-service-chi.vercel.app').replace(/\/+$/, '');
+const BACKUP_URL = (import.meta.env?.VITE_WHATSAPP_FALLBACK_URL || '').replace(/\/+$/, '');
 const API_KEY = (import.meta.env?.VITE_WHATSAPP_API_KEY || 'wa_sec_9f7a8b3e2d1c4b5a6f7e8d9c0b1a2f3e').trim();
 
 // Track active endpoint discovered dynamically: { url, isBackup, mode }
@@ -64,20 +64,23 @@ async function fetchDirect(baseUrl, path, options = {}, timeoutMs = 2500) {
  * Execute direct request with automatic failover (localhost:3005 -> Vercel backup)
  */
 async function fetchWithFailover(path, options = {}) {
-    // 1. Try local port 3005 first (fast timeout)
+    // 1. Try local port 3005 first
     try {
-        const data = await fetchDirect(LOCAL_URL, path, options, 1500);
+        const data = await fetchDirect(LOCAL_URL, path, options, 4000);
         activeEndpoint = { url: LOCAL_URL, isBackup: false, mode: 'direct_local' };
         return { data, isBackup: false, endpoint: LOCAL_URL };
     } catch (localErr) {
-        // 2. Automatic switch to cloud backup
-        try {
-            const data = await fetchDirect(BACKUP_URL, path, options, 8000);
-            activeEndpoint = { url: BACKUP_URL, isBackup: true, mode: 'direct_backup' };
-            return { data, isBackup: true, endpoint: BACKUP_URL };
-        } catch (backupErr) {
-            throw new Error(`WhatsApp service unreachable on both localhost:3005 and backup (${BACKUP_URL})`);
+        // 2. Automatic switch to cloud backup if configured
+        if (BACKUP_URL) {
+            try {
+                const data = await fetchDirect(BACKUP_URL, path, options, 8000);
+                activeEndpoint = { url: BACKUP_URL, isBackup: true, mode: 'direct_backup' };
+                return { data, isBackup: true, endpoint: BACKUP_URL };
+            } catch (backupErr) {
+                throw new Error(`WhatsApp service unreachable on localhost:3005 and backup (${BACKUP_URL})`);
+            }
         }
+        throw new Error(`WhatsApp engine on port 3005 is starting or unreachable. (${localErr.message})`);
     }
 }
 

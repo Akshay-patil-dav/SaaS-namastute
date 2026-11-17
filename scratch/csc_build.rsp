@@ -1,0 +1,17 @@
+﻿/nologo
+/target:winexe
+/optimize+
+/platform:anycpu
+/out:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\exe APP\namustutam_POS.exe"
+/win32icon:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\build_payload\app.ico"
+/reference:System.dll
+/reference:System.Drawing.dll
+/reference:System.Windows.Forms.dll
+/resource:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\build_payload\app.jar",AppJar
+/resource:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\build_payload\app.ico",AppIcon
+/resource:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\build_payload\start.bat",StartBat
+/resource:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\build_payload\stop.bat",StopBat
+/resource:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\build_payload\setup_db.bat",SetupDbBat
+/resource:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\build_payload\uninstall.bat",UninstallBat
+/resource:"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\build_payload\README.txt",ReadmeTxt
+"C:\Users\aksha\Desktop\Namustutam-Official\Namustutam\SaaS-namastute\scratch\NamustutamPOS.cs"

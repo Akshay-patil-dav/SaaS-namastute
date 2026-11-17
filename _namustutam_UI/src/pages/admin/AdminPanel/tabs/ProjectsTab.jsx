@@ -4,7 +4,9 @@ import {
     Check, X, Sparkles, FolderGit2, Layers, Globe, Zap, Code2, 
     Shield, MessageCircle, CheckCircle2 
 } from 'lucide-react';
-import { useLandingPage } from '../../../../context/LandingPageContext';
+import { useLandingPage, dedupeByIdOrTitle } from '../../../../context/LandingPageContext';
+import { DEFAULT_LANDING_DATA } from '../../../../data/landingPageDefaultData';
+import { formatLiveUrl } from '../../../../data/projectsData';
 import AdminPagination from '../components/AdminPagination';
 import SectionVisibilityBanner from '../components/SectionVisibilityBanner';
 
@@ -60,7 +62,25 @@ const POPULAR_TECHS = [
 
 export default function ProjectsTab() {
     const { landingData, addProject, updateProject, deleteProject, updateSection } = useLandingPage();
-    const projects = landingData.projects || [];
+    const rawProjects = Array.isArray(landingData?.projects) ? landingData.projects : (DEFAULT_LANDING_DATA.projects || []);
+    const projects = dedupeByIdOrTitle(rawProjects).map((p, idx) => ({
+        ...p,
+        id: p.id || `proj-${idx + 1}`
+    }));
+
+    const currentHeader = {
+        badge: 'Selected Works',
+        title: 'Showcase of Brilliance',
+        subtitle: 'Explore some of our recent flagship projects and enterprise solutions.',
+        ...(landingData.portfolioSection || {})
+    };
+
+    const handleHeaderChange = (field, value) => {
+        updateSection('portfolioSection', {
+            ...currentHeader,
+            [field]: value
+        });
+    };
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -69,6 +89,7 @@ export default function ProjectsTab() {
     const [modalMode, setModalMode] = useState(null); // 'create' | 'edit' | null
     const [editingProj, setEditingProj] = useState(null);
     const [modalTab, setModalTab] = useState('general'); // 'general' | 'overview' | 'features' | 'tech' | 'license' | 'faq'
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Form state for Modal
     const [formData, setFormData] = useState({
@@ -92,12 +113,15 @@ export default function ProjectsTab() {
     });
 
     // Categories
-    const categories = ['ALL', ...new Set(projects.map(p => p.category || 'General'))];
+    const categories = ['ALL', ...new Set(projects.map(p => (p.category || '').trim()).filter(Boolean))];
 
     const filteredProjects = projects.filter(p => {
-        const matchesSearch = (p.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              (p.description || '').toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedCategory === 'ALL' || p.category === selectedCategory;
+        const titleMatch = (p.title || '').toLowerCase().includes(searchTerm.toLowerCase());
+        const descMatch = (p.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+        const techMatch = (Array.isArray(p.techStack) ? p.techStack : [p.techStack])
+            .some(t => (typeof t === 'string' ? t : (t?.name || '')).toLowerCase().includes(searchTerm.toLowerCase()));
+        const matchesSearch = titleMatch || descMatch || techMatch;
+        const matchesCategory = selectedCategory === 'ALL' || (p.category || '').trim() === selectedCategory;
         return matchesSearch && matchesCategory;
     });
 
@@ -109,13 +133,13 @@ export default function ProjectsTab() {
         setFormData({
             title: '',
             author: 'Namustutam',
-            category: 'E-Commerce',
+            category: 'Web Application',
             filter: 'Web Application',
             price: '$99 USD',
             img: '/dashboard1.png',
             description: '',
             techStack: 'React, Spring Boot, PostgreSQL',
-            liveLink: 'http://localhost:5174',
+            liveLink: 'https://',
             githubLink: '#',
             featured: true,
             architectureDescription: '',
@@ -134,28 +158,28 @@ export default function ProjectsTab() {
         setFormData({
             title: proj.title || '',
             author: proj.author || 'Namustutam',
-            category: proj.category || 'E-Commerce',
+            category: proj.category || '',
             filter: proj.filter || 'Web Application',
-            price: proj.price || '$99 USD',
+            price: proj.price !== undefined ? proj.price : '',
             img: proj.img || '/dashboard1.png',
             description: proj.description || '',
             techStack: Array.isArray(proj.techStack) 
-                ? proj.techStack.map(t => typeof t === 'string' ? t : t.name).join(', ') 
-                : (proj.techStack || ''),
-            liveLink: proj.liveLink || '#',
+                ? proj.techStack.map(t => typeof t === 'string' ? t : (t?.name || '')).filter(Boolean).join(', ') 
+                : (typeof proj.techStack === 'string' ? proj.techStack : ''),
+            liveLink: proj.liveLink || '',
             githubLink: proj.githubLink || '#',
             featured: proj.featured !== false,
             architectureDescription: proj.architectureDescription || '',
             whatsIncluded: Array.isArray(proj.whatsIncluded) && proj.whatsIncluded.length > 0 
                 ? proj.whatsIncluded 
-                : [...DEFAULT_WHATS_INCLUDED],
+                : (typeof proj.whatsIncluded === 'string' ? proj.whatsIncluded.split('\n').filter(Boolean) : [...DEFAULT_WHATS_INCLUDED]),
             features: Array.isArray(proj.features) && proj.features.length > 0
-                ? proj.features.map(f => typeof f === 'string' ? f : f.title || f.name || '')
-                : [...DEFAULT_PROJECT_FEATURES],
+                ? proj.features.map(f => typeof f === 'string' ? f : (f?.title || f?.name || ''))
+                : (typeof proj.features === 'string' ? proj.features.split('\n').filter(Boolean) : [...DEFAULT_PROJECT_FEATURES]),
             licenseTier: proj.licenseTier || 'Single End Product',
             licenseTerms: Array.isArray(proj.licenseTerms) && proj.licenseTerms.length > 0
                 ? proj.licenseTerms
-                : [...DEFAULT_LICENSE_TERMS],
+                : (typeof proj.licenseTerms === 'string' ? proj.licenseTerms.split('\n').filter(Boolean) : [...DEFAULT_LICENSE_TERMS]),
             faqs: Array.isArray(proj.faqs) && proj.faqs.length > 0
                 ? proj.faqs
                 : [...DEFAULT_PROJECT_FAQS]
@@ -232,28 +256,35 @@ export default function ProjectsTab() {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        const techArray = formData.techStack.split(',').map(s => s.trim()).filter(Boolean);
+        if (isSubmitting) return;
+        setIsSubmitting(true);
 
-        const projectPayload = {
-            ...formData,
-            techStack: techArray,
-            whatsIncluded: formData.whatsIncluded.filter(item => item && item.trim()),
-            features: formData.features.filter(f => f && f.trim()),
-            licenseTerms: formData.licenseTerms.filter(t => t && t.trim()),
-            faqs: formData.faqs.filter(f => f.q && f.q.trim())
-        };
+        try {
+            const techArray = (formData.techStack || '').split(',').map(s => s.trim()).filter(Boolean);
 
-        if (modalMode === 'create') {
-            addProject(projectPayload);
-        } else if (modalMode === 'edit' && editingProj) {
-            updateProject(editingProj.id, projectPayload);
+            const projectPayload = {
+                ...formData,
+                techStack: techArray,
+                whatsIncluded: (formData.whatsIncluded || []).filter(item => item && item.trim()),
+                features: (formData.features || []).filter(f => f && f.trim()),
+                licenseTerms: (formData.licenseTerms || []).filter(t => t && t.trim()),
+                faqs: (formData.faqs || []).filter(f => f && f.q && f.q.trim())
+            };
+
+            if (modalMode === 'create') {
+                addProject(projectPayload);
+            } else if (modalMode === 'edit' && editingProj) {
+                updateProject(editingProj.id, projectPayload);
+            }
+
+            setModalMode(null);
+        } finally {
+            setIsSubmitting(false);
         }
-
-        setModalMode(null);
     };
 
     const handleDelete = (id, title) => {
-        if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
+        if (window.confirm(`Are you sure you want to delete "${title || 'this project'}"?`)) {
             deleteProject(id);
         }
     };
@@ -285,8 +316,8 @@ export default function ProjectsTab() {
                         <input
                             type="text"
                             className="admin-control-input"
-                            value={landingData.portfolioSection?.badge ?? 'Selected Works'}
-                            onChange={(e) => updateSection('portfolioSection', { badge: e.target.value })}
+                            value={currentHeader.badge}
+                            onChange={(e) => handleHeaderChange('badge', e.target.value)}
                             placeholder="e.g. Selected Works"
                         />
                     </div>
@@ -297,8 +328,8 @@ export default function ProjectsTab() {
                         <input
                             type="text"
                             className="admin-control-input"
-                            value={landingData.portfolioSection?.title ?? 'Showcase of Brilliance'}
-                            onChange={(e) => updateSection('portfolioSection', { title: e.target.value })}
+                            value={currentHeader.title}
+                            onChange={(e) => handleHeaderChange('title', e.target.value)}
                             placeholder="e.g. Showcase of Brilliance"
                         />
                     </div>
@@ -309,8 +340,8 @@ export default function ProjectsTab() {
                         <input
                             type="text"
                             className="admin-control-input"
-                            value={landingData.portfolioSection?.subtitle ?? 'Explore some of our recent flagship projects and enterprise solutions.'}
-                            onChange={(e) => updateSection('portfolioSection', { subtitle: e.target.value })}
+                            value={currentHeader.subtitle}
+                            onChange={(e) => handleHeaderChange('subtitle', e.target.value)}
                             placeholder="e.g. Explore some of our recent flagship projects and enterprise solutions."
                         />
                     </div>
@@ -383,25 +414,54 @@ export default function ProjectsTab() {
                         <div style={{
                             height: '170px',
                             width: '100%',
-                            background: `url(${p.img}) center/cover no-repeat #0a0f1d`,
                             position: 'relative',
-                            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+                            backgroundColor: '#0a0f1d',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                            overflow: 'hidden'
                         }}>
-                            <span style={{
-                                position: 'absolute',
-                                top: '12px',
-                                left: '12px',
-                                background: 'rgba(15, 23, 42, 0.85)',
-                                backdropFilter: 'blur(8px)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                color: '#a5b4fc',
-                                fontSize: '11px',
-                                fontWeight: '700',
-                                padding: '4px 10px',
-                                borderRadius: '9999px'
-                            }}>
-                                {p.category}
-                            </span>
+                            {p.img ? (
+                                <img
+                                    src={p.img}
+                                    alt={p.title || 'Project'}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                    }}
+                                />
+                            ) : null}
+                            <div
+                                style={{
+                                    display: p.img ? 'none' : 'flex',
+                                    width: '100%',
+                                    height: '100%',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+                                    color: '#ff620b'
+                                }}
+                            >
+                                <Layers size={36} />
+                            </div>
+
+                            {p.category && (
+                                <span style={{
+                                    position: 'absolute',
+                                    top: '12px',
+                                    left: '12px',
+                                    background: 'rgba(15, 23, 42, 0.85)',
+                                    backdropFilter: 'blur(8px)',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    color: '#a5b4fc',
+                                    fontSize: '11px',
+                                    fontWeight: '700',
+                                    padding: '4px 10px',
+                                    borderRadius: '9999px',
+                                    zIndex: 2
+                                }}>
+                                    {p.category}
+                                </span>
+                            )}
 
                             {p.price && (
                                 <span style={{
@@ -413,7 +473,8 @@ export default function ProjectsTab() {
                                     fontSize: '11px',
                                     fontWeight: '800',
                                     padding: '4px 10px',
-                                    borderRadius: '9999px'
+                                    borderRadius: '9999px',
+                                    zIndex: 2
                                 }}>
                                     {p.price}
                                 </span>
@@ -432,21 +493,25 @@ export default function ProjectsTab() {
 
                             {/* Tech Stack Tags */}
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', margin: '4px 0' }}>
-                                {(Array.isArray(p.techStack) ? p.techStack : [p.techStack]).map((t, idx) => (
-                                    <span
-                                        key={idx}
-                                        style={{
-                                            background: 'rgba(255, 255, 255, 0.06)',
-                                            color: '#cbd5e1',
-                                            fontSize: '11px',
-                                            fontWeight: '600',
-                                            padding: '2px 8px',
-                                            borderRadius: '6px'
-                                        }}
-                                    >
-                                        {typeof t === 'string' ? t : (t?.name || 'Tech')}
-                                    </span>
-                                ))}
+                                {(Array.isArray(p.techStack) ? p.techStack : [p.techStack]).map((t, idx) => {
+                                    const label = typeof t === 'string' ? t : (t?.name || '');
+                                    if (!label) return null;
+                                    return (
+                                        <span
+                                            key={idx}
+                                            style={{
+                                                background: 'rgba(255, 255, 255, 0.06)',
+                                                color: '#cbd5e1',
+                                                fontSize: '11px',
+                                                fontWeight: '600',
+                                                padding: '2px 8px',
+                                                borderRadius: '6px'
+                                            }}
+                                        >
+                                            {label}
+                                        </span>
+                                    );
+                                })}
                             </div>
 
                             {/* Action Bar */}
@@ -460,11 +525,12 @@ export default function ProjectsTab() {
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     {p.liveLink && p.liveLink !== '#' && (
                                         <a
-                                            href={p.liveLink}
+                                            href={formatLiveUrl(p.liveLink) || p.liveLink}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="admin-btn admin-btn-secondary"
                                             style={{ padding: '6px 10px', fontSize: '12px' }}
+                                            title={`Open live site: ${p.liveLink}`}
                                         >
                                             <ExternalLink size={13} />
                                             <span>Live</span>
@@ -504,9 +570,35 @@ export default function ProjectsTab() {
                         border: '1px dashed rgba(255, 255, 255, 0.1)',
                         color: '#94a3b8'
                     }}>
-                        <FolderGit2 size={40} style={{ color: '#4f46e5', marginBottom: '12px' }} />
+                        <FolderGit2 size={40} style={{ color: '#ff620b', marginBottom: '12px' }} />
                         <h4 style={{ color: '#fff', margin: '0 0 6px' }}>No Projects Found</h4>
-                        <p style={{ margin: 0, fontSize: '14px' }}>Try adjusting your search query or add a new project.</p>
+                        <p style={{ margin: '0 0 16px', fontSize: '14px' }}>
+                            {searchTerm || selectedCategory !== 'ALL'
+                                ? 'Try adjusting your search query or category filter.'
+                                : 'No showcase projects found in the database.'}
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                            <button
+                                type="button"
+                                className="admin-btn admin-btn-primary"
+                                onClick={openCreateModal}
+                            >
+                                <Plus size={15} />
+                                <span>Add New Project</span>
+                            </button>
+                            {projects.length === 0 && (
+                                <button
+                                    type="button"
+                                    className="admin-btn admin-btn-secondary"
+                                    onClick={() => {
+                                        updateSection('projects', DEFAULT_LANDING_DATA.projects);
+                                    }}
+                                >
+                                    <Sparkles size={15} />
+                                    <span>Load Default Showcase Projects</span>
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -1159,8 +1251,15 @@ export default function ProjectsTab() {
                                 >
                                     Cancel
                                 </button>
-                                <button type="submit" className="admin-btn admin-btn-primary">
-                                    {modalMode === 'create' ? 'Create Project' : 'Save Changes'}
+                                <button 
+                                    type="submit" 
+                                    className="admin-btn admin-btn-primary"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting 
+                                        ? 'Saving...' 
+                                        : (modalMode === 'create' ? 'Create Project' : 'Save Changes')
+                                    }
                                 </button>
                             </div>
                         </form>

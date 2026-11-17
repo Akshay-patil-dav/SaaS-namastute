@@ -11,6 +11,20 @@ const cleanLocalLinks = (data) => {
     return data;
 };
 
+export const dedupeByIdOrTitle = (list) => {
+    if (!Array.isArray(list)) return [];
+    const seen = new Set();
+    return list.filter(item => {
+        if (!item) return false;
+        const key = item.id 
+            ? `id:${item.id}` 
+            : `title:${(item.title || item.name || '').trim().toLowerCase()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+};
+
 export const LandingPageProvider = ({ children }) => {
     // Deep merge function to ensure all default sections exist even if older localStorage is present
     const loadInitialData = () => {
@@ -101,16 +115,23 @@ export const LandingPageProvider = ({ children }) => {
                             ...(parsed.posSoftware?.demoInfo || {})
                         }
                     },
+                    portfolioSection: {
+                        ...DEFAULT_LANDING_DATA.portfolioSection,
+                        ...(parsed.portfolioSection || {})
+                    },
                     marquee: { ...DEFAULT_LANDING_DATA.marquee, ...(parsed.marquee || {}) },
                     announcement: { ...DEFAULT_LANDING_DATA.announcement, ...(parsed.announcement || {}) },
                     seo: { ...DEFAULT_LANDING_DATA.seo, ...(parsed.seo || {}) },
                     chatbot: { ...DEFAULT_LANDING_DATA.chatbot, ...(parsed.chatbot || {}) },
                     sectionVisibility: { ...DEFAULT_LANDING_DATA.sectionVisibility, ...(parsed.sectionVisibility || {}) },
-                    services: Array.isArray(parsed.services) ? parsed.services : DEFAULT_LANDING_DATA.services,
-                    projects: Array.isArray(parsed.projects) ? parsed.projects : DEFAULT_LANDING_DATA.projects,
+                    services: dedupeByIdOrTitle(Array.isArray(parsed.services) ? parsed.services : DEFAULT_LANDING_DATA.services),
+                    projects: dedupeByIdOrTitle((Array.isArray(parsed.projects) ? parsed.projects : (DEFAULT_LANDING_DATA.projects || [])).map((p, idx) => ({
+                        ...p,
+                        id: p.id || `proj-${idx + 1}`
+                    }))),
                     sdlcSteps: Array.isArray(parsed.sdlcSteps) ? parsed.sdlcSteps : DEFAULT_LANDING_DATA.sdlcSteps,
-                    team: Array.isArray(parsed.team) ? parsed.team : DEFAULT_LANDING_DATA.team,
-                    testimonials: Array.isArray(parsed.testimonials) ? parsed.testimonials : DEFAULT_LANDING_DATA.testimonials,
+                    team: dedupeByIdOrTitle(Array.isArray(parsed.team) ? parsed.team : DEFAULT_LANDING_DATA.team),
+                    testimonials: dedupeByIdOrTitle(Array.isArray(parsed.testimonials) ? parsed.testimonials : DEFAULT_LANDING_DATA.testimonials),
                 };
             }
         } catch (e) {
@@ -213,7 +234,19 @@ export const LandingPageProvider = ({ children }) => {
                             ...DEFAULT_LANDING_DATA.posSoftware?.demoInfo,
                             ...(cleaned.posSoftware?.demoInfo || {})
                         }
-                    }
+                    },
+                    portfolioSection: {
+                        ...DEFAULT_LANDING_DATA.portfolioSection,
+                        ...(cleaned.portfolioSection || {})
+                    },
+                    projects: dedupeByIdOrTitle((Array.isArray(cleaned.projects) ? cleaned.projects : (DEFAULT_LANDING_DATA.projects || [])).map((p, idx) => ({
+                        ...p,
+                        id: p.id || `proj-${idx + 1}`
+                    }))),
+                    services: dedupeByIdOrTitle(Array.isArray(cleaned.services) ? cleaned.services : (DEFAULT_LANDING_DATA.services || [])),
+                    team: dedupeByIdOrTitle(Array.isArray(cleaned.team) ? cleaned.team : (DEFAULT_LANDING_DATA.team || [])),
+                    testimonials: dedupeByIdOrTitle(Array.isArray(cleaned.testimonials) ? cleaned.testimonials : (DEFAULT_LANDING_DATA.testimonials || [])),
+                    sdlcSteps: Array.isArray(cleaned.sdlcSteps) ? cleaned.sdlcSteps : (DEFAULT_LANDING_DATA.sdlcSteps || [])
                 }));
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
                 return true;
@@ -304,43 +337,52 @@ export const LandingPageProvider = ({ children }) => {
         };
     }, [checkBackendStatus, fetchAndSyncRemoteConfig]);
 
-    // Listen for storage events across tabs
+    // ── Auto-sync landingData to localStorage whenever state changes ─────────
     useEffect(() => {
-        const handleSync = () => {
-            setLandingData(loadInitialData());
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(landingData));
+        } catch (err) {
+            console.warn('Failed to sync landingData to localStorage:', err);
+        }
+    }, [landingData]);
+
+    // ── Listen for storage events across other tabs ──────────────────────────
+    useEffect(() => {
+        const handleSync = (e) => {
+            if (e.key === STORAGE_KEY && e.newValue) {
+                setLandingData(loadInitialData());
+            }
         };
         window.addEventListener('storage', handleSync);
-        window.addEventListener('namustutam_landing_content_saved', handleSync);
         return () => {
             window.removeEventListener('storage', handleSync);
-            window.removeEventListener('namustutam_landing_content_saved', handleSync);
         };
     }, []);
 
     // ── Update helper ────────────────────────────────────────────────────────
     const updateSection = useCallback((sectionKey, partialData) => {
-        setLandingData(prev => {
-            const next = {
-                ...prev,
-                [sectionKey]: {
-                    ...prev[sectionKey],
+        setLandingData(prev => ({
+            ...prev,
+            [sectionKey]: Array.isArray(partialData)
+                ? partialData
+                : {
+                    ...(DEFAULT_LANDING_DATA[sectionKey] || {}),
+                    ...(prev[sectionKey] || {}),
                     ...partialData
                 }
-            };
-            return next;
-        });
+        }));
         setHasUnsavedChanges(true);
     }, []);
 
     // ── Project Actions ──────────────────────────────────────────────────────
     const addProject = useCallback((project) => {
         const newProj = {
-            id: 'proj-' + Date.now(),
+            id: project.id || ('proj-' + Date.now()),
             title: 'New Flagship Project',
             category: 'Web App',
             filter: 'Web Application',
             price: '$99 USD',
-            img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
+            img: '/dashboard1.png',
             techStack: ['React', 'Spring Boot'],
             description: 'Custom developed solution tailored for high performance.',
             liveLink: '#',
@@ -348,18 +390,21 @@ export const LandingPageProvider = ({ children }) => {
             featured: true,
             ...project
         };
+
         setLandingData(prev => {
-            const next = {
-                ...prev,
-                projects: [newProj, ...prev.projects]
-            };
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-                window.dispatchEvent(new Event('namustutam_landing_content_saved'));
-            } catch (err) {
-                console.warn('Failed to sync project addition to localStorage:', err);
+            const currentList = Array.isArray(prev.projects) ? prev.projects : (DEFAULT_LANDING_DATA.projects || []);
+            // Guard: Never add duplicate if same id or same non-empty title already exists
+            const isDuplicate = currentList.some(p => 
+                (p.id && String(p.id) === String(newProj.id)) ||
+                (p.title && newProj.title && p.title.trim().toLowerCase() === newProj.title.trim().toLowerCase())
+            );
+            if (isDuplicate) {
+                return prev;
             }
-            return next;
+            return {
+                ...prev,
+                projects: [newProj, ...currentList]
+            };
         });
         setHasUnsavedChanges(true);
         return newProj;
@@ -367,34 +412,31 @@ export const LandingPageProvider = ({ children }) => {
 
     const updateProject = useCallback((id, updatedFields) => {
         setLandingData(prev => {
-            const next = {
+            const currentList = Array.isArray(prev.projects) ? prev.projects : (DEFAULT_LANDING_DATA.projects || []);
+            return {
                 ...prev,
-                projects: prev.projects.map(p => p.id === id ? { ...p, ...updatedFields } : p)
+                projects: currentList.map(p => {
+                    const isTarget = (p.id && id && String(p.id) === String(id)) ||
+                                     (!p.id && p.title === updatedFields?.title);
+                    return isTarget ? { ...p, ...updatedFields, id: p.id || id || ('proj-' + Date.now()) } : p;
+                })
             };
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-                window.dispatchEvent(new Event('namustutam_landing_content_saved'));
-            } catch (err) {
-                console.warn('Failed to sync project update to localStorage:', err);
-            }
-            return next;
         });
         setHasUnsavedChanges(true);
     }, []);
 
     const deleteProject = useCallback((id) => {
         setLandingData(prev => {
-            const next = {
+            const currentList = Array.isArray(prev.projects) ? prev.projects : (DEFAULT_LANDING_DATA.projects || []);
+            return {
                 ...prev,
-                projects: prev.projects.filter(p => p.id !== id)
+                projects: currentList.filter(p => {
+                    if (p.id && id) {
+                        return String(p.id) !== String(id);
+                    }
+                    return true;
+                })
             };
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-                window.dispatchEvent(new Event('namustutam_landing_content_saved'));
-            } catch (err) {
-                console.warn('Failed to sync project deletion to localStorage:', err);
-            }
-            return next;
         });
         setHasUnsavedChanges(true);
     }, []);
@@ -402,7 +444,7 @@ export const LandingPageProvider = ({ children }) => {
     // ── Services Actions ─────────────────────────────────────────────────────
     const addService = useCallback((service) => {
         const newService = {
-            id: 'srv-' + Date.now(),
+            id: service.id || ('srv-' + Date.now()),
             icon: '⚡',
             title: 'New Service',
             desc: 'Custom enterprise software service for your business growth.',
@@ -410,10 +452,18 @@ export const LandingPageProvider = ({ children }) => {
             active: true,
             ...service
         };
-        setLandingData(prev => ({
-            ...prev,
-            services: [...prev.services, newService]
-        }));
+        setLandingData(prev => {
+            const currentList = Array.isArray(prev.services) ? prev.services : (DEFAULT_LANDING_DATA.services || []);
+            const isDuplicate = currentList.some(s => 
+                (s.id && String(s.id) === String(newService.id)) ||
+                (s.title && newService.title && s.title.trim().toLowerCase() === newService.title.trim().toLowerCase())
+            );
+            if (isDuplicate) return prev;
+            return {
+                ...prev,
+                services: [...currentList, newService]
+            };
+        });
         setHasUnsavedChanges(true);
         return newService;
     }, []);
@@ -421,7 +471,7 @@ export const LandingPageProvider = ({ children }) => {
     const updateService = useCallback((id, updatedFields) => {
         setLandingData(prev => ({
             ...prev,
-            services: prev.services.map(s => s.id === id ? { ...s, ...updatedFields } : s)
+            services: (prev.services || []).map(s => s.id === id ? { ...s, ...updatedFields } : s)
         }));
         setHasUnsavedChanges(true);
     }, []);
@@ -429,7 +479,7 @@ export const LandingPageProvider = ({ children }) => {
     const deleteService = useCallback((id) => {
         setLandingData(prev => ({
             ...prev,
-            services: prev.services.filter(s => s.id !== id)
+            services: (prev.services || []).filter(s => s.id !== id)
         }));
         setHasUnsavedChanges(true);
     }, []);
@@ -437,7 +487,7 @@ export const LandingPageProvider = ({ children }) => {
     // ── Team Actions ─────────────────────────────────────────────────────────
     const addTeamMember = useCallback((member) => {
         const newMember = {
-            id: 'tm-' + Date.now(),
+            id: member.id || ('tm-' + Date.now()),
             name: 'New Team Member',
             role: 'Software Developer',
             badge: 'Contributor',
@@ -446,10 +496,18 @@ export const LandingPageProvider = ({ children }) => {
             socials: { linkedin: '#', twitter: '#' },
             ...member
         };
-        setLandingData(prev => ({
-            ...prev,
-            team: [...prev.team, newMember]
-        }));
+        setLandingData(prev => {
+            const currentList = Array.isArray(prev.team) ? prev.team : (DEFAULT_LANDING_DATA.team || []);
+            const isDuplicate = currentList.some(m => 
+                (m.id && String(m.id) === String(newMember.id)) ||
+                (m.name && newMember.name && m.name.trim().toLowerCase() === newMember.name.trim().toLowerCase())
+            );
+            if (isDuplicate) return prev;
+            return {
+                ...prev,
+                team: [...currentList, newMember]
+            };
+        });
         setHasUnsavedChanges(true);
         return newMember;
     }, []);
@@ -457,7 +515,7 @@ export const LandingPageProvider = ({ children }) => {
     const updateTeamMember = useCallback((id, updatedFields) => {
         setLandingData(prev => ({
             ...prev,
-            team: prev.team.map(m => m.id === id ? { ...m, ...updatedFields } : m)
+            team: (prev.team || []).map(m => m.id === id ? { ...m, ...updatedFields } : m)
         }));
         setHasUnsavedChanges(true);
     }, []);
@@ -465,7 +523,7 @@ export const LandingPageProvider = ({ children }) => {
     const deleteTeamMember = useCallback((id) => {
         setLandingData(prev => ({
             ...prev,
-            team: prev.team.filter(m => m.id !== id)
+            team: (prev.team || []).filter(m => m.id !== id)
         }));
         setHasUnsavedChanges(true);
     }, []);
@@ -473,7 +531,7 @@ export const LandingPageProvider = ({ children }) => {
     // ── Testimonial Actions ──────────────────────────────────────────────────
     const addTestimonial = useCallback((testimonial) => {
         const newTestimonial = {
-            id: 't-' + Date.now(),
+            id: testimonial.id || ('t-' + Date.now()),
             name: 'Happy Client',
             role: 'Business Owner',
             rating: 5,
@@ -481,10 +539,18 @@ export const LandingPageProvider = ({ children }) => {
             avatar: 'C',
             ...testimonial
         };
-        setLandingData(prev => ({
-            ...prev,
-            testimonials: [newTestimonial, ...prev.testimonials]
-        }));
+        setLandingData(prev => {
+            const currentList = Array.isArray(prev.testimonials) ? prev.testimonials : (DEFAULT_LANDING_DATA.testimonials || []);
+            const isDuplicate = currentList.some(t => 
+                (t.id && String(t.id) === String(newTestimonial.id)) ||
+                (t.name && newTestimonial.name && t.name.trim().toLowerCase() === newTestimonial.name.trim().toLowerCase())
+            );
+            if (isDuplicate) return prev;
+            return {
+                ...prev,
+                testimonials: [newTestimonial, ...currentList]
+            };
+        });
         setHasUnsavedChanges(true);
         return newTestimonial;
     }, []);
@@ -492,7 +558,7 @@ export const LandingPageProvider = ({ children }) => {
     const updateTestimonial = useCallback((id, updatedFields) => {
         setLandingData(prev => ({
             ...prev,
-            testimonials: prev.testimonials.map(t => t.id === id ? { ...t, ...updatedFields } : t)
+            testimonials: (prev.testimonials || []).map(t => t.id === id ? { ...t, ...updatedFields } : t)
         }));
         setHasUnsavedChanges(true);
     }, []);
@@ -500,7 +566,7 @@ export const LandingPageProvider = ({ children }) => {
     const deleteTestimonial = useCallback((id) => {
         setLandingData(prev => ({
             ...prev,
-            testimonials: prev.testimonials.filter(t => t.id !== id)
+            testimonials: (prev.testimonials || []).filter(t => t.id !== id)
         }));
         setHasUnsavedChanges(true);
     }, []);
@@ -519,17 +585,13 @@ export const LandingPageProvider = ({ children }) => {
         setLandingData(prev => {
             const currentVis = prev.sectionVisibility || DEFAULT_LANDING_DATA.sectionVisibility || {};
             const isCurrentlyVisible = currentVis[sectionKey] !== false;
-            const updatedVis = {
-                ...currentVis,
-                [sectionKey]: !isCurrentlyVisible
-            };
-            const next = {
+            return {
                 ...prev,
-                sectionVisibility: updatedVis
+                sectionVisibility: {
+                    ...currentVis,
+                    [sectionKey]: !isCurrentlyVisible
+                }
             };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-            window.dispatchEvent(new Event('namustutam_landing_content_saved'));
-            return next;
         });
         setHasUnsavedChanges(true);
     }, []);
@@ -537,17 +599,13 @@ export const LandingPageProvider = ({ children }) => {
     const setSectionVisibility = useCallback((sectionKey, isVisible) => {
         setLandingData(prev => {
             const currentVis = prev.sectionVisibility || DEFAULT_LANDING_DATA.sectionVisibility || {};
-            const updatedVis = {
-                ...currentVis,
-                [sectionKey]: Boolean(isVisible)
-            };
-            const next = {
+            return {
                 ...prev,
-                sectionVisibility: updatedVis
+                sectionVisibility: {
+                    ...currentVis,
+                    [sectionKey]: Boolean(isVisible)
+                }
             };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-            window.dispatchEvent(new Event('namustutam_landing_content_saved'));
-            return next;
         });
         setHasUnsavedChanges(true);
     }, []);
@@ -556,16 +614,24 @@ export const LandingPageProvider = ({ children }) => {
     const saveAndPublish = async () => {
         setIsSaving(true);
         try {
-            // 1. Save locally as fallback
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(landingData));
-            window.dispatchEvent(new Event('namustutam_landing_content_saved'));
+            // Deduplicate all collections before persistence
+            const cleanData = {
+                ...landingData,
+                projects: dedupeByIdOrTitle(landingData.projects),
+                services: dedupeByIdOrTitle(landingData.services),
+                team: dedupeByIdOrTitle(landingData.team),
+                testimonials: dedupeByIdOrTitle(landingData.testimonials)
+            };
+
+            // 1. Save locally
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanData));
 
             let savedToBackend = false;
             let backendMsg = '';
 
             // 2. Persist to Spring Boot backend & PostgreSQL
             try {
-                const res = await apiClient.put('/landing-page', landingData, { timeout: 8000 });
+                const res = await apiClient.put('/landing-page', cleanData, { timeout: 8000 });
                 if (res.data && res.data.success) {
                     savedToBackend = true;
                     backendMsg = res.data.databaseSaved
@@ -578,6 +644,7 @@ export const LandingPageProvider = ({ children }) => {
                 setBackendStatus(prev => ({ ...prev, connected: false, error: backendErr.message }));
             }
 
+            setLandingData(cleanData);
             setHasUnsavedChanges(false);
             setSaveMessage({
                 type: 'success',
