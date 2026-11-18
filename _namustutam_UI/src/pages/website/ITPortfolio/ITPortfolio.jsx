@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Code2, Smartphone, Server, Database, Cloud, ShieldCheck, MonitorPlay, Component, ArrowRight, ArrowUpRight, Star, ExternalLink } from 'lucide-react';
 import { BsArrowRight } from 'react-icons/bs';
 import '../BlogDetail/LandingPage.css';
@@ -215,7 +215,7 @@ export default function ITPortfolio() {
                             <div className="hero-sun-glow" />
 
                             {/* Akshay Portrait Stage */}
-                            <div className="hero-person-stage">
+                            <Link to="/Akshay-Patil" className="hero-person-stage" title="View Akshay Patil Portfolio" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
                                 <img
                                     src={hero.personImage || '/team/Akshay_namustutam.png'}
                                     alt={hero.name || 'Akshay Patil - Namustutam'}
@@ -239,7 +239,7 @@ export default function ITPortfolio() {
                                         <span className="stat-badge-sub">Worked With Globally</span>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         </div>
                     </div>
 
@@ -264,36 +264,59 @@ export default function ITPortfolio() {
                     </div>
 
                     <div className="portfolio-services-grid">
-                        {(Array.isArray(services) ? services : []).filter(s => s && s.active !== false).map((srv, i) => (
-                            <div
-                                key={srv.id || i}
-                                className="portfolio-service-card reveal-up"
-                                style={{ transitionDelay: `${i * 80}ms` }}
-                                onClick={() => srv.link && (srv.link.startsWith('#') ? scrollTo(srv.link) : navigate(srv.link))}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') srv.link && (srv.link.startsWith('#') ? scrollTo(srv.link) : navigate(srv.link)); }}
-                            >
-                                <div className="portfolio-service-card-top">
-                                    <div className="portfolio-service-icon">
-                                        <ServiceIcon icon={srv.icon} title={srv.title} size={28} />
+                        {(Array.isArray(services) ? services : []).filter(s => s && s.active !== false).map((srv, i) => {
+                            const isExternal = srv.link && (srv.link.startsWith('http://') || srv.link.startsWith('https://'));
+                            const isHash = srv.link && srv.link.startsWith('#');
+                            const CardBody = (
+                                <>
+                                    <div className="portfolio-service-card-top">
+                                        <div className="portfolio-service-icon">
+                                            <ServiceIcon icon={srv.icon} title={srv.title} size={28} />
+                                        </div>
+                                        <span className="portfolio-service-badge">
+                                            {String(i + 1).padStart(2, '0')}
+                                        </span>
                                     </div>
-                                    <span className="portfolio-service-badge">
-                                        {String(i + 1).padStart(2, '0')}
-                                    </span>
+                                    <h3 className="portfolio-service-title">
+                                        {srv.title}
+                                    </h3>
+                                    <p className="portfolio-service-desc">
+                                        {srv.desc}
+                                    </p>
+                                    <div className="portfolio-service-link">
+                                        <span>Explore Service</span>
+                                        <BsArrowRight className="portfolio-service-arrow" />
+                                    </div>
+                                </>
+                            );
+
+                            if (srv.link && !isExternal && !isHash) {
+                                return (
+                                    <Link
+                                        key={srv.id || i}
+                                        to={srv.link}
+                                        className="portfolio-service-card reveal-up"
+                                        style={{ transitionDelay: `${i * 80}ms`, textDecoration: 'none', color: 'inherit' }}
+                                    >
+                                        {CardBody}
+                                    </Link>
+                                );
+                            }
+
+                            return (
+                                <div
+                                    key={srv.id || i}
+                                    className="portfolio-service-card reveal-up"
+                                    style={{ transitionDelay: `${i * 80}ms` }}
+                                    onClick={() => srv.link && (isHash ? scrollTo(srv.link) : window.open(srv.link, '_blank'))}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') srv.link && (isHash ? scrollTo(srv.link) : window.open(srv.link, '_blank')); }}
+                                >
+                                    {CardBody}
                                 </div>
-                                <h3 className="portfolio-service-title">
-                                    {srv.title}
-                                </h3>
-                                <p className="portfolio-service-desc">
-                                    {srv.desc}
-                                </p>
-                                <div className="portfolio-service-link">
-                                    <span>Explore Service</span>
-                                    <BsArrowRight className="portfolio-service-arrow" />
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </section>
             )}
@@ -317,14 +340,11 @@ export default function ITPortfolio() {
                             const liveUrl = isLive ? formatLiveUrl(p.liveLink) : null;
 
                             return (
-                                <div
+                                <Link
                                     key={p.id || `project-${i}`}
+                                    to={`/project-info/${slug}`}
                                     className={`portfolio-project-card project-card-${i} reveal-up`}
-                                    style={{ transitionDelay: `${i * 90}ms` }}
-                                    onClick={() => navigate(`/project-info/${slug}`)}
-                                    role="button"
-                                    tabIndex={0}
-                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/project-info/${slug}`); }}
+                                    style={{ transitionDelay: `${i * 90}ms`, textDecoration: 'none', color: 'inherit' }}
                                 >
                                     {/* Media Container */}
                                     <div className="project-card-media">
@@ -333,6 +353,7 @@ export default function ITPortfolio() {
                                                 src={p.img}
                                                 alt={p.title}
                                                 className="project-card-img"
+                                                loading="lazy"
                                                 onError={(e) => {
                                                     e.target.style.display = 'none';
                                                     e.target.parentElement.classList.add('no-img');
@@ -393,15 +414,15 @@ export default function ITPortfolio() {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             );
                         })}
                     </div>
 
                     <div className="portfolio-btn-wrapper" style={{ marginTop: '40px' }}>
-                        <button className="portfolio-btn-outline" onClick={() => navigate('/project-works')}>
+                        <Link to="/project-works" className="portfolio-btn-outline" style={{ textDecoration: 'none', display: 'inline-block' }}>
                             See more project work →
-                        </button>
+                        </Link>
                     </div>
                 </section>
             )}

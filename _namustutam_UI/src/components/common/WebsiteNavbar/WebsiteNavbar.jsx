@@ -111,13 +111,12 @@ const WebsiteNavbar = () => {
 
     const scrollTo = (id) => {
         setMenuOpen(false);
-        if (window.location.pathname !== '/possoftware') {
-            navigate('/possoftware');
-            setTimeout(() => {
-                document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-            }, 300);
-        } else {
-            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        const cleanId = (id || '').replace(/^#/, '');
+        const elem = document.getElementById(cleanId);
+        if (elem) {
+            elem.scrollIntoView({ behavior: 'smooth' });
+        } else if (location.pathname !== '/') {
+            navigate(`/#${cleanId}`);
         }
     };
 

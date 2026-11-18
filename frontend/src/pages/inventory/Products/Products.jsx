@@ -179,6 +179,39 @@ const Products = () => {
         document.body.removeChild(link);
     };
 
+    // ── Export CSV Handler ──────────────────────────────────────────────────
+    const handleExportCsv = () => {
+        if (!filtered.length) {
+            showToast('error', 'No products available to export.');
+            return;
+        }
+        const headers = ['Product Name', 'SKU', 'Category', 'Brand', 'Price', 'Unit', 'Quantity', 'Item Type'];
+        const rows = filtered.map(p => [
+            `"${(p.name || '').replace(/"/g, '""')}"`,
+            `"${p.sku || ''}"`,
+            `"${p.category || ''}"`,
+            `"${p.brand || ''}"`,
+            `"${p.price || 0}"`,
+            `"${p.unit || ''}"`,
+            `"${p.quantity ?? 0}"`,
+            `"${p.itemType || 'STANDARD_ITEM'}"`
+        ]);
+        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute('download', `products_export_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('success', `${filtered.length} products exported successfully.`);
+    };
+
+    // ── Print / PDF Handler ─────────────────────────────────────────────────
+    const handlePrintPdf = () => {
+        window.print();
+    };
+
     const allProducts = dbProducts;
 
     // ── Search & Classification Filter ───────────────────────────────────
@@ -313,27 +346,46 @@ const Products = () => {
                     <div className="ss-header-tools">
                         {canManage('products') && (
                             <>
-                                <button className="ss-btn-icon-square" style={{ color: '#ea5455', borderColor: '#fbdada', background: '#fff1f1' }} title="PDF"><FileText size={16} /></button>
-                                <button className="ss-btn-icon-square" style={{ color: '#28c76f', borderColor: '#d4f4e2', background: '#e9f9ef' }} title="Excel"><FileSpreadsheet size={16} /></button>
+                                <button 
+                                    className="ss-btn-icon-square ss-btn-pdf" 
+                                    title="Export PDF / Print"
+                                    onClick={handlePrintPdf}
+                                >
+                                    <FileText size={16} />
+                                </button>
+                                <button 
+                                    className="ss-btn-icon-square ss-btn-excel" 
+                                    title="Export to Excel / CSV"
+                                    onClick={handleExportCsv}
+                                >
+                                    <FileSpreadsheet size={16} />
+                                </button>
                             </>
                         )}
-                        <button className="ss-btn-icon-square" title="Refresh" onClick={fetchProducts}>
+                        <button 
+                            className="ss-btn-icon-square ss-btn-refresh" 
+                            title="Refresh Products" 
+                            onClick={fetchProducts}
+                        >
                             <RefreshCw size={16} className={loading ? 'spin' : ''} />
                         </button>
                     </div>
+
+                    <span className="ss-header-divider" />
+
                     {canManage('products') && selectedIds.length > 0 && !isMobile && (
                         <button className="ss-btn-red-outline" onClick={handleBulkDelete}>
                             <Trash2 size={16} /> Delete Selected ({selectedIds.length})
                         </button>
                     )}
+
                     {canManage('products') && (
                         <div className="ss-header-primary-btns">
-                            <Link to="/create-product" className="ss-btn-orange ss-btn-add-product" style={{ textDecoration: 'none' }}>
+                            <Link to="/create-product" className="ss-btn-add-product">
                                 <PlusCircle size={18} /> Add Product
                             </Link>
                             <button 
-                                className="ss-btn-orange ss-btn-import-product" 
-                                style={{ background: '#5b6670', borderColor: '#5b6670' }}
+                                className="ss-btn-import-product" 
                                 onClick={() => setShowImportModal(true)}
                             >
                                 <Download size={18} /> Import Product

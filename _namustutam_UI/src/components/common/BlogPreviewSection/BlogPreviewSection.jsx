@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FiArrowRight, FiClock, FiCalendar } from 'react-icons/fi';
 import { DEFAULT_BLOGS } from '../../../data/blogData';
 import apiClient, { ENV } from '../../../api/config';
@@ -92,10 +92,12 @@ export default function BlogPreviewSection() {
             </div>
             <div className="bps-grid">
                 {blogs.map((b, i) => (
-                    <div
+                    <Link
                         key={b.id || i}
+                        to={`/blog/${b.slug}`}
+                        state={{ blog: b.originalBlog }}
                         className="bps-card group"
-                        onClick={() => navigate(`/blog/${b.slug}`, { state: { blog: b.originalBlog } })}
+                        style={{ textDecoration: 'none', color: 'inherit' }}
                     >
                         <div className="bps-card-img-wrapper" style={{ position: 'relative', overflow: 'hidden' }}>
                             {b.imageUrl ? (
@@ -103,6 +105,7 @@ export default function BlogPreviewSection() {
                                     src={b.imageUrl} 
                                     alt={b.title} 
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    loading="lazy"
                                     onError={(e) => { e.target.style.display = 'none'; }}
                                 />
                             ) : (
@@ -127,16 +130,17 @@ export default function BlogPreviewSection() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
             <div className="bps-footer">
-                <button
+                <Link
+                    to="/blog"
                     className="bps-btn-outline"
-                    onClick={() => navigate('/blog')}
+                    style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
                 >
                     View All Articles <FiArrowRight className="bps-btn-icon" />
-                </button>
+                </Link>
             </div>
         </section>
     );

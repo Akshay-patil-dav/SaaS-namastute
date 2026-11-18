@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { LandingPageProvider, useLandingPage } from './context/LandingPageContext';
 import { CompanyProvider } from './context/CompanyContext';
@@ -40,30 +40,61 @@ const BlogPosts = lazy(() => import('./pages/webapp/BlogPosts/BlogPosts.jsx'));
 const AddBlogPost = lazy(() => import('./pages/webapp/AddBlogPost/AddBlogPost.jsx'));
 const EditBlogPost = lazy(() => import('./pages/webapp/EditBlogPost/EditBlogPost.jsx'));
 
-// ── Global page loading fallback ─────────────────────────────────────────────
+// ── Preload high-traffic public pages on idle for instant 0ms routing ────────
+if (typeof window !== 'undefined') {
+    const idlePreload = window.requestIdleCallback || ((cb) => setTimeout(cb, 1200));
+    idlePreload(() => {
+        import('./pages/website/WebDevelopment/WebDevelopment.jsx');
+        import('./pages/website/PosSoftware/PosSoftware.jsx');
+        import('./pages/website/ProjectWorks/ProjectWorks.jsx');
+        import('./pages/website/ContactUs/ContactUs.jsx');
+        import('./pages/website/BlogPage/BlogPage.jsx');
+    });
+}
+
+// ── Scroll to Top on every route transition & handle hash anchor scroll ─────
+function ScrollToTop() {
+    const { pathname, hash } = useLocation();
+
+    useEffect(() => {
+        if (!hash) {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        } else {
+            const cleanId = hash.replace(/^#/, '');
+            const elem = document.getElementById(cleanId);
+            if (elem) {
+                elem.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, [pathname, hash]);
+
+    return null;
+}
+
+// ── Non-blocking Top Progress Bar (Replaces jarring full-screen black spinner) ──
 function PageLoader() {
     return (
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100vh',
-            background: '#090d16',
-            color: '#94a3b8',
-            fontSize: '15px',
-            fontFamily: 'Inter, sans-serif',
-            gap: '12px',
-        }}>
-            <div style={{
-                width: '26px',
-                height: '26px',
-                border: '3px solid rgba(255, 255, 255, 0.1)',
-                borderTopColor: '#6366f1',
-                borderRadius: '50%',
-                animation: 'spin 0.7s linear infinite',
-            }} />
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            <span>Loading Namustutam...</span>
+        <div
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '3px',
+                zIndex: 999999,
+                background: 'linear-gradient(90deg, #ff5b00, #ff902f, #ffb86c)',
+                animation: 'pageProgress 1s ease-in-out infinite',
+            }}
+            role="progressbar"
+            aria-label="Loading page"
+        >
+            <style>{`
+                @keyframes pageProgress {
+                    0% { transform: scaleX(0); transform-origin: left; }
+                    50% { transform: scaleX(0.7); transform-origin: left; }
+                    100% { transform: scaleX(1); transform-origin: right; }
+                }
+            `}</style>
         </div>
     );
 }
@@ -164,6 +195,14 @@ function AppRoutes() {
                 <Route path="/pos-software" element={<Navigate to="/possoftware" replace />} />
                 <Route path="/retail-saas-platform" element={<Navigate to="/possoftware" replace />} />
 
+                {/* Quick Navigation Aliases */}
+                <Route path="/portfolio" element={<Navigate to="/project-works" replace />} />
+                <Route path="/projects" element={<Navigate to="/project-works" replace />} />
+                <Route path="/about" element={<Navigate to="/Akshay-Patil" replace />} />
+                <Route path="/about-us" element={<Navigate to="/Akshay-Patil" replace />} />
+                <Route path="/contact-us" element={<Navigate to="/contact" replace />} />
+                <Route path="/services" element={<Navigate to="/services/web-development" replace />} />
+
                 {/* 404 Fallback for any unknown route */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
@@ -254,6 +293,7 @@ export default function App() {
                 <CompanyProvider>
                     <ConfirmProvider>
                         <BrowserRouter>
+                            <ScrollToTop />
                             <TopHeaderBars />
                             <ChatBot />
                             <ErrorBoundary>

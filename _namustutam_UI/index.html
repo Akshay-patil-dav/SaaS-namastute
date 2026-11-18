@@ -70,7 +70,7 @@
       gap: 32px;
       /* White/light bg matching the app's #f8f9fc dashboard background */
       background: #f8f9fc;
-      transition: opacity 0.6s ease, visibility 0.6s ease;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
     }
 
     #app-loader.hidden {
@@ -331,14 +331,10 @@
       var observer = new MutationObserver(function () {
         if (root.children.length > 0) {
           observer.disconnect();
-          // Small delay so the first frame is painted
+          loader.classList.add('hidden');
           setTimeout(function () {
-            loader.classList.add('hidden');
-            // Remove from DOM after fade finishes
-            setTimeout(function () {
-              loader.remove();
-            }, 700);
-          }, 350);
+            loader.remove();
+          }, 250);
         }
       });
 
